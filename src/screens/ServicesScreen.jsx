@@ -1,0 +1,169 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  StatusBar,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const ServicesScreen = () => {
+  const services = [
+    {
+      id: 1,
+      name: 'Home Caregiver',
+      desc: 'Daily care for elderly & patients',
+      icon: 'account-heart',
+      color: '#2474D4',
+    },
+    {
+      id: 2,
+      name: 'Registered Nurse',
+      desc: 'Professional nursing at home',
+      icon: 'needle',
+      color: '#16B890',
+    },
+    {
+      id: 3,
+      name: 'Hospital Attendant',
+      desc: '24/7 hospital companionship',
+      icon: 'hospital-box',
+      color: '#E67E22',
+    },
+    {
+      id: 4,
+      name: 'Physiotherapy',
+      desc: 'Recovery & rehabilitation at home',
+      icon: 'human-handsup',
+      color: '#9B59B6',
+    },
+    {
+      id: 5,
+      name: 'Baby Care',
+      desc: 'Newborn & infant care support',
+      icon: 'baby-face-outline',
+      color: '#E74C3C',
+    },
+    {
+      id: 6,
+      name: 'Medical Equipment',
+      desc: 'Rent medical devices & supplies',
+      icon: 'medical-bag',
+      color: '#3498DB',
+    },
+  ];
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Services</Text>
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}>
+
+        <Text style={styles.subtitle}>
+          Choose from our professional care services
+        </Text>
+
+        {services.map(service => (
+          <TouchableOpacity
+            key={service.id}
+            activeOpacity={0.8}
+            style={styles.serviceCard}>
+            <View style={[styles.iconBg, {backgroundColor: service.color + '15'}]}>
+              <MaterialCommunityIcons
+                name={service.icon}
+                size={28}
+                color={service.color}
+              />
+            </View>
+            <View style={styles.serviceInfo}>
+              <Text style={styles.serviceName}>{service.name}</Text>
+              <Text style={styles.serviceDesc}>{service.desc}</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#C0C8D6" />
+          </TouchableOpacity>
+        ))}
+
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default ServicesScreen;
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8F9FC',
+  },
+
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 18,
+    paddingBottom: 6,
+  },
+
+  headerTitle: {
+    fontSize: 27,
+    fontWeight: '700',
+    color: '#182331',
+    letterSpacing: -0.4,
+  },
+
+  scrollContent: {
+    paddingBottom: 30,
+    paddingHorizontal: 24,
+  },
+
+  subtitle: {
+    fontSize: 15,
+    color: '#7D8BA5',
+    marginTop: 4,
+    marginBottom: 22,
+  },
+
+  serviceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#EDF1F7',
+  },
+
+  iconBg: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  serviceInfo: {
+    flex: 1,
+    marginLeft: 16,
+  },
+
+  serviceName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#182331',
+  },
+
+  serviceDesc: {
+    fontSize: 13.5,
+    color: '#7D8BA5',
+    marginTop: 3,
+  },
+});

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <font-family name="MaterialCommunityIcons">
+        <font
+            asset="MaterialCommunityIcons.ttf" />
+    </font-family>
+</resources>
