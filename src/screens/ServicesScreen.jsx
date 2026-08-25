@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ServicesScreen = () => {
   const services = [
@@ -16,42 +16,42 @@ const ServicesScreen = () => {
       id: 1,
       name: 'Home Caregiver',
       desc: 'Daily care for elderly & patients',
-      icon: 'account-heart',
+      icon: 'heart-outline',
       color: '#2474D4',
     },
     {
       id: 2,
       name: 'Registered Nurse',
       desc: 'Professional nursing at home',
-      icon: 'needle',
+      icon: 'fitness-outline',
       color: '#16B890',
     },
     {
       id: 3,
       name: 'Hospital Attendant',
       desc: '24/7 hospital companionship',
-      icon: 'hospital-box',
+      icon: 'business-outline',
       color: '#E67E22',
     },
     {
       id: 4,
       name: 'Physiotherapy',
       desc: 'Recovery & rehabilitation at home',
-      icon: 'human-handsup',
+      icon: 'pulse',
       color: '#9B59B6',
     },
     {
       id: 5,
       name: 'Baby Care',
       desc: 'Newborn & infant care support',
-      icon: 'baby-face-outline',
+      icon: 'happy-outline',
       color: '#E74C3C',
     },
     {
       id: 6,
       name: 'Medical Equipment',
       desc: 'Rent medical devices & supplies',
-      icon: 'medical-bag',
+      icon: 'medkit',
       color: '#3498DB',
     },
   ];
@@ -79,7 +79,7 @@ const ServicesScreen = () => {
             activeOpacity={0.8}
             style={styles.serviceCard}>
             <View style={[styles.iconBg, {backgroundColor: service.color + '15'}]}>
-              <MaterialCommunityIcons
+              <Icon
                 name={service.icon}
                 size={28}
                 color={service.color}
@@ -89,7 +89,7 @@ const ServicesScreen = () => {
               <Text style={styles.serviceName}>{service.name}</Text>
               <Text style={styles.serviceDesc}>{service.desc}</Text>
             </View>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#C0C8D6" />
+            <Icon name="chevron-forward" size={24} color="#C0C8D6" />
           </TouchableOpacity>
         ))}
 
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 85,
     paddingHorizontal: 24,
   },
 

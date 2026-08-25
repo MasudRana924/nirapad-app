@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const CreateAccountScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -56,8 +56,8 @@ const CreateAccountScreen = ({navigation}) => {
               activeOpacity={0.7}
               style={styles.backButton}
               onPress={() => navigation?.goBack()}>
-              <MaterialCommunityIcons
-                name="arrow-left"
+              <Icon
+                name="arrow-back"
                 size={27}
                 color="#182331"
               />
@@ -116,8 +116,8 @@ const CreateAccountScreen = ({navigation}) => {
               <Text style={styles.label}>Phone Number</Text>
 
               <View style={styles.inputContainer}>
-                <MaterialCommunityIcons
-                  name="phone-outline"
+                <Icon
+                  name="call-outline"
                   size={22}
                   color="#7D8BA2"
                   style={styles.leftIcon}
@@ -141,8 +141,8 @@ const CreateAccountScreen = ({navigation}) => {
               <Text style={styles.label}>Email (optional)</Text>
 
               <View style={styles.inputContainer}>
-                <MaterialCommunityIcons
-                  name="email-outline"
+                <Icon
+                  name="mail-outline"
                   size={22}
                   color="#7D8BA2"
                   style={styles.leftIcon}
@@ -167,8 +167,8 @@ const CreateAccountScreen = ({navigation}) => {
               <Text style={styles.label}>Password</Text>
 
               <View style={styles.inputContainer}>
-                <MaterialCommunityIcons
-                  name="lock-outline"
+                <Icon
+                  name="lock-closed-outline"
                   size={22}
                   color="#7D8BA2"
                   style={styles.leftIcon}
@@ -195,7 +195,7 @@ const CreateAccountScreen = ({navigation}) => {
                   onPress={() =>
                     setShowPassword(prev => !prev)
                   }>
-                  <MaterialCommunityIcons
+                  <Icon
                     name={
                       showPassword
                         ? 'eye-outline'
@@ -218,8 +218,8 @@ const CreateAccountScreen = ({navigation}) => {
                   agreed && styles.checkboxActive,
                 ]}>
                 {agreed && (
-                  <MaterialCommunityIcons
-                    name="check"
+                  <Icon
+                    name="checkmark"
                     size={17}
                     color="#FFFFFF"
                   />

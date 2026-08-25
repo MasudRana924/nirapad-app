@@ -8,7 +8,7 @@ import {
   StatusBar,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const services = [
   {
@@ -16,21 +16,21 @@ const services = [
     title: 'Hospital Visit Assistance',
     description: 'Accompany patient to hospital, registration & billing',
     price: '৳800',
-    icon: 'hospital-building',
+    icon: 'business',
   },
   {
     id: 'nursing',
     title: 'Home Nursing',
     description: 'Professional nurse visits at home',
     price: '৳1,500',
-    icon: 'stethoscope',
+    icon: 'fitness',
   },
   {
     id: 'elderly',
     title: 'Elderly Companion',
     description: 'Daily companionship and personal assistance',
     price: '৳700',
-    icon: 'heart-handshake',
+    icon: 'heart-outline',
   },
 ];
 
@@ -69,7 +69,7 @@ const NewBookingScreen = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={25} color="#182331" />
+          <Icon name="arrow-back" size={25} color="#182331" />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>New Booking</Text>
@@ -116,7 +116,7 @@ const NewBookingScreen = ({navigation}) => {
                 {/* Icon */}
 
                 <View style={[styles.serviceIcon, selected && styles.serviceIconSelected]}>
-                  <MaterialCommunityIcons
+                  <Icon
                     name={service.icon}
                     size={25}
                     color={selected ? '#FFFFFF' : '#7D8BA5'}
@@ -137,8 +137,8 @@ const NewBookingScreen = ({navigation}) => {
 
                 {selected && (
                   <View style={styles.selectedIcon}>
-                    <MaterialCommunityIcons
-                      name="check-circle-outline"
+                    <Icon
+                      name="checkmark-circle-outline"
                       size={22}
                       color="#1473DC"
                     />
@@ -184,8 +184,8 @@ const NewBookingScreen = ({navigation}) => {
                 {/* Selected */}
 
                 {selected && (
-                  <MaterialCommunityIcons
-                    name="check-circle-outline"
+                  <Icon
+                    name="checkmark-circle-outline"
                     size={22}
                     color="#1473DC"
                   />
@@ -201,7 +201,7 @@ const NewBookingScreen = ({navigation}) => {
             style={styles.addPatientButton}
             onPress={() => navigation?.navigate('AddFamilyMember')}>
             <View style={styles.addIcon}>
-              <MaterialCommunityIcons name="plus" size={25} color="#7D8BA5" />
+              <Icon name="add" size={25} color="#7D8BA5" />
             </View>
 
             <Text style={styles.addPatientText}>Add another family member</Text>

@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const CartScreen = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
@@ -64,7 +64,7 @@ const CartScreen = ({navigation, route}) => {
           activeOpacity={0.8}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={27} color="#182331" />
+          <Icon name="arrow-back" size={27} color="#182331" />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>My Cart</Text>
@@ -79,7 +79,7 @@ const CartScreen = ({navigation, route}) => {
         contentContainerStyle={styles.cartContent}>
         {cartItems.length === 0 ? (
           <View style={styles.emptyCart}>
-            <MaterialCommunityIcons name="cart-off" size={64} color="#C8D0DC" />
+            <Icon name="cart-outline" size={64} color="#C8D0DC" />
             <Text style={styles.emptyText}>Your cart is empty</Text>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -106,7 +106,7 @@ const CartScreen = ({navigation, route}) => {
                         activeOpacity={0.8}
                         style={styles.quantityButton}
                         onPress={() => updateQuantity(item.id, -1)}>
-                        <MaterialCommunityIcons name="minus" size={16} color="#1473DC" />
+                        <Icon name="remove" size={16} color="#1473DC" />
                       </TouchableOpacity>
 
                       <Text style={styles.quantityText}>{item.quantity}</Text>
@@ -115,7 +115,7 @@ const CartScreen = ({navigation, route}) => {
                         activeOpacity={0.8}
                         style={styles.quantityButton}
                         onPress={() => updateQuantity(item.id, 1)}>
-                        <MaterialCommunityIcons name="plus" size={16} color="#1473DC" />
+                        <Icon name="add" size={16} color="#1473DC" />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -125,7 +125,7 @@ const CartScreen = ({navigation, route}) => {
                   activeOpacity={0.8}
                   style={styles.removeButton}
                   onPress={() => removeItem(item.id)}>
-                  <MaterialCommunityIcons name="trash-can-outline" size={20} color="#E34242" />
+                  <Icon name="trash-outline" size={20} color="#E34242" />
                 </TouchableOpacity>
               </View>
             ))}

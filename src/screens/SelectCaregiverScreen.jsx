@@ -10,7 +10,7 @@ import {
   StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const caregivers = [
   {
@@ -86,7 +86,7 @@ const SelectCaregiverScreen = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={27} color="#182331" />
+          <Icon name="arrow-back" size={27} color="#182331" />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Select Caregiver</Text>
@@ -100,7 +100,7 @@ const SelectCaregiverScreen = ({navigation}) => {
 
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
-            <MaterialCommunityIcons name="magnify" size={23} color="#7D8BA5" />
+            <Icon name="search" size={23} color="#7D8BA5" />
 
             <TextInput
               value={search}
@@ -112,7 +112,7 @@ const SelectCaregiverScreen = ({navigation}) => {
           </View>
 
           <TouchableOpacity activeOpacity={0.85} style={styles.filterButton}>
-            <MaterialCommunityIcons name="tune-vertical" size={23} color="#FFFFFF" />
+            <Icon name="options-outline" size={23} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
@@ -145,7 +145,7 @@ const SelectCaregiverScreen = ({navigation}) => {
           <Text style={styles.availableText}>24 caregivers available</Text>
 
           <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
-            <MaterialCommunityIcons name="swap-vertical" size={19} color="#1473DC" />
+            <Icon name="swap-vertical" size={19} color="#1473DC" />
 
             <Text style={styles.sortText}>Sort</Text>
           </TouchableOpacity>
@@ -166,7 +166,7 @@ const SelectCaregiverScreen = ({navigation}) => {
                 <Image source={{uri: caregiver.image}} style={styles.avatar} />
 
                 <View style={styles.verifiedBadge}>
-                  <MaterialCommunityIcons name="check" size={11} color="#FFFFFF" />
+                  <Icon name="checkmark" size={11} color="#FFFFFF" />
                 </View>
               </View>
 
@@ -180,7 +180,7 @@ const SelectCaregiverScreen = ({navigation}) => {
                 {/* Rating */}
 
                 <View style={styles.ratingRow}>
-                  <MaterialCommunityIcons name="star" size={17} color="#F6A900" />
+                  <Icon name="star" size={17} color="#F6A900" />
 
                   <Text style={styles.rating}>{caregiver.rating}</Text>
 
@@ -191,7 +191,7 @@ const SelectCaregiverScreen = ({navigation}) => {
 
                 <View style={styles.metaRow}>
                   <View style={styles.metaItem}>
-                    <MaterialCommunityIcons
+                    <Icon
                       name="briefcase-outline"
                       size={14}
                       color="#7D8BA5"
@@ -201,7 +201,7 @@ const SelectCaregiverScreen = ({navigation}) => {
                   </View>
 
                   <View style={styles.metaItem}>
-                    <MaterialCommunityIcons name="map-marker" size={14} color="#7D8BA5" />
+                    <Icon name="location-sharp" size={14} color="#7D8BA5" />
 
                     <Text style={styles.metaText}>{caregiver.distance}</Text>
                   </View>

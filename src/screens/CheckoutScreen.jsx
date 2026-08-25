@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const CheckoutScreen = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
@@ -51,7 +51,7 @@ const CheckoutScreen = ({navigation, route}) => {
           activeOpacity={0.8}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={27} color="#182331" />
+          <Icon name="arrow-back" size={27} color="#182331" />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Checkout</Text>
@@ -68,7 +68,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
         <View style={styles.inputSection}>
           <View style={styles.inputContainer}>
-            <MaterialCommunityIcons name="map-marker" size={20} color="#7D8BA5" />
+            <Icon name="location-sharp" size={20} color="#7D8BA5" />
             <TextInput
               style={styles.input}
               placeholder="Enter your address"
@@ -79,7 +79,7 @@ const CheckoutScreen = ({navigation, route}) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <MaterialCommunityIcons name="phone" size={20} color="#7D8BA5" />
+            <Icon name="call-outline" size={20} color="#7D8BA5" />
             <TextInput
               style={styles.input}
               placeholder="Phone number"
@@ -110,7 +110,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
             <View style={[styles.radioButton, selectedPayment === 'bkash' && styles.radioButtonSelected]}>
               {selectedPayment === 'bkash' && (
-                <MaterialCommunityIcons name="check" size={14} color="#FFFFFF" />
+                <Icon name="checkmark" size={14} color="#FFFFFF" />
               )}
             </View>
           </TouchableOpacity>
@@ -122,14 +122,14 @@ const CheckoutScreen = ({navigation, route}) => {
             onPress={() => setSelectedPayment('cod')}>
             <View style={styles.paymentLeft}>
               <View style={styles.codIcon}>
-                <MaterialCommunityIcons name="cash" size={20} color="#FFFFFF" />
+                <Icon name="cash-outline" size={20} color="#FFFFFF" />
               </View>
               <Text style={styles.paymentLabel}>Cash on Delivery</Text>
             </View>
 
             <View style={[styles.radioButton, selectedPayment === 'cod' && styles.radioButtonSelected]}>
               {selectedPayment === 'cod' && (
-                <MaterialCommunityIcons name="check" size={14} color="#FFFFFF" />
+                <Icon name="checkmark" size={14} color="#FFFFFF" />
               )}
             </View>
           </TouchableOpacity>

@@ -8,33 +8,33 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const HomeScreen = ({navigation}) => {
   const quickServices = [
     {
       title: 'Hospital',
-      icon: 'hospital-building',
+      icon: 'business',
     },
     {
       title: 'Book Nurse',
-      icon: 'stethoscope',
+      icon: 'fitness',
     },
     {
       title: 'Elderly Care',
-      icon: 'hand-heart-outline',
+      icon: 'heart-outline',
     },
     {
       title: 'Medicine',
-      icon: 'pill',
+      icon: 'medkit-outline',
     },
     {
       title: 'Reports',
-      icon: 'file-document-outline',
+      icon: 'document-text-outline',
     },
     {
       title: 'Doctor',
-      icon: 'account-outline',
+      icon: 'person-outline',
     },
     {
       title: 'Physio',
@@ -42,7 +42,7 @@ const HomeScreen = ({navigation}) => {
     },
     {
       title: 'More',
-      icon: 'view-grid-outline',
+      icon: 'grid-outline',
     },
   ];
 
@@ -114,7 +114,7 @@ const HomeScreen = ({navigation}) => {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}>
@@ -132,7 +132,7 @@ const HomeScreen = ({navigation}) => {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.notificationButton}>
-              <MaterialCommunityIcons name="bell-outline" size={21} color="#172333" />
+              <Icon name="notifications-outline" size={21} color="#172333" />
 
               <View style={styles.notificationDot} />
             </TouchableOpacity>
@@ -167,7 +167,7 @@ const HomeScreen = ({navigation}) => {
           <Text style={styles.bookingPerson}>Abul Hossain (Father)</Text>
 
           <View style={styles.locationRow}>
-            <MaterialCommunityIcons name="map-marker" size={14} color="#FFFFFF" />
+            <Icon name="location-sharp" size={14} color="#FFFFFF" />
 
             <Text style={styles.locationText}>Square Hospital, Dhaka</Text>
           </View>
@@ -175,7 +175,7 @@ const HomeScreen = ({navigation}) => {
           <View style={styles.bookingBottom}>
             <View style={styles.bookingPeople}>
               <View style={styles.avatarWhite}>
-                <MaterialCommunityIcons name="account" size={22} color="#B5C0D0" />
+                <Icon name="person" size={22} color="#B5C0D0" />
               </View>
 
               <Text style={styles.caregiverName}>Rahim Ahmed</Text>
@@ -216,7 +216,7 @@ const HomeScreen = ({navigation}) => {
                 }
               }}>
               <View style={styles.serviceIcon}>
-                <MaterialCommunityIcons name={service.icon} size={24} color="#1473DC" />
+                <Icon name={service.icon} size={24} color="#1473DC" />
               </View>
 
               <Text style={styles.serviceText}>{service.title}</Text>
@@ -271,7 +271,7 @@ const HomeScreen = ({navigation}) => {
             style={styles.addFamilyCard}
             onPress={() => navigation?.navigate('AddFamilyMember')}>
             <View style={styles.addFamilyIcon}>
-              <MaterialCommunityIcons name="plus" size={27} color="#1473DC" />
+              <Icon name="add" size={27} color="#1473DC" />
             </View>
 
             <Text style={styles.addFamilyTitle}>Add Family</Text>
@@ -309,7 +309,7 @@ const HomeScreen = ({navigation}) => {
               <Text style={styles.caregiverName}>{caregiver.name}</Text>
 
               <View style={styles.caregiverRating}>
-                <MaterialCommunityIcons name="star" size={12} color="#F6A900" />
+                <Icon name="star" size={12} color="#F6A900" />
                 <Text style={styles.caregiverRatingText}>{caregiver.rating}</Text>
               </View>
 
@@ -345,7 +345,7 @@ const HomeScreen = ({navigation}) => {
               <Text style={styles.caregiverName}>{nurse.name}</Text>
 
               <View style={styles.caregiverRating}>
-                <MaterialCommunityIcons name="star" size={12} color="#F6A900" />
+                <Icon name="star" size={12} color="#F6A900" />
                 <Text style={styles.caregiverRatingText}>{nurse.rating}</Text>
               </View>
 
@@ -367,8 +367,8 @@ const HomeScreen = ({navigation}) => {
         {/* Activity 1 */}
         <TouchableOpacity activeOpacity={0.8} style={styles.activityCard}>
           <View style={styles.activityIcon}>
-            <MaterialCommunityIcons
-              name="calendar-check-outline"
+            <Icon
+              name="calendar-outline"
               size={21}
               color="#1473DC"
             />
@@ -386,7 +386,7 @@ const HomeScreen = ({navigation}) => {
         {/* Activity 2 */}
         <TouchableOpacity activeOpacity={0.8} style={styles.activityCard}>
           <View style={styles.activityIcon}>
-            <MaterialCommunityIcons name="file-document-outline" size={21} color="#1473DC" />
+            <Icon name="document-text-outline" size={21} color="#1473DC" />
           </View>
 
           <View style={styles.activityContent}>
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingHorizontal: 12,
-    paddingBottom: 25,
+    paddingBottom: 85,
   },
 
   // =====================================================

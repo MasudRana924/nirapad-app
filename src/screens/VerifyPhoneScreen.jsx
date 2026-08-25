@@ -9,7 +9,7 @@ import {
   Keyboard,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const OTP_LENGTH = 4;
 
@@ -108,8 +108,8 @@ const VerifyPhoneScreen = ({navigation, route}) => {
           activeOpacity={0.7}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons
-            name="arrow-left"
+          <Icon
+            name="arrow-back"
             size={27}
             color="#182331"
           />

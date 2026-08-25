@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const CaregiverDetailsScreen = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
@@ -35,11 +35,11 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
           activeOpacity={0.8}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={22} color="#182331" />
+          <Icon name="arrow-back" size={22} color="#182331" />
         </TouchableOpacity>
 
         <TouchableOpacity activeOpacity={0.8} style={styles.shareButton}>
-          <MaterialCommunityIcons name="share-variant-outline" size={20} color="#182331" />
+          <Icon name="share-outline" size={20} color="#182331" />
         </TouchableOpacity>
       </View>
 
@@ -61,7 +61,7 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
             <Image source={{uri: caregiver.image}} style={styles.profileImage} />
 
             <View style={styles.verifiedIcon}>
-              <MaterialCommunityIcons name="check" size={11} color="#FFFFFF" />
+              <Icon name="checkmark" size={11} color="#FFFFFF" />
             </View>
           </View>
 
@@ -80,11 +80,11 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
 
             <View style={styles.ratingRow}>
               <View style={styles.stars}>
-                <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
+                <Icon name="star-outline" size={14} color="#F2A500" />
+                <Icon name="star-outline" size={14} color="#F2A500" />
+                <Icon name="star-outline" size={14} color="#F2A500" />
+                <Icon name="star-outline" size={14} color="#F2A500" />
+                <Icon name="star-outline" size={14} color="#F2A500" />
               </View>
 
               <Text style={styles.ratingNumber}>{caregiver.rating}</Text>
@@ -96,13 +96,13 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
 
             <View style={styles.verificationRow}>
               <View style={styles.verificationBadge}>
-                <MaterialCommunityIcons name="shield-check" size={12} color="#FFFFFF" />
+                <Icon name="shield-checkmark" size={12} color="#FFFFFF" />
 
                 <Text style={styles.verificationText}>ID Verified</Text>
               </View>
 
               <View style={styles.verificationBadge}>
-                <MaterialCommunityIcons name="shield-check" size={12} color="#FFFFFF" />
+                <Icon name="shield-checkmark" size={12} color="#FFFFFF" />
 
                 <Text style={styles.verificationText}>Background Checked</Text>
               </View>
@@ -198,11 +198,11 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
                 <Text style={styles.reviewerName}>Nadia R.</Text>
 
                 <View style={styles.reviewStars}>
-                  <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                  <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                  <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                  <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
-                  <MaterialCommunityIcons name="star-outline" size={14} color="#F2A500" />
+                  <Icon name="star-outline" size={14} color="#F2A500" />
+                  <Icon name="star-outline" size={14} color="#F2A500" />
+                  <Icon name="star-outline" size={14} color="#F2A500" />
+                  <Icon name="star-outline" size={14} color="#F2A500" />
+                  <Icon name="star-outline" size={14} color="#F2A500" />
                 </View>
               </View>
 
@@ -232,7 +232,7 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
           activeOpacity={0.85}
           style={styles.bookButton}
           onPress={() => navigation?.navigate('NewBooking', {caregiver})}>
-          <MaterialCommunityIcons name="calendar-plus-outline" size={19} color="#FFFFFF" />
+          <Icon name="calendar-outline" size={19} color="#FFFFFF" />
 
           <Text style={styles.bookButtonText}>Book Rahim — ৳800/visit</Text>
         </TouchableOpacity>

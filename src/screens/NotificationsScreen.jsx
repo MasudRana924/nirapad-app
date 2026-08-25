@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const NotificationsScreen = () => {
   const notifications = [
@@ -18,7 +18,7 @@ const NotificationsScreen = () => {
       message: 'Your booking with Rahim Ahmed has been confirmed for tomorrow at 10:00 AM',
       time: '2 hours ago',
       type: 'success',
-      icon: 'check-circle',
+      icon: 'checkmark-circle',
     },
     {
       id: 2,
@@ -26,7 +26,7 @@ const NotificationsScreen = () => {
       message: 'Payment of ৳800 for hospital visit has been processed successfully',
       time: '5 hours ago',
       type: 'success',
-      icon: 'credit-card-check',
+      icon: 'card-outline',
     },
     {
       id: 3,
@@ -34,7 +34,7 @@ const NotificationsScreen = () => {
       message: 'Fatema Khanam is now available in your area. Check her profile!',
       time: '1 day ago',
       type: 'info',
-      icon: 'account-plus',
+      icon: 'person-add-outline',
     },
     {
       id: 4,
@@ -42,7 +42,7 @@ const NotificationsScreen = () => {
       message: 'Don\'t forget your upcoming appointment with Karim Mia on Friday',
       time: '2 days ago',
       type: 'warning',
-      icon: 'bell-ring',
+      icon: 'notifications',
     },
     {
       id: 5,
@@ -50,7 +50,7 @@ const NotificationsScreen = () => {
       message: 'Your profile information has been successfully updated',
       time: '3 days ago',
       type: 'info',
-      icon: 'account-check',
+      icon: 'person-outline',
     },
   ];
 
@@ -81,7 +81,7 @@ const NotificationsScreen = () => {
                 notification.type === 'warning' && styles.iconWarning,
                 notification.type === 'info' && styles.iconInfo,
               ]}>
-              <MaterialCommunityIcons
+              <Icon
                 name={notification.icon}
                 size={22}
                 color="#FFFFFF"
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingHorizontal: 24,
-    paddingBottom: 30,
+    paddingBottom: 85,
   },
 
   notificationCard: {

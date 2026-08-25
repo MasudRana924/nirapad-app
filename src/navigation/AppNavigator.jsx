@@ -3,7 +3,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Dimensions} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -33,32 +34,41 @@ function MainTabs() {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2474D4',
-        tabBarInactiveTintColor: '#8995A9',
         tabBarStyle: {
-          height: 55 + insets.bottom,
-          paddingBottom: 5 + insets.bottom,
-          paddingTop: 6,
-          backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#EDF1F7',
-          elevation: 8,
+          height: 65,
+          paddingBottom: 8,
+          paddingTop: 4,
+          backgroundColor: 'rgba(9, 81, 251, 0.92)',
+          position: 'absolute',
+          bottom: 10 + insets.bottom,
+          left: 20,
+          right: 20,
+          borderTopWidth: 0,
+          borderRadius: 25,
+          elevation: 10,
           shadowColor: '#000',
-          shadowOffset: {width: 0, height: -3},
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
+          shadowOffset: {width: 0, height: 4},
+          shadowOpacity: 0.3,
+          shadowRadius: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
+          marginTop: 2,
         },
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#000',
       }}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="home" size={26} color={color} />
+          tabBarIcon: ({focused, color}) => (
+            <Icon
+              name={focused ? 'home' : 'home-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -66,8 +76,12 @@ function MainTabs() {
         name="Services"
         component={ServicesScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="medical-bag" size={26} color={color} />
+          tabBarIcon: ({focused, color}) => (
+            <Icon
+              name={focused ? 'medkit' : 'medkit-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -75,8 +89,12 @@ function MainTabs() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="account" size={26} color={color} />
+          tabBarIcon: ({focused, color}) => (
+            <Icon
+              name={focused ? 'person' : 'person-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -84,8 +102,12 @@ function MainTabs() {
         name="Notifications"
         component={NotificationsScreen}
         options={{
-          tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="bell-outline" size={26} color={color} />
+          tabBarIcon: ({focused, color}) => (
+            <Icon
+              name={focused ? 'notifications' : 'notifications-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />

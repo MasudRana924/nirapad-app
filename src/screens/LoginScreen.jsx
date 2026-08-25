@@ -12,8 +12,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const LoginScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
@@ -45,7 +44,7 @@ const LoginScreen = ({ navigation }) => {
               style={styles.backButton}
               onPress={() => navigation?.goBack()}
             >
-              <Ionicons
+              <Icon
                 name="arrow-back"
                 size={23}
                 color="#111827"
@@ -79,7 +78,7 @@ const LoginScreen = ({ navigation }) => {
 
               <View style={styles.inputContainer}>
 
-                <Ionicons
+                <Icon
                   name="call-outline"
                   size={22}
                   color="#7D8BA3"
@@ -111,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
 
               <View style={styles.inputContainer}>
 
-                <Ionicons
+                <Icon
                   name="lock-closed-outline"
                   size={22}
                   color="#7D8BA3"
@@ -133,7 +132,7 @@ const LoginScreen = ({ navigation }) => {
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.eyeButton}
                 >
-                  <Ionicons
+                  <Icon
                     name={
                       showPassword
                         ? 'eye-outline'
@@ -204,8 +203,8 @@ const LoginScreen = ({ navigation }) => {
 
               <View style={styles.fingerprintCircle}>
 
-                <MaterialCommunityIcons
-                  name="fingerprint"
+                <Icon
+                  name="finger-print"
                   size={25}
                   color="#FFFFFF"
                 />

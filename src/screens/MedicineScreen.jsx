@@ -10,7 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const medicines = [
   {
@@ -135,7 +135,7 @@ const MedicineScreen = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.backButton}
           onPress={() => navigation?.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={27} color="#182331" />
+          <Icon name="arrow-back" size={27} color="#182331" />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Medicine Store</Text>
@@ -144,7 +144,7 @@ const MedicineScreen = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.cartButton}
           onPress={() => navigation?.navigate('Cart', {cart, medicines})}>
-          <MaterialCommunityIcons name="cart-outline" size={24} color="#182331" />
+          <Icon name="cart-outline" size={24} color="#182331" />
 
           {getCartCount() > 0 && (
             <View style={styles.cartBadge}>
@@ -158,8 +158,8 @@ const MedicineScreen = ({navigation}) => {
 
       <View style={styles.searchRow}>
         <View style={styles.searchContainer}>
-          <MaterialCommunityIcons
-            name="magnify"
+          <Icon
+            name="search"
             size={22}
             color="#7D8BA3"
             style={styles.searchIcon}
@@ -175,7 +175,7 @@ const MedicineScreen = ({navigation}) => {
         </View>
 
         <TouchableOpacity activeOpacity={0.85} style={styles.filterButton}>
-          <MaterialCommunityIcons name="tune-vertical" size={23} color="#FFFFFF" />
+          <Icon name="options-outline" size={23} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
@@ -227,7 +227,7 @@ const MedicineScreen = ({navigation}) => {
                         activeOpacity={0.8}
                         style={styles.quantityButton}
                         onPress={() => removeFromCart(medicine.id)}>
-                        <MaterialCommunityIcons name="minus" size={16} color="#1473DC" />
+                        <Icon name="remove" size={16} color="#1473DC" />
                       </TouchableOpacity>
 
                       <Text style={styles.quantityText}>{cart[medicine.id]}</Text>
@@ -236,7 +236,7 @@ const MedicineScreen = ({navigation}) => {
                         activeOpacity={0.8}
                         style={styles.quantityButton}
                         onPress={() => addToCart(medicine)}>
-                        <MaterialCommunityIcons name="plus" size={16} color="#1473DC" />
+                        <Icon name="add" size={16} color="#1473DC" />
                       </TouchableOpacity>
                     </>
                   ) : (
@@ -244,7 +244,7 @@ const MedicineScreen = ({navigation}) => {
                       activeOpacity={0.8}
                       style={styles.addButton}
                       onPress={() => addToCart(medicine)}>
-                      <MaterialCommunityIcons name="plus" size={16} color="#FFFFFF" />
+                      <Icon name="add" size={16} color="#FFFFFF" />
                       <Text style={styles.addButtonText}>Add</Text>
                     </TouchableOpacity>
                   )}

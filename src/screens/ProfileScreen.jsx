@@ -8,16 +8,16 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProfileScreen = ({navigation}) => {
   const menuItems = [
-    {id: 1, name: 'Personal Information', icon: 'account-outline', color: '#2474D4'},
-    {id: 2, name: 'My Bookings', icon: 'clipboard-text-outline', color: '#16B890'},
-    {id: 3, name: 'Payment Methods', icon: 'credit-card-outline', color: '#E67E22'},
-    {id: 4, name: 'Notifications', icon: 'bell-outline', color: '#9B59B6'},
+    {id: 1, name: 'Personal Information', icon: 'person-outline', color: '#2474D4'},
+    {id: 2, name: 'My Bookings', icon: 'clipboard-outline', color: '#16B890'},
+    {id: 3, name: 'Payment Methods', icon: 'card-outline', color: '#E67E22'},
+    {id: 4, name: 'Notifications', icon: 'notifications-outline', color: '#9B59B6'},
     {id: 5, name: 'Help & Support', icon: 'help-circle-outline', color: '#3498DB'},
-    {id: 6, name: 'About Us', icon: 'information-outline', color: '#7D8BA5'},
+    {id: 6, name: 'About Us', icon: 'information-circle-outline', color: '#7D8BA5'},
   ];
 
   return (
@@ -43,7 +43,7 @@ const ProfileScreen = ({navigation}) => {
             <Text style={styles.profilePhone}>+880 1712-345678</Text>
           </View>
           <TouchableOpacity activeOpacity={0.7} style={styles.editButton}>
-            <MaterialCommunityIcons name="pencil-outline" size={20} color="#2474D4" />
+            <Icon name="pencil-outline" size={20} color="#2474D4" />
           </TouchableOpacity>
         </View>
 
@@ -55,14 +55,14 @@ const ProfileScreen = ({navigation}) => {
               activeOpacity={0.7}
               style={styles.menuItem}>
               <View style={[styles.menuIconBg, {backgroundColor: item.color + '15'}]}>
-                <MaterialCommunityIcons
+                <Icon
                   name={item.icon}
                   size={22}
                   color={item.color}
                 />
               </View>
               <Text style={styles.menuText}>{item.name}</Text>
-              <MaterialCommunityIcons name="chevron-right" size={22} color="#C0C8D6" />
+              <Icon name="chevron-forward" size={22} color="#C0C8D6" />
             </TouchableOpacity>
           ))}
         </View>
@@ -72,7 +72,7 @@ const ProfileScreen = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.logoutButton}
           onPress={() => navigation?.navigate('Welcome')}>
-          <MaterialCommunityIcons name="logout" size={22} color="#E74C3C" />
+          <Icon name="log-out-outline" size={22} color="#E74C3C" />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
 
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 85,
   },
 
   header: {
