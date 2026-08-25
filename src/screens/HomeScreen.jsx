@@ -3,157 +3,275 @@ import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const HomeScreen = ({navigation}) => {
-  const services = [
-    {id: 1, name: 'Caregiver', icon: 'account-heart', color: '#2474D4'},
-    {id: 2, name: 'Nurse', icon: 'needle', color: '#16B890'},
-    {id: 3, name: 'Attendant', icon: 'hospital-box', color: '#E67E22'},
-    {id: 4, name: 'Physiotherapy', icon: 'human-handsup', color: '#9B59B6'},
+  const quickServices = [
+    {
+      title: 'Hospital',
+      icon: 'hospital-building',
+    },
+    {
+      title: 'Book Nurse',
+      icon: 'stethoscope',
+    },
+    {
+      title: 'Elderly Care',
+      icon: 'hand-heart-outline',
+    },
+    {
+      title: 'Medicine',
+      icon: 'pill',
+    },
+    {
+      title: 'Reports',
+      icon: 'file-document-outline',
+    },
+    {
+      title: 'Doctor',
+      icon: 'account-outline',
+    },
+    {
+      title: 'Physio',
+      icon: 'pulse',
+    },
+    {
+      title: 'More',
+      icon: 'view-grid-outline',
+    },
   ];
 
   const familyMembers = [
     {
-      id: 1,
       name: 'Abul Hossain',
       relation: 'Father',
       age: '72',
-      avatar: '👴',
+      service: 'At Square Hospital',
+      image: 'https://randomuser.me/api/portraits/men/75.jpg',
+      online: true,
     },
     {
-      id: 2,
       name: 'Farida Begum',
       relation: 'Mother',
       age: '68',
-      avatar: '👵',
+      service: 'At Home',
+      image: 'https://randomuser.me/api/portraits/women/65.jpg',
+      online: false,
     },
   ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}>
+        {/* ================= HEADER ================= */}
 
-        {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Good Evening 👋</Text>
-            <Text style={styles.userName}>Rafiq Hossain</Text>
+            <Text style={styles.goodMorning}>Good morning</Text>
+
+            <Text style={styles.userName}>Nadia Rahman</Text>
           </View>
 
-          <TouchableOpacity activeOpacity={0.7} style={styles.notifButton}>
-            <MaterialCommunityIcons name="bell-outline" size={24} color="#182331" />
-            <View style={styles.notifDot} />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.headerRight}>
+            {/* Notification */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.notificationButton}>
+              <MaterialCommunityIcons name="bell-outline" size={21} color="#172333" />
 
-        {/* Search */}
-        <TouchableOpacity activeOpacity={0.8} style={styles.searchBar}>
-          <MaterialCommunityIcons name="magnify" size={22} color="#8290A8" />
-          <Text style={styles.searchPlaceholder}>Search services, caregivers...</Text>
-        </TouchableOpacity>
+              <View style={styles.notificationDot} />
+            </TouchableOpacity>
 
-        {/* Banner */}
-        <View style={styles.banner}>
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerTitle}>Professional Care</Text>
-            <Text style={styles.bannerSubtitle}>for Your Family</Text>
-            <Text style={styles.bannerDesc}>
-              Book verified caregivers and nurses anytime.
-            </Text>
-            <TouchableOpacity activeOpacity={0.8} style={styles.bannerButton}>
-              <Text style={styles.bannerButtonText}>Book Now</Text>
+            {/* Profile */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.profileButton}>
+              <Image
+                source={{
+                  uri: 'https://randomuser.me/api/portraits/women/44.jpg',
+                }}
+                style={styles.profileImage}
+              />
             </TouchableOpacity>
           </View>
-          <View style={styles.bannerIconContainer}>
-            <MaterialCommunityIcons name="heart-pulse" size={64} color="rgba(255,255,255,0.25)" />
-          </View>
         </View>
 
-        {/* Services */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Our Services</Text>
+        {/* ================= BOOKING CARD ================= */}
+
+        <View style={styles.bookingCard}>
+          <View style={styles.bookingTop}>
+            <Text style={styles.bookingLabel}>Active Booking</Text>
+
+            <View style={styles.onWayBadge}>
+              <Text style={styles.onWayText}>On the Way</Text>
+            </View>
+          </View>
+
+          <Text style={styles.bookingTitle}>Hospital Assistance</Text>
+
+          <Text style={styles.bookingPerson}>Abul Hossain (Father)</Text>
+
+          <View style={styles.locationRow}>
+            <MaterialCommunityIcons name="map-marker" size={14} color="#FFFFFF" />
+
+            <Text style={styles.locationText}>Square Hospital, Dhaka</Text>
+          </View>
+
+          <View style={styles.bookingBottom}>
+            <View style={styles.bookingPeople}>
+              <View style={styles.avatarWhite}>
+                <MaterialCommunityIcons name="account" size={22} color="#B5C0D0" />
+              </View>
+
+              <Text style={styles.caregiverName}>Rahim Ahmed</Text>
+            </View>
+
+            <View style={styles.morePeople}>
+              <View style={styles.smallWhiteCircle} />
+              <View style={styles.smallWhiteCircle} />
+            </View>
+          </View>
+
           <TouchableOpacity activeOpacity={0.7}>
-            <Text style={styles.seeAll}>See All</Text>
+            <Text style={styles.trackLive}>
+              Track Live <Text style={styles.externalIcon}>↗</Text>
+            </Text>
           </TouchableOpacity>
+        </View>
+
+        {/* ================= QUICK SERVICES ================= */}
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Quick Services</Text>
         </View>
 
         <View style={styles.servicesGrid}>
-          {services.map(service => (
+          {quickServices.map((service, index) => (
             <TouchableOpacity
-              key={service.id}
-              activeOpacity={0.8}
-              style={styles.serviceCard}>
-              <View style={[styles.serviceIconBg, {backgroundColor: service.color + '15'}]}>
-                <MaterialCommunityIcons
-                  name={service.icon}
-                  size={28}
-                  color={service.color}
-                />
+              activeOpacity={0.75}
+              key={index}
+              style={styles.serviceItem}
+              onPress={() => {
+                if (service.title === 'Elderly Care') {
+                  navigation?.navigate('SelectCaregiver');
+                }
+              }}>
+              <View style={styles.serviceIcon}>
+                <MaterialCommunityIcons name={service.icon} size={24} color="#1473DC" />
               </View>
-              <Text style={styles.serviceName}>{service.name}</Text>
+
+              <Text style={styles.serviceText}>{service.title}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* Helping Hand */}
+        {/* ================= MY FAMILY ================= */}
+
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Helping Hand</Text>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => navigation?.navigate('SelectCaregiver')}>
-            <Text style={styles.seeAll}>See All</Text>
+          <Text style={styles.sectionTitle}>My Family</Text>
+
+          <TouchableOpacity activeOpacity={0.7}>
+            <Text style={styles.seeAll}>See all</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.familyContainer}>
-          {familyMembers.map(member => (
+        {/* Horizontal flexible family list */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.familyScroll}>
+          {familyMembers.map((member, index) => (
             <TouchableOpacity
-              key={member.id}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
+              key={index}
               style={styles.familyCard}>
-              <View style={styles.familyAvatar}>
-                <Text style={styles.familyAvatarText}>{member.avatar}</Text>
+              <View style={styles.familyImageWrapper}>
+                <Image source={{uri: member.image}} style={styles.familyImage} />
+
+                {member.online && <View style={styles.onlineDot} />}
               </View>
-              <Text style={styles.familyName}>{member.name}</Text>
-              <Text style={styles.familyRelation}>
+
+              <Text numberOfLines={1} style={styles.familyName}>
+                {member.name}
+              </Text>
+
+              <Text style={styles.familyAge}>
                 {member.relation} · {member.age} yrs
               </Text>
+
+              <View style={styles.familyStatus}>
+                <Text style={styles.familyStatusText}>{member.service}</Text>
+              </View>
             </TouchableOpacity>
           ))}
+
+          {/* ADD FAMILY MEMBER */}
 
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.addFamilyCard}
-            onPress={() => navigation?.navigate('SelectCaregiver')}>
-            <MaterialCommunityIcons name="plus" size={28} color="#2474D4" />
-            <Text style={styles.addFamilyText}>Add</Text>
-          </TouchableOpacity>
-        </View>
+            onPress={() => navigation?.navigate('AddFamilyMember')}>
+            <View style={styles.addFamilyIcon}>
+              <MaterialCommunityIcons name="plus" size={27} color="#1473DC" />
+            </View>
 
-        {/* Recent Bookings */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Bookings</Text>
+            <Text style={styles.addFamilyTitle}>Add Family</Text>
+
+            <Text style={styles.addFamilySubtitle}>Member</Text>
+          </TouchableOpacity>
+        </ScrollView>
+
+        {/* ================= RECENT ACTIVITY ================= */}
+
+        <View style={[styles.sectionHeader, styles.activityHeader]}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+
           <TouchableOpacity activeOpacity={0.7}>
-            <Text style={styles.seeAll}>View All</Text>
+            <Text style={styles.seeAll}>See all</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.emptyBooking}>
-          <MaterialCommunityIcons name="clipboard-text-outline" size={48} color="#C8D0DC" />
-          <Text style={styles.emptyText}>No recent bookings</Text>
-          <Text style={styles.emptySubtext}>Your booking history will appear here</Text>
-        </View>
+        {/* Activity 1 */}
+        <TouchableOpacity activeOpacity={0.8} style={styles.activityCard}>
+          <View style={styles.activityIcon}>
+            <MaterialCommunityIcons
+              name="calendar-check-outline"
+              size={21}
+              color="#1473DC"
+            />
+          </View>
 
+          <View style={styles.activityContent}>
+            <Text style={styles.activityTitle}>Booking Completed</Text>
+
+            <Text style={styles.activityDescription}>Hospital Visit — Square Hospital</Text>
+          </View>
+
+          <Text style={styles.activityTime}>Yesterday</Text>
+        </TouchableOpacity>
+
+        {/* Activity 2 */}
+        <TouchableOpacity activeOpacity={0.8} style={styles.activityCard}>
+          <View style={styles.activityIcon}>
+            <MaterialCommunityIcons name="file-document-outline" size={21} color="#1473DC" />
+          </View>
+
+          <View style={styles.activityContent}>
+            <Text style={styles.activityTitle}>Care Report Ready</Text>
+
+            <Text style={styles.activityDescription}>Post-visit report from Rahim</Text>
+            <Text style={styles.activityDescription}>Ahmed</Text>
+          </View>
+
+          <Text style={styles.activityTime}>2 days ago</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -164,261 +282,333 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#F7F9FC',
   },
 
   scrollContent: {
-    paddingBottom: 30,
+    paddingHorizontal: 12,
+    paddingBottom: 25,
   },
 
-  // Header
+  // =====================================================
+  // HEADER
+  // =====================================================
+
   header: {
+    height: 56,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 18,
-    paddingBottom: 8,
+    justifyContent: 'space-between',
   },
 
-  greeting: {
-    fontSize: 15,
-    color: '#7D8BA5',
+  goodMorning: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: '#8190A7',
     fontWeight: '400',
   },
 
   userName: {
-    fontSize: 22,
+    fontSize: 20,
+    lineHeight: 25,
+    color: '#172333',
     fontWeight: '700',
-    color: '#182331',
-    marginTop: 2,
-    letterSpacing: -0.3,
+    marginTop: 1,
   },
 
-  notifButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#EDF1F7',
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+  },
+
+  notificationButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  notifDot: {
+  notificationDot: {
     position: 'absolute',
-    top: 10,
-    right: 12,
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
-    backgroundColor: '#E74C3C',
+    backgroundColor: '#E34242',
+    right: 5,
+    top: 4,
   },
 
-  // Search
-  searchBar: {
-    marginHorizontal: 24,
-    marginTop: 18,
-    height: 50,
+  profileButton: {
+    width: 32,
+    height: 32,
     borderRadius: 16,
-    backgroundColor: '#EFF2F7',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-
-  searchPlaceholder: {
-    marginLeft: 10,
-    fontSize: 15,
-    color: '#8290A8',
-    fontWeight: '400',
-  },
-
-  // Banner
-  banner: {
-    marginHorizontal: 24,
-    marginTop: 22,
-    borderRadius: 20,
-    backgroundColor: '#2474D4',
-    padding: 24,
-    flexDirection: 'row',
     overflow: 'hidden',
   },
 
-  bannerContent: {
-    flex: 1,
+  profileImage: {
+    width: '100%',
+    height: '100%',
   },
 
-  bannerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+  // =====================================================
+  // BOOKING
+  // =====================================================
+
+  bookingCard: {
+    backgroundColor: '#2478D4',
+    borderRadius: 18,
+    padding: 13,
+    marginTop: 13,
+    minHeight: 166,
+  },
+
+  bookingTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  bookingLabel: {
+    fontSize: 11,
+    color: '#DCEBFC',
+  },
+
+  onWayBadge: {
+    backgroundColor: '#FFB900',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+
+  onWayText: {
     color: '#FFFFFF',
+    fontSize: 10.5,
+    fontWeight: '700',
   },
 
-  bannerSubtitle: {
-    fontSize: 20,
+  bookingTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    lineHeight: 20,
     fontWeight: '700',
-    color: 'rgba(255,255,255,0.8)',
+    marginTop: 8,
+  },
+
+  bookingPerson: {
+    color: '#DCEBFC',
+    fontSize: 10.5,
     marginTop: 2,
   },
 
-  bannerDesc: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
-    marginTop: 10,
-    lineHeight: 19,
-  },
-
-  bannerButton: {
-    marginTop: 16,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-
-  bannerButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#2474D4',
-  },
-
-  bannerIconContainer: {
-    justifyContent: 'center',
+  locationRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 10,
+    marginTop: 5,
   },
 
-  // Section
-  sectionHeader: {
+  locationText: {
+    color: '#DCEBFC',
+    fontSize: 10.5,
+    marginLeft: 3,
+  },
+
+  bookingBottom: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginTop: 28,
-    marginBottom: 16,
+    marginTop: 8,
+  },
+
+  bookingPeople: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  avatarWhite: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  caregiverName: {
+    color: '#FFFFFF',
+    fontSize: 10.5,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+
+  morePeople: {
+    flexDirection: 'row',
+    gap: 7,
+  },
+
+  smallWhiteCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+  },
+
+  trackLive: {
+    color: '#FFFFFF',
+    fontSize: 10.5,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+    marginTop: 7,
+  },
+
+  externalIcon: {
+    textDecorationLine: 'none',
+  },
+
+  // =====================================================
+  // SECTION
+  // =====================================================
+
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 17,
+    marginBottom: 9,
   },
 
   sectionTitle: {
-    fontSize: 19,
+    fontSize: 15,
+    lineHeight: 20,
     fontWeight: '700',
-    color: '#182331',
+    color: '#172333',
   },
 
   seeAll: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#2474D4',
+    color: '#1473DC',
   },
 
-  // Services Grid
+  // =====================================================
+  // QUICK SERVICES
+  // =====================================================
+
   servicesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 18,
     justifyContent: 'space-between',
   },
 
-  serviceCard: {
-    width: '47%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 14,
+  serviceItem: {
+    width: '24%',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#EDF1F7',
+    marginBottom: 9,
   },
 
-  serviceIconBg: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+  serviceIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#E9F1FC',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
   },
 
-  serviceName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#182331',
-  },
-
-  // Empty
-  emptyBooking: {
-    alignItems: 'center',
-    paddingVertical: 36,
-    marginHorizontal: 24,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#EDF1F7',
-  },
-
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#8290A8',
-    marginTop: 12,
-  },
-
-  emptySubtext: {
-    fontSize: 14,
-    color: '#A8B3C4',
-    marginTop: 4,
-  },
-
-  // Family Container
-  familyContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 18,
-    marginBottom: 14,
-  },
-
-  familyCard: {
-    width: '31%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#EDF1F7',
-    marginRight: 10,
-  },
-
-  familyAvatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#EDF1F7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-
-  familyAvatarText: {
-    fontSize: 28,
-  },
-
-  familyName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#182331',
-    marginBottom: 3,
-  },
-
-  familyRelation: {
-    fontSize: 11,
-    color: '#7D8BA5',
+  serviceText: {
+    fontSize: 9.5,
+    color: '#172333',
+    marginTop: 5,
     textAlign: 'center',
   },
 
-  addFamilyCard: {
-    width: '31%',
+  // =====================================================
+  // FAMILY
+  // =====================================================
+
+  familyScroll: {
+    paddingRight: 5,
+  },
+
+  familyCard: {
+    width: 121,
+    height: 124,
+    borderRadius: 12,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E1E6EF',
+    alignItems: 'center',
+    paddingTop: 10,
+    marginRight: 9,
+  },
+
+  familyImageWrapper: {
+    position: 'relative',
+  },
+
+  familyImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+
+  onlineDot: {
+    position: 'absolute',
+    right: -1,
+    bottom: 0,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#19B57A',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+
+  familyName: {
+    maxWidth: 105,
+    fontSize: 10.5,
+    lineHeight: 14,
+    fontWeight: '700',
+    color: '#172333',
+    marginTop: 5,
+  },
+
+  familyAge: {
+    fontSize: 9.5,
+    color: '#8190A7',
+    marginTop: 1,
+  },
+
+  familyStatus: {
+    height: 20,
+    minWidth: 100,
+    paddingHorizontal: 6,
+    borderRadius: 5,
+    backgroundColor: '#EAF2FE',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+
+  familyStatusText: {
+    color: '#1473DC',
+    fontSize: 8.5,
+    fontWeight: '600',
+  },
+
+  // =====================================================
+  // ADD FAMILY
+  // =====================================================
+
+  addFamilyCard: {
+    width: 121,
+    height: 124,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

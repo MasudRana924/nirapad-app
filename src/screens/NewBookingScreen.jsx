@@ -7,7 +7,7 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const services = [
@@ -52,6 +52,7 @@ const patients = [
 ];
 
 const NewBookingScreen = ({navigation}) => {
+  const insets = useSafeAreaInsets();
   const [selectedService, setSelectedService] = useState('hospital');
   const [selectedPatient, setSelectedPatient] = useState('abul');
 
@@ -208,14 +209,14 @@ const NewBookingScreen = ({navigation}) => {
         </View>
 
         {/* Space for fixed button */}
-        <View style={styles.bottomSpacing} />
+        <View style={[styles.bottomSpacing, {height: 80 + insets.bottom}]} />
       </ScrollView>
 
       {/* =====================================================
           FIXED CONTINUE BUTTON
       ===================================================== */}
 
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, {bottom: insets.bottom}]}>
         <TouchableOpacity
           activeOpacity={0.85}
           style={styles.continueButton}
@@ -510,7 +511,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
     height: 76,
     backgroundColor: '#F7F9FC',
     paddingTop: 9,

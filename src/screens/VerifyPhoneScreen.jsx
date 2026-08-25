@@ -11,10 +11,10 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const OTP_LENGTH = 6;
+const OTP_LENGTH = 4;
 
 const VerifyPhoneScreen = ({navigation, route}) => {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [seconds, setSeconds] = useState(42);
 
   const inputs = useRef([]);
@@ -126,7 +126,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
         {/* Description */}
         <Text style={styles.description}>
-          We sent a 6-digit code to
+          We sent a 4-digit code to
         </Text>
 
         <Text style={styles.phoneNumber}>
@@ -208,12 +208,12 @@ export default VerifyPhoneScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
   },
 
   header: {
     height: 52,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     paddingHorizontal: 18,
   },

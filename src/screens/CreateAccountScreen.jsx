@@ -208,52 +208,6 @@ const CreateAccountScreen = ({navigation}) => {
               </View>
             </View>
 
-            {/* Confirm Password */}
-            <View style={styles.field}>
-              <Text style={styles.label}>Confirm Password</Text>
-
-              <View style={styles.inputContainer}>
-                <MaterialCommunityIcons
-                  name="lock-outline"
-                  size={22}
-                  color="#7D8BA2"
-                  style={styles.leftIcon}
-                />
-
-                <TextInput
-                  style={[
-                    styles.input,
-                    styles.iconInput,
-                    styles.passwordInput,
-                  ]}
-                  placeholder="Re-enter password"
-                  placeholderTextColor="#8290A8"
-                  secureTextEntry={!showConfirmPassword}
-                  value={form.confirmPassword}
-                  onChangeText={text =>
-                    updateField('confirmPassword', text)
-                  }
-                />
-
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.rightIconButton}
-                  onPress={() =>
-                    setShowConfirmPassword(prev => !prev)
-                  }>
-                  <MaterialCommunityIcons
-                    name={
-                      showConfirmPassword
-                        ? 'eye-outline'
-                        : 'eye-off-outline'
-                    }
-                    size={22}
-                    color="#7D8BA2"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
             {/* Terms */}
             <View style={styles.termsRow}>
               <TouchableOpacity
@@ -317,7 +271,7 @@ export default CreateAccountScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
   },
 
   keyboardView: {
@@ -330,7 +284,7 @@ const styles = StyleSheet.create({
 
   header: {
     height: 52,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     paddingHorizontal: 18,
   },

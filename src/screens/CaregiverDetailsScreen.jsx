@@ -8,10 +8,11 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const CaregiverDetailsScreen = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
   const caregiver = route?.params?.caregiver || {
     name: 'Rahim Ahmed',
     image: 'https://randomuser.me/api/portraits/men/32.jpg',
@@ -219,14 +220,14 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
         </View>
 
         {/* Bottom spacing for fixed button */}
-        <View style={styles.bottomSpace} />
+        <View style={[styles.bottomSpace, {height: 65 + insets.bottom}]} />
       </ScrollView>
 
       {/* =====================================================
           FIXED BOOK BUTTON
       ===================================================== */}
 
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, {bottom: insets.bottom}]}>
         <TouchableOpacity
           activeOpacity={0.85}
           style={styles.bookButton}
@@ -648,7 +649,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
     height: 60,
     backgroundColor: '#F7F9FC',
     paddingTop: 9,
