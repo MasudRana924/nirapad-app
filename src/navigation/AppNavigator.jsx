@@ -16,6 +16,11 @@ import NotificationsScreen from '../screens/NotificationsScreen';
 import SelectCaregiverScreen from '../screens/SelectCaregiverScreen';
 import CaregiverDetailsScreen from '../screens/CaregiverDetailsScreen';
 import NewBookingScreen from '../screens/NewBookingScreen';
+import SelectNurseScreen from '../screens/SelectNurseScreen';
+import MedicineScreen from '../screens/MedicineScreen';
+import CartScreen from '../screens/CartScreen';
+import CheckoutScreen from '../screens/CheckoutScreen';
+import BookingConfirmedScreen from '../screens/BookingConfirmedScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -31,9 +36,9 @@ function MainTabs() {
         tabBarActiveTintColor: '#2474D4',
         tabBarInactiveTintColor: '#8995A9',
         tabBarStyle: {
-          height: 65 + insets.bottom,
-          paddingBottom: 10 + insets.bottom,
-          paddingTop: 8,
+          height: 55 + insets.bottom,
+          paddingBottom: 5 + insets.bottom,
+          paddingTop: 6,
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#EDF1F7',
@@ -109,6 +114,12 @@ function AppNavigator() {
         <Stack.Screen name="SelectCaregiver" component={SelectCaregiverScreen} />
         <Stack.Screen name="CaregiverDetails" component={CaregiverDetailsScreen} />
         <Stack.Screen name="NewBooking" component={NewBookingScreen} />
+        <Stack.Screen name="SelectNurse" component={SelectNurseScreen} />
+        <Stack.Screen name="NurseDetails" component={CaregiverDetailsScreen} />
+        <Stack.Screen name="Medicine" component={MedicineScreen} />
+        <Stack.Screen name="Cart" component={CartScreen} />
+        <Stack.Screen name="Checkout" component={CheckoutScreen} />
+        <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

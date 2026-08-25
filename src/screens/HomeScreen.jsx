@@ -65,6 +65,54 @@ const HomeScreen = ({navigation}) => {
     },
   ];
 
+  const topCaregivers = [
+    {
+      id: 1,
+      name: 'Rahim Ahmed',
+      image: 'https://randomuser.me/api/portraits/men/32.jpg',
+      rating: '4.9',
+      jobs: '142 jobs',
+    },
+    {
+      id: 2,
+      name: 'Fatema Khanam',
+      image: 'https://randomuser.me/api/portraits/women/44.jpg',
+      rating: '4.8',
+      jobs: '98 jobs',
+    },
+    {
+      id: 3,
+      name: 'Karim Mia',
+      image: 'https://randomuser.me/api/portraits/men/52.jpg',
+      rating: '4.7',
+      jobs: '210 jobs',
+    },
+  ];
+
+  const topNurses = [
+    {
+      id: 1,
+      name: 'Sumaiya Begum',
+      image: 'https://randomuser.me/api/portraits/women/68.jpg',
+      rating: '4.8',
+      jobs: '87 jobs',
+    },
+    {
+      id: 2,
+      name: 'Nasrin Akter',
+      image: 'https://randomuser.me/api/portraits/women/55.jpg',
+      rating: '4.7',
+      jobs: '65 jobs',
+    },
+    {
+      id: 3,
+      name: 'Ruma Islam',
+      image: 'https://randomuser.me/api/portraits/women/42.jpg',
+      rating: '4.6',
+      jobs: '54 jobs',
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -161,6 +209,10 @@ const HomeScreen = ({navigation}) => {
               onPress={() => {
                 if (service.title === 'Elderly Care') {
                   navigation?.navigate('SelectCaregiver');
+                } else if (service.title === 'Book Nurse') {
+                  navigation?.navigate('SelectNurse');
+                } else if (service.title === 'Medicine') {
+                  navigation?.navigate('Medicine');
                 }
               }}>
               <View style={styles.serviceIcon}>
@@ -226,6 +278,80 @@ const HomeScreen = ({navigation}) => {
 
             <Text style={styles.addFamilySubtitle}>Member</Text>
           </TouchableOpacity>
+        </ScrollView>
+
+        {/* ================= TOP CAREGIVERS ================= */}
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Top Caregivers</Text>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation?.navigate('SelectCaregiver')}>
+            <Text style={styles.seeAll}>See all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.caregiverScroll}>
+          {topCaregivers.map(caregiver => (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              key={caregiver.id}
+              style={styles.caregiverCard}
+              onPress={() =>
+                navigation?.navigate('CaregiverDetails', {caregiver})
+              }>
+              <Image source={{uri: caregiver.image}} style={styles.caregiverImage} />
+
+              <Text style={styles.caregiverName}>{caregiver.name}</Text>
+
+              <View style={styles.caregiverRating}>
+                <MaterialCommunityIcons name="star" size={12} color="#F6A900" />
+                <Text style={styles.caregiverRatingText}>{caregiver.rating}</Text>
+              </View>
+
+              <Text style={styles.caregiverJobs}>{caregiver.jobs}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* ================= TOP NURSES ================= */}
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Top Nurses</Text>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => navigation?.navigate('SelectNurse')}>
+            <Text style={styles.seeAll}>See all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.caregiverScroll}>
+          {topNurses.map(nurse => (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              key={nurse.id}
+              style={styles.caregiverCard}
+              onPress={() => navigation?.navigate('NurseDetails', {nurse})}>
+              <Image source={{uri: nurse.image}} style={styles.caregiverImage} />
+
+              <Text style={styles.caregiverName}>{nurse.name}</Text>
+
+              <View style={styles.caregiverRating}>
+                <MaterialCommunityIcons name="star" size={12} color="#F6A900" />
+                <Text style={styles.caregiverRatingText}>{nurse.rating}</Text>
+              </View>
+
+              <Text style={styles.caregiverJobs}>{nurse.jobs}</Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
 
         {/* ================= RECENT ACTIVITY ================= */}
@@ -467,6 +593,58 @@ const styles = StyleSheet.create({
 
   externalIcon: {
     textDecorationLine: 'none',
+  },
+
+  // =====================================================
+  // CAREGIVER/NURSE CARDS
+  // =====================================================
+
+  caregiverScroll: {
+    paddingRight: 5,
+  },
+
+  caregiverCard: {
+    width: 120,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E1E6EF',
+    alignItems: 'center',
+    paddingTop: 12,
+    paddingBottom: 10,
+    marginRight: 9,
+  },
+
+  caregiverImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginBottom: 8,
+  },
+
+  caregiverName: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#172333',
+    marginBottom: 4,
+  },
+
+  caregiverRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+
+  caregiverRatingText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#172333',
+    marginLeft: 2,
+  },
+
+  caregiverJobs: {
+    fontSize: 9,
+    color: '#8190A7',
   },
 
   // =====================================================
