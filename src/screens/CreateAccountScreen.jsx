@@ -9,22 +9,23 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Spinner from 'react-native-loading-spinner-overlay';
+import {registerUser} from '../services/api';
 
 const CreateAccountScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
-    phone: '',
     email: '',
     password: '',
-    confirmPassword: '',
   });
 
   const updateField = (field, value) => {
@@ -34,8 +35,49 @@ const CreateAccountScreen = ({navigation}) => {
     }));
   };
 
+  const handleRegister = async () => {
+    const {firstName, lastName, email, password} = form;
+
+    // Validation
+    if (!firstName.trim() || !lastName.trim()) {
+      Alert.alert('Error', 'Please enter your full name');
+      return;
+    }
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return;
+    }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter a password');
+      return;
+    }
+    if (!agreed) {
+      Alert.alert('Error', 'Please agree to the Terms of Service');
+      return;
+    }
+
+    const name = `${firstName.trim()} ${lastName.trim()}`;
+
+    setLoading(true);
+    try {
+      const response = await registerUser(name, email.trim(), password);
+
+      if (response.success) {
+        navigation?.navigate('VerifyPhone', {email: email.trim()});
+      } else {
+        Alert.alert('Error', response.message || 'Registration failed');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('Register error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Spinner visible={loading} textStyle={styles.spinnerText}/>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#F8F9FC"
@@ -111,34 +153,9 @@ const CreateAccountScreen = ({navigation}) => {
               </View>
             </View>
 
-            {/* Phone */}
-            <View style={styles.field}>
-              <Text style={styles.label}>Phone Number</Text>
-
-              <View style={styles.inputContainer}>
-                <Icon
-                  name="call-outline"
-                  size={22}
-                  color="#7D8BA2"
-                  style={styles.leftIcon}
-                />
-
-                <TextInput
-                  style={[styles.input, styles.iconInput]}
-                  placeholder="+880 1XXX-XXXXXX"
-                  placeholderTextColor="#8290A8"
-                  keyboardType="phone-pad"
-                  value={form.phone}
-                  onChangeText={text =>
-                    updateField('phone', text)
-                  }
-                />
-              </View>
-            </View>
-
             {/* Email */}
             <View style={styles.field}>
-              <Text style={styles.label}>Email (optional)</Text>
+              <Text style={styles.label}>Email</Text>
 
               <View style={styles.inputContainer}>
                 <Icon
@@ -238,9 +255,8 @@ const CreateAccountScreen = ({navigation}) => {
             <TouchableOpacity
               activeOpacity={0.85}
               style={styles.createButton}
-              onPress={() => {
-                navigation?.navigate('VerifyPhone');
-              }}>
+              disabled={loading}
+              onPress={handleRegister}>
               <Text style={styles.createButtonText}>
                 Create Account
               </Text>
@@ -292,8 +308,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#E9EEF5',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -313,16 +327,16 @@ const styles = StyleSheet.create({
 
   subtitle: {
     marginTop: 3,
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 24,
     fontWeight: '400',
     color: '#7D8BA5',
   },
 
   label: {
-    fontSize: 14.5,
+    fontSize: 14,
     lineHeight: 20,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#182331',
     marginBottom: 7,
   },
@@ -417,6 +431,12 @@ const styles = StyleSheet.create({
   link: {
     color: '#126AD1',
     fontWeight: '400',
+  },
+
+  spinnerText: {
+    color: '#126AD1',
+    fontSize: 16,
+    fontWeight: '700',
   },
 
   createButton: {

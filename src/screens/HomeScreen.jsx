@@ -46,25 +46,6 @@ const HomeScreen = ({navigation}) => {
     },
   ];
 
-  const familyMembers = [
-    {
-      name: 'Abul Hossain',
-      relation: 'Father',
-      age: '72',
-      service: 'At Square Hospital',
-      image: 'https://randomuser.me/api/portraits/men/75.jpg',
-      online: true,
-    },
-    {
-      name: 'Farida Begum',
-      relation: 'Mother',
-      age: '68',
-      service: 'At Home',
-      image: 'https://randomuser.me/api/portraits/women/65.jpg',
-      online: false,
-    },
-  ];
-
   const topCaregivers = [
     {
       id: 1,
@@ -224,62 +205,6 @@ const HomeScreen = ({navigation}) => {
           ))}
         </View>
 
-        {/* ================= MY FAMILY ================= */}
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>My Family</Text>
-
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text style={styles.seeAll}>See all</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Horizontal flexible family list */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.familyScroll}>
-          {familyMembers.map((member, index) => (
-            <TouchableOpacity
-              activeOpacity={0.85}
-              key={index}
-              style={styles.familyCard}>
-              <View style={styles.familyImageWrapper}>
-                <Image source={{uri: member.image}} style={styles.familyImage} />
-
-                {member.online && <View style={styles.onlineDot} />}
-              </View>
-
-              <Text numberOfLines={1} style={styles.familyName}>
-                {member.name}
-              </Text>
-
-              <Text style={styles.familyAge}>
-                {member.relation} · {member.age} yrs
-              </Text>
-
-              <View style={styles.familyStatus}>
-                <Text style={styles.familyStatusText}>{member.service}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-
-          {/* ADD FAMILY MEMBER */}
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.addFamilyCard}
-            onPress={() => navigation?.navigate('AddFamilyMember')}>
-            <View style={styles.addFamilyIcon}>
-              <Icon name="add" size={27} color="#1473DC" />
-            </View>
-
-            <Text style={styles.addFamilyTitle}>Add Family</Text>
-
-            <Text style={styles.addFamilySubtitle}>Member</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
         {/* ================= TOP CAREGIVERS ================= */}
 
         <View style={styles.sectionHeader}>
@@ -353,51 +278,6 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* ================= RECENT ACTIVITY ================= */}
-
-        <View style={[styles.sectionHeader, styles.activityHeader]}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
-
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text style={styles.seeAll}>See all</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Activity 1 */}
-        <TouchableOpacity activeOpacity={0.8} style={styles.activityCard}>
-          <View style={styles.activityIcon}>
-            <Icon
-              name="calendar-outline"
-              size={21}
-              color="#1473DC"
-            />
-          </View>
-
-          <View style={styles.activityContent}>
-            <Text style={styles.activityTitle}>Booking Completed</Text>
-
-            <Text style={styles.activityDescription}>Hospital Visit — Square Hospital</Text>
-          </View>
-
-          <Text style={styles.activityTime}>Yesterday</Text>
-        </TouchableOpacity>
-
-        {/* Activity 2 */}
-        <TouchableOpacity activeOpacity={0.8} style={styles.activityCard}>
-          <View style={styles.activityIcon}>
-            <Icon name="document-text-outline" size={21} color="#1473DC" />
-          </View>
-
-          <View style={styles.activityContent}>
-            <Text style={styles.activityTitle}>Care Report Ready</Text>
-
-            <Text style={styles.activityDescription}>Post-visit report from Rahim</Text>
-            <Text style={styles.activityDescription}>Ahmed</Text>
-          </View>
-
-          <Text style={styles.activityTime}>2 days ago</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -408,7 +288,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FFF',
   },
 
   scrollContent: {
@@ -607,8 +487,8 @@ const styles = StyleSheet.create({
     width: 120,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E1E6EF',
+
+
     alignItems: 'center',
     paddingTop: 12,
     paddingBottom: 10,
@@ -622,12 +502,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  caregiverName: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#172333',
-    marginBottom: 4,
-  },
 
   caregiverRating: {
     flexDirection: 'row',
@@ -717,8 +591,7 @@ const styles = StyleSheet.create({
     height: 124,
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E1E6EF',
+
     alignItems: 'center',
     paddingTop: 10,
     marginRight: 9,
@@ -789,8 +662,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#EDF1F7',
+  
     borderStyle: 'dashed',
   },
 

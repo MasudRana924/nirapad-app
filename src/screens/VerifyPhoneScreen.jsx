@@ -7,17 +7,26 @@ import {
   TouchableOpacity,
   TextInput,
   Keyboard,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Spinner from 'react-native-loading-spinner-overlay';
+import {verifyOtp, resendOtp} from '../services/api';
+import {useAuth} from '../context/AuthContext';
 
 const OTP_LENGTH = 4;
 
 const VerifyPhoneScreen = ({navigation, route}) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [seconds, setSeconds] = useState(42);
+  const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const inputs = useRef([]);
+  const {login} = useAuth();
+
+  const email = route?.params?.email || '';
 
   // Countdown
   useEffect(() => {
@@ -71,32 +80,59 @@ const VerifyPhoneScreen = ({navigation, route}) => {
     }
   };
 
-  const handleResend = () => {
-    if (seconds > 0) {
+  const handleResend = async () => {
+    if (seconds > 0 || resending) {
       return;
     }
 
-    setSeconds(42);
+    setResending(true);
+    try {
+      const response = await resendOtp(email);
+      if (response.success) {
+        setSeconds(42);
+        Alert.alert('Success', 'OTP has been resent to your email');
+      } else {
+        Alert.alert('Error', response.message || 'Failed to resend OTP');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('Resend OTP error:', error);
+    } finally {
+      setResending(false);
+    }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const enteredOtp = otp.join('');
 
     if (enteredOtp.length !== OTP_LENGTH) {
       return;
     }
 
-    console.log('OTP:', enteredOtp);
-    navigation?.navigate('Main');
+    setLoading(true);
+    try {
+      const response = await verifyOtp(email, enteredOtp);
+
+      if (response.success && response.token) {
+        // Save token and redirect to home
+        await login(response.token, response.refreshToken, response.user);
+        // Navigation will auto-switch to Main via AuthContext
+      } else {
+        Alert.alert('Error', response.message || 'OTP verification failed');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('Verify OTP error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isOtpComplete = otp.every(value => value !== '');
 
-  const phoneNumber =
-    route?.params?.phoneNumber || '+880 1712-345678';
-
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Spinner visible={loading} textStyle={styles.spinnerText} />
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#F8F9FC"
@@ -121,7 +157,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
         {/* Title */}
         <Text style={styles.title}>
-          Verify Phone
+          Verify Email
         </Text>
 
         {/* Description */}
@@ -129,8 +165,8 @@ const VerifyPhoneScreen = ({navigation, route}) => {
           We sent a 4-digit code to
         </Text>
 
-        <Text style={styles.phoneNumber}>
-          {phoneNumber}
+        <Text style={styles.emailText}>
+          {email}
         </Text>
 
         {/* OTP */}
@@ -170,16 +206,18 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            disabled={seconds > 0}
+            disabled={seconds > 0 || resending}
             onPress={handleResend}>
             <Text
               style={[
                 styles.resendLink,
                 seconds > 0 && styles.resendLinkDisabled,
               ]}>
-              {seconds > 0
-                ? `Resend in 0:${String(seconds).padStart(2, '0')}`
-                : 'Resend'}
+              {resending
+                ? 'Sending...'
+                : seconds > 0
+                  ? `Resend in 0:${String(seconds).padStart(2, '0')}`
+                  : 'Resend'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -187,7 +225,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         {/* Verify Button */}
         <TouchableOpacity
           activeOpacity={0.85}
-          disabled={!isOtpComplete}
+          disabled={!isOtpComplete || loading}
           onPress={handleVerify}
           style={[
             styles.verifyButton,
@@ -249,7 +287,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
 
-  phoneNumber: {
+  emailText: {
     marginTop: 2,
     fontSize: 16,
     lineHeight: 23,
@@ -333,5 +371,11 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  
+  spinnerText: {
+    color: '#126AD1',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

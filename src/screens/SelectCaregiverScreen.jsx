@@ -77,7 +77,7 @@ const SelectCaregiverScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F7F9FC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
 
       {/* ================= HEADER ================= */}
 
@@ -242,7 +242,7 @@ export default SelectCaregiverScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FFF',
   },
 
   // =====================================================
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     height: 55,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FFF',
     paddingHorizontal: 18,
   },
 
@@ -268,10 +268,11 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: 19,
-    lineHeight: 24,
-    fontWeight: '700',
-    color: '#182331',
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#11182e',
+    flex: 1,
+    textAlign: 'center',
   },
 
   // =====================================================
@@ -405,8 +406,7 @@ const styles = StyleSheet.create({
     minHeight: 126,
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#DDE4EE',
+
     marginBottom: 14,
     paddingTop: 13,
     paddingBottom: 12,

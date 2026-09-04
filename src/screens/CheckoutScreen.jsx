@@ -42,7 +42,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F7F9FC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
 
       {/* ================= HEADER ================= */}
 

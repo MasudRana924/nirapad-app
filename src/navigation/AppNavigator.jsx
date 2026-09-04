@@ -3,8 +3,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Dimensions} from 'react-native';
+import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+import {useAuth} from '../context/AuthContext';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -13,7 +15,7 @@ import VerifyPhoneScreen from '../screens/VerifyPhoneScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ServicesScreen from '../screens/ServicesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import NotificationsScreen from '../screens/NotificationsScreen';
+import FamilyScreen from '../screens/FamilyScreen';
 import SelectCaregiverScreen from '../screens/SelectCaregiverScreen';
 import CaregiverDetailsScreen from '../screens/CaregiverDetailsScreen';
 import NewBookingScreen from '../screens/NewBookingScreen';
@@ -38,26 +40,18 @@ function MainTabs() {
           height: 65,
           paddingBottom: 8,
           paddingTop: 4,
-          backgroundColor: 'rgba(9, 81, 251, 0.92)',
+          backgroundColor: '#FFF',
           position: 'absolute',
-          bottom: 10 + insets.bottom,
-          left: 20,
-          right: 20,
+          bottom:  0+ insets.bottom,
           borderTopWidth: 0,
-          borderRadius: 25,
-          elevation: 10,
-          shadowColor: '#000',
-          shadowOffset: {width: 0, height: 4},
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
         },
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
           marginTop: 2,
         },
-        tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: '#000',
+        tabBarActiveTintColor: '#2478D4',
+        tabBarInactiveTintColor: '#7D8BA2',
       }}>
       <Tab.Screen
         name="Home"
@@ -99,12 +93,12 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="Notifications"
-        component={NotificationsScreen}
+        name="Family"
+        component={FamilyScreen}
         options={{
           tabBarIcon: ({focused, color}) => (
             <Icon
-              name={focused ? 'notifications' : 'notifications-outline'}
+              name={focused ? 'people' : 'people-outline'}
               size={24}
               color={color}
             />
@@ -116,35 +110,63 @@ function MainTabs() {
 }
 
 function AppNavigator() {
+  const {userToken, isLoading} = useAuth();
+
+  // Show loading screen while checking token
+  if (isLoading) {
+    return (
+      <View style={loadingStyles.container}>
+        <ActivityIndicator size="large" color="#2478D4" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Welcome"
         screenOptions={{
           headerShown: false,
           animation: 'slide_from_right',
         }}>
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={CreateAccountScreen} />
-        <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
-        <Stack.Screen
-          name="Main"
-          component={MainTabs}
-          options={{gestureEnabled: false}}
-        />
-        <Stack.Screen name="SelectCaregiver" component={SelectCaregiverScreen} />
-        <Stack.Screen name="CaregiverDetails" component={CaregiverDetailsScreen} />
-        <Stack.Screen name="NewBooking" component={NewBookingScreen} />
-        <Stack.Screen name="SelectNurse" component={SelectNurseScreen} />
-        <Stack.Screen name="NurseDetails" component={CaregiverDetailsScreen} />
-        <Stack.Screen name="Medicine" component={MedicineScreen} />
-        <Stack.Screen name="Cart" component={CartScreen} />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
-        <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
+        {userToken ? (
+          // Authenticated — show main app
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainTabs}
+              options={{gestureEnabled: false}}
+            />
+            <Stack.Screen name="SelectCaregiver" component={SelectCaregiverScreen} />
+            <Stack.Screen name="CaregiverDetails" component={CaregiverDetailsScreen} />
+            <Stack.Screen name="NewBooking" component={NewBookingScreen} />
+            <Stack.Screen name="SelectNurse" component={SelectNurseScreen} />
+            <Stack.Screen name="NurseDetails" component={CaregiverDetailsScreen} />
+            <Stack.Screen name="Medicine" component={MedicineScreen} />
+            <Stack.Screen name="Cart" component={CartScreen} />
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
+            <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
+          </>
+        ) : (
+          // Not authenticated — show auth screens
+          <>
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={CreateAccountScreen} />
+            <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+const loadingStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: '#fff',
+  },
+});
 
 export default AppNavigator;

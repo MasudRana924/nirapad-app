@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 import {
   View,
@@ -9,18 +9,55 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import Spinner from 'react-native-loading-spinner-overlay';
+import {loginUser} from '../services/api';
+import {useAuth} from '../context/AuthContext';
 
-const LoginScreen = ({ navigation }) => {
-  const [phone, setPhone] = useState('');
+const LoginScreen = ({navigation}) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const {login} = useAuth();
+
+  const handleLogin = async () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return;
+    }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await loginUser(email.trim(), password);
+
+      if (response.success && response.token) {
+        // Save token and redirect to home
+        await login(response.token, response.refreshToken, response.user);
+        // Navigation will auto-switch to Main via AuthContext
+      } else {
+        Alert.alert('Error', response.message || 'Login failed');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
+      <Spinner visible={loading} color="#FFFFFF" />
 
       <StatusBar
         barStyle="dark-content"
@@ -68,18 +105,18 @@ const LoginScreen = ({ navigation }) => {
             </Text>
 
 
-            {/* ================= PHONE ================= */}
+            {/* ================= EMAIL ================= */}
 
             <View style={styles.inputGroup}>
 
               <Text style={styles.label}>
-                Phone Number
+                Email
               </Text>
 
               <View style={styles.inputContainer}>
 
                 <Icon
-                  name="call-outline"
+                  name="mail-outline"
                   size={22}
                   color="#7D8BA3"
                   style={styles.inputIcon}
@@ -87,12 +124,12 @@ const LoginScreen = ({ navigation }) => {
 
                 <TextInput
                   style={styles.input}
-                  value={phone}
-                  onChangeText={setPhone}
-                  placeholder="+880 1XXX-XXXXXX"
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Enter your email"
                   placeholderTextColor="#7D8BA3"
-                  keyboardType="phone-pad"
-                  maxLength={15}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                 />
 
               </View>
@@ -166,55 +203,12 @@ const LoginScreen = ({ navigation }) => {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.loginButton}
-              onPress={() => {
-                navigation?.navigate('Main');
-              }}
+              disabled={loading}
+              onPress={handleLogin}
             >
               <Text style={styles.loginButtonText}>
                 Login
               </Text>
-            </TouchableOpacity>
-
-
-            {/* ================= OR ================= */}
-
-            <View style={styles.orContainer}>
-
-              <View style={styles.orLine} />
-
-              <Text style={styles.orText}>
-                or continue with
-              </Text>
-
-              <View style={styles.orLine} />
-
-            </View>
-
-
-            {/* ================= BIOMETRIC ================= */}
-
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.biometricButton}
-              onPress={() => {
-                // Biometric login
-              }}
-            >
-
-              <View style={styles.fingerprintCircle}>
-
-                <Icon
-                  name="finger-print"
-                  size={25}
-                  color="#FFFFFF"
-                />
-
-              </View>
-
-              <Text style={styles.biometricText}>
-                Biometric Login
-              </Text>
-
             </TouchableOpacity>
 
           </View>
@@ -275,11 +269,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: 36,
     height: 36,
-
-    borderRadius: 20,
-
-    backgroundColor: '#EDF1F7',
-
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -299,7 +288,7 @@ const styles = StyleSheet.create({
 
     fontWeight: '700',
 
-    color: '#111827',
+    color: '#1F1F1F',
 
     letterSpacing: -0.5,
   },
@@ -311,7 +300,7 @@ const styles = StyleSheet.create({
 
     lineHeight: 24,
 
-    color: '#7C89A1',
+    color: '#797979',
 
     fontWeight: '400',
   },
@@ -325,13 +314,13 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    fontSize: 15,
+    fontSize: 14,
 
     lineHeight: 20,
 
-    fontWeight: '600',
+    fontWeight: '400',
 
-    color: '#172033',
+    color: '#1F1F1F',
 
     marginBottom: 8,
   },

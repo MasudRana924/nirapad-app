@@ -126,7 +126,7 @@ const MedicineScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F7F9FC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
 
       {/* ================= HEADER ================= */}
 
@@ -138,7 +138,7 @@ const MedicineScreen = ({navigation}) => {
           <Icon name="arrow-back" size={27} color="#182331" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Medicine Store</Text>
+        <Text style={styles.headerTitle}>All Medicines</Text>
 
         <TouchableOpacity
           activeOpacity={0.8}
@@ -178,30 +178,6 @@ const MedicineScreen = ({navigation}) => {
           <Icon name="options-outline" size={23} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-
-      {/* ================= CATEGORIES ================= */}
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryScroll}>
-        {categories.map(category => {
-          const selected = selectedCategory === category;
-
-          return (
-            <TouchableOpacity
-              key={category}
-              activeOpacity={0.8}
-              onPress={() => setSelectedCategory(category)}
-              style={[styles.categoryChip, selected && styles.categoryChipActive]}>
-              <Text
-                style={[styles.categoryText, selected && styles.categoryTextActive]}>
-                {category}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
 
       {/* ================= MEDICINE LIST ================= */}
 
@@ -283,7 +259,7 @@ export default MedicineScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FFF',
   },
 
   // =====================================================
@@ -294,7 +270,7 @@ const styles = StyleSheet.create({
     height: 55,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F7F9FC',
+    backgroundColor: '#FFF',
     paddingHorizontal: 18,
   },
 
@@ -309,11 +285,11 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
+   fontSize: 15,
+    fontWeight: 'bold',
+    color: '#11182e',
     flex: 1,
-    fontSize: 19,
-    lineHeight: 24,
-    fontWeight: '700',
-    color: '#182331',
+    textAlign: 'center',
   },
 
   cartButton: {
