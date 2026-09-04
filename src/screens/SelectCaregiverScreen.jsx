@@ -9,7 +9,7 @@ import {
   Image,
   StatusBar,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const caregivers = [
@@ -67,13 +67,25 @@ const filters = [
   'Budget',
 ];
 
-const SelectCaregiverScreen = ({navigation}) => {
+const SelectCaregiverScreen = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
   const [selectedFilter, setSelectedFilter] = useState('Available');
   const [search, setSearch] = useState('');
+  const [selectedCaregiver, setSelectedCaregiver] = useState(null);
+  const {selectedMember} = route.params || {};
 
   const filteredCaregivers = caregivers.filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const handleNext = () => {
+    if (selectedCaregiver) {
+      navigation?.navigate('HospitalSelection', {
+        selectedMember,
+        selectedCaregiver,
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -95,7 +107,7 @@ const SelectCaregiverScreen = ({navigation}) => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: 100 + insets.bottom}]}>
         {/* ================= SEARCH ================= */}
 
         <View style={styles.searchRow}>
@@ -158,81 +170,55 @@ const SelectCaregiverScreen = ({navigation}) => {
             <TouchableOpacity
               key={caregiver.id}
               activeOpacity={0.9}
-              style={styles.caregiverCard}
-              onPress={() => navigation?.navigate('CaregiverDetails', {caregiver})}>
-              {/* Avatar */}
-
-              <View style={styles.avatarWrapper}>
-                <Image source={{uri: caregiver.image}} style={styles.avatar} />
-
-                <View style={styles.verifiedBadge}>
-                  <Icon name="checkmark" size={11} color="#FFFFFF" />
-                </View>
-              </View>
-
-              {/* Main Information */}
-
-              <View style={styles.caregiverInfo}>
-                <Text numberOfLines={1} style={styles.caregiverName}>
-                  {caregiver.name}
-                </Text>
-
-                {/* Rating */}
-
-                <View style={styles.ratingRow}>
-                  <Icon name="star" size={17} color="#F6A900" />
-
-                  <Text style={styles.rating}>{caregiver.rating}</Text>
-
-                  <Text style={styles.jobs}>({caregiver.jobs})</Text>
-                </View>
-
-                {/* Experience / Distance / Available */}
-
-                <View style={styles.metaRow}>
-                  <View style={styles.metaItem}>
-                    <Icon
-                      name="briefcase-outline"
-                      size={14}
-                      color="#7D8BA5"
-                    />
-
-                    <Text style={styles.metaText}>{caregiver.experience}</Text>
-                  </View>
-
-                  <View style={styles.metaItem}>
-                    <Icon name="location-sharp" size={14} color="#7D8BA5" />
-
-                    <Text style={styles.metaText}>{caregiver.distance}</Text>
-                  </View>
-
-                  <View style={styles.availableBadge}>
-                    <Text style={styles.availableBadgeText}>Available</Text>
+              style={[
+                styles.caregiverCard,
+                selectedCaregiver?.id === caregiver.id && styles.selectedCard,
+              ]}
+              onPress={() => setSelectedCaregiver(caregiver)}>
+              <View style={styles.cardContent}>
+                <View style={styles.cardLeft}>
+                  <View style={styles.iconContainer}>
+                    <Icon name="person" size={24} color="#2478D4" />
                   </View>
                 </View>
 
-                {/* Tags */}
-
-                <View style={styles.tagsRow}>
-                  {caregiver.tags.map(tag => (
-                    <View key={tag} style={styles.tag}>
-                      <Text style={styles.tagText}>{tag}</Text>
+                <View style={styles.cardRight}>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.caregiverName}>{caregiver.name}</Text>
+                    <View style={styles.availableBadge}>
+                      <Text style={styles.availableBadgeText}>Available</Text>
                     </View>
-                  ))}
+                  </View>
+
+                  <Text style={styles.locationText}>
+                    {caregiver.experience} · {caregiver.distance}
+                  </Text>
                 </View>
-              </View>
 
-              {/* Price */}
-
-              <View style={styles.priceContainer}>
-                <Text style={styles.price}>{caregiver.price}</Text>
-
-                <Text style={styles.visit}>/visit</Text>
+                <View style={styles.ratingSection}>
+                  <Text style={styles.ratingText}>{caregiver.rating}</Text>
+                  <Icon name="star" size={16} color="#F6A900" />
+                </View>
               </View>
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
+
+      {/* ================= NEXT BUTTON ================= */}
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={[
+            styles.nextButton,
+            !selectedCaregiver && styles.disabledButton,
+          ]}
+          onPress={handleNext}
+          disabled={!selectedCaregiver}>
+          <Text style={styles.nextButtonText}>Next</Text>
+          <Icon name="arrow-forward" size={20} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -261,7 +247,6 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 20,
-    backgroundColor: '#E9EEF5',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -282,7 +267,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 14,
     paddingHorizontal: 19,
-    paddingBottom: 30,
+    paddingBottom: 100,
   },
 
   // =====================================================
@@ -398,179 +383,127 @@ const styles = StyleSheet.create({
   // =====================================================
 
   caregiverList: {
-    width: '100%',
+    flexDirection: 'column',
   },
 
   caregiverCard: {
-    width: '100%',
-    minHeight: 126,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
     borderRadius: 16,
-
-    marginBottom: 14,
-    paddingTop: 13,
-    paddingBottom: 12,
-    paddingLeft: 13,
-    paddingRight: 12,
-    flexDirection: 'row',
-    position: 'relative',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
   },
 
-  // =====================================================
-  // AVATAR
-  // =====================================================
-
-  avatarWrapper: {
-    width: 66,
-    height: 66,
-    position: 'relative',
-    marginRight: 10,
-  },
-
-  avatar: {
-    width: 62,
-    height: 62,
-    borderRadius: 18,
-    backgroundColor: '#E9EDF3',
-  },
-
-  verifiedBadge: {
-    position: 'absolute',
-    right: 0,
-    top: -4,
-    width: 19,
-    height: 19,
-    borderRadius: 10,
-    backgroundColor: '#13B88A',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // =====================================================
-  // INFO
-  // =====================================================
-
-  caregiverInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-
-  caregiverName: {
-    fontSize: 14.5,
-    lineHeight: 19,
-    color: '#182331',
-    fontWeight: '700',
-    paddingRight: 4,
-  },
-
-  ratingRow: {
+  cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 22,
-    marginTop: 1,
+    padding: 16,
   },
 
-  rating: {
-    fontSize: 13,
-    color: '#182331',
-    fontWeight: '600',
-    marginLeft: 2,
+  cardLeft: {
+    marginRight: 12,
   },
 
-  jobs: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginLeft: 4,
-  },
-
-  // =====================================================
-  // META
-  // =====================================================
-
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 1,
-  },
-
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-
-  metaText: {
-    fontSize: 11.5,
-    color: '#8190A7',
-    marginLeft: 2,
-  },
-
-  availableBadge: {
-    height: 23,
-    borderRadius: 6,
-    paddingHorizontal: 9,
-    backgroundColor: '#12B886',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 1,
-  },
-
-  availableBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 10.5,
-    fontWeight: '700',
-  },
-
-  // =====================================================
-  // TAGS
-  // =====================================================
-
-  tagsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 7,
-  },
-
-  tag: {
-    height: 21,
-    borderRadius: 5,
-    paddingHorizontal: 7,
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#EAF2FE',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 5,
   },
 
-  tagText: {
-    fontSize: 10.5,
-    color: '#1473DC',
-    fontWeight: '500',
+  cardRight: {
+    flex: 1,
   },
 
-  // =====================================================
-  // PRICE
-  // =====================================================
-
-  priceContainer: {
-    position: 'absolute',
-    right: 13,
-    top: 14,
-    alignItems: 'flex-end',
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
 
-  price: {
-    fontSize: 17,
-    lineHeight: 21,
-    color: '#1473DC',
-    fontWeight: '700',
+  caregiverName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#172333',
+    marginRight: 8,
   },
 
-  visit: {
-    fontSize: 12,
-    lineHeight: 18,
+  availableBadge: {
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+
+  availableBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#19B57A',
+  },
+
+  locationText: {
+    fontSize: 13,
     color: '#8190A7',
-    fontWeight: '400',
+  },
+
+  ratingSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+
+  ratingText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#172333',
+    marginRight: 4,
+  },
+
+  // =====================================================
+  // SELECTION STYLES
+  // =====================================================
+
+  selectedCard: {
+    borderWidth: 1,
+    borderColor: '#2478D4',
+  },
+
+  // =====================================================
+  // BOTTOM BUTTON
+  // =====================================================
+
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
+ 
+  },
+
+  nextButton: {
+    backgroundColor: '#2478D4',
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+
+  disabledButton: {
+    backgroundColor: '#B5C0D0',
+  },
+
+  nextButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 8,
   },
 });

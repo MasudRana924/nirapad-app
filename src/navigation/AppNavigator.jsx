@@ -17,6 +17,9 @@ import ServicesScreen from '../screens/ServicesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FamilyScreen from '../screens/FamilyScreen';
 import SelectCaregiverScreen from '../screens/SelectCaregiverScreen';
+import SelectFamilyMember from '../screens/SelectFamilyMember';
+import HospitalSelection from '../screens/HospitalSelection';
+import BookingDateTime from '../screens/BookingDateTime';
 import CaregiverDetailsScreen from '../screens/CaregiverDetailsScreen';
 import NewBookingScreen from '../screens/NewBookingScreen';
 import SelectNurseScreen from '../screens/SelectNurseScreen';
@@ -145,6 +148,9 @@ function AppNavigator() {
             <Stack.Screen name="Cart" component={CartScreen} />
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
             <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
+            <Stack.Screen name="SelectFamilyMember" component={SelectFamilyMember} />
+            <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
+            <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
           </>
         ) : (
           // Not authenticated — show auth screens

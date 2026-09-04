@@ -175,6 +175,25 @@ const HomeScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
 
+        {/* ================= BOOKING BUTTONS ================= */}
+        <View style={styles.bookingButtonsContainer}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.bookingButton}
+            onPress={() => navigation?.navigate('SelectFamilyMember')}>
+            <Icon name="person-add" size={20} color="#2478D4" />
+            <Text style={styles.bookingButtonText}>Book Caregiver</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.bookingButton}
+            onPress={() => navigation?.navigate('SelectFamilyMember')}>
+            <Icon name="medical" size={20} color="#2478D4" />
+            <Text style={styles.bookingButtonText}>Book Nurse</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* ================= QUICK SERVICES ================= */}
 
         <View style={styles.sectionHeader}>
@@ -219,7 +238,7 @@ const HomeScreen = ({navigation}) => {
 
         <ScrollView
           horizontal
-          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.caregiverScroll}>
           {topCaregivers.map(caregiver => (
             <TouchableOpacity
@@ -671,5 +690,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2474D4',
     marginTop: 6,
+  },
+
+  // =====================================================
+  // BOOKING BUTTONS
+  // =====================================================
+
+  bookingButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+
+  bookingButton: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#2478D4',
+  },
+
+  bookingButtonText: {
+    color: '#2478D4',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
   },
 });
