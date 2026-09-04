@@ -40,9 +40,9 @@ const LoginScreen = ({navigation}) => {
     try {
       const response = await loginUser(email.trim(), password);
 
-      if (response.success && response.token) {
+      if (response.success && response.data?.token) {
         // Save token and redirect to home
-        await login(response.token, response.refreshToken, response.user);
+        await login(response.data.token, response.data.refreshToken, response.data.user);
         // Navigation will auto-switch to Main via AuthContext
       } else {
         Alert.alert('Error', response.message || 'Login failed');

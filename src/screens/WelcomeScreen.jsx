@@ -7,12 +7,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import LinearGradient from 'react-native-linear-gradient';
 import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {Platform} from 'react-native';
 
 const WelcomeScreen = ({navigation}) => {
   const handleGetStarted = async () => {

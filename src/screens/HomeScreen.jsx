@@ -49,48 +49,60 @@ const HomeScreen = ({navigation}) => {
   const topCaregivers = [
     {
       id: 1,
-      name: 'Rahim Ahmed',
+      name: 'David Miller',
       image: 'https://randomuser.me/api/portraits/men/32.jpg',
       rating: '4.9',
-      jobs: '142 jobs',
+      specialty: 'Elder Care Specialist',
+      price: '$25/hr',
     },
     {
       id: 2,
-      name: 'Fatema Khanam',
+      name: 'Sarah Jenkins',
       image: 'https://randomuser.me/api/portraits/women/44.jpg',
       rating: '4.8',
-      jobs: '98 jobs',
+      specialty: 'Home Assistant',
+      price: '$22/hr',
     },
     {
       id: 3,
       name: 'Karim Mia',
       image: 'https://randomuser.me/api/portraits/men/52.jpg',
       rating: '4.7',
-      jobs: '210 jobs',
+      specialty: 'Child Care Expert',
+      price: '$20/hr',
     },
   ];
 
-  const topNurses = [
+  const availableNurses = [
     {
       id: 1,
-      name: 'Sumaiya Begum',
+      name: 'Nurse Elena',
       image: 'https://randomuser.me/api/portraits/women/68.jpg',
-      rating: '4.8',
-      jobs: '87 jobs',
+      rating: '5.0',
+      reviews: 120,
+      specialty: 'General Nursing',
+      experience: '8 Yrs Exp',
+      status: 'ACTIVE',
     },
     {
       id: 2,
-      name: 'Nasrin Akter',
-      image: 'https://randomuser.me/api/portraits/women/55.jpg',
-      rating: '4.7',
-      jobs: '65 jobs',
+      name: 'Nurse Marcus',
+      image: 'https://randomuser.me/api/portraits/men/55.jpg',
+      rating: '4.9',
+      reviews: 85,
+      specialty: 'ICU Specialist',
+      experience: '5 Yrs Exp',
+      status: 'ACTIVE',
     },
     {
       id: 3,
-      name: 'Ruma Islam',
+      name: 'Nurse Fatima',
       image: 'https://randomuser.me/api/portraits/women/42.jpg',
-      rating: '4.6',
-      jobs: '54 jobs',
+      rating: '4.8',
+      reviews: 64,
+      specialty: 'Pediatric Care',
+      experience: '6 Yrs Exp',
+      status: 'ACTIVE',
     },
   ];
 
@@ -232,13 +244,13 @@ const HomeScreen = ({navigation}) => {
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation?.navigate('AllCaregivers')}>
-            <Text style={styles.seeAll}>See all</Text>
+            <Text style={styles.seeAll}>See All</Text>
           </TouchableOpacity>
         </View>
 
         <ScrollView
           horizontal
-          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.caregiverScroll}>
           {topCaregivers.map(caregiver => (
             <TouchableOpacity
@@ -248,55 +260,79 @@ const HomeScreen = ({navigation}) => {
               onPress={() =>
                 navigation?.navigate('CaregiverDetails', {caregiver})
               }>
-              <Image source={{uri: caregiver.image}} style={styles.caregiverImage} />
-
-              <Text style={styles.caregiverName}>{caregiver.name}</Text>
-
-              <View style={styles.caregiverRating}>
-                <Icon name="star" size={12} color="#F6A900" />
-                <Text style={styles.caregiverRatingText}>{caregiver.rating}</Text>
+              <View style={styles.caregiverImageContainer}>
+                <Image source={{uri: caregiver.image}} style={styles.caregiverImage} />
+                <View style={styles.ratingBadge}>
+                  <Icon name="star" size={10} color="#F6A900" />
+                  <Text style={styles.ratingBadgeText}>{caregiver.rating}</Text>
+                </View>
               </View>
 
-              <Text style={styles.caregiverJobs}>{caregiver.jobs}</Text>
+              <Text style={styles.cgCardName}>{caregiver.name}</Text>
+              <Text style={styles.cgCardSpecialty}>{caregiver.specialty}</Text>
+
+              <View style={styles.cgCardBottom}>
+                <Text style={styles.cgCardPrice}>{caregiver.price}</Text>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.profileBtn}
+                  onPress={() =>
+                    navigation?.navigate('CaregiverDetails', {caregiver})
+                  }>
+                  <Text style={styles.profileBtnText}>PROFILE</Text>
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        {/* ================= TOP NURSES ================= */}
+        {/* ================= AVAILABLE NURSES ================= */}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Top Nurses</Text>
+          <Text style={styles.sectionTitle}>Available Nurses</Text>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => navigation?.navigate('SelectNurse')}>
-            <Text style={styles.seeAll}>See all</Text>
+            <Text style={styles.seeAll}>See All</Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.caregiverScroll}>
-          {topNurses.map(nurse => (
+        <View style={styles.nurseListContainer}>
+          {availableNurses.map(nurse => (
             <TouchableOpacity
               activeOpacity={0.85}
               key={nurse.id}
-              style={styles.caregiverCard}
+              style={styles.nurseRow}
               onPress={() => navigation?.navigate('NurseDetails', {nurse})}>
-              <Image source={{uri: nurse.image}} style={styles.caregiverImage} />
+              <Image source={{uri: nurse.image}} style={styles.nurseAvatar} />
 
-              <Text style={styles.caregiverName}>{nurse.name}</Text>
+              <View style={styles.nurseInfo}>
+                <View style={styles.nurseNameRow}>
+                  <Text style={styles.nurseName}>{nurse.name}</Text>
+                  <View style={styles.activeBadge}>
+                    <Text style={styles.activeBadgeText}>{nurse.status}</Text>
+                  </View>
+                </View>
 
-              <View style={styles.caregiverRating}>
-                <Icon name="star" size={12} color="#F6A900" />
-                <Text style={styles.caregiverRatingText}>{nurse.rating}</Text>
+                <Text style={styles.nurseSpecialty}>
+                  {nurse.specialty} • {nurse.experience}
+                </Text>
+
+                <View style={styles.nurseRatingRow}>
+                  <Icon name="star" size={12} color="#F6A900" />
+                  <Text style={styles.nurseRatingText}>
+                    {nurse.rating} ({nurse.reviews} reviews)
+                  </Text>
+                </View>
               </View>
 
-              <Text style={styles.caregiverJobs}>{nurse.jobs}</Text>
+              <View style={styles.nurseChevron}>
+                <Icon name="chevron-forward" size={18} color="#0d9488" />
+              </View>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -385,7 +421,7 @@ const styles = StyleSheet.create({
   // =====================================================
 
   bookingCard: {
-    backgroundColor: '#008178',
+    backgroundColor: '#2d836f',
     borderRadius: 18,
     padding: 13,
     marginTop: 13,
@@ -495,7 +531,7 @@ const styles = StyleSheet.create({
   },
 
   // =====================================================
-  // CAREGIVER/NURSE CARDS
+  // TOP CAREGIVERS CARDS (new design)
   // =====================================================
 
   caregiverScroll: {
@@ -503,41 +539,174 @@ const styles = StyleSheet.create({
   },
 
   caregiverCard: {
-    width: 120,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    width: 170,
+    backgroundColor: '#F6F8FA',
+    borderRadius: 16,
+    alignItems: 'flex-start',
+    paddingBottom: 14,
+    marginRight: 12,
+    overflow: 'hidden',
+  },
 
-
-    alignItems: 'center',
-    paddingTop: 12,
-    paddingBottom: 10,
-    marginRight: 9,
+  caregiverImageContainer: {
+    width: '100%',
+    height: 150,
+    position: 'relative',
   },
 
   caregiverImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginBottom: 8,
+    width: '100%',
+    height: '100%',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
 
-
-  caregiverRating: {
+  ratingBadge: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
   },
 
-  caregiverRatingText: {
+  ratingBadgeText: {
     fontSize: 10,
+    fontWeight: '700',
+    color: '#172333',
+    marginLeft: 3,
+  },
+
+  cgCardName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#172333',
+    marginTop: 10,
+    paddingHorizontal: 12,
+  },
+
+  cgCardSpecialty: {
+    fontSize: 11,
+    color: '#8190A7',
+    marginTop: 2,
+    paddingHorizontal: 12,
+  },
+
+  cgCardBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 12,
+    marginTop: 10,
+  },
+
+  cgCardPrice: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#008178',
+  },
+
+  profileBtn: {
+    backgroundColor: '#172333',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+
+  profileBtnText: {
+    color: '#FFFFFF',
+    fontSize: 6,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+
+  // =====================================================
+  // AVAILABLE NURSES LIST (new design)
+  // =====================================================
+
+  nurseListContainer: {
+    gap: 10,
+  },
+
+  nurseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0fdfa',
+    borderRadius: 16,
+    padding: 14,
+  },
+
+  nurseAvatar: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+  },
+
+  nurseInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  nurseNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  nurseName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#172333',
+  },
+
+  activeBadge: {
+    backgroundColor: '#E6F9F1',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+
+  activeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#19B57A',
+  },
+
+  nurseSpecialty: {
+    fontSize: 12,
+    color: '#8190A7',
+    marginTop: 3,
+  },
+
+  nurseRatingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+
+  nurseRatingText: {
+    fontSize: 12,
     fontWeight: '600',
     color: '#172333',
-    marginLeft: 2,
+    marginLeft: 4,
   },
 
-  caregiverJobs: {
-    fontSize: 9,
-    color: '#8190A7',
+  nurseChevron: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // =====================================================
@@ -548,8 +717,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 17,
-    marginBottom: 9,
+    marginTop: 30,
+    marginBottom: 15,
   },
 
   sectionTitle: {

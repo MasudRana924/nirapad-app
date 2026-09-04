@@ -1,4 +1,4 @@
-const BASE_URL = 'https://carevita-service.onrender.com/api';
+const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
 
 const apiRequest = async (endpoint, method = 'GET', body = null) => {
   const config = {
