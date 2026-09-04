@@ -22,8 +22,7 @@ const CreateAccountScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
   });
@@ -36,11 +35,11 @@ const CreateAccountScreen = ({navigation}) => {
   };
 
   const handleRegister = async () => {
-    const {firstName, lastName, email, password} = form;
+    const {name, email, password} = form;
 
     // Validation
-    if (!firstName.trim() || !lastName.trim()) {
-      Alert.alert('Error', 'Please enter your full name');
+    if (!name.trim()) {
+      Alert.alert('Error', 'Please enter your name');
       return;
     }
     if (!email.trim()) {
@@ -56,11 +55,9 @@ const CreateAccountScreen = ({navigation}) => {
       return;
     }
 
-    const name = `${firstName.trim()} ${lastName.trim()}`;
-
     setLoading(true);
     try {
-      const response = await registerUser(name, email.trim(), password);
+      const response = await registerUser(name.trim(), email.trim(), password);
 
       if (response.success) {
         navigation?.navigate('VerifyPhone', {email: email.trim()});
@@ -116,40 +113,21 @@ const CreateAccountScreen = ({navigation}) => {
               Register to start caring for your family
             </Text>
 
-            {/* First + Last Name */}
-            <View style={styles.row}>
-              <View style={styles.halfInput}>
-                <Text style={styles.label}>First Name</Text>
+            {/* Name */}
+            <View style={styles.field}>
+              <Text style={styles.label}>Full Name</Text>
 
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Rafiq"
-                    placeholderTextColor="#8290A8"
-                    value={form.firstName}
-                    onChangeText={text =>
-                      updateField('firstName', text)
-                    }
-                    autoCapitalize="words"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.halfInput}>
-                <Text style={styles.label}>Last Name</Text>
-
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Hossain"
-                    placeholderTextColor="#8290A8"
-                    value={form.lastName}
-                    onChangeText={text =>
-                      updateField('lastName', text)
-                    }
-                    autoCapitalize="words"
-                  />
-                </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your full name"
+                  placeholderTextColor="#8290A8"
+                  value={form.name}
+                  onChangeText={text =>
+                    updateField('name', text)
+                  }
+                  autoCapitalize="words"
+                />
               </View>
             </View>
 
@@ -339,16 +317,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#182331',
     marginBottom: 7,
-  },
-
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 24,
-  },
-
-  halfInput: {
-    width: '48%',
   },
 
   field: {

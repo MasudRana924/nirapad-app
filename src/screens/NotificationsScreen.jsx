@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
 
   markAllRead: {
     fontSize: 14,
-    color: '#2474D4',
+    color: '#008178',
     fontWeight: '600',
   },
 
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
 
   iconInfo: {
-    backgroundColor: '#2474D4',
+    backgroundColor: '#008178',
   },
 
   notificationContent: {
@@ -203,6 +203,6 @@ const styles = StyleSheet.create({
   },
 
   unreadDotVisible: {
-    backgroundColor: '#2474D4',
+    backgroundColor: '#008178',
   },
 });

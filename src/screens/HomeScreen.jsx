@@ -688,7 +688,7 @@ const styles = StyleSheet.create({
   addFamilyText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2474D4',
+    color: '#008178',
     marginTop: 6,
   },
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 import {
   View,
@@ -11,8 +11,34 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import LinearGradient from 'react-native-linear-gradient';
+import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {Platform} from 'react-native';
 
-const WelcomeScreen = ({ navigation }) => {
+const WelcomeScreen = ({navigation}) => {
+  const handleGetStarted = async () => {
+    try {
+      // Request location permission
+      await request(
+        Platform.OS === 'android'
+          ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
+          : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+      );
+
+      // Request notification permission
+      await request(
+        Platform.OS === 'android'
+          ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
+          : PERMISSIONS.IOS.NOTIFICATIONS,
+      );
+
+      // Navigate to Login screen
+      navigation?.navigate('Login');
+    } catch (error) {
+      console.error('Permission error:', error);
+      // Navigate to Login screen even if permissions are denied
+      navigation?.navigate('Login');
+    }
+  };
   return (
     <View style={styles.container}>
 
@@ -68,7 +94,7 @@ const WelcomeScreen = ({ navigation }) => {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.primaryButton}
-              onPress={() => navigation?.navigate('Login')}
+              onPress={handleGetStarted}
             >
               <Text style={styles.primaryButtonText}>
                 Get Started
@@ -178,7 +204,7 @@ const styles = StyleSheet.create({
 
     fontWeight: '700',
 
-    color: '#2474D4',
+    color: '#008178',
 
     letterSpacing: -0.5,
   },
@@ -208,7 +234,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 17,
 
-    backgroundColor: '#2474D4',
+    backgroundColor: '#008178',
 
     alignItems: 'center',
     justifyContent: 'center',
@@ -233,7 +259,7 @@ const styles = StyleSheet.create({
 
     borderWidth: 1.5,
 
-    borderColor: '#2474D4',
+    borderColor: '#008178',
 
     alignItems: 'center',
     justifyContent: 'center',
@@ -244,7 +270,7 @@ const styles = StyleSheet.create({
 
     fontWeight: '600',
 
-    color: '#2474D4',
+    color: '#008178',
   },
 
   termsContainer: {
@@ -274,7 +300,7 @@ const styles = StyleSheet.create({
   },
 
   linkText: {
-    color: '#2474D4',
+    color: '#008178',
 
     fontWeight: '500',
   },

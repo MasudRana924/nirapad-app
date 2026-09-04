@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProfileScreen = ({navigation}) => {
   const menuItems = [
-    {id: 1, name: 'Personal Information', icon: 'person-outline', color: '#2474D4'},
+    {id: 1, name: 'Personal Information', icon: 'person-outline', color: '#008178'},
     {id: 2, name: 'My Bookings', icon: 'clipboard-outline', color: '#16B890'},
     {id: 3, name: 'Payment Methods', icon: 'card-outline', color: '#E67E22'},
     {id: 4, name: 'Notifications', icon: 'notifications-outline', color: '#9B59B6'},
@@ -43,7 +43,7 @@ const ProfileScreen = ({navigation}) => {
             <Text style={styles.profilePhone}>+880 1712-345678</Text>
           </View>
           <TouchableOpacity activeOpacity={0.7} style={styles.editButton}>
-            <Icon name="pencil-outline" size={20} color="#2474D4" />
+            <Icon name="pencil-outline" size={20} color="#008178" />
           </TouchableOpacity>
         </View>
 
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2474D4',
+    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
   },

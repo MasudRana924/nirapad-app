@@ -17,7 +17,7 @@ const ServicesScreen = () => {
       name: 'Home Caregiver',
       desc: 'Daily care for elderly & patients',
       icon: 'heart-outline',
-      color: '#2474D4',
+      color: '#008178',
     },
     {
       id: 2,
