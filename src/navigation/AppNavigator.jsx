@@ -71,6 +71,19 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
+        name="Family"
+        component={FamilyScreen}
+        options={{
+          tabBarIcon: ({focused, color}) => (
+            <Icon
+              name={focused ? 'people' : 'people-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Services"
         component={ServicesScreen}
         options={{
@@ -90,19 +103,6 @@ function MainTabs() {
           tabBarIcon: ({focused, color}) => (
             <Icon
               name={focused ? 'person' : 'person-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Family"
-        component={FamilyScreen}
-        options={{
-          tabBarIcon: ({focused, color}) => (
-            <Icon
-              name={focused ? 'people' : 'people-outline'}
               size={24}
               color={color}
             />
