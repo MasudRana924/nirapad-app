@@ -27,6 +27,7 @@ import MedicineScreen from '../screens/MedicineScreen';
 import CartScreen from '../screens/CartScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import BookingConfirmedScreen from '../screens/BookingConfirmedScreen';
+import AllCaregiversScreen from '../screens/AllCaregiversScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -151,6 +152,7 @@ function AppNavigator() {
             <Stack.Screen name="SelectFamilyMember" component={SelectFamilyMember} />
             <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
             <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
+            <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
           </>
         ) : (
           // Not authenticated — show auth screens

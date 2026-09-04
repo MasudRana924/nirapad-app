@@ -12,7 +12,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const SelectFamilyMember = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
-  const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
+  const {selectedCaregiver} = route.params || {};
 
   const familyMembers = [
     {
@@ -37,7 +38,18 @@ const SelectFamilyMember = ({navigation, route}) => {
 
   const handleNext = () => {
     if (selectedMember) {
-      navigation?.navigate('SelectCaregiver', {selectedMember});
+      if (selectedCaregiver) {
+        // Skip caregiver selection, go directly to hospital selection
+        navigation?.navigate('HospitalSelection', {
+          selectedMember,
+          selectedCaregiver,
+        });
+      } else {
+        // Normal flow: go to caregiver selection
+        navigation?.navigate('SelectCaregiver', {
+          selectedMember,
+        });
+      }
     }
   };
 

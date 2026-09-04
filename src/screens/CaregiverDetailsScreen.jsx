@@ -231,10 +231,10 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
         <TouchableOpacity
           activeOpacity={0.85}
           style={styles.bookButton}
-          onPress={() => navigation?.navigate('NewBooking', {caregiver})}>
+          onPress={() => navigation?.navigate('SelectFamilyMember', {selectedCaregiver: caregiver})}>
           <Icon name="calendar-outline" size={19} color="#FFFFFF" />
 
-          <Text style={styles.bookButtonText}>Book Rahim — ৳800/visit</Text>
+          <Text style={styles.bookButtonText}>Book {caregiver.name} — {caregiver.price}/visit</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

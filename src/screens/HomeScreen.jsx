@@ -231,7 +231,7 @@ const HomeScreen = ({navigation}) => {
 
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => navigation?.navigate('SelectCaregiver')}>
+            onPress={() => navigation?.navigate('AllCaregivers')}>
             <Text style={styles.seeAll}>See all</Text>
           </TouchableOpacity>
         </View>
