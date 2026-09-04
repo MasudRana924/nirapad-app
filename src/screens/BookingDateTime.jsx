@@ -110,7 +110,7 @@ const BookingDateTime = ({navigation, route}) => {
             <View style={styles.summaryItem}>
               <View style={styles.summaryItemLeft}>
                 <View style={styles.hospitalIcon}>
-                  <Icon name="business" size={20} color="#2478D4" />
+                  <Icon name="business" size={20} color="#008178" />
                 </View>
                 <View style={styles.summaryItemText}>
                   <Text style={styles.summaryLabel}>Hospital</Text>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   },
 
   selectedDateCard: {
-    borderColor: '#2478D4',
+    borderColor: '#008178',
     backgroundColor: '#EAF2FE',
   },
 
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   },
 
   selectedDayText: {
-    color: '#2478D4',
+    color: '#008178',
     fontWeight: '600',
   },
 
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   },
 
   selectedDateText: {
-    color: '#2478D4',
+    color: '#008178',
   },
 
   // ================= TIME =================
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
 
   selectedTimeCard: {
-    borderColor: '#2478D4',
+    borderColor: '#008178',
     backgroundColor: '#EAF2FE',
   },
 
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
 
   selectedTimeText: {
-    color: '#2478D4',
+    color: '#008178',
     fontWeight: '600',
   },
 
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
 
   proceedButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

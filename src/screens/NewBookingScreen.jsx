@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
 
   progressSegmentActive: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
   },
 
   stepText: {
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   },
 
   serviceIconSelected: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
   },
 
   serviceInfo: {
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 76,
     borderRadius: 17,
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',

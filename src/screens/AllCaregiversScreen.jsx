@@ -164,7 +164,7 @@ const AllCaregiversScreen = ({navigation}) => {
               <View style={styles.cardContent}>
                 <View style={styles.cardLeft}>
                   <View style={styles.iconContainer}>
-                    <Icon name="person" size={24} color="#2478D4" />
+                    <Icon name="person" size={24} color="#008178" />
                   </View>
                 </View>
 
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
 
   activeFilter: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
   },
 
   filterText: {

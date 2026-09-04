@@ -390,8 +390,8 @@ const styles = StyleSheet.create({
   },
 
   categoryChipActive: {
-    backgroundColor: '#2478D4',
-    borderColor: '#2478D4',
+    backgroundColor: '#008178',
+    borderColor: '#008178',
   },
 
   categoryText: {
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 14,
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
   },
 
   checkoutButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,

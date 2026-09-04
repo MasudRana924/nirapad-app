@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
 
   checkboxActive: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
   },
 
   termsText: {
@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
   createButton: {
     height: 52,
     borderRadius: 17,
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 22,

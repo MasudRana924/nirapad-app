@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
 
   shopButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
 
   checkoutButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,

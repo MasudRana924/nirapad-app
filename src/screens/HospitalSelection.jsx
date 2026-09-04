@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
 
   selectedCard: {
-    borderColor: '#2478D4',
+    borderColor: '#008178',
   },
 
   cardContent: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
 
   nextButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',

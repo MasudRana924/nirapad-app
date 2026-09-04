@@ -90,7 +90,7 @@ const SelectFamilyMember = ({navigation, route}) => {
               <View style={styles.cardContent}>
                 <View style={styles.cardLeft}>
                   <View style={styles.iconContainer}>
-                    <Icon name="person" size={24} color="#2478D4" />
+                    <Icon name="person" size={24} color="#008178" />
                   </View>
                 </View>
 
@@ -111,7 +111,7 @@ const SelectFamilyMember = ({navigation, route}) => {
 
                 {selectedMember?.id === member.id && (
                   <View style={styles.checkSection}>
-                    <Icon name="checkmark-circle" size={24} color="#2478D4" />
+                    <Icon name="checkmark-circle" size={24} color="#008178" />
                   </View>
                 )}
               </View>
@@ -201,7 +201,7 @@ sectionTitle:{
   },
 
   selectedCard: {
-    borderColor: '#2478D4',
+    borderColor: '#008178',
   },
 
   cardContent: {
@@ -275,7 +275,7 @@ sectionTitle:{
   },
 
   nextButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',

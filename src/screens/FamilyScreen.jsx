@@ -67,7 +67,7 @@ const FamilyScreen = ({navigation}) => {
           activeOpacity={0.7}
           style={styles.addButton}
           onPress={() => setModalVisible(true)}>
-          <Icon name="add" size={24} color="#2478D4" />
+          <Icon name="add" size={24} color="#008178" />
         </TouchableOpacity>
       </View>
 
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   // ================= ADD BUTTON =================
   addMemberButton: {
     height: 53,
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

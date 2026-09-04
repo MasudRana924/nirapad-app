@@ -316,9 +316,9 @@ const styles = StyleSheet.create({
   },
 
   paymentOptionSelected: {
-    borderColor: '#2478D4',
+    borderColor: '#008178',
     backgroundColor: '#F0F7FF',
-    shadowColor: '#2478D4',
+    shadowColor: '#008178',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -356,11 +356,11 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 10,
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
-    shadowColor: '#2478D4',
+    shadowColor: '#008178',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -385,8 +385,8 @@ const styles = StyleSheet.create({
   },
 
   radioButtonSelected: {
-    backgroundColor: '#2478D4',
-    borderColor: '#2478D4',
+    backgroundColor: '#008178',
+    borderColor: '#008178',
   },
 
   // =====================================================
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   summaryItemPrice: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#2478D4',
+    color: '#008178',
   },
 
   divider: {
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   summaryValueTotal: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#2478D4',
+    color: '#008178',
   },
 
   // =====================================================
@@ -511,16 +511,16 @@ const styles = StyleSheet.create({
   bottomPrice: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#2478D4',
+    color: '#008178',
     letterSpacing: -0.5,
   },
 
   placeOrderButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: 14,
-    shadowColor: '#2478D4',
+    shadowColor: '#008178',
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.3,
     shadowRadius: 8,

@@ -54,7 +54,7 @@ function MainTabs() {
           fontWeight: '600',
           marginTop: 2,
         },
-        tabBarActiveTintColor: '#2478D4',
+        tabBarActiveTintColor: '#008178',
         tabBarInactiveTintColor: '#7D8BA2',
       }}>
       <Tab.Screen
@@ -120,7 +120,7 @@ function AppNavigator() {
   if (isLoading) {
     return (
       <View style={loadingStyles.container}>
-        <ActivityIndicator size="large" color="#2478D4" />
+        <ActivityIndicator size="large" color="#008178" />
       </View>
     );
   }

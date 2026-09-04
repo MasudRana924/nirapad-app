@@ -350,8 +350,8 @@ const styles = StyleSheet.create({
   },
 
   filterChipActive: {
-    backgroundColor: '#2478D4',
-    borderColor: '#2478D4',
+    backgroundColor: '#008178',
+    borderColor: '#008178',
   },
 
   filterText: {

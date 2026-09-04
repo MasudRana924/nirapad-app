@@ -181,7 +181,7 @@ const HomeScreen = ({navigation}) => {
             activeOpacity={0.8}
             style={styles.bookingButton}
             onPress={() => navigation?.navigate('SelectFamilyMember')}>
-            <Icon name="person-add" size={20} color="#2478D4" />
+            <Icon name="person-add" size={20} color="#008178" />
             <Text style={styles.bookingButtonText}>Book Caregiver</Text>
           </TouchableOpacity>
 
@@ -189,7 +189,7 @@ const HomeScreen = ({navigation}) => {
             activeOpacity={0.8}
             style={styles.bookingButton}
             onPress={() => navigation?.navigate('SelectFamilyMember')}>
-            <Icon name="medical" size={20} color="#2478D4" />
+            <Icon name="medical" size={20} color="#008178" />
             <Text style={styles.bookingButtonText}>Book Nurse</Text>
           </TouchableOpacity>
         </View>
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   // =====================================================
 
   bookingCard: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     borderRadius: 18,
     padding: 13,
     marginTop: 13,
@@ -713,11 +713,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginHorizontal: 4,
     borderWidth: 1,
-    borderColor: '#2478D4',
+    borderColor: '#008178',
   },
 
   bookingButtonText: {
-    color: '#2478D4',
+    color: '#008178',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 6,

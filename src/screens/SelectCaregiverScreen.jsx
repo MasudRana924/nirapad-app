@@ -178,7 +178,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
               <View style={styles.cardContent}>
                 <View style={styles.cardLeft}>
                   <View style={styles.iconContainer}>
-                    <Icon name="person" size={24} color="#2478D4" />
+                    <Icon name="person" size={24} color="#008178" />
                   </View>
                 </View>
 
@@ -335,8 +335,8 @@ const styles = StyleSheet.create({
   },
 
   filterChipActive: {
-    backgroundColor: '#2478D4',
-    borderColor: '#2478D4',
+    backgroundColor: '#008178',
+    borderColor: '#008178',
   },
 
   filterText: {
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
 
   selectedCard: {
     borderWidth: 1,
-    borderColor: '#2478D4',
+    borderColor: '#008178',
   },
 
   // =====================================================
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   },
 
   nextButton: {
-    backgroundColor: '#2478D4',
+    backgroundColor: '#008178',
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
