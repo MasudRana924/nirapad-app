@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, ScrollView} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
@@ -8,8 +8,28 @@ import BookingButtons from '../components/home/BookingButtons';
 import QuickServices from '../components/home/QuickServices';
 import TopCaregivers from '../components/home/TopCaregivers';
 import AvailableNurses from '../components/home/AvailableNurses';
+import HomeSkeleton from '../components/home/HomeSkeleton';
 
 const HomeScreen = ({navigation}) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        <HomeSkeleton />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView

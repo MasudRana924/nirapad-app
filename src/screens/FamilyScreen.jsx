@@ -10,44 +10,89 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useFamilyMembers} from '../api/queries';
+import {useAddFamilyMember} from '../api/mutations';
+import Toast from '../components/common/Toast';
+import FamilySkeleton from '../components/home/FamilySkeleton';
 
 const FamilyScreen = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [toast, setToast] = useState({visible: false, message: '', type: 'success'});
   const [newMember, setNewMember] = useState({
     name: '',
-    relation: '',
-    age: '',
+    relationship: '',
+    phone: '',
+    blood_group: '',
+    date_of_birth: '',
+    description: '',
   });
 
-  const familyMembers = [
-    {
-      id: 1,
-      name: 'Abul Hossain',
-      relation: 'Father',
-      age: '72',
-      service: 'At Square Hospital',
-      image: 'https://randomuser.me/api/portraits/men/75.jpg',
-      online: true,
-    },
-    {
-      id: 2,
-      name: 'Farida Begum',
-      relation: 'Mother',
-      age: '68',
-      service: 'At Home',
-      image: 'https://randomuser.me/api/portraits/women/65.jpg',
-      online: false,
-    },
-  ];
+  // React Query hooks
+  const {data: familyMembersData, isLoading, refetch} = useFamilyMembers();
+  const addMutation = useAddFamilyMember();
 
-  const handleAddMember = () => {
-    // TODO: Add logic to save new family member
-    console.log('Adding member:', newMember);
-    setModalVisible(false);
-    setNewMember({name: '', relation: '', age: ''});
+  const familyMembers = familyMembersData?.data || [];
+
+  const showToast = (message, type = 'success') => {
+    setToast({visible: true, message, type});
+  };
+
+  const handleAddMember = async () => {
+    const {name, relationship, phone, blood_group, date_of_birth, description} = newMember;
+
+    if (!name.trim()) {
+      Alert.alert('Error', 'Please enter name');
+      return;
+    }
+    if (!relationship.trim()) {
+      Alert.alert('Error', 'Please enter relationship');
+      return;
+    }
+    if (!phone.trim()) {
+      Alert.alert('Error', 'Please enter phone number');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('relationship', relationship);
+      formData.append('phone', phone);
+      if (blood_group) formData.append('blood_group', blood_group);
+      if (date_of_birth) formData.append('date_of_birth', date_of_birth);
+      if (description) formData.append('description', description);
+
+      await addMutation.mutateAsync(formData);
+      showToast('Family member added successfully');
+      setModalVisible(false);
+      setNewMember({
+        name: '',
+        relationship: '',
+        phone: '',
+        blood_group: '',
+        date_of_birth: '',
+        description: '',
+      });
+    } catch (error) {
+      console.error('Failed to add family member:', error);
+      showToast('Failed to add family member', 'error');
+    }
+  };
+
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return 'N/A';
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age.toString();
   };
 
   return (
@@ -76,47 +121,59 @@ const FamilyScreen = ({navigation}) => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.familyGrid}>
-          {familyMembers.map(member => (
-            <TouchableOpacity
-              key={member.id}
-              activeOpacity={0.85}
-              style={styles.familyCard}>
-              <View style={styles.cardLeft}>
-                <View style={styles.familyImageWrapper}>
-                  <Image source={{uri: member.image}} style={styles.familyImage} />
-                  {member.online && <View style={styles.onlineDot} />}
+        {isLoading ? (
+          <FamilySkeleton />
+        ) : familyMembers.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Icon name="people-outline" size={64} color="#E3E8F0" />
+            <Text style={styles.emptyTitle}>No Family Members</Text>
+            <Text style={styles.emptyText}>
+              Add your family members to get started
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.familyGrid}>
+            {familyMembers.map(member => (
+              <TouchableOpacity
+                key={member.id}
+                activeOpacity={0.85}
+                style={styles.familyCard}>
+                <View style={styles.cardLeft}>
+                  <View style={styles.familyImageWrapper}>
+                    {member.photo ? (
+                      <Image source={{uri: member.photo}} style={styles.familyImage} />
+                    ) : (
+                      <View style={styles.placeholderImage}>
+                        <Icon name="person" size={32} color="#8190A7" />
+                      </View>
+                    )}
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.cardRight}>
-                <View style={styles.cardHeader}>
+                <View style={styles.cardRight}>
                   <Text style={styles.familyName}>{member.name}</Text>
-                  {member.online && (
-                    <View style={styles.onlineBadge}>
-                      <Text style={styles.onlineBadgeText}>Online</Text>
+
+                  <View style={styles.infoRow}>
+                    <Icon name="person-outline" size={14} color="#8190A7" />
+                    <Text style={styles.familyRelation}>{member.relationship}</Text>
+                  </View>
+
+                  <View style={styles.infoRow}>
+                    <Icon name="calendar-outline" size={14} color="#8190A7" />
+                    <Text style={styles.familyAge}>{calculateAge(member.date_of_birth)} years old</Text>
+                  </View>
+
+                  {member.blood_group && (
+                    <View style={styles.infoRow}>
+                      <Icon name="medkit-outline" size={14} color="#8190A7" />
+                      <Text style={styles.familyRelation}>Blood: {member.blood_group}</Text>
                     </View>
                   )}
                 </View>
-
-                <View style={styles.infoRow}>
-                  <Icon name="person-outline" size={14} color="#8190A7" />
-                  <Text style={styles.familyRelation}>{member.relation}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <Icon name="calendar-outline" size={14} color="#8190A7" />
-                  <Text style={styles.familyAge}>{member.age} years old</Text>
-                </View>
-
-                <View style={styles.statusContainer}>
-                  <Icon name="location-outline" size={14} color="#1473DC" />
-                  <Text style={styles.familyStatusText}>{member.service}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
       {/* ================= ADD FAMILY MODAL (BOTTOM SHEET) ================= */}
@@ -144,59 +201,113 @@ const FamilyScreen = ({navigation}) => {
               </View>
 
               {/* Form Fields */}
-              <View style={styles.formContainer}>
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Name</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newMember.name}
-                    onChangeText={text =>
-                      setNewMember({...newMember, name: text})
-                    }
-                    placeholder="Enter name"
-                    placeholderTextColor="#8190A7"
-                  />
-                </View>
+              <ScrollView style={styles.formScroll}>
+                <View style={styles.formContainer}>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Name *</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newMember.name}
+                      onChangeText={text =>
+                        setNewMember({...newMember, name: text})
+                      }
+                      placeholder="Enter name"
+                      placeholderTextColor="#8190A7"
+                    />
+                  </View>
 
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Relation</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newMember.relation}
-                    onChangeText={text =>
-                      setNewMember({...newMember, relation: text})
-                    }
-                    placeholder="e.g., Father, Mother"
-                    placeholderTextColor="#8190A7"
-                  />
-                </View>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Relationship *</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newMember.relationship}
+                      onChangeText={text =>
+                        setNewMember({...newMember, relationship: text})
+                      }
+                      placeholder="e.g., Father, Mother, Spouse"
+                      placeholderTextColor="#8190A7"
+                    />
+                  </View>
 
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Age</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newMember.age}
-                    onChangeText={text =>
-                      setNewMember({...newMember, age: text})
-                    }
-                    placeholder="Enter age"
-                    placeholderTextColor="#8190A7"
-                    keyboardType="numeric"
-                  />
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Phone *</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newMember.phone}
+                      onChangeText={text =>
+                        setNewMember({...newMember, phone: text})
+                      }
+                      placeholder="Enter phone number"
+                      placeholderTextColor="#8190A7"
+                      keyboardType="phone-pad"
+                    />
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Blood Group</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newMember.blood_group}
+                      onChangeText={text =>
+                        setNewMember({...newMember, blood_group: text})
+                      }
+                      placeholder="e.g., O+, A+, B+"
+                      placeholderTextColor="#8190A7"
+                    />
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Date of Birth</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newMember.date_of_birth}
+                      onChangeText={text =>
+                        setNewMember({...newMember, date_of_birth: text})
+                      }
+                      placeholder="YYYY-MM-DD"
+                      placeholderTextColor="#8190A7"
+                    />
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Description</Text>
+                    <TextInput
+                      style={[styles.input, styles.textArea]}
+                      value={newMember.description}
+                      onChangeText={text =>
+                        setNewMember({...newMember, description: text})
+                      }
+                      placeholder="Medical notes or other information"
+                      placeholderTextColor="#8190A7"
+                      multiline
+                      numberOfLines={3}
+                    />
+                  </View>
                 </View>
-              </View>
+              </ScrollView>
 
               {/* Add Button */}
               <TouchableOpacity
                 activeOpacity={0.8}
-                style={styles.addMemberButton}
-                onPress={handleAddMember}>
-                <Text style={styles.addMemberButtonText}>Add Member</Text>
+                style={[styles.addMemberButton, isAdding && styles.disabledButton]}
+                onPress={handleAddMember}
+                disabled={isAdding}>
+                <Text style={styles.addMemberButtonText}>
+                  {isAdding ? 'Adding...' : 'Add Member'}
+                </Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
         </View>
       </Modal>
+
+      {/* Toast */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() => setToast({...toast, visible: false})}
+      />
     </SafeAreaView>
   );
 };
@@ -281,16 +392,13 @@ const styles = StyleSheet.create({
     borderRadius: 32,
   },
 
-  onlineDot: {
-    position: 'absolute',
-    right: 2,
-    bottom: 2,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#19B57A',
-    borderWidth: 2.5,
-    borderColor: '#FFFFFF',
+  placeholderImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   cardHeader: {
@@ -298,6 +406,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 8,
+  },
+
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#172333',
+    marginTop: 16,
+  },
+
+  emptyText: {
+    fontSize: 14,
+    color: '#8190A7',
+    marginTop: 8,
   },
 
   familyName: {
@@ -394,6 +522,10 @@ const styles = StyleSheet.create({
   },
 
   // ================= FORM =================
+  formScroll: {
+    maxHeight: 400,
+  },
+
   formContainer: {
     marginBottom: 24,
   },
@@ -420,6 +552,12 @@ const styles = StyleSheet.create({
     borderColor: '#E3E8F0',
   },
 
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+    paddingTop: 12,
+  },
+
   // ================= ADD BUTTON =================
   addMemberButton: {
     height: 53,
@@ -427,6 +565,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  disabledButton: {
+    backgroundColor: '#B5C0D0',
   },
 
   addMemberButtonText: {

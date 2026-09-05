@@ -1,0 +1,106 @@
+/**
+ * React Query Queries
+ * Custom query hooks for data fetching
+ */
+
+import {useQuery} from '@tanstack/react-query';
+import {familyService, caregiverService, bookingService, hospitalService} from './services';
+import {queryKeys} from './queryKeys';
+
+/**
+ * Family Members Queries
+ */
+export const useFamilyMembers = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.familyMembers.lists(),
+    queryFn: () => familyService.getFamilyMembers(),
+    ...options,
+  });
+};
+
+export const useFamilyMember = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.familyMembers.detail(id),
+    queryFn: () => familyService.getFamilyMember(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Caregivers Queries
+ */
+export const useCaregivers = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.caregivers.lists(),
+    queryFn: () => caregiverService.getCaregivers(),
+    ...options,
+  });
+};
+
+export const useCaregiver = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.caregivers.detail(id),
+    queryFn: () => caregiverService.getCaregiverDetails(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Bookings Queries
+ */
+export const useBookings = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.bookings.lists(),
+    queryFn: () => bookingService.getBookings(),
+    ...options,
+  });
+};
+
+export const useBooking = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.bookings.detail(id),
+    queryFn: () => bookingService.getBooking(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Hospitals Queries
+ */
+export const useHospitals = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.hospitals.lists(),
+    queryFn: () => hospitalService.getHospitals(),
+    ...options,
+  });
+};
+
+export const useHospital = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.hospitals.detail(id),
+    queryFn: () => hospitalService.getHospitalDetails(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export default {
+  // Family members
+  useFamilyMembers,
+  useFamilyMember,
+
+  // Caregivers
+  useCaregivers,
+  useCaregiver,
+
+  // Bookings
+  useBookings,
+  useBooking,
+
+  // Hospitals
+  useHospitals,
+  useHospital,
+};

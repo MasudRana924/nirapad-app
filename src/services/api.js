@@ -1,15 +1,27 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
 
-const apiRequest = async (endpoint, method = 'GET', body = null) => {
+const apiRequest = async (endpoint, method = 'GET', body = null, isFormData = false) => {
+  const token = await AsyncStorage.getItem('userToken');
+  
   const config = {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {},
   };
 
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (isFormData) {
+    config.headers['Content-Type'] = 'multipart/form-data';
+  } else {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
   if (body) {
-    config.body = JSON.stringify(body);
+    config.body = isFormData ? body : JSON.stringify(body);
   }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
@@ -31,4 +43,12 @@ export const resendOtp = async email => {
 
 export const loginUser = async (email, password) => {
   return apiRequest('/auth/login', 'POST', {email, password});
+};
+
+export const getFamilyMembers = async () => {
+  return apiRequest('/family-members', 'GET');
+};
+
+export const addFamilyMember = async (formData) => {
+  return apiRequest('/family-members', 'POST', formData, true);
 };

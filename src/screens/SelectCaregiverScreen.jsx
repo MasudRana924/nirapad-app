@@ -15,47 +15,67 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const caregivers = [
   {
     id: 1,
-    name: 'Rahim Ahmed',
+    name: 'Tanzim Ahmed',
+    title: 'Senior Patient Escort',
+    rating: '4.8',
+    reviews: '98',
+    experience: '4 yrs exp',
+    trips: '120 trips',
+    price: '৳380',
+    estimated: '৳1,140',
     image: 'https://randomuser.me/api/portraits/men/32.jpg',
-    rating: '4.9',
-    jobs: '142 jobs',
-    experience: '4 yrs',
-    distance: '2.3 km',
-    price: '৳800',
-    tags: ['Hospital', 'Elderly'],
+    description:
+      'Specialized in orthopedic and geriatric care assistance, wheelchair transit, and prescription & medication management.',
+    languages: ['Bengali', 'English'],
+    available: true,
   },
   {
     id: 2,
-    name: 'Fatema Khanam',
+    name: 'Farhana Yasmin',
+    title: 'Compassionate Caregiver',
+    rating: '4.9',
+    reviews: '210',
+    experience: '5 yrs exp',
+    trips: '240+ trips',
+    price: '৳450',
+    estimated: '৳1,350',
     image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    rating: '4.8',
-    jobs: '98 jobs',
-    experience: '3 yrs',
-    distance: '3.1 km',
-    price: '৳750',
-    tags: ['Home Care', 'Nursing Asst.'],
+    description:
+      'Deep experience in oncology, post-surgery follow-up appointments, calm communication with anxious patients, and doctor communication assistance.',
+    languages: ['Bengali', 'English', 'Hindi'],
+    available: true,
   },
   {
     id: 3,
     name: 'Karim Mia',
-    image: 'https://randomuser.me/api/portraits/men/52.jpg',
+    title: 'Hospital Escort Specialist',
     rating: '4.7',
-    jobs: '210 jobs',
-    experience: '6 yrs',
-    distance: '4.5 km',
-    price: '৳900',
-    tags: ['Hospital', 'Transport'],
+    reviews: '142',
+    experience: '6 yrs exp',
+    trips: '210 trips',
+    price: '৳420',
+    estimated: '৳1,260',
+    image: 'https://randomuser.me/api/portraits/men/52.jpg',
+    description:
+      'Expert in hospital navigation, appointment coordination, and patient transport. Experienced with elderly and disabled patients.',
+    languages: ['Bengali', 'English'],
+    available: true,
   },
   {
     id: 4,
     name: 'Sumaiya Begum',
-    image: 'https://randomuser.me/api/portraits/women/68.jpg',
+    title: 'Home Care Assistant',
     rating: '4.6',
-    jobs: '67 jobs',
-    experience: '2 yrs',
-    distance: '1.8 km',
-    price: '৳650',
-    tags: ['Elderly', 'Companion'],
+    reviews: '67',
+    experience: '2 yrs exp',
+    trips: '87 trips',
+    price: '৳350',
+    estimated: '৳1,050',
+    image: 'https://randomuser.me/api/portraits/women/68.jpg',
+    description:
+      'Specialized in home-based care, medication management, and daily living assistance. Patient and compassionate caregiver.',
+    languages: ['Bengali'],
+    available: true,
   },
 ];
 
@@ -175,30 +195,80 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                 selectedCaregiver?.id === caregiver.id && styles.selectedCard,
               ]}
               onPress={() => setSelectedCaregiver(caregiver)}>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <View style={styles.iconContainer}>
-                    <Icon name="person" size={24} color="#008178" />
-                  </View>
+              {/* Top Section */}
+              <View style={styles.topSection}>
+                <View style={styles.imageContainer}>
+                  <Image source={{uri: caregiver.image}} style={styles.profileImage} />
+                  <View style={styles.onlineDot} />
                 </View>
-
-                <View style={styles.cardRight}>
+                <View style={styles.mainInfo}>
                   <View style={styles.nameRow}>
-                    <Text style={styles.caregiverName}>{caregiver.name}</Text>
+                    <View style={styles.nameContainer}>
+                      <Text style={styles.name} numberOfLines={1}>
+                        {caregiver.name}
+                      </Text>
+                    </View>
                     <View style={styles.availableBadge}>
-                      <Text style={styles.availableBadgeText}>Available</Text>
+                      <Text style={styles.availableText}>Available</Text>
                     </View>
                   </View>
+                  <Text style={styles.title}>{caregiver.title}</Text>
+                  <View style={styles.statsRow}>
+                    <View style={styles.statItem}>
+                      <Icon name="star" size={16} color="#F59E0B" />
+                      <Text style={styles.ratingText}>{caregiver.rating}</Text>
+                      <Text style={styles.reviewText}>({caregiver.reviews})</Text>
+                    </View>
+                    <View style={styles.separator}>•</View>
+                    <View style={styles.statItem}>
+                      <Icon name="briefcase-outline" size={15} color="#1E293B" />
+                      <Text style={styles.statText}>{caregiver.experience}</Text>
+                    </View>
+                    <View style={styles.separator}>•</View>
+                  </View>
+                  <View style={styles.tripsRow}>
+                    <Icon name="add-square-outline" size={15} color="#008F72" />
+                    <Text style={styles.tripsText}>{caregiver.trips}</Text>
+                  </View>
+                </View>
+              </View>
 
-                  <Text style={styles.locationText}>
-                    {caregiver.experience} · {caregiver.distance}
+              {/* Description */}
+              <View style={styles.descriptionBox}>
+                <Text style={styles.description}>{caregiver.description}</Text>
+                <View style={styles.languageRow}>
+                  <Icon name="language-outline" size={17} color="#26364A" />
+                  <Text style={styles.languageText}>
+                    {caregiver.languages.join(', ')}
                   </Text>
                 </View>
+              </View>
 
-                <View style={styles.ratingSection}>
-                  <Text style={styles.ratingText}>{caregiver.rating}</Text>
-                  <Icon name="star" size={16} color="#F6A900" />
+              {/* Bottom Price Section */}
+              <View style={styles.bottomSection}>
+                <View style={styles.priceContainer}>
+                  <View style={styles.priceRow}>
+                    <Text style={styles.price}>{caregiver.price}</Text>
+                    <Text style={styles.perHour}>/ hr</Text>
+                  </View>
+                  <Text style={styles.estimatedPrice}>
+                    {caregiver.estimated} for 3 hrs estimated
+                  </Text>
                 </View>
+                <TouchableOpacity
+                  activeOpacity={0.75}
+                  style={[
+                    styles.selectButton,
+                    selectedCaregiver?.id === caregiver.id && styles.selectedButton,
+                  ]}>
+                  <Text
+                    style={[
+                      styles.selectText,
+                      selectedCaregiver?.id === caregiver.id && styles.selectedButtonText,
+                    ]}>
+                    {selectedCaregiver?.id === caregiver.id ? 'Selected' : 'Select'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </TouchableOpacity>
           ))}
@@ -387,87 +457,262 @@ const styles = StyleSheet.create({
   },
 
   caregiverCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 12,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 13,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F0F1F4',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
   },
 
-  cardContent: {
+  selectedCard: {
+    borderWidth: 2,
+    borderColor: '#008178',
+  },
+
+  // ================= TOP SECTION =================
+  topSection: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    width: '100%',
+    minHeight: 88,
   },
 
-  cardLeft: {
-    marginRight: 12,
+  imageContainer: {
+    width: 67,
+    height: 67,
+    position: 'relative',
+    marginRight: 13,
   },
 
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#EAF2FE',
-    alignItems: 'center',
-    justifyContent: 'center',
+  profileImage: {
+    width: 67,
+    height: 67,
+    borderRadius: 9,
+    backgroundColor: '#E5E7EB',
   },
 
-  cardRight: {
+  onlineDot: {
+    position: 'absolute',
+    right: -3,
+    bottom: -2,
+    width: 15,
+    height: 15,
+    borderRadius: 8,
+    backgroundColor: '#13C875',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+
+  mainInfo: {
     flex: 1,
+    minWidth: 0,
   },
 
   nameRow: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    justifyContent: 'space-between',
   },
 
-  caregiverName: {
-    fontSize: 15,
+  nameContainer: {
+    flex: 1,
+    paddingRight: 6,
+  },
+
+  name: {
+    fontSize: 19,
+    lineHeight: 23,
     fontWeight: '600',
-    color: '#172333',
-    marginRight: 8,
+    color: '#101820',
   },
 
   availableBadge: {
-    backgroundColor: '#E8F5E9',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    height: 22,
+    paddingHorizontal: 9,
+    borderRadius: 12,
+    backgroundColor: '#EDF3FF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
-  availableBadgeText: {
+  availableText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#19B57A',
+    lineHeight: 14,
+    color: '#43658B',
+    fontWeight: '500',
   },
 
-  locationText: {
-    fontSize: 13,
-    color: '#8190A7',
+  title: {
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: '500',
+    color: '#008F72',
+    marginTop: 0,
   },
 
-  ratingSection: {
+  statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+    height: 22,
+    marginTop: 1,
+  },
+
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   ratingText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#172333',
-    marginRight: 4,
+    fontSize: 12,
+    color: '#17202A',
+    marginLeft: 3,
+    fontWeight: '500',
   },
 
-  // =====================================================
-  // SELECTION STYLES
-  // =====================================================
+  reviewText: {
+    fontSize: 12,
+    color: '#17202A',
+    marginLeft: 2,
+  },
 
-  selectedCard: {
-    borderWidth: 1,
-    borderColor: '#008178',
+  statText: {
+    fontSize: 12,
+    color: '#17202A',
+    marginLeft: 4,
+  },
+
+  separator: {
+    fontSize: 13,
+    color: '#27313D',
+    marginHorizontal: 7,
+  },
+
+  tripsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 19,
+    marginTop: 1,
+  },
+
+  tripsText: {
+    fontSize: 13,
+    lineHeight: 17,
+    color: '#008F72',
+    marginLeft: 5,
+    fontWeight: '500',
+  },
+
+  // ================= DESCRIPTION BOX =================
+  descriptionBox: {
+    width: '100%',
+    backgroundColor: '#EEF3FF',
+    borderRadius: 8,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingTop: 11,
+    paddingBottom: 10,
+  },
+
+  description: {
+    fontSize: 15,
+    lineHeight: 23,
+    color: '#17283D',
+    fontWeight: '400',
+  },
+
+  languageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 7,
+  },
+
+  languageText: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#26364A',
+    marginLeft: 5,
+    fontWeight: '400',
+  },
+
+  // ================= BOTTOM SECTION =================
+  bottomSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 14,
+  },
+
+  priceContainer: {
+    justifyContent: 'center',
+  },
+
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+
+  price: {
+    fontSize: 21,
+    lineHeight: 25,
+    fontWeight: '700',
+    color: '#101820',
+  },
+
+  perHour: {
+    fontSize: 12,
+    color: '#26313C',
+    marginLeft: 3,
+  },
+
+  estimatedPrice: {
+    fontSize: 11,
+    lineHeight: 15,
+    color: '#26313C',
+    marginTop: 0,
+  },
+
+  selectButton: {
+    width: 86,
+    height: 47,
+    borderRadius: 12,
+    backgroundColor: '#DDE9FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+
+  selectedButton: {
+    backgroundColor: '#008178',
+  },
+
+  selectText: {
+    fontSize: 14,
+    lineHeight: 18,
+    color: '#102238',
+    fontWeight: '500',
+  },
+
+  selectedButtonText: {
+    color: '#FFFFFF',
   },
 
   // =====================================================

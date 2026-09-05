@@ -18,21 +18,27 @@ const SelectFamilyMember = ({navigation, route}) => {
   const familyMembers = [
     {
       id: 1,
-      name: 'Abul Hossain',
+      name: 'Abdul Khaleque',
       relation: 'Father',
-      age: '72',
-      service: 'At Square Hospital',
+      age: '68',
+      bloodGroup: 'O+',
+      emergencyContact: 'Masud (Son)',
+      careNote: 'Hearing assistance; takes blood pressure\nmedicine at 11:00 AM.',
+      idNumber: 'HH-7310',
+      checkupDue: true,
       image: 'https://randomuser.me/api/portraits/men/75.jpg',
-      online: true,
     },
     {
       id: 2,
       name: 'Farida Begum',
       relation: 'Mother',
       age: '68',
-      service: 'At Home',
+      bloodGroup: 'A+',
+      emergencyContact: 'Rahim (Son)',
+      careNote: 'Diabetes management; insulin at 8:00 AM\nand 8:00 PM daily.',
+      idNumber: 'HH-7311',
+      checkupDue: false,
       image: 'https://randomuser.me/api/portraits/women/65.jpg',
-      online: false,
     },
   ];
 
@@ -87,34 +93,59 @@ const SelectFamilyMember = ({navigation, route}) => {
                 selectedMember?.id === member.id && styles.selectedCard,
               ]}
               onPress={() => setSelectedMember(member)}>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <View style={styles.iconContainer}>
-                    <Icon name="person" size={24} color="#008178" />
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.avatarContainer}>
+                  <Image source={{uri: member.image}} style={styles.avatar} />
+                  <View style={styles.bloodBadge}>
+                    <Text style={styles.bloodText}>{member.bloodGroup}</Text>
                   </View>
                 </View>
-
-                <View style={styles.cardRight}>
-                  <View style={styles.nameRow}>
-                    <Text style={styles.familyName}>{member.name}</Text>
-                    {member.online && (
-                      <View style={styles.onlineBadge}>
-                        <Text style={styles.onlineBadgeText}>Online</Text>
-                      </View>
-                    )}
+                <View style={styles.userInfo}>
+                  <Text style={styles.name}>{member.name}</Text>
+                  <View style={styles.infoRow}>
+                    <Icon name="person-outline" size={15} color="#303944" />
+                    <Text style={styles.infoText}>
+                      {member.relation} · {member.age} years
+                    </Text>
                   </View>
+                  <View style={styles.infoRow}>
+                    <Icon name="call-outline" size={14} color="#303944" />
+                    <Text style={styles.infoText}>
+                      Emergency Contact: {member.emergencyContact}
+                    </Text>
+                  </View>
+                </View>
+              </View>
 
-                  <Text style={styles.relationText}>
-                    {member.relation} · {member.age} years
+              {/* Care Note */}
+              <View style={styles.careNote}>
+                <View style={styles.careHeader}>
+                  <Icon name="ear-outline" size={19} color="#159B9A" />
+                  <Text style={styles.careTitle}>Care Note</Text>
+                </View>
+                <Text style={styles.careDescription}>{member.careNote}</Text>
+              </View>
+
+              {/* Footer */}
+              <View style={styles.footer}>
+                <View style={styles.footerLeft}>
+                  <Icon name="medkit-outline" size={16} color="#36404C" />
+                  <Text style={styles.footerText}>
+                    ID: {member.idNumber} · {member.checkupDue ? 'Checkup due' : 'Checkup OK'}
                   </Text>
                 </View>
-
-                {selectedMember?.id === member.id && (
-                  <View style={styles.checkSection}>
-                    <Icon name="checkmark-circle" size={24} color="#008178" />
-                  </View>
-                )}
+                <TouchableOpacity activeOpacity={0.7} style={styles.editButton}>
+                  <Text style={styles.editText}>Edit details</Text>
+                  <Icon name="chevron-forward" size={17} color="#128D90" />
+                </TouchableOpacity>
               </View>
+
+              {selectedMember?.id === member.id && (
+                <View style={styles.selectedOverlay}>
+                  <Icon name="checkmark-circle" size={32} color="#008178" />
+                </View>
+              )}
             </TouchableOpacity>
           ))}
         </View>
@@ -193,73 +224,172 @@ sectionTitle:{
   },
 
   familyCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 12,
+    width: '100%',
+    height: 234,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingTop: 16,
     borderWidth: 1,
     borderColor: '#E3E8F0',
+    paddingBottom: 10,
+    marginBottom: 12,
+    position: 'relative',
   },
 
   selectedCard: {
     borderColor: '#008178',
+    borderWidth: 2,
   },
 
-  cardContent: {
+  selectedOverlay: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+  },
+
+  // ================= HEADER =================
+  header: {
+    width: '100%',
+    height: 81,
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    alignItems: 'flex-start',
   },
 
-  cardLeft: {
-    marginRight: 12,
+  avatarContainer: {
+    width: 58,
+    height: 58,
+    position: 'relative',
+    marginRight: 13,
   },
 
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#EAF2FE',
+  avatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#E5E5E5',
+  },
+
+  bloodBadge: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    minWidth: 29,
+    height: 18,
+    paddingHorizontal: 5,
+    borderRadius: 10,
+    backgroundColor: '#EAF3FF',
+    borderWidth: 1,
+    borderColor: '#D8E7FA',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  cardRight: {
-    flex: 1,
+  bloodText: {
+    fontSize: 10,
+    lineHeight: 12,
+    fontWeight: '600',
+    color: '#43658B',
   },
 
-  nameRow: {
+  userInfo: {
+    flex: 1,
+    paddingTop: 1,
+  },
+
+  name: {
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: '700',
+    color: '#111820',
+    marginBottom: 3,
+  },
+
+  infoRow: {
+    height: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
   },
 
-  familyName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#172333',
-    marginRight: 8,
-  },
-
-  onlineBadge: {
-    backgroundColor: '#E8F5E9',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-
-  onlineBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#19B57A',
-  },
-
-  relationText: {
+  infoText: {
+    marginLeft: 5,
     fontSize: 13,
-    color: '#8190A7',
+    lineHeight: 17,
+    fontWeight: '400',
+    color: '#303944',
   },
 
-  checkSection: {
-    marginLeft: 12,
+  // ================= CARE NOTE =================
+  careNote: {
+    width: '100%',
+    height: 82,
+    backgroundColor: '#E3EDFF',
+    borderRadius: 13,
+    paddingHorizontal: 12,
+    paddingTop: 9,
+    marginTop: 10,
+  },
+
+  careHeader: {
+    height: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  careTitle: {
+    marginLeft: 8,
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '600',
+    color: '#168C91',
+  },
+
+  careDescription: {
+    marginLeft: 23,
+    marginTop: 1,
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '400',
+    color: '#344052',
+  },
+
+  // ================= FOOTER =================
+  footer: {
+    height: 50,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingBottom: 1,
+  },
+
+  footerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 1,
+  },
+
+  footerText: {
+    marginLeft: 5,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '400',
+    color: '#36404C',
+  },
+
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 0,
+  },
+
+  editText: {
+    marginRight: 2,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '500',
+    color: '#128D90',
   },
 
   // ================= BOTTOM =================
