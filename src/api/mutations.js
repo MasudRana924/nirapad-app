@@ -136,6 +136,18 @@ export const useRegister = () => {
   });
 };
 
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData) => authService.updateUserProfile(formData),
+    onSuccess: () => {
+      // Invalidate user profile query
+      queryClient.invalidateQueries({queryKey: queryKeys.userProfile.current()});
+    },
+  });
+};
+
 export default {
   // Family members
   useAddFamilyMember,
@@ -153,4 +165,5 @@ export default {
   // Auth
   useLogin,
   useRegister,
+  useUpdateProfile,
 };

@@ -54,8 +54,9 @@ const FamilyScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.addButton}
-          onPress={() => navigation?.navigate('AddFamilyMember')}>
-          <Icon name="add" size={24} color="#008178" />
+          onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}>
+          <Icon name="add" size={20} color="#FFFFFF" />
+          <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
 
@@ -114,7 +115,10 @@ const FamilyScreen = ({navigation}) => {
                       </View>
                     )}
                   </View>
-                  <TouchableOpacity activeOpacity={0.7} style={styles.editButtonTop}>
+                  <TouchableOpacity 
+                    activeOpacity={0.7} 
+                    style={styles.editButtonTop}
+                    onPress={() => navigation?.navigate('AddFamilyMember', {memberId: member.id})}>
                     <Text style={styles.editText}>Edit details</Text>
                     <Icon name="chevron-forward" size={17} color="#128D90" />
                   </TouchableOpacity>
@@ -179,10 +183,19 @@ const styles = StyleSheet.create({
   },
 
   addButton: {
-    width: 36,
-    height: 36,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#008178',
+  },
+
+  addButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 4,
   },
 
   // ================= SCROLL =================

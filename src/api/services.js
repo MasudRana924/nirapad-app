@@ -76,6 +76,12 @@ export const authService = {
 
   resendOtp: (email) =>
     apiRequest('/auth/resend-otp', 'POST', {email}),
+
+  getUserProfile: () =>
+    apiRequest('/user/profile', 'GET'),
+
+  updateUserProfile: (formData) =>
+    apiRequest('/user/profile', 'PUT', formData, true),
 };
 
 /**
@@ -84,6 +90,9 @@ export const authService = {
 export const familyService = {
   getFamilyMembers: () =>
     apiRequest('/family-members', 'GET'),
+
+  getFamilyMember: (id) =>
+    apiRequest(`/family-members/${id}`, 'GET'),
 
   addFamilyMember: (formData) =>
     apiRequest('/family-members', 'POST', formData, true),

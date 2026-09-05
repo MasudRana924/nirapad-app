@@ -7,40 +7,27 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useFamilyMembers} from '../api/queries';
 
 const SelectFamilyMember = ({navigation, route}) => {
-  const insets = useSafeAreaInsets();
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
   const {selectedCaregiver} = route.params || {};
+  const {data: familyMembersData, isLoading} = useFamilyMembers();
+  const familyMembers = familyMembersData?.data || [];
 
-  const familyMembers = [
-    {
-      id: 1,
-      name: 'Abdul Khaleque',
-      relation: 'Father',
-      age: '68',
-      bloodGroup: 'O+',
-      emergencyContact: 'Masud (Son)',
-      careNote: 'Hearing assistance; takes blood pressure\nmedicine at 11:00 AM.',
-      idNumber: 'HH-7310',
-      checkupDue: true,
-      image: 'https://randomuser.me/api/portraits/men/75.jpg',
-    },
-    {
-      id: 2,
-      name: 'Farida Begum',
-      relation: 'Mother',
-      age: '68',
-      bloodGroup: 'A+',
-      emergencyContact: 'Rahim (Son)',
-      careNote: 'Diabetes management; insulin at 8:00 AM\nand 8:00 PM daily.',
-      idNumber: 'HH-7311',
-      checkupDue: false,
-      image: 'https://randomuser.me/api/portraits/women/65.jpg',
-    },
-  ];
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return '';
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const handleNext = () => {
     if (selectedMember) {
@@ -57,6 +44,12 @@ const SelectFamilyMember = ({navigation, route}) => {
         });
       }
     }
+  };
+
+  const handleAddMember = () => {
+    navigation?.navigate('AddFamilyMember', {
+      redirectBack: 'SelectFamilyMember',
+    });
   };
 
   return (
@@ -83,72 +76,101 @@ const SelectFamilyMember = ({navigation, route}) => {
           <View>
             <Text style={styles.sectionTitle}>Who needs assistance?</Text>
           </View>
-        <View style={styles.familyGrid}>
-          {familyMembers.map(member => (
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        ) : familyMembers.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Icon name="people-outline" size={64} color="#E3E8F0" />
+            <Text style={styles.emptyTitle}>No Family Members</Text>
+            <Text style={styles.emptyText}>
+              Add your family members to get started
+            </Text>
             <TouchableOpacity
-              key={member.id}
-              activeOpacity={0.85}
-              style={[
-                styles.familyCard,
-                selectedMember?.id === member.id && styles.selectedCard,
-              ]}
-              onPress={() => setSelectedMember(member)}>
-              {/* Header */}
-              <View style={styles.header}>
-                <View style={styles.avatarContainer}>
-                  <Image source={{uri: member.image}} style={styles.avatar} />
-                  <View style={styles.bloodBadge}>
-                    <Text style={styles.bloodText}>{member.bloodGroup}</Text>
-                  </View>
-                </View>
-                <View style={styles.userInfo}>
-                  <Text style={styles.name}>{member.name}</Text>
-                  <View style={styles.infoRow}>
-                    <Icon name="person-outline" size={15} color="#303944" />
-                    <Text style={styles.infoText}>
-                      {member.relation} · {member.age} years
-                    </Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Icon name="call-outline" size={14} color="#303944" />
-                    <Text style={styles.infoText}>
-                      Emergency Contact: {member.emergencyContact}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Care Note */}
-              <View style={styles.careNote}>
-                <View style={styles.careHeader}>
-                  <Icon name="ear-outline" size={19} color="#159B9A" />
-                  <Text style={styles.careTitle}>Care Note</Text>
-                </View>
-                <Text style={styles.careDescription}>{member.careNote}</Text>
-              </View>
-
-              {/* Footer */}
-              <View style={styles.footer}>
-                <View style={styles.footerLeft}>
-                  <Icon name="medkit-outline" size={16} color="#36404C" />
-                  <Text style={styles.footerText}>
-                    ID: {member.idNumber} · {member.checkupDue ? 'Checkup due' : 'Checkup OK'}
-                  </Text>
-                </View>
-                <TouchableOpacity activeOpacity={0.7} style={styles.editButton}>
-                  <Text style={styles.editText}>Edit details</Text>
-                  <Icon name="chevron-forward" size={17} color="#128D90" />
-                </TouchableOpacity>
-              </View>
-
-              {selectedMember?.id === member.id && (
-                <View style={styles.selectedOverlay}>
-                  <Icon name="checkmark-circle" size={32} color="#008178" />
-                </View>
-              )}
+              activeOpacity={0.8}
+              style={styles.addButton}
+              onPress={handleAddMember}>
+              <Icon name="add" size={20} color="#FFFFFF" />
+              <Text style={styles.addButtonText}>Add Family Member</Text>
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
+        ) : (
+          <View style={styles.familyGrid}>
+            {familyMembers.map(member => (
+              <TouchableOpacity
+                key={member.id}
+                activeOpacity={0.85}
+                style={[
+                  styles.familyCard,
+                  selectedMember?.id === member.id && styles.selectedCard,
+                ]}
+                onPress={() => setSelectedMember(member)}>
+                {/* Header */}
+                <View style={styles.cardHeader}>
+                  <View style={styles.avatarContainer}>
+                    {member.photo ? (
+                      <Image source={{uri: member.photo}} style={styles.avatar} />
+                    ) : (
+                      <View style={styles.placeholderAvatar}>
+                        <Icon name="person" size={24} color="#8190A7" />
+                      </View>
+                    )}
+                    {member.blood_group && (
+                      <View style={styles.bloodBadge}>
+                        <Text style={styles.bloodText}>{member.blood_group}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.userInfo}>
+                    <Text style={styles.name}>{member.name}</Text>
+                    <View style={styles.infoRow}>
+                      <Icon name="person-outline" size={15} color="#303944" />
+                      <Text style={styles.infoText}>
+                        {member.relationship} · {calculateAge(member.date_of_birth)} years
+                      </Text>
+                    </View>
+                    {member.emergency_contact_phone && (
+                      <View style={styles.infoRow}>
+                        <Icon name="call-outline" size={14} color="#303944" />
+                        <Text style={styles.infoText}>
+                          Emergency: {member.emergency_contact_phone}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+
+                {/* Care Note */}
+                {member.medical_history && (
+                  <View style={styles.careNote}>
+                    <View style={styles.careHeader}>
+                      <Icon name="ear-outline" size={19} color="#159B9A" />
+                      <Text style={styles.careTitle}>Care Note</Text>
+                    </View>
+                    <Text style={styles.careDescription}>{member.medical_history}</Text>
+                  </View>
+                )}
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                  <View style={styles.footerLeft}>
+                    <Icon name="medkit-outline" size={16} color="#36404C" />
+                    <Text style={styles.footerText}>
+                      ID: {member.id}
+                    </Text>
+                  </View>
+                </View>
+
+                {selectedMember?.id === member.id && (
+                  <View style={styles.selectedOverlay}>
+                    <Icon name="checkmark-circle" size={32} color="#008178" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
       {/* ================= NEXT BUTTON ================= */}
@@ -207,15 +229,68 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-sectionTitle:{
+
+  sectionTitle:{
     fontSize: 12,
     fontWeight: '500',
     color: '#172333',
     marginBottom: 15,
-},
+  },
+
   scrollContent: {
     padding: 16,
     paddingBottom: 100,
+  },
+
+  // ================= LOADING =================
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+
+  loadingText: {
+    fontSize: 16,
+    color: '#8190A7',
+  },
+
+  // ================= EMPTY STATE =================
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#172333',
+    marginTop: 16,
+  },
+
+  emptyText: {
+    fontSize: 14,
+    color: '#8190A7',
+    marginTop: 8,
+    marginBottom: 24,
+  },
+
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 20,
+    backgroundColor: '#008178',
+  },
+
+  addButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 8,
   },
 
   // ================= FAMILY GRID =================
@@ -250,12 +325,21 @@ sectionTitle:{
     borderRadius: 16,
   },
 
-  // ================= HEADER =================
-  header: {
+  // ================= CARD HEADER =================
+  cardHeader: {
     width: '100%',
     height: 81,
     flexDirection: 'row',
     alignItems: 'flex-start',
+  },
+
+  placeholderAvatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   avatarContainer: {

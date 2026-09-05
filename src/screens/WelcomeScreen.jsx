@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 
 import {
   View,
@@ -15,6 +15,26 @@ import LinearGradient from 'react-native-linear-gradient';
 import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 const WelcomeScreen = ({navigation}) => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const steps = [
+    {
+      heading: 'Professional Care,',
+      headingBlue: 'Anytime You Need',
+      description: 'Verified caregivers, nurses, and hospital attendants — available when your family needs it most.',
+    },
+    {
+      heading: 'Book Nurses',
+      headingBlue: 'For Family Members',
+      description: 'Easily book professional nurses and caregivers for your loved ones with just a few taps.',
+    },
+    {
+      heading: 'Order Medicines',
+      headingBlue: 'At Your Doorstep',
+      description: 'Get your prescribed medicines delivered to your home quickly and safely.',
+    },
+  ];
+
   const handleGetStarted = async () => {
     try {
       // Request location permission
@@ -39,6 +59,18 @@ const WelcomeScreen = ({navigation}) => {
       navigation?.navigate('Login');
     }
   };
+
+  const handleNext = () => {
+    if (currentStep < 2) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleSkip = () => {
+    setCurrentStep(2);
+  };
+
+  const currentStepData = steps[currentStep];
   return (
     <View style={styles.container}>
 
@@ -47,6 +79,29 @@ const WelcomeScreen = ({navigation}) => {
         backgroundColor="#FFFFFF"
         translucent={false}
       />
+
+      {/* Step Indicators and Skip - Absolute Top */}
+      <View style={styles.stepIndicatorsTop}>
+        <View style={styles.stepIndicatorsRow}>
+          {[0, 1, 2].map(step => (
+            <View
+              key={step}
+              style={[
+                styles.stepIndicator,
+                step === currentStep && styles.stepIndicatorActive,
+              ]}
+            />
+          ))}
+        </View>
+        {currentStep < 2 && (
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.skipButtonTop}
+            onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Background Image */}
       <Image
@@ -73,64 +128,72 @@ const WelcomeScreen = ({navigation}) => {
 
           {/* Heading */}
           <View style={styles.textSection}>
+
             <Text style={styles.heading}>
-              Professional Care,
+              {currentStepData.heading}
             </Text>
 
             <Text style={styles.headingBlue}>
-              Anytime You Need
+              {currentStepData.headingBlue}
             </Text>
 
             <Text style={styles.description}>
-              Verified caregivers, nurses, and hospital
-              attendants — available when your family
-              needs it most.
+              {currentStepData.description}
             </Text>
           </View>
 
           {/* Buttons */}
           <View style={styles.buttonSection}>
+            {currentStep === 2 ? (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.primaryButton}
+                onPress={handleGetStarted}>
+                <Text style={styles.primaryButtonText}>
+                  Get Started
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.primaryButton}
+                onPress={handleNext}>
+                <Text style={styles.primaryButtonText}>
+                  Next
+                </Text>
+              </TouchableOpacity>
+            )}
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.primaryButton}
-              onPress={handleGetStarted}
-            >
-              <Text style={styles.primaryButtonText}>
-                Get Started
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.secondaryButton}
-              onPress={() => navigation?.navigate('Login')}
-            >
-              <Text style={styles.secondaryButtonText}>
-                I already have an account
-              </Text>
-            </TouchableOpacity>
-
+            {currentStep === 2 && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.secondaryButton}
+                onPress={() => navigation?.navigate('Login')}>
+                <Text style={styles.secondaryButtonText}>
+                  I already have an account
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Terms */}
-          <View style={styles.termsContainer}>
-
-            <Text style={styles.termsText}>
-              By continuing, you agree to our{' '}
-              <Text style={styles.linkText}>
-                Terms of Service
+          {currentStep === 2 && (
+            <View style={styles.termsContainer}>
+              <Text style={styles.termsText}>
+                By continuing, you agree to our{' '}
+                <Text style={styles.linkText}>
+                  Terms of Service
+                </Text>
+                {' '}and
               </Text>
-              {' '}and
-            </Text>
 
-            <Text style={styles.privacyText}>
-              <Text style={styles.linkText}>
-                Privacy Policy
+              <Text style={styles.privacyText}>
+                <Text style={styles.linkText}>
+                  Privacy Policy
+                </Text>
               </Text>
-            </Text>
-
-          </View>
+            </View>
+          )}
 
         </View>
       </SafeAreaView>
@@ -181,6 +244,63 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
 
     paddingBottom: 26,
+  },
+
+  // Step Indicators - Absolute Top
+  stepIndicatorsTop: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 50 : 40,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 10,
+  },
+
+  stepIndicatorsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  stepIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+
+  stepIndicator: {
+    width: 70,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#D1D5DB',
+    marginHorizontal: 6,
+  },
+
+  stepIndicatorActive: {
+    backgroundColor: '#008178',
+    width: 70,
+  },
+
+  // Skip Button Top
+  skipButtonTop: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+
+  // Skip Button
+  skipButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 16,
+  },
+
+  skipText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#008178',
   },
 
   textSection: {

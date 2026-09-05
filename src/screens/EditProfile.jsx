@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,56 +10,49 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  PermissionsAndroid,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useAuth} from '../context/AuthContext';
+import {useUserProfile} from '../api/queries';
+import {useUpdateProfile} from '../api/mutations';
 import {launchImageLibrary, requestMediaLibraryPermissions} from 'react-native-image-picker';
-import {useAddFamilyMember, useUpdateFamilyMember} from '../api/mutations';
-import {useFamilyMember} from '../api/queries';
 import Toast from '../components/common/Toast';
 
-const AddFamilyMember = ({navigation, route}) => {
-  const insets = useSafeAreaInsets();
-  const {memberId, redirectBack} = route.params || {};
-  const isEditMode = !!memberId;
-  
-  const addMutation = useAddFamilyMember();
-  const updateMutation = useUpdateFamilyMember();
-  const {data: memberData, isLoading: isLoadingMember} = useFamilyMember(isEditMode ? memberId : null);
+const EditProfile = ({navigation}) => {
+  const {data: profileData} = useUserProfile();
+  const updateMutation = useUpdateProfile();
   
   const [toast, setToast] = useState({visible: false, message: '', type: 'success'});
   const [imageUri, setImageUri] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    relationship: '',
+    email: '',
     phone: '',
-    blood_group: '',
+    address: '',
     date_of_birth: '',
-    description: '',
   });
 
-  // Populate form when member data loads in edit mode
-  useEffect(() => {
-    if (isEditMode && memberData?.data) {
-      const member = memberData.data;
+  const user = profileData?.data || {};
+
+  // Populate form when user data loads
+  React.useEffect(() => {
+    if (user.name) {
       setFormData({
-        name: member.name || '',
-        relationship: member.relationship || '',
-        phone: member.emergency_contact_phone || '',
-        blood_group: member.blood_group || '',
-        date_of_birth: member.date_of_birth ? String(member.date_of_birth).split('T')[0] : '',
-        description: member.medical_history || '',
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: '',
+        date_of_birth: '',
       });
-      if (member.photo) {
-        setImageUri(member.photo);
+      if (user.profile_photo) {
+        setImageUri(user.profile_photo);
       }
     }
-  }, [isEditMode, memberData]);
+  }, [user]);
 
   const handleImagePick = async () => {
     try {
-      // Request permission for media library
       const permissionResult = await requestMediaLibraryPermissions({
         mediaType: 'photo',
       });
@@ -86,60 +79,45 @@ const AddFamilyMember = ({navigation, route}) => {
     }
   };
 
-  const showToast = (message, type = 'success') => {
-    setToast({visible: true, message, type});
-  };
-
-  const handleSubmit = async () => {
-    const {name, relationship, phone, blood_group, date_of_birth, description} = formData;
+  const handleSaveProfile = async () => {
+    const {name, email, phone, address, date_of_birth} = formData;
 
     if (!name.trim()) {
       Alert.alert('Error', 'Please enter name');
       return;
     }
-    if (!relationship.trim()) {
-      Alert.alert('Error', 'Please enter relationship');
-      return;
-    }
-    if (!phone.trim()) {
-      Alert.alert('Error', 'Please enter phone number');
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter email');
       return;
     }
 
     try {
       const data = new FormData();
       data.append('name', name);
-      data.append('relationship', relationship);
-      data.append('phone', phone);
-      if (blood_group) data.append('blood_group', blood_group);
+      data.append('email', email);
+      if (phone) data.append('phone', phone);
+      if (address) data.append('address', address);
       if (date_of_birth) data.append('date_of_birth', date_of_birth);
-      if (description) data.append('description', description);
       
       if (imageUri) {
-        data.append('photo', {
+        data.append('profile_photo', {
           uri: imageUri,
           type: 'image/jpeg',
-          name: 'photo.jpg',
+          name: 'profile_photo.jpg',
         });
       }
 
-      if (isEditMode) {
-        await updateMutation.mutateAsync({id: memberId, formData: data});
-        showToast('Family member updated successfully');
-        navigation?.goBack();
-      } else {
-        await addMutation.mutateAsync(data);
-        showToast('Family member added successfully');
-        if (redirectBack === 'SelectFamilyMember') {
-          navigation?.goBack();
-        } else {
-          navigation?.goBack();
-        }
-      }
+      await updateMutation.mutateAsync(data);
+      showToast('Profile updated successfully');
+      navigation?.goBack();
     } catch (error) {
-      console.error('Failed to save family member:', error);
-      showToast(isEditMode ? 'Failed to update family member' : 'Failed to add family member', 'error');
+      console.error('Failed to update profile:', error);
+      showToast('Failed to update profile', 'error');
     }
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({visible: true, message, type});
   };
 
   return (
@@ -155,7 +133,7 @@ const AddFamilyMember = ({navigation, route}) => {
             onPress={() => navigation?.goBack()}>
             <Icon name="arrow-back" size={24} color="#172333" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{isEditMode ? 'Edit Family Member' : 'Add Family Member'}</Text>
+          <Text style={styles.headerTitle}>Edit Profile</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -192,18 +170,20 @@ const AddFamilyMember = ({navigation, route}) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Relationship *</Text>
+              <Text style={styles.label}>Email *</Text>
               <TextInput
                 style={styles.input}
-                value={formData.relationship}
-                onChangeText={text => setFormData({...formData, relationship: text})}
-                placeholder="e.g., Father, Mother, Spouse"
+                value={formData.email}
+                onChangeText={text => setFormData({...formData, email: text})}
+                placeholder="Enter email"
                 placeholderTextColor="#8190A7"
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Phone *</Text>
+              <Text style={styles.label}>Phone</Text>
               <TextInput
                 style={styles.input}
                 value={formData.phone}
@@ -215,12 +195,12 @@ const AddFamilyMember = ({navigation, route}) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Blood Group</Text>
+              <Text style={styles.label}>Address</Text>
               <TextInput
                 style={styles.input}
-                value={formData.blood_group}
-                onChangeText={text => setFormData({...formData, blood_group: text})}
-                placeholder="e.g., O+, A+, B+"
+                value={formData.address}
+                onChangeText={text => setFormData({...formData, address: text})}
+                placeholder="Enter address"
                 placeholderTextColor="#8190A7"
               />
             </View>
@@ -235,33 +215,18 @@ const AddFamilyMember = ({navigation, route}) => {
                 placeholderTextColor="#8190A7"
               />
             </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Medical History / Description</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={formData.description}
-                onChangeText={text => setFormData({...formData, description: text})}
-                placeholder="Medical notes or other information"
-                placeholderTextColor="#8190A7"
-                multiline
-                numberOfLines={4}
-              />
-            </View>
           </View>
         </ScrollView>
 
         {/* Submit Button */}
-        <View style={[styles.bottomContainer, {paddingBottom: insets.bottom + 16}]}>
+        <View style={styles.bottomContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
-            style={[styles.submitButton, (addMutation.isPending || updateMutation.isPending) && styles.disabledButton]}
-            onPress={handleSubmit}
-            disabled={addMutation.isPending || updateMutation.isPending}>
+            style={[styles.submitButton, updateMutation.isPending && styles.disabledButton]}
+            onPress={handleSaveProfile}
+            disabled={updateMutation.isPending}>
             <Text style={styles.submitButtonText}>
-              {(addMutation.isPending || updateMutation.isPending) 
-                ? (isEditMode ? 'Updating...' : 'Adding...') 
-                : (isEditMode ? 'Update Member' : 'Add Member')}
+              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -383,12 +348,6 @@ const styles = StyleSheet.create({
     borderColor: '#E3E8F0',
   },
 
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-    paddingTop: 12,
-  },
-
   // ================= BOTTOM =================
   bottomContainer: {
     position: 'absolute',
@@ -419,4 +378,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddFamilyMember;
+export default EditProfile;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,22 +6,61 @@ import {
   StatusBar,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useAuth} from '../context/AuthContext';
+import {useUserProfile} from '../api/queries';
+import Toast from '../components/common/Toast';
 
 const ProfileScreen = ({navigation}) => {
+  const {logout} = useAuth();
+  const {data: profileData, isLoading} = useUserProfile();
+  
+  const [toast, setToast] = useState({visible: false, message: '', type: 'success'});
+
+  const user = profileData?.data || {};
+
+  const handleUpdateDetails = () => {
+    navigation?.navigate('EditProfile');
+  };
+
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'Logout', onPress: logout, style: 'destructive'},
+      ],
+    );
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({visible: true, message, type});
+  };
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   const menuItems = [
-    {id: 1, name: 'Personal Information', icon: 'person-outline', color: '#008178'},
-    {id: 2, name: 'My Bookings', icon: 'clipboard-outline', color: '#16B890'},
-    {id: 3, name: 'Payment Methods', icon: 'card-outline', color: '#E67E22'},
-    {id: 4, name: 'Notifications', icon: 'notifications-outline', color: '#9B59B6'},
-    {id: 5, name: 'Help & Support', icon: 'help-circle-outline', color: '#3498DB'},
-    {id: 6, name: 'About Us', icon: 'information-circle-outline', color: '#7D8BA5'},
+    {id: 1, name: 'Language', icon: 'language-outline', color: '#008178'},
+    {id: 2, name: 'Settings', icon: 'settings-outline', color: '#16B890'},
+    {id: 3, name: 'Privacy', icon: 'lock-closed-outline', color: '#9B59B6'},
+    {id: 4, name: 'Version', icon: 'information-circle-outline', color: '#7D8BA5', value: '1.0.0'},
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
 
       <ScrollView
@@ -35,16 +74,28 @@ const ProfileScreen = ({navigation}) => {
 
         {/* Profile Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>RH</Text>
-          </View>
+          {user.profile_photo ? (
+            <Image source={{uri: user.profile_photo}} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{getInitials(user.name)}</Text>
+            </View>
+          )}
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Rafiq Hossain</Text>
-            <Text style={styles.profilePhone}>+880 1712-345678</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.profileName}>{user.name || 'Loading...'}</Text>
+              <TouchableOpacity 
+                activeOpacity={0.7} 
+                style={styles.editIcon}
+                onPress={handleUpdateDetails}>
+                <Icon name="pencil-outline" size={18} color="#008178" />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.profileEmail}>{user.email || ''}</Text>
+            {user.phone && (
+              <Text style={styles.profilePhone}>{user.phone}</Text>
+            )}
           </View>
-          <TouchableOpacity activeOpacity={0.7} style={styles.editButton}>
-            <Icon name="pencil-outline" size={20} color="#008178" />
-          </TouchableOpacity>
         </View>
 
         {/* Menu */}
@@ -62,7 +113,11 @@ const ProfileScreen = ({navigation}) => {
                 />
               </View>
               <Text style={styles.menuText}>{item.name}</Text>
-              <Icon name="chevron-forward" size={22} color="#C0C8D6" />
+              {item.value ? (
+                <Text style={styles.menuValue}>{item.value}</Text>
+              ) : (
+                <Icon name="chevron-forward" size={22} color="#C0C8D6" />
+              )}
             </TouchableOpacity>
           ))}
         </View>
@@ -71,12 +126,20 @@ const ProfileScreen = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.logoutButton}
-          onPress={() => navigation?.navigate('Welcome')}>
+          onPress={handleLogout}>
           <Icon name="log-out-outline" size={22} color="#E74C3C" />
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
 
       </ScrollView>
+
+      {/* Toast */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() => setToast({...toast, visible: false})}
+      />
     </SafeAreaView>
   );
 };
@@ -86,7 +149,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#FFFFFF',
   },
 
   scrollContent: {
@@ -120,16 +183,22 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
+  avatarImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+  },
+
   avatarText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
     color: '#FFFFFF',
   },
@@ -139,21 +208,37 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
 
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
   profileName: {
     fontSize: 18,
     fontWeight: '700',
     color: '#182331',
+    marginRight: 8,
   },
 
-  profilePhone: {
+  editIcon: {
+    padding: 4,
+  },
+
+  profileEmail: {
     fontSize: 14,
     color: '#7D8BA5',
     marginTop: 3,
   },
 
+  profilePhone: {
+    fontSize: 14,
+    color: '#7D8BA5',
+    marginTop: 2,
+  },
+
   editButton: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     backgroundColor: '#EDF1F7',
     alignItems: 'center',
@@ -196,6 +281,12 @@ const styles = StyleSheet.create({
     marginLeft: 14,
   },
 
+  menuValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#7D8BA5',
+  },
+
   // Logout
   logoutButton: {
     flexDirection: 'row',
@@ -216,4 +307,5 @@ const styles = StyleSheet.create({
     color: '#E74C3C',
     marginLeft: 10,
   },
+
 });

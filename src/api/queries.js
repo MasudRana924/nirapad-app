@@ -4,8 +4,19 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService} from './services';
 import {queryKeys} from './queryKeys';
+
+/**
+ * User Profile Queries
+ */
+export const useUserProfile = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.userProfile.current(),
+    queryFn: () => authService.getUserProfile(),
+    ...options,
+  });
+};
 
 /**
  * Family Members Queries

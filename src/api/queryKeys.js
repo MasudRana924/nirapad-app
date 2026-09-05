@@ -10,6 +10,12 @@ export const queryKeys = {
     user: () => ['auth', 'user'],
   },
 
+  // User profile keys
+  userProfile: {
+    all: ['userProfile'],
+    current: () => ['userProfile', 'current'],
+  },
+
   // Family members keys
   familyMembers: {
     all: ['familyMembers'],

@@ -15,6 +15,7 @@ import VerifyPhoneScreen from '../screens/VerifyPhoneScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ServicesScreen from '../screens/ServicesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import EditProfile from '../screens/EditProfile';
 import FamilyScreen from '../screens/FamilyScreen';
 import AddFamilyMember from '../screens/AddFamilyMember';
 import SelectCaregiverScreen from '../screens/SelectCaregiverScreen';
@@ -152,6 +153,7 @@ function AppNavigator() {
             <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
             <Stack.Screen name="SelectFamilyMember" component={SelectFamilyMember} />
             <Stack.Screen name="AddFamilyMember" component={AddFamilyMember} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
             <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
             <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
