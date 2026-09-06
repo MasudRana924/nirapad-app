@@ -11,6 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookingDetails} from '../api/queries';
 import Header from '../components/common/Header';
+import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 
 const BookingDetailsScreen = ({navigation, route}) => {
   const {bookingId} = route.params || {};
@@ -67,9 +68,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
         <Header title="Booking Details" onBack={() => navigation?.goBack()} />
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
+        <BookingDetailsSkeleton />
       </SafeAreaView>
     );
   }
@@ -139,7 +138,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         {/* Family Member Card */}
         {booking.family_member && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Family Member</Text>
+            <Text style={styles.subcardTitle}>Family Member</Text>
             <View style={styles.divider} />
             <View style={styles.memberCard}>
               <View style={styles.avatarContainer}>
@@ -173,7 +172,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         {/* Caregiver Card */}
         {booking.caregiver && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Caregiver</Text>
+            <Text style={styles.subcardTitle}>Caregiver</Text>
             <View style={styles.divider} />
             <View style={styles.memberCard}>
               <View style={styles.avatarContainer}>
@@ -223,7 +222,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         {/* Hospital Card */}
         {booking.hospital && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Hospital</Text>
+            <Text style={styles.subcardTitle}>Hospital</Text>
             <View style={styles.divider} />
             <View style={styles.memberCard}>
               <View style={styles.avatarContainer}>
@@ -255,7 +254,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         {/* Patient Requirements */}
         {booking.patient_requirements && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Patient Requirements</Text>
+            <Text style={styles.subcardTitle}>Patient Requirements</Text>
             <View style={styles.divider} />
             <Text style={styles.requirementsText}>{booking.patient_requirements}</Text>
           </View>
@@ -264,7 +263,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         {/* Notes */}
         {booking.notes && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Additional Notes</Text>
+            <Text style={styles.subcardTitle}>Additional Notes</Text>
             <View style={styles.divider} />
             <Text style={styles.notesText}>{booking.notes}</Text>
           </View>
@@ -309,11 +308,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
     borderRadius: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F5F5F5',
     overflow: 'hidden',
   },
   cardHeader: {
@@ -323,8 +322,15 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#172333',
+    // padding: 16,
+    paddingBottom: 8,
+  },
+  subcardTitle: {
+    fontSize: 14,
+    fontWeight: '500',
     color: '#172333',
     padding: 16,
     paddingBottom: 8,
@@ -335,28 +341,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 8,
     fontWeight: '600',
     color: '#FFFFFF',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E3E8F0',
-    marginHorizontal: 16,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 6,
   },
   infoLabel: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#8190A7',
   },
   infoValue: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: '#172333',
   },

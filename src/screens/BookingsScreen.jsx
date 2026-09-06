@@ -87,7 +87,7 @@ const BookingsScreen = ({navigation}) => {
             <View key={booking.id} style={styles.bookingCard}>
               <View style={styles.cardHeader}>
                 <View style={styles.bookingNumberContainer}>
-                  <Text style={styles.bookingNumberLabel}>Booking #</Text>
+                  <Text style={styles.bookingNumberLabel}>Booking ID</Text>
                   <Text style={styles.bookingNumber}>{booking.booking_number}</Text>
                 </View>
                 <TouchableOpacity
@@ -182,11 +182,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   bookingCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
     borderRadius: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F5F5F5',
     overflow: 'hidden',
   },
   cardHeader: {
@@ -203,13 +203,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bookingNumberLabel: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#8190A7',
     marginBottom: 4,
   },
   bookingNumber: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '500',
     color: '#172333',
   },
   statusContainer: {},
@@ -223,11 +223,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#E3E8F0',
-    marginHorizontal: 16,
-  },
+
   cardBody: {
     padding: 16,
   },
