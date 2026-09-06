@@ -128,17 +128,23 @@ export const caregiverService = {
  * Bookings Services
  */
 export const bookingService = {
-  getBookings: () =>
-    apiRequest('/bookings', 'GET'),
+  getBookings: (params = {}) => {
+    const {page = 1, limit = 20} = params;
+    const queryParams = new URLSearchParams({page: page.toString(), limit: limit.toString()});
+    return apiRequest(`/api/v1/bookings?${queryParams.toString()}`, 'GET');
+  },
+
+  getBookingDetails: (id) =>
+    apiRequest(`/api/v1/bookings/${id}`, 'GET'),
 
   createBooking: (bookingData) =>
-    apiRequest('/bookings', 'POST', bookingData, false),
+    apiRequest('/api/v1/bookings', 'POST', bookingData, false),
 
   updateBooking: (id, bookingData) =>
-    apiRequest(`/bookings/${id}`, 'PUT', bookingData),
+    apiRequest(`/api/v1/bookings/${id}`, 'PUT', bookingData),
 
   cancelBooking: (id) =>
-    apiRequest(`/bookings/${id}/cancel`, 'POST'),
+    apiRequest(`/api/v1/bookings/${id}/cancel`, 'POST'),
 };
 
 /**

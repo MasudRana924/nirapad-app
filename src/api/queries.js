@@ -69,18 +69,18 @@ export const useCaregiver = (id, options = {}) => {
 /**
  * Bookings Queries
  */
-export const useBookings = (options = {}) => {
+export const useBookings = (params = {}, options = {}) => {
   return useQuery({
     queryKey: queryKeys.bookings.lists(),
-    queryFn: () => bookingService.getBookings(),
+    queryFn: () => bookingService.getBookings(params),
     ...options,
   });
 };
 
-export const useBooking = (id, options = {}) => {
+export const useBookingDetails = (id, options = {}) => {
   return useQuery({
     queryKey: queryKeys.bookings.detail(id),
-    queryFn: () => bookingService.getBooking(id),
+    queryFn: () => bookingService.getBookingDetails(id),
     enabled: !!id,
     ...options,
   });
@@ -105,6 +105,7 @@ export const useSearchHospitals = (params = {}, options = {}) => {
   });
 };
 
+
 export const useHospital = (id, options = {}) => {
   return useQuery({
     queryKey: queryKeys.hospitals.detail(id),
@@ -125,7 +126,7 @@ export default {
 
   // Bookings
   useBookings,
-  useBooking,
+  useBookingDetails,
 
   // Hospitals
   useHospitals,

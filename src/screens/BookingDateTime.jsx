@@ -127,17 +127,13 @@ const BookingDateTime = ({navigation}) => {
     console.log('Booking Request Body:', JSON.stringify(bookingData, null, 2));
 
     try {
-      await createBooking.mutateAsync(bookingData);
+      const response = await createBooking.mutateAsync(bookingData);
       await storage.clearBookingData();
-      Alert.alert('Success', 'Booking created successfully', [
-        {
-          text: 'OK',
-          onPress: () => navigation?.reset({
-            index: 0,
-            routes: [{name: 'HomeScreen'}],
-          }),
-        },
-      ]);
+      navigation?.navigate('BookingConfirmedScreen', {
+        message: response.message || 'Booking created successfully',
+        status: response.data?.status || 'PENDING_PAYMENT',
+        bookingNumber: response.data?.booking_number,
+      });
     } catch (error) {
       Alert.alert('Error', 'Failed to create booking. Please try again.');
     } finally {

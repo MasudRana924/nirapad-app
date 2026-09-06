@@ -30,6 +30,8 @@ import CartScreen from '../screens/CartScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import BookingConfirmedScreen from '../screens/BookingConfirmedScreen';
 import AllCaregiversScreen from '../screens/AllCaregiversScreen';
+import BookingsScreen from '../screens/BookingsScreen';
+import BookingDetailsScreen from '../screens/BookingDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -99,6 +101,19 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
+        name="Bookings"
+        component={BookingsScreen}
+        options={{
+          tabBarIcon: ({focused, color}) => (
+            <Icon
+              name={focused ? 'calendar' : 'calendar-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
@@ -157,6 +172,7 @@ function AppNavigator() {
             <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
             <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
             <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
+            <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
           </>
         ) : (
           // Not authenticated — show auth screens

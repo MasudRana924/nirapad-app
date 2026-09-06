@@ -20,13 +20,18 @@ const COLORS = {
   green: '#11B58B',
 };
 
-const BookingConfirmedScreen = ({navigation}) => {
+const BookingConfirmedScreen = ({navigation, route}) => {
+  const {message, status, bookingNumber} = route.params || {};
+
   const handleTrackBooking = () => {
     console.log('Track Booking');
   };
 
   const handleBackHome = () => {
-    navigation?.navigate('Main');
+    navigation?.reset({
+      index: 0,
+      routes: [{name: 'HomeScreen'}],
+    });
   };
 
   return (
@@ -45,44 +50,27 @@ const BookingConfirmedScreen = ({navigation}) => {
         <Text style={styles.title}>Booking Confirmed!</Text>
 
         {/* SUBTITLE */}
-        <Text style={styles.subtitle}>
-          Your booking has been placed successfully. Rahim
-          {'\n'}
-          Ahmed will be assigned shortly.
-        </Text>
+        <Text style={styles.subtitle}>{message || 'Your booking has been placed successfully.'}</Text>
 
         {/* BOOKING CARD */}
         <View style={styles.bookingCard}>
-          {/* BOOKING ID */}
-          <View style={styles.bookingIdSection}>
-            <Text style={styles.bookingIdLabel}>Booking ID</Text>
+          {/* BOOKING NUMBER */}
+          {bookingNumber && (
+            <View style={styles.bookingIdSection}>
+              <Text style={styles.bookingIdLabel}>Booking Number</Text>
+              <Text style={styles.bookingId}>{bookingNumber}</Text>
+            </View>
+          )}
 
-            <Text style={styles.bookingId}>CB-2024-08471</Text>
+          {bookingNumber && <View style={styles.divider} />}
+
+          {/* STATUS */}
+          <View style={styles.statusSection}>
+            <Text style={styles.statusLabel}>Status</Text>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>{status || 'PENDING_PAYMENT'}</Text>
+            </View>
           </View>
-
-          <View style={styles.divider} />
-
-          {/* SERVICE */}
-          <InfoRow
-            icon="medkit-outline"
-            label="Service"
-            value="Hospital Visit Assistance"
-          />
-
-          {/* DATE */}
-          <InfoRow
-            icon="calendar-outline"
-            label="Date & Time"
-            value="Sun, 15 Jun · 10:00 AM"
-          />
-
-          {/* PAYMENT */}
-          <InfoRow
-            icon="card-outline"
-            label="Payment"
-            value="৳980 via bKash"
-            last
-          />
         </View>
 
         {/* NOTIFICATION */}
@@ -92,9 +80,7 @@ const BookingConfirmedScreen = ({navigation}) => {
           </View>
 
           <Text style={styles.notificationText}>
-            You will receive a notification when your
-            {'\n'}
-            caregiver is assigned and on the way.
+            You will receive a notification when your caregiver is assigned.
           </Text>
         </View>
 
@@ -228,6 +214,31 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: COLORS.text,
     letterSpacing: 0.1,
+  },
+
+  statusSection: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+
+  statusLabel: {
+    fontSize: 13,
+    lineHeight: 17,
+    color: COLORS.muted,
+    marginBottom: 8,
+  },
+
+  statusBadge: {
+    backgroundColor: COLORS.green,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 
   divider: {
