@@ -4,7 +4,7 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService, notificationService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -82,6 +82,17 @@ export const useBookingDetails = (id, options = {}) => {
     queryKey: queryKeys.bookings.detail(id),
     queryFn: () => bookingService.getBookingDetails(id),
     enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Notifications Queries
+ */
+export const useNotifications = (params = {}, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.notifications.lists(),
+    queryFn: () => notificationService.getNotifications(params),
     ...options,
   });
 };

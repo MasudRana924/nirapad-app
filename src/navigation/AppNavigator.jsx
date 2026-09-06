@@ -32,6 +32,7 @@ import BookingConfirmedScreen from '../screens/BookingConfirmedScreen';
 import AllCaregiversScreen from '../screens/AllCaregiversScreen';
 import BookingsScreen from '../screens/BookingsScreen';
 import BookingDetailsScreen from '../screens/BookingDetailsScreen';
+import InboxScreen from '../screens/InboxScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -88,12 +89,12 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="Services"
-        component={ServicesScreen}
+        name="Inbox"
+        component={InboxScreen}
         options={{
           tabBarIcon: ({focused, color}) => (
             <Icon
-              name={focused ? 'medkit' : 'medkit-outline'}
+              name={focused ? 'mail' : 'mail-outline'}
               size={24}
               color={color}
             />

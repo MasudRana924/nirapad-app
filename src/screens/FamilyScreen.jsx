@@ -152,7 +152,7 @@ export default FamilyScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
   },
 
   // ================= HEADER =================

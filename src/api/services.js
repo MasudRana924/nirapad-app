@@ -125,6 +125,20 @@ export const caregiverService = {
 };
 
 /**
+ * Notifications Services
+ */
+export const notificationService = {
+  getNotifications: (params = {}) => {
+    const {page = 1, limit = 20} = params;
+    const queryParams = new URLSearchParams({page: page.toString(), limit: limit.toString()});
+    return apiRequest(`/notifications?${queryParams.toString()}`, 'GET');
+  },
+
+  markAsRead: (id) =>
+    apiRequest(`/notifications/${id}/read`, 'POST'),
+};
+
+/**
  * Bookings Services
  */
 export const bookingService = {
@@ -173,4 +187,5 @@ export default {
   caregiverService,
   bookingService,
   hospitalService,
+  notificationService,
 };

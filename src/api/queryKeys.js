@@ -44,6 +44,13 @@ export const queryKeys = {
     detail: (id) => ['bookings', 'detail', id],
   },
 
+  // Notifications keys
+  notifications: {
+    all: ['notifications'],
+    lists: () => ['notifications', 'list'],
+    list: (filters) => ['notifications', 'list', filters],
+  },
+
   // Hospitals keys
   hospitals: {
     all: ['hospitals'],
