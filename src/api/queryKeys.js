@@ -49,6 +49,7 @@ export const queryKeys = {
     all: ['hospitals'],
     lists: () => ['hospitals', 'list'],
     list: (filters) => ['hospitals', 'list', filters],
+    search: (params) => ['hospitals', 'search', params],
     details: () => ['hospitals', 'detail'],
     detail: (id) => ['hospitals', 'detail', id],
   },

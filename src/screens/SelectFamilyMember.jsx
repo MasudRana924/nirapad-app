@@ -11,6 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useFamilyMembers} from '../api/queries';
 import Header from '../components/common/Header';
+import FamilySkeleton from '../components/home/FamilySkeleton';
 
 const SelectFamilyMember = ({navigation, route}) => {
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
@@ -66,9 +67,7 @@ const SelectFamilyMember = ({navigation, route}) => {
             <Text style={styles.sectionTitle}>Who needs assistance?</Text>
           </View>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading...</Text>
-          </View>
+          <FamilySkeleton />
         ) : familyMembers.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon name="people-outline" size={64} color="#E3E8F0" />

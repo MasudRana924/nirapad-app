@@ -150,6 +150,14 @@ export const hospitalService = {
 
   getHospitalDetails: (id) =>
     apiRequest(`/hospitals/${id}`, 'GET'),
+
+  searchHospitals: (params = {}) => {
+    const {page = 1, limit = 20, district, city} = params;
+    const queryParams = new URLSearchParams({page: page.toString(), limit: limit.toString()});
+    if (district) queryParams.append('district', district);
+    if (city) queryParams.append('city', city);
+    return apiRequest(`/admin/hospitals?${queryParams.toString()}`, 'GET');
+  },
 };
 
 export default {

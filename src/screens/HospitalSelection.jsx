@@ -7,56 +7,26 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useSearchHospitals} from '../api/queries';
+import Header from '../components/common/Header';
+import HospitalSkeleton from '../components/home/HospitalSkeleton';
+import SearchableDropdown from '../components/common/SearchableDropdown';
+import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
 
 const HospitalSelection = ({navigation, route}) => {
-  const insets = useSafeAreaInsets();
   const [selectedHospital, setSelectedHospital] = useState(null);
+  const [district, setDistrict] = useState('');
+  const [city, setCity] = useState('');
   const {selectedMember, selectedCaregiver} = route.params || {};
 
-  const hospitals = [
-    {
-      id: 1,
-      name: 'Evercare Hospital Dhaka',
-      address: 'Bashundhara, Dhaka',
-      rating: '4.7',
-      distance: '4.5 km away',
-      popular: true,
-    },
-    {
-      id: 2,
-      name: 'Bangladesh Specialized Hospital',
-      address: 'Gulshan-2, Dhaka',
-      rating: '4.6',
-      distance: '3.2 km away',
-      popular: false,
-    },
-    {
-      id: 3,
-      name: 'Square Hospital',
-      address: 'West Panthapath, Dhaka',
-      rating: '4.8',
-      distance: '2.5 km away',
-      popular: true,
-    },
-    {
-      id: 4,
-      name: 'United Hospital',
-      address: 'Gulshan-2, Dhaka',
-      rating: '4.7',
-      distance: '3.2 km away',
-      popular: false,
-    },
-    {
-      id: 5,
-      name: 'Apollo Hospitals',
-      address: 'Bashundhara R/A, Dhaka',
-      rating: '4.9',
-      distance: '4.1 km away',
-      popular: true,
-    },
-  ];
+  const {data: hospitalsData, isLoading} = useSearchHospitals({
+    district,
+    city,
+  });
+
+  const hospitals = hospitalsData?.data || [];
 
   const handleNext = () => {
     if (selectedHospital) {
@@ -69,27 +39,46 @@ const HospitalSelection = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* ================= HEADER ================= */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={24} color="#172333" />
-        </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header title="Select Hospital" onBack={() => navigation?.goBack()} />
 
-        <Text style={styles.headerTitle}>Select Hospital</Text>
-
-        <View style={styles.placeholder} />
-      </View>
-
-      {/* ================= HOSPITAL LIST ================= */}
+      {/* ================= SEARCH FILTERS ================= */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, {paddingBottom: 100 + insets.bottom}]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.hospitalGrid}>
+        <View style={styles.searchSection}>
+          <SearchableDropdown
+            data={bangladeshDistricts}
+            label="District"
+            placeholder="Select district"
+            value={district}
+            onSelect={setDistrict}
+            icon="location-outline"
+            containerStyle={styles.dropdownContainer}
+          />
+          <SearchableDropdown
+            data={bangladeshCities}
+            label="City"
+            placeholder="Select city"
+            value={city}
+            onSelect={setCity}
+            icon="business-outline"
+            containerStyle={styles.dropdownContainer}
+          />
+        </View>
+
+        {/* ================= HOSPITAL LIST ================= */}
+        {isLoading ? (
+          <HospitalSkeleton />
+        ) : hospitals.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Icon name="medkit-outline" size={64} color="#E3E8F0" />
+            <Text style={styles.emptyTitle}>No Hospitals Found</Text>
+            <Text style={styles.emptyText}>Try adjusting your filters</Text>
+          </View>
+        ) : (
+          <View style={styles.hospitalGrid}>
           {hospitals.map(hospital => (
             <TouchableOpacity
               key={hospital.id}
@@ -109,16 +98,17 @@ const HospitalSelection = ({navigation, route}) => {
                 <View style={styles.cardRight}>
                   <View style={styles.nameRow}>
                     <Text style={styles.hospitalName}>{hospital.name}</Text>
-                    {hospital.popular && (
+                    {hospital.is_verified && (
                       <View style={styles.popularBadge}>
-                        <Text style={styles.popularText}>Popular</Text>
+                        <Text style={styles.popularText}>Verified</Text>
                       </View>
                     )}
                   </View>
 
                   <Text style={styles.locationText}>
-                    {hospital.address} · {hospital.distance}
+                    {hospital.address} · {hospital.city}, {hospital.district}
                   </Text>
+                  <Text style={styles.typeText}>{hospital.type}</Text>
                 </View>
 
                 <View style={styles.ratingSection}>
@@ -127,8 +117,9 @@ const HospitalSelection = ({navigation, route}) => {
                 </View>
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
       {/* ================= NEXT BUTTON ================= */}
@@ -157,31 +148,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 
-  // ================= HEADER =================
-  header: {
-    height: 56,
+  // ================= SEARCH SECTION =================
+  searchSection: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    marginBottom: 16,
+    gap: 10,
   },
 
-  backButton: {
-    width: 36,
-    height: 36,
+  dropdownContainer: {
+    flex: 1,
+  },
+
+  // ================= EMPTY STATE =================
+  emptyState: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 80,
   },
 
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
     color: '#172333',
+    marginTop: 16,
   },
 
-  placeholder: {
-    width: 36,
+  emptyText: {
+    fontSize: 14,
+    color: '#8190A7',
+    marginTop: 8,
   },
 
   // ================= SCROLL =================
@@ -263,6 +259,13 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 13,
     color: '#8190A7',
+  },
+
+  typeText: {
+    fontSize: 12,
+    color: '#008178',
+    fontWeight: '500',
+    marginTop: 2,
   },
 
   ratingSection: {

@@ -97,6 +97,14 @@ export const useHospitals = (options = {}) => {
   });
 };
 
+export const useSearchHospitals = (params = {}, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.hospitals.search(params),
+    queryFn: () => hospitalService.searchHospitals(params),
+    ...options,
+  });
+};
+
 export const useHospital = (id, options = {}) => {
   return useQuery({
     queryKey: queryKeys.hospitals.detail(id),
