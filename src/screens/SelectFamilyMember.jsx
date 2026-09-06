@@ -54,7 +54,7 @@ const SelectFamilyMember = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header title="Select Family Member" onBack={() => navigation?.goBack()} />
 
       {/* ================= FAMILY LIST ================= */}

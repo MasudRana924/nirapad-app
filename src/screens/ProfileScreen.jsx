@@ -61,9 +61,7 @@ const ProfileScreen = ({navigation}) => {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor="#008178" />
-
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header title="Profile" showBack={false} />
 
       <ScrollView

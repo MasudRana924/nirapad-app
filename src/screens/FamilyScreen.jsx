@@ -40,7 +40,7 @@ const FamilyScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header
         title="Family"
         onBack={() => navigation?.goBack()}

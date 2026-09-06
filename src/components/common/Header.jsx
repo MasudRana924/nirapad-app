@@ -1,27 +1,33 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, StatusBar, Platform} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const Header = ({title, onBack, showBack = true, rightComponent}) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        {showBack ? (
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={onBack}>
-            <Icon name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.placeholder} />
-        )}
-        
-        <Text style={styles.title}>{title}</Text>
-        
-        {rightComponent || <View style={styles.placeholder} />}
+    <>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#008178"
+      />
+      <View style={styles.container}>
+        <View style={styles.content}>
+          {showBack ? (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.backButton}
+              onPress={onBack}>
+              <Icon name="arrow-back" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.placeholder} />
+          )}
+          
+          <Text style={styles.title}>{title}</Text>
+          
+          {rightComponent || <View style={styles.placeholder} />}
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -31,11 +37,12 @@ const styles = StyleSheet.create({
   },
   
   content: {
-    height: 56,
+    height: 90,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    paddingTop:20
   },
   
   backButton: {
