@@ -10,6 +10,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useFamilyMembers} from '../api/queries';
+import Header from '../components/common/Header';
 
 const SelectFamilyMember = ({navigation, route}) => {
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
@@ -54,19 +55,7 @@ const SelectFamilyMember = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* ================= HEADER ================= */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={24} color="#172333" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Select Family Member</Text>
-
-        <View style={styles.placeholder} />
-      </View>
+      <Header title="Select Family Member" onBack={() => navigation?.goBack()} />
 
       {/* ================= FAMILY LIST ================= */}
       <ScrollView
@@ -197,32 +186,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-
-  // ================= HEADER =================
-  header: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-
-  backButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#172333',
-  },
-
-  placeholder: {
-    width: 36,
   },
 
   // ================= SCROLL =================

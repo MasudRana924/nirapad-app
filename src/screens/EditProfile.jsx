@@ -18,6 +18,7 @@ import {useUserProfile} from '../api/queries';
 import {useUpdateProfile} from '../api/mutations';
 import {launchImageLibrary, requestMediaLibraryPermissions} from 'react-native-image-picker';
 import Toast from '../components/common/Toast';
+import Header from '../components/common/Header';
 
 const EditProfile = ({navigation}) => {
   const {data: profileData} = useUserProfile();
@@ -125,17 +126,7 @@ const EditProfile = ({navigation}) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'undefined'}
         style={styles.keyboardContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={24} color="#172333" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Profile</Text>
-          <View style={styles.placeholder} />
-        </View>
+        <Header title="Edit Profile" onBack={() => navigation?.goBack()} />
 
         <ScrollView
           style={styles.scrollView}
@@ -251,32 +242,6 @@ const styles = StyleSheet.create({
 
   keyboardContainer: {
     flex: 1,
-  },
-
-  // ================= HEADER =================
-  header: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-
-  backButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#172333',
-  },
-
-  placeholder: {
-    width: 36,
   },
 
   // ================= SCROLL =================

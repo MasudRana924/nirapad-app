@@ -18,6 +18,7 @@ import {launchImageLibrary, requestMediaLibraryPermissions} from 'react-native-i
 import {useAddFamilyMember, useUpdateFamilyMember} from '../api/mutations';
 import {useFamilyMember} from '../api/queries';
 import Toast from '../components/common/Toast';
+import Header from '../components/common/Header';
 
 const AddFamilyMember = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
@@ -147,17 +148,10 @@ const AddFamilyMember = ({navigation, route}) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'undefined'}
         style={styles.keyboardContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={24} color="#172333" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{isEditMode ? 'Edit Family Member' : 'Add Family Member'}</Text>
-          <View style={styles.placeholder} />
-        </View>
+        <Header 
+          title={isEditMode ? 'Edit Family Member' : 'Add Family Member'} 
+          onBack={() => navigation?.goBack()} 
+        />
 
         <ScrollView
           style={styles.scrollView}
@@ -281,37 +275,11 @@ const AddFamilyMember = ({navigation, route}) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F8F9FC',
   },
 
   keyboardContainer: {
     flex: 1,
-  },
-
-  // ================= HEADER =================
-  header: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-
-  backButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#172333',
-  },
-
-  placeholder: {
-    width: 36,
   },
 
   // ================= SCROLL =================

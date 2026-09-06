@@ -58,7 +58,7 @@ const ServicesScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -89,7 +89,7 @@ const ServicesScreen = () => {
               <Text style={styles.serviceName}>{service.name}</Text>
               <Text style={styles.serviceDesc}>{service.desc}</Text>
             </View>
-            <Icon name="chevron-forward" size={24} color="#C0C8D6" />
+            <Icon name="chevron-forward" size={24} color="#008178" />
           </TouchableOpacity>
         ))}
 
@@ -103,7 +103,7 @@ export default ServicesScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
   },
 
   header: {
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: 27,
+    fontSize: 15,
     fontWeight: '700',
     color: '#182331',
     letterSpacing: -0.4,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: 15,
+    fontSize: 12,
     color: '#7D8BA5',
     marginTop: 4,
     marginBottom: 22,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   iconBg: {
     width: 52,
     height: 52,
-    borderRadius: 16,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
   },

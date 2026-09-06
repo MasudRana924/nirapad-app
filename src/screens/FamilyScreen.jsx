@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useFamilyMembers} from '../api/queries';
 import Toast from '../components/common/Toast';
 import FamilySkeleton from '../components/home/FamilySkeleton';
+import Header from '../components/common/Header';
 
 const FamilyScreen = ({navigation}) => {
   const [toast, setToast] = React.useState({visible: false, message: '', type: 'success'});
@@ -40,25 +41,19 @@ const FamilyScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* ================= HEADER ================= */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={24} color="#172333" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Family</Text>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.addButton}
-          onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}>
-          <Icon name="add" size={20} color="#FFFFFF" />
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Family"
+        onBack={() => navigation?.goBack()}
+        rightComponent={
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.addButton}
+            onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}>
+            <Icon name="add" size={20} color="#FFFFFF" />
+            <Text style={styles.addButtonText}>Add</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* ================= FAMILY LIST ================= */}
       <ScrollView
@@ -157,7 +152,7 @@ export default FamilyScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F8F9FC',
   },
 
   // ================= HEADER =================

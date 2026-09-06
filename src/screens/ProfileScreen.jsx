@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../context/AuthContext';
 import {useUserProfile} from '../api/queries';
 import Toast from '../components/common/Toast';
+import Header from '../components/common/Header';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useAuth();
@@ -61,16 +62,13 @@ const ProfileScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
+      <StatusBar barStyle="light-content" backgroundColor="#008178" />
+
+      <Header title="Profile" showBack={false} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}>
-
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profile</Text>
-        </View>
 
         {/* Profile Card */}
         <View style={styles.profileCard}>
@@ -154,19 +152,6 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingBottom: 85,
-  },
-
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 18,
-    paddingBottom: 6,
-  },
-
-  headerTitle: {
-    fontSize: 27,
-    fontWeight: '700',
-    color: '#182331',
-    letterSpacing: -0.4,
   },
 
   // Profile Card
