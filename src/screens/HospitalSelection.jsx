@@ -14,6 +14,7 @@ import Header from '../components/common/Header';
 import HospitalSkeleton from '../components/home/HospitalSkeleton';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
+import {storage} from '../utils/storage';
 
 const HospitalSelection = ({navigation, route}) => {
   const [selectedHospital, setSelectedHospital] = useState(null);
@@ -30,6 +31,7 @@ const HospitalSelection = ({navigation, route}) => {
 
   const handleNext = () => {
     if (selectedHospital) {
+      storage.saveSelectedHospital(selectedHospital);
       navigation?.navigate('BookingDateTime', {
         selectedMember,
         selectedCaregiver,

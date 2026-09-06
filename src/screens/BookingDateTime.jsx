@@ -1,20 +1,49 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
+  TextInput,
+  Alert,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useCreateBooking} from '../api/mutations';
+import {storage} from '../utils/storage';
+import Header from '../components/common/Header';
+import SearchableDropdown from '../components/common/SearchableDropdown';
+import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
 
-const BookingDateTime = ({navigation, route}) => {
-  const insets = useSafeAreaInsets();
+const BookingDateTime = ({navigation}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
-  const {selectedMember, selectedCaregiver, selectedHospital} = route.params || {};
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedCaregiver, setSelectedCaregiver] = useState(null);
+  const [selectedHospital, setSelectedHospital] = useState(null);
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [pickupCity, setPickupCity] = useState('');
+  const [pickupDistrict, setPickupDistrict] = useState('');
+  const [pickupDivision, setPickupDivision] = useState('');
+  const [patientRequirements, setPatientRequirements] = useState('');
+  const [durationHours, setDurationHours] = useState(4);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createBooking = useCreateBooking();
+
+  useEffect(() => {
+    loadBookingData();
+  }, []);
+
+  const loadBookingData = async () => {
+    const member = await storage.getSelectedFamilyMember();
+    const caregiver = await storage.getSelectedCaregiver();
+    const hospital = await storage.getSelectedHospital();
+    setSelectedMember(member);
+    setSelectedCaregiver(caregiver);
+    setSelectedHospital(hospital);
+  };
 
   const dates = [
     {id: 1, day: 'Mon', date: '15', fullDate: '2024-01-15'},
@@ -37,86 +66,96 @@ const BookingDateTime = ({navigation, route}) => {
     {id: 8, time: '05:00 PM'},
   ];
 
-  const handleProceed = () => {
-    if (selectedDate && selectedTime) {
-      navigation?.navigate('BookingConfirmed', {
-        selectedMember,
-        selectedCaregiver,
-        selectedHospital,
-        selectedDate,
-        selectedTime,
-      });
+  const handleBook = async () => {
+    if (!selectedDate || !selectedTime) {
+      Alert.alert('Error', 'Please select date and time');
+      return;
+    }
+
+    if (!pickupAddress || !pickupCity || !pickupDistrict) {
+      Alert.alert('Error', 'Please fill in pickup location details');
+      return;
+    }
+
+    if (!patientRequirements) {
+      Alert.alert('Error', 'Please provide patient requirements');
+      return;
+    }
+
+    const token = await storage.getAuthToken();
+    if (!token) {
+      Alert.alert('Error', 'Please login to book an appointment');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const bookingData = {
+      service_type: 'HOME_CARE',
+      family_member_id: selectedMember.id,
+      provider_type: 'CAREGIVER',
+      provider_id: selectedCaregiver.id,
+      hospital_id: selectedHospital.id,
+      booking_date: selectedDate.fullDate,
+      start_time: selectedTime.time.replace(' AM', '').replace(' PM', ''),
+      duration_hours: durationHours,
+      pickup_location: {
+        address: pickupAddress,
+        city: pickupCity,
+        district: pickupDistrict,
+        division: pickupDivision || pickupDistrict,
+        latitude: 23.8103,
+        longitude: 90.4125,
+      },
+      patient_requirements: patientRequirements,
+    };
+
+    try {
+      await createBooking.mutateAsync(bookingData);
+      await storage.clearBookingData();
+      Alert.alert('Success', 'Booking created successfully', [
+        {
+          text: 'OK',
+          onPress: () => navigation?.reset({
+            index: 0,
+            routes: [{name: 'HomeScreen'}],
+          }),
+        },
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create booking. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* ================= HEADER ================= */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={24} color="#172333" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Book Appointment</Text>
-
-        <View style={styles.placeholder} />
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header title="Book Appointment" onBack={() => navigation?.goBack()} />
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, {paddingBottom: 100 + insets.bottom}]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {/* ================= BOOKING SUMMARY ================= */}
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Booking Summary</Text>
-
-          {/* Family Member */}
+        {/* ================= SELECTED INFO ================= */}
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Selected Details</Text>
           {selectedMember && (
-            <View style={styles.summaryItem}>
-              <View style={styles.summaryItemLeft}>
-                <Image
-                  source={{uri: selectedMember.image}}
-                  style={styles.summaryImage}
-                />
-                <View style={styles.summaryItemText}>
-                  <Text style={styles.summaryLabel}>Family Member</Text>
-                  <Text style={styles.summaryValue}>{selectedMember.name}</Text>
-                </View>
-              </View>
+            <View style={styles.infoItem}>
+              <Icon name="person-outline" size={18} color="#008178" />
+              <Text style={styles.infoText}>{selectedMember.name}</Text>
             </View>
           )}
-
-          {/* Caregiver */}
           {selectedCaregiver && (
-            <View style={styles.summaryItem}>
-              <View style={styles.summaryItemLeft}>
-                <Image
-                  source={{uri: selectedCaregiver.image}}
-                  style={styles.summaryImage}
-                />
-                <View style={styles.summaryItemText}>
-                  <Text style={styles.summaryLabel}>Caregiver</Text>
-                  <Text style={styles.summaryValue}>{selectedCaregiver.name}</Text>
-                </View>
-              </View>
+            <View style={styles.infoItem}>
+              <Icon name="medkit-outline" size={18} color="#008178" />
+              <Text style={styles.infoText}>{selectedCaregiver.name}</Text>
             </View>
           )}
-
-          {/* Hospital */}
           {selectedHospital && (
-            <View style={styles.summaryItem}>
-              <View style={styles.summaryItemLeft}>
-                <View style={styles.hospitalIcon}>
-                  <Icon name="business" size={20} color="#008178" />
-                </View>
-                <View style={styles.summaryItemText}>
-                  <Text style={styles.summaryLabel}>Hospital</Text>
-                  <Text style={styles.summaryValue}>{selectedHospital.name}</Text>
-                </View>
-              </View>
+            <View style={styles.infoItem}>
+              <Icon name="business-outline" size={18} color="#008178" />
+              <Text style={styles.infoText}>{selectedHospital.name}</Text>
             </View>
           )}
         </View>
@@ -176,19 +215,100 @@ const BookingDateTime = ({navigation, route}) => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* ================= DURATION ================= */}
+        <Text style={styles.sectionTitle}>Duration (Hours)</Text>
+        <View style={styles.durationContainer}>
+          {[2, 3, 4, 5, 6, 8].map(hours => (
+            <TouchableOpacity
+              key={hours}
+              activeOpacity={0.85}
+              style={[
+                styles.durationCard,
+                durationHours === hours && styles.selectedDurationCard,
+              ]}
+              onPress={() => setDurationHours(hours)}>
+              <Text
+                style={[
+                  styles.durationText,
+                  durationHours === hours && styles.selectedDurationText,
+                ]}>
+                {hours}h
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* ================= PICKUP LOCATION ================= */}
+        <Text style={styles.sectionTitle}>Pickup Location</Text>
+        <View style={styles.inputContainer}>
+          <Icon name="location-outline" size={18} color="#7D8BA5" />
+          <TextInput
+            style={styles.input}
+            placeholder="Address"
+            placeholderTextColor="#7D8BA5"
+            value={pickupAddress}
+            onChangeText={setPickupAddress}
+          />
+        </View>
+        <SearchableDropdown
+          data={bangladeshCities}
+          label="City"
+          placeholder="Select city"
+          value={pickupCity}
+          onSelect={setPickupCity}
+          icon="business-outline"
+        />
+        <SearchableDropdown
+          data={bangladeshDistricts}
+          label="District"
+          placeholder="Select district"
+          value={pickupDistrict}
+          onSelect={setPickupDistrict}
+          icon="location-outline"
+        />
+        <View style={styles.inputContainer}>
+          <Icon name="map-outline" size={18} color="#7D8BA5" />
+          <TextInput
+            style={styles.input}
+            placeholder="Division (optional)"
+            placeholderTextColor="#7D8BA5"
+            value={pickupDivision}
+            onChangeText={setPickupDivision}
+          />
+        </View>
+
+        {/* ================= PATIENT REQUIREMENTS ================= */}
+        <Text style={styles.sectionTitle}>Patient Requirements</Text>
+        <View style={styles.textAreaContainer}>
+          <TextInput
+            style={styles.textArea}
+            placeholder="Describe patient needs, medical conditions, special requirements..."
+            placeholderTextColor="#7D8BA5"
+            value={patientRequirements}
+            onChangeText={setPatientRequirements}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+        </View>
       </ScrollView>
 
-      {/* ================= PROCEED BUTTON ================= */}
-      <View style={[styles.bottomContainer, {paddingBottom: 16 + insets.bottom}]}>
+      {/* ================= BOOK BUTTON ================= */}
+      <View style={styles.bottomContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
           style={[
-            styles.proceedButton,
-            (!selectedDate || !selectedTime) && styles.disabledButton,
+            styles.bookButton,
+            (!selectedDate || !selectedTime || isSubmitting) && styles.disabledButton,
           ]}
-          onPress={handleProceed}
-          disabled={!selectedDate || !selectedTime}>
-          <Text style={styles.proceedButtonText}>Proceed to Book</Text>
+          onPress={handleBook}
+          disabled={!selectedDate || !selectedTime || isSubmitting}>
+          {isSubmitting ? (
+            <Text style={styles.bookButtonText}>Booking...</Text>
+          ) : (
+            <Text style={styles.bookButtonText}>Book Appointment</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -203,31 +323,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 
-  // ================= HEADER =================
-  header: {
-    height: 56,
+  // ================= INFO CARD =================
+  infoCard: {
+    backgroundColor: '#F5F7FA',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+
+  infoTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#172333',
+    marginBottom: 12,
+  },
+
+  infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    marginBottom: 8,
   },
 
-  backButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  infoText: {
+    fontSize: 14,
     color: '#172333',
-  },
-
-  placeholder: {
-    width: 36,
+    marginLeft: 8,
   },
 
   // ================= SCROLL =================
@@ -240,66 +360,71 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
 
-  // ================= SUMMARY =================
-  summaryCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+  // ================= INPUTS =================
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F7FA',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 48,
+    marginBottom: 12,
+  },
+
+  input: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#172333',
+  },
+
+  textAreaContainer: {
+    backgroundColor: '#F5F7FA',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     marginBottom: 20,
+  },
+
+  textArea: {
+    fontSize: 14,
+    color: '#172333',
+    minHeight: 100,
+  },
+
+  // ================= DURATION =================
+  durationContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 24,
+  },
+
+  durationCard: {
+    width: '31%',
+    height: 48,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: '#E3E8F0',
   },
 
-  summaryTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#172333',
-    marginBottom: 16,
-  },
-
-  summaryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-
-  summaryItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-
-  summaryImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
-  },
-
-  hospitalIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  selectedDurationCard: {
+    borderColor: '#008178',
     backgroundColor: '#EAF2FE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
   },
 
-  summaryItemText: {
-    flex: 1,
-  },
-
-  summaryLabel: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginBottom: 2,
-  },
-
-  summaryValue: {
+  durationText: {
     fontSize: 14,
-    fontWeight: '600',
     color: '#172333',
+  },
+
+  selectedDurationText: {
+    color: '#008178',
+    fontWeight: '600',
   },
 
   // ================= SECTION TITLE =================
@@ -401,7 +526,7 @@ const styles = StyleSheet.create({
 
   },
 
-  proceedButton: {
+  bookButton: {
     backgroundColor: '#008178',
     borderRadius: 12,
     alignItems: 'center',
@@ -413,7 +538,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#B5C0D0',
   },
 
-  proceedButtonText: {
+  bookButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',

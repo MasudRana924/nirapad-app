@@ -13,6 +13,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchCaregivers} from '../api/queries';
 import Header from '../components/common/Header';
+import {storage} from '../utils/storage';
 
 const SelectCaregiverScreen = ({navigation, route}) => {
   const [search, setSearch] = useState('');
@@ -45,6 +46,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
 
   const handleNext = () => {
     if (selectedCaregiver) {
+      storage.saveSelectedCaregiver(selectedCaregiver);
       navigation?.navigate('HospitalSelection', {
         selectedMember,
         selectedCaregiver,

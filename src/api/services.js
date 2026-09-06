@@ -132,7 +132,7 @@ export const bookingService = {
     apiRequest('/bookings', 'GET'),
 
   createBooking: (bookingData) =>
-    apiRequest('/bookings', 'POST', bookingData),
+    apiRequest('/bookings', 'POST', bookingData, true),
 
   updateBooking: (id, bookingData) =>
     apiRequest(`/bookings/${id}`, 'PUT', bookingData),

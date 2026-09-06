@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useFamilyMembers} from '../api/queries';
 import Header from '../components/common/Header';
 import FamilySkeleton from '../components/home/FamilySkeleton';
+import {storage} from '../utils/storage';
 
 const SelectFamilyMember = ({navigation, route}) => {
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
@@ -33,6 +34,7 @@ const SelectFamilyMember = ({navigation, route}) => {
 
   const handleNext = () => {
     if (selectedMember) {
+      storage.saveSelectedFamilyMember(selectedMember);
       if (selectedCaregiver) {
         // Skip caregiver selection, go directly to hospital selection
         navigation?.navigate('HospitalSelection', {
