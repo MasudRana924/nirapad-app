@@ -131,20 +131,20 @@ export const bookingService = {
   getBookings: (params = {}) => {
     const {page = 1, limit = 20} = params;
     const queryParams = new URLSearchParams({page: page.toString(), limit: limit.toString()});
-    return apiRequest(`/api/v1/bookings?${queryParams.toString()}`, 'GET');
+    return apiRequest(`/bookings?${queryParams.toString()}`, 'GET');
   },
 
   getBookingDetails: (id) =>
-    apiRequest(`/api/v1/bookings/${id}`, 'GET'),
+    apiRequest(`/bookings/${id}`, 'GET'),
 
   createBooking: (bookingData) =>
-    apiRequest('/api/v1/bookings', 'POST', bookingData, false),
+    apiRequest('/bookings', 'POST', bookingData, false),
 
   updateBooking: (id, bookingData) =>
-    apiRequest(`/api/v1/bookings/${id}`, 'PUT', bookingData),
+    apiRequest(`/bookings/${id}`, 'PUT', bookingData),
 
   cancelBooking: (id) =>
-    apiRequest(`/api/v1/bookings/${id}/cancel`, 'POST'),
+    apiRequest(`/bookings/${id}/cancel`, 'POST'),
 };
 
 /**

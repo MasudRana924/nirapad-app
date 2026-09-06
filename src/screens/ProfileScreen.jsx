@@ -14,6 +14,7 @@ import {useAuth} from '../context/AuthContext';
 import {useUserProfile} from '../api/queries';
 import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
+import {storage} from '../utils/storage';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useAuth();
@@ -28,13 +29,20 @@ const ProfileScreen = ({navigation}) => {
   };
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
       [
         {text: 'Cancel', style: 'cancel'},
-        {text: 'Logout', onPress: logout, style: 'destructive'},
+        {
+          text: 'Logout',
+          onPress: async () => {
+            await storage.clearBookingData();
+            logout();
+          },
+          style: 'destructive',
+        },
       ],
     );
   };

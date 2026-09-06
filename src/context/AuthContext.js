@@ -53,7 +53,9 @@ export const AuthProvider = ({children}) => {
 
   const logout = async () => {
     try {
-      await AsyncStorage.multiRemove(['userToken', 'refreshToken', 'user']);
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('user');
       setUserToken(null);
       setRefreshToken(null);
       setUser(null);
