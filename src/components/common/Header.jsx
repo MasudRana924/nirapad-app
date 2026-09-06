@@ -16,7 +16,7 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
               activeOpacity={0.7}
               style={styles.backButton}
               onPress={onBack}>
-              <Icon name="arrow-back" size={24} color="#FFFFFF" />
+              <Icon name="arrow-back" size={24} color="#172333" />
             </TouchableOpacity>
           ) : (
             <View style={styles.placeholder} />
@@ -33,7 +33,8 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#008178',
+    // backgroundColor: '#008178',
+    backgroundColor: '#fff',
   },
   
   content: {
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
+    color: '#172333',
   },
   
   placeholder: {
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#172333',
     textAlign: 'center',
     flex: 1,
   },

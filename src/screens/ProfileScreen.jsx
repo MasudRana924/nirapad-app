@@ -70,7 +70,7 @@ const ProfileScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Profile" showBack={false} />
+      <Header title="Profile" showBack={true} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -120,7 +120,7 @@ const ProfileScreen = ({navigation}) => {
               {item.value ? (
                 <Text style={styles.menuValue}>{item.value}</Text>
               ) : (
-                <Icon name="chevron-forward" size={22} color="#C0C8D6" />
+                <Icon name="chevron-forward" size={22} color="#008178" />
               )}
             </TouchableOpacity>
           ))}
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     marginTop: 24,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#EDF1F7',

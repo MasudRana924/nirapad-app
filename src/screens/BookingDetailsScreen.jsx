@@ -269,6 +269,15 @@ const BookingDetailsScreen = ({navigation, route}) => {
           </View>
         )}
       </ScrollView>
+
+      {/* Pay Now Button */}
+      {booking.payment_status === 'PENDING' && (
+        <View style={styles.payButtonContainer}>
+          <TouchableOpacity style={styles.payButton}>
+            <Text style={styles.payButtonText}>Pay Now</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -448,6 +457,26 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  payButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    // padding: 16,
+
+  },
+  payButton: {
+    backgroundColor: '#008178',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  payButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
 
