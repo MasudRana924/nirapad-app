@@ -10,7 +10,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const COLORS = {
-  background: '#F7F8FC',
+  background: '#fff',
   white: '#FFFFFF',
   text: '#17212D',
   muted: '#7D8BA3',
@@ -80,7 +80,7 @@ const BookingConfirmedScreen = ({navigation, route}) => {
           </View>
 
           <Text style={styles.notificationText}>
-            You will receive a notification when your caregiver is assigned.
+            You will receive a notification when your caregiver is accepted.
           </Text>
         </View>
 
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
 
   bookingCard: {
     width: '100%',
-    backgroundColor: COLORS.white,
+    backgroundColor: '#F5F5F5',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: "#F5F5F5",
     borderRadius: 16,
     paddingHorizontal: 22,
     paddingTop: 23,

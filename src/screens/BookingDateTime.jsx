@@ -129,7 +129,7 @@ const BookingDateTime = ({navigation}) => {
     try {
       const response = await createBooking.mutateAsync(bookingData);
       await storage.clearBookingData();
-      navigation?.navigate('BookingConfirmedScreen', {
+      navigation?.navigate('BookingConfirmed', {
         message: response.message || 'Booking created successfully',
         status: response.data?.status || 'PENDING_PAYMENT',
         bookingNumber: response.data?.booking_number,
