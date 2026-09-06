@@ -9,94 +9,39 @@ import {
   Image,
   StatusBar,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-const caregivers = [
-  {
-    id: 1,
-    name: 'Tanzim Ahmed',
-    title: 'Senior Patient Escort',
-    rating: '4.8',
-    reviews: '98',
-    experience: '4 yrs exp',
-    trips: '120 trips',
-    price: '৳380',
-    estimated: '৳1,140',
-    image: 'https://randomuser.me/api/portraits/men/32.jpg',
-    description:
-      'Specialized in orthopedic and geriatric care assistance, wheelchair transit, and prescription & medication management.',
-    languages: ['Bengali', 'English'],
-    available: true,
-  },
-  {
-    id: 2,
-    name: 'Farhana Yasmin',
-    title: 'Compassionate Caregiver',
-    rating: '4.9',
-    reviews: '210',
-    experience: '5 yrs exp',
-    trips: '240+ trips',
-    price: '৳450',
-    estimated: '৳1,350',
-    image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    description:
-      'Deep experience in oncology, post-surgery follow-up appointments, calm communication with anxious patients, and doctor communication assistance.',
-    languages: ['Bengali', 'English', 'Hindi'],
-    available: true,
-  },
-  {
-    id: 3,
-    name: 'Karim Mia',
-    title: 'Hospital Escort Specialist',
-    rating: '4.7',
-    reviews: '142',
-    experience: '6 yrs exp',
-    trips: '210 trips',
-    price: '৳420',
-    estimated: '৳1,260',
-    image: 'https://randomuser.me/api/portraits/men/52.jpg',
-    description:
-      'Expert in hospital navigation, appointment coordination, and patient transport. Experienced with elderly and disabled patients.',
-    languages: ['Bengali', 'English'],
-    available: true,
-  },
-  {
-    id: 4,
-    name: 'Sumaiya Begum',
-    title: 'Home Care Assistant',
-    rating: '4.6',
-    reviews: '67',
-    experience: '2 yrs exp',
-    trips: '87 trips',
-    price: '৳350',
-    estimated: '৳1,050',
-    image: 'https://randomuser.me/api/portraits/women/68.jpg',
-    description:
-      'Specialized in home-based care, medication management, and daily living assistance. Patient and compassionate caregiver.',
-    languages: ['Bengali'],
-    available: true,
-  },
-];
-
-const filters = [
-  'Available',
-  'Top Rated',
-  'Female',
-  'Nearby',
-  'Budget',
-];
+import {useSearchCaregivers} from '../api/queries';
+import Header from '../components/common/Header';
 
 const SelectCaregiverScreen = ({navigation, route}) => {
-  const insets = useSafeAreaInsets();
-  const [selectedFilter, setSelectedFilter] = useState('Available');
   const [search, setSearch] = useState('');
+  const [location, setLocation] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('');
   const [selectedCaregiver, setSelectedCaregiver] = useState(null);
   const {selectedMember} = route.params || {};
 
-  const filteredCaregivers = caregivers.filter(item =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filters = [
+    {id: 'all', label: 'All'},
+    {id: 'male', label: 'Male'},
+    {id: 'female', label: 'Female'},
+  ];
+
+  const {data: caregiversData, isLoading} = useSearchCaregivers({
+    name: search,
+    location,
+    gender: selectedFilter === 'all' ? '' : selectedFilter,
+  });
+
+  const caregivers = caregiversData?.data || [];
+
+  const handleFilterSelect = (filterId) => {
+    setSelectedFilter(filterId === selectedFilter ? '' : filterId);
+  };
+
+  const handleSearch = (text) => {
+    setSearch(text);
+  };
 
   const handleNext = () => {
     if (selectedCaregiver) {
@@ -108,63 +53,58 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
-
-      {/* ================= HEADER ================= */}
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={27} color="#182331" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Select Caregiver</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header title="Select Caregiver" onBack={() => navigation?.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[styles.scrollContent, {paddingBottom: 100 + insets.bottom}]}>
+        contentContainerStyle={styles.scrollContent}>
         {/* ================= SEARCH ================= */}
-
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
             <Icon name="search" size={23} color="#7D8BA5" />
-
             <TextInput
               value={search}
-              onChangeText={setSearch}
-              placeholder="Search caregivers..."
+              onChangeText={handleSearch}
+              placeholder="Search by name..."
               placeholderTextColor="#7D8BA5"
               style={styles.searchInput}
             />
           </View>
-
           <TouchableOpacity activeOpacity={0.85} style={styles.filterButton}>
             <Icon name="options-outline" size={23} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
-        {/* ================= FILTER CHIPS ================= */}
+        {/* Location Filter */}
+        <View style={styles.locationFilter}>
+          <Icon name="location-outline" size={18} color="#7D8BA5" />
+          <TextInput
+            value={location}
+            onChangeText={setLocation}
+            placeholder="Filter by location..."
+            placeholderTextColor="#7D8BA5"
+            style={styles.locationInput}
+          />
+        </View>
 
+        {/* ================= FILTER CHIPS ================= */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterScroll}>
           {filters.map(filter => {
-            const selected = selectedFilter === filter;
+            const selected = selectedFilter === filter.id;
 
             return (
               <TouchableOpacity
-                key={filter}
+                key={filter.id}
                 activeOpacity={0.8}
-                onPress={() => setSelectedFilter(filter)}
+                onPress={() => handleFilterSelect(filter.id)}
                 style={[styles.filterChip, selected && styles.filterChipActive]}>
                 <Text style={[styles.filterText, selected && styles.filterTextActive]}>
-                  {filter}
+                  {filter.label}
                 </Text>
               </TouchableOpacity>
             );
@@ -172,22 +112,29 @@ const SelectCaregiverScreen = ({navigation, route}) => {
         </ScrollView>
 
         {/* ================= RESULT HEADER ================= */}
-
         <View style={styles.resultHeader}>
-          <Text style={styles.availableText}>24 caregivers available</Text>
-
+          <Text style={styles.availableText}>{caregivers.length} caregivers available</Text>
           <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
             <Icon name="swap-vertical" size={19} color="#1473DC" />
-
             <Text style={styles.sortText}>Sort</Text>
           </TouchableOpacity>
         </View>
 
         {/* ================= CAREGIVER LIST ================= */}
-
-        <View style={styles.caregiverList}>
-          {filteredCaregivers.map(caregiver => (
-            <TouchableOpacity
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        ) : caregivers.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Icon name="people-outline" size={64} color="#E3E8F0" />
+            <Text style={styles.emptyTitle}>No Caregivers Found</Text>
+            <Text style={styles.emptyText}>Try adjusting your filters</Text>
+          </View>
+        ) : (
+          <View style={styles.caregiverList}>
+            {caregivers.map(caregiver => (
+              <TouchableOpacity
               key={caregiver.id}
               activeOpacity={0.9}
               style={[
@@ -198,8 +145,14 @@ const SelectCaregiverScreen = ({navigation, route}) => {
               {/* Top Section */}
               <View style={styles.topSection}>
                 <View style={styles.imageContainer}>
-                  <Image source={{uri: caregiver.image}} style={styles.profileImage} />
-                  <View style={styles.onlineDot} />
+                  {caregiver.profile_photo ? (
+                    <Image source={{uri: caregiver.profile_photo}} style={styles.profileImage} />
+                  ) : (
+                    <View style={styles.placeholderImage}>
+                      <Icon name="person" size={24} color="#8190A7" />
+                    </View>
+                  )}
+                  {caregiver.is_available && <View style={styles.onlineDot} />}
                 </View>
                 <View style={styles.mainInfo}>
                   <View style={styles.nameRow}>
@@ -208,41 +161,39 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                         {caregiver.name}
                       </Text>
                     </View>
-                    <View style={styles.availableBadge}>
-                      <Text style={styles.availableText}>Available</Text>
-                    </View>
+                    {caregiver.is_available && (
+                      <View style={styles.availableBadge}>
+                        <Text style={styles.availableText}>Available</Text>
+                      </View>
+                    )}
                   </View>
-                  <Text style={styles.title}>{caregiver.title}</Text>
+                  <Text style={styles.title}>{caregiver.bio || 'Caregiver'}</Text>
                   <View style={styles.statsRow}>
                     <View style={styles.statItem}>
                       <Icon name="star" size={16} color="#F59E0B" />
                       <Text style={styles.ratingText}>{caregiver.rating}</Text>
-                      <Text style={styles.reviewText}>({caregiver.reviews})</Text>
+                      <Text style={styles.reviewText}>({caregiver.completed_bookings})</Text>
                     </View>
                     <View style={styles.separator}>•</View>
                     <View style={styles.statItem}>
                       <Icon name="briefcase-outline" size={15} color="#1E293B" />
-                      <Text style={styles.statText}>{caregiver.experience}</Text>
+                      <Text style={styles.statText}>{caregiver.experience_years} yrs exp</Text>
                     </View>
                     <View style={styles.separator}>•</View>
                   </View>
                   <View style={styles.tripsRow}>
                     <Icon name="add-square-outline" size={15} color="#008F72" />
-                    <Text style={styles.tripsText}>{caregiver.trips}</Text>
+                    <Text style={styles.tripsText}>{caregiver.service_areas?.join(', ') || 'No location'}</Text>
                   </View>
                 </View>
               </View>
 
               {/* Description */}
-              <View style={styles.descriptionBox}>
-                <Text style={styles.description}>{caregiver.description}</Text>
-                <View style={styles.languageRow}>
-                  <Icon name="language-outline" size={17} color="#26364A" />
-                  <Text style={styles.languageText}>
-                    {caregiver.languages.join(', ')}
-                  </Text>
+              {caregiver.bio && (
+                <View style={styles.descriptionBox}>
+                  <Text style={styles.description}>{caregiver.bio}</Text>
                 </View>
-              </View>
+              )}
 
               {/* Bottom Price Section */}
               <View style={styles.bottomSection}>
@@ -271,18 +222,16 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
-      {/* ================= NEXT BUTTON ================= */}
+      {/* ================= BOTTOM BUTTON ================= */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
-          style={[
-            styles.nextButton,
-            !selectedCaregiver && styles.disabledButton,
-          ]}
+          style={[styles.nextButton, !selectedCaregiver && styles.disabledButton]}
           onPress={handleNext}
           disabled={!selectedCaregiver}>
           <Text style={styles.nextButtonText}>Next</Text>
@@ -301,33 +250,38 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
 
-  // =====================================================
-  // HEADER
-  // =====================================================
-
-  header: {
-    height: 55,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 18,
-  },
-
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 20,
+  // ================= LOADING =================
+  loadingContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    paddingVertical: 80,
   },
 
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#11182e',
+  loadingText: {
+    fontSize: 16,
+    color: '#8190A7',
+  },
+
+  // ================= EMPTY STATE =================
+  emptyState: {
     flex: 1,
-    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#172333',
+    marginTop: 16,
+  },
+
+  emptyText: {
+    fontSize: 14,
+    color: '#8190A7',
+    marginTop: 8,
   },
 
   // =====================================================
@@ -380,6 +334,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 9,
+  },
+
+  // ================= LOCATION FILTER =================
+  locationFilter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingHorizontal: 14,
+    height: 44,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 12,
+  },
+
+  locationInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#172333',
   },
 
   // =====================================================
@@ -498,8 +470,17 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 67,
     height: 67,
-    borderRadius: 9,
+    borderRadius: 34,
     backgroundColor: '#E5E7EB',
+  },
+
+  placeholderImage: {
+    width: 67,
+    height: 67,
+    borderRadius: 34,
+    backgroundColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   onlineDot: {

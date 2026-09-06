@@ -11,184 +11,156 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-const caregivers = [
-  {
-    id: 1,
-    name: 'Rahim Ahmed',
-    image: 'https://randomuser.me/api/portraits/men/32.jpg',
-    rating: '4.9',
-    jobs: '142 jobs',
-    experience: '4 yrs',
-    distance: '2.3 km',
-    price: '৳800',
-    tags: ['Hospital', 'Elderly'],
-  },
-  {
-    id: 2,
-    name: 'Fatema Khanam',
-    image: 'https://randomuser.me/api/portraits/women/44.jpg',
-    rating: '4.8',
-    jobs: '98 jobs',
-    experience: '3 yrs',
-    distance: '3.1 km',
-    price: '৳750',
-    tags: ['Home Care', 'Elderly'],
-  },
-  {
-    id: 3,
-    name: 'Karim Mia',
-    image: 'https://randomuser.me/api/portraits/men/52.jpg',
-    rating: '4.7',
-    jobs: '210 jobs',
-    experience: '5 yrs',
-    distance: '1.8 km',
-    price: '৳900',
-    tags: ['Hospital', 'Physio'],
-  },
-  {
-    id: 4,
-    name: 'Nasrin Akter',
-    image: 'https://randomuser.me/api/portraits/women/55.jpg',
-    rating: '4.6',
-    jobs: '76 jobs',
-    experience: '2 yrs',
-    distance: '4.2 km',
-    price: '৳700',
-    tags: ['Home Care', 'Baby'],
-  },
-  {
-    id: 5,
-    name: 'Jamal Uddin',
-    image: 'https://randomuser.me/api/portraits/men/62.jpg',
-    rating: '4.8',
-    jobs: '156 jobs',
-    experience: '4 yrs',
-    distance: '2.9 km',
-    price: '৳850',
-    tags: ['Hospital', 'Elderly'],
-  },
-];
-
-const filters = [
-  'Available',
-  'Top Rated',
-  'Female',
-  'Nearby',
-  'Budget',
-];
+import {useSearchCaregivers} from '../api/queries';
+import Header from '../components/common/Header';
 
 const AllCaregiversScreen = ({navigation}) => {
-  const [selectedFilter, setSelectedFilter] = useState('Available');
   const [search, setSearch] = useState('');
+  const [location, setLocation] = useState('');
+  const [gender, setGender] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('');
 
-  const filteredCaregivers = caregivers.filter(item =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filters = [
+    {id: 'all', label: 'All'},
+    {id: 'male', label: 'Male'},
+    {id: 'female', label: 'Female'},
+  ];
+
+  const {data: caregiversData, isLoading} = useSearchCaregivers({
+    name: search,
+    location,
+    gender: selectedFilter === 'all' ? '' : selectedFilter,
+  });
+
+  const caregivers = caregiversData?.data || [];
+
+  const handleFilterSelect = (filterId) => {
+    setSelectedFilter(filterId === selectedFilter ? '' : filterId);
+  };
+
+  const handleSearch = (text) => {
+    setSearch(text);
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      {/* ================= HEADER ================= */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={27} color="#182331" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>All Caregivers</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header title="All Caregivers" onBack={() => navigation?.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.scrollContent}>
         {/* ================= SEARCH ================= */}
-
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
             <Icon name="search" size={23} color="#7D8BA5" />
-
             <TextInput
               value={search}
-              onChangeText={setSearch}
-              placeholder="Search caregivers..."
+              onChangeText={handleSearch}
+              placeholder="Search by name..."
               placeholderTextColor="#7D8BA5"
               style={styles.searchInput}
             />
           </View>
-
           <TouchableOpacity style={styles.filterButton}>
             <Icon name="options-outline" size={22} color="#1473DC" />
           </TouchableOpacity>
         </View>
 
-        {/* ================= FILTERS ================= */}
+        {/* Location Filter */}
+        <View style={styles.locationFilter}>
+          <Icon name="location-outline" size={18} color="#7D8BA5" />
+          <TextInput
+            value={location}
+            onChangeText={setLocation}
+            placeholder="Filter by location..."
+            placeholderTextColor="#7D8BA5"
+            style={styles.locationInput}
+          />
+        </View>
 
+        {/* ================= FILTERS ================= */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filtersScroll}>
           {filters.map(filter => (
             <TouchableOpacity
-              key={filter}
+              key={filter.id}
               activeOpacity={0.75}
               style={[
                 styles.filterChip,
-                selectedFilter === filter && styles.activeFilter,
+                selectedFilter === filter.id && styles.activeFilter,
               ]}
-              onPress={() => setSelectedFilter(filter)}>
+              onPress={() => handleFilterSelect(filter.id)}>
               <Text
                 style={[
                   styles.filterText,
-                  selectedFilter === filter && styles.activeFilterText,
+                  selectedFilter === filter.id && styles.activeFilterText,
                 ]}>
-                {filter}
+                {filter.label}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
         {/* ================= CAREGIVER LIST ================= */}
-        <View style={styles.caregiverList}>
-          {filteredCaregivers.map(caregiver => (
-            <TouchableOpacity
-              key={caregiver.id}
-              activeOpacity={0.9}
-              style={styles.caregiverCard}
-              onPress={() =>
-                navigation?.navigate('CaregiverDetails', {caregiver})
-              }>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <View style={styles.iconContainer}>
-                    <Icon name="person" size={24} color="#008178" />
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        ) : caregivers.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Icon name="people-outline" size={64} color="#E3E8F0" />
+            <Text style={styles.emptyTitle}>No Caregivers Found</Text>
+            <Text style={styles.emptyText}>Try adjusting your filters</Text>
+          </View>
+        ) : (
+          <View style={styles.caregiverList}>
+            {caregivers.map(caregiver => (
+              <TouchableOpacity
+                key={caregiver.id}
+                activeOpacity={0.9}
+                style={styles.caregiverCard}
+                onPress={() =>
+                  navigation?.navigate('CaregiverDetails', {caregiver})
+                }>
+                <View style={styles.cardContent}>
+                  <View style={styles.cardLeft}>
+                    {caregiver.profile_photo ? (
+                      <Image source={{uri: caregiver.profile_photo}} style={styles.avatar} />
+                    ) : (
+                      <View style={styles.iconContainer}>
+                        <Icon name="person" size={24} color="#008178" />
+                      </View>
+                    )}
                   </View>
-                </View>
 
-                <View style={styles.cardRight}>
-                  <View style={styles.nameRow}>
-                    <Text style={styles.caregiverName}>{caregiver.name}</Text>
-                    <View style={styles.availableBadge}>
-                      <Text style={styles.availableBadgeText}>Available</Text>
+                  <View style={styles.cardRight}>
+                    <View style={styles.nameRow}>
+                      <Text style={styles.caregiverName}>{caregiver.name}</Text>
+                      {caregiver.is_available && (
+                        <View style={styles.availableBadge}>
+                          <Text style={styles.availableBadgeText}>Available</Text>
+                        </View>
+                      )}
                     </View>
+
+                    <Text style={styles.locationText}>
+                      {caregiver.experience_years} yrs exp · {caregiver.service_areas?.join(', ') || 'No location'}
+                    </Text>
+                    <Text style={styles.priceText}>৳{caregiver.hourly_rate}/hr</Text>
                   </View>
 
-                  <Text style={styles.locationText}>
-                    {caregiver.experience} · {caregiver.distance}
-                  </Text>
+                  <View style={styles.ratingSection}>
+                    <Text style={styles.ratingText}>{caregiver.rating}</Text>
+                    <Icon name="star" size={16} color="#F6A900" />
+                  </View>
                 </View>
-
-                <View style={styles.ratingSection}>
-                  <Text style={styles.ratingText}>{caregiver.rating}</Text>
-                  <Icon name="star" size={16} color="#F6A900" />
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -202,24 +174,38 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-  // =====================================================
-  // HEADER
-  // =====================================================
-
-  header: {
-    height: 56,
-    flexDirection: 'row',
+  // ================= LOADING =================
+  loadingContainer: {
+    flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
 
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  loadingText: {
+    fontSize: 16,
+    color: '#8190A7',
+  },
+
+  // ================= EMPTY STATE =================
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
     color: '#172333',
-    marginLeft: 16,
+    marginTop: 16,
+  },
+
+  emptyText: {
+    fontSize: 14,
+    color: '#8190A7',
+    marginTop: 8,
   },
 
   // =====================================================
@@ -257,6 +243,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // ================= LOCATION FILTER =================
+  locationFilter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingHorizontal: 14,
+    height: 44,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 12,
+  },
+
+  locationInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#172333',
   },
 
   // =====================================================
@@ -325,6 +329,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+
   cardRight: {
     flex: 1,
   },
@@ -358,6 +368,13 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 13,
     color: '#8190A7',
+  },
+
+  priceText: {
+    fontSize: 13,
+    color: '#008178',
+    fontWeight: '600',
+    marginTop: 2,
   },
 
   ratingSection: {

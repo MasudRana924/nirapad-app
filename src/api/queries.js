@@ -49,6 +49,14 @@ export const useCaregivers = (options = {}) => {
   });
 };
 
+export const useSearchCaregivers = (params = {}, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.caregivers.search(params),
+    queryFn: () => caregiverService.searchCaregivers(params),
+    ...options,
+  });
+};
+
 export const useCaregiver = (id, options = {}) => {
   return useQuery({
     queryKey: queryKeys.caregivers.detail(id),

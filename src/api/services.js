@@ -113,6 +113,15 @@ export const caregiverService = {
 
   getCaregiverDetails: (id) =>
     apiRequest(`/caregivers/${id}`, 'GET'),
+
+  searchCaregivers: (params = {}) => {
+    const {page = 1, limit = 20, location, gender, name} = params;
+    const queryParams = new URLSearchParams({page: page.toString(), limit: limit.toString()});
+    if (location) queryParams.append('location', location);
+    if (gender) queryParams.append('gender', gender);
+    if (name) queryParams.append('name', name);
+    return apiRequest(`/caregiver/search?${queryParams.toString()}`, 'GET');
+  },
 };
 
 /**

@@ -30,6 +30,7 @@ export const queryKeys = {
     all: ['caregivers'],
     lists: () => ['caregivers', 'list'],
     list: (filters) => ['caregivers', 'list', filters],
+    search: (params) => ['caregivers', 'search', params],
     details: () => ['caregivers', 'detail'],
     detail: (id) => ['caregivers', 'detail', id],
   },
