@@ -3,7 +3,7 @@
  * Centralized endpoint definitions for all API routes
  */
 
-const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
+const BASE_URL = 'http://192.168.10.78:8000/api/v1';
 
 export const ENDPOINTS = {
   // Auth endpoints

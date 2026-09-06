@@ -4,7 +4,7 @@ const STORAGE_KEYS = {
   SELECTED_FAMILY_MEMBER: 'selected_family_member',
   SELECTED_CAREGIVER: 'selected_caregiver',
   SELECTED_HOSPITAL: 'selected_hospital',
-  AUTH_TOKEN: 'auth_token',
+  AUTH_TOKEN: 'userToken',
 };
 
 export const storage = {

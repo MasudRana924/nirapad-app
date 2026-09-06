@@ -27,8 +27,10 @@ const BookingDateTime = ({navigation}) => {
   const [pickupDistrict, setPickupDistrict] = useState('');
   const [pickupDivision, setPickupDivision] = useState('');
   const [patientRequirements, setPatientRequirements] = useState('');
+  const [notes, setNotes] = useState('');
   const [durationHours, setDurationHours] = useState(4);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   const createBooking = useCreateBooking();
 
@@ -37,12 +39,18 @@ const BookingDateTime = ({navigation}) => {
   }, []);
 
   const loadBookingData = async () => {
-    const member = await storage.getSelectedFamilyMember();
-    const caregiver = await storage.getSelectedCaregiver();
-    const hospital = await storage.getSelectedHospital();
-    setSelectedMember(member);
-    setSelectedCaregiver(caregiver);
-    setSelectedHospital(hospital);
+    try {
+      const member = await storage.getSelectedFamilyMember();
+      const caregiver = await storage.getSelectedCaregiver();
+      const hospital = await storage.getSelectedHospital();
+      setSelectedMember(member);
+      setSelectedCaregiver(caregiver);
+      setSelectedHospital(hospital);
+    } catch (error) {
+      console.error('Error loading booking data:', error);
+    } finally {
+      setIsLoadingData(false);
+    }
   };
 
   const dates = [
@@ -67,6 +75,11 @@ const BookingDateTime = ({navigation}) => {
   ];
 
   const handleBook = async () => {
+    if (!selectedMember || !selectedCaregiver || !selectedHospital) {
+      Alert.alert('Error', 'Missing booking information. Please go back and select family member, caregiver, and hospital.');
+      return;
+    }
+
     if (!selectedDate || !selectedTime) {
       Alert.alert('Error', 'Please select date and time');
       return;
@@ -92,10 +105,10 @@ const BookingDateTime = ({navigation}) => {
 
     const bookingData = {
       service_type: 'HOME_CARE',
-      family_member_id: selectedMember.id,
+      family_member_id: selectedMember.id || selectedMember.uuid,
       provider_type: 'CAREGIVER',
-      provider_id: selectedCaregiver.id,
-      hospital_id: selectedHospital.id,
+      provider_id: selectedCaregiver.id || selectedCaregiver.uuid,
+      hospital_id: selectedHospital.id || selectedHospital.uuid,
       booking_date: selectedDate.fullDate,
       start_time: selectedTime.time.replace(' AM', '').replace(' PM', ''),
       duration_hours: durationHours,
@@ -108,7 +121,10 @@ const BookingDateTime = ({navigation}) => {
         longitude: 90.4125,
       },
       patient_requirements: patientRequirements,
+      notes: notes,
     };
+
+    console.log('Booking Request Body:', JSON.stringify(bookingData, null, 2));
 
     try {
       await createBooking.mutateAsync(bookingData);
@@ -137,6 +153,12 @@ const BookingDateTime = ({navigation}) => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
+        {isLoadingData ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading booking details...</Text>
+          </View>
+        ) : (
+          <>
         {/* ================= SELECTED INFO ================= */}
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>Selected Details</Text>
@@ -292,6 +314,23 @@ const BookingDateTime = ({navigation}) => {
             textAlignVertical="top"
           />
         </View>
+
+        {/* ================= NOTES ================= */}
+        <Text style={styles.sectionTitle}>Additional Notes (Optional)</Text>
+        <View style={styles.textAreaContainer}>
+          <TextInput
+            style={styles.textArea}
+            placeholder="Any additional notes for the caregiver..."
+            placeholderTextColor="#7D8BA5"
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+        </View>
+        </>
+        )}
       </ScrollView>
 
       {/* ================= BOOK BUTTON ================= */}
@@ -348,6 +387,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#172333',
     marginLeft: 8,
+  },
+
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+  },
+
+  loadingText: {
+    fontSize: 16,
+    color: '#8190A7',
   },
 
   // ================= SCROLL =================
