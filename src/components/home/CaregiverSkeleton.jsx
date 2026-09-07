@@ -11,8 +11,8 @@ const Skeleton = ({style}) => (
   />
 );
 
-/** Matches HospitalSelection card layout (same structure as caregiver cards) */
-const HospitalSkeleton = () => {
+/** Matches SelectCaregiverScreen card layout */
+const CaregiverSkeleton = () => {
   return (
     <View style={styles.container}>
       {[1, 2, 3].map(i => (
@@ -132,4 +132,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HospitalSkeleton;
+export default CaregiverSkeleton;

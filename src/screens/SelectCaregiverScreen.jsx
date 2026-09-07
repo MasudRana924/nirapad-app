@@ -12,6 +12,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchCaregivers} from '../api/queries';
 import Header from '../components/common/Header';
+import CaregiverSkeleton from '../components/home/CaregiverSkeleton';
 import {storage} from '../utils/storage';
 
 const SelectCaregiverScreen = ({navigation, route}) => {
@@ -124,9 +125,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
 
         {/* ================= CAREGIVER LIST ================= */}
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading...</Text>
-          </View>
+          <CaregiverSkeleton />
         ) : caregivers.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon name="people-outline" size={64} color="#E3E8F0" />
@@ -259,7 +258,6 @@ const SelectCaregiverScreen = ({navigation, route}) => {
           onPress={handleNext}
           disabled={!selectedCaregiver}>
           <Text style={styles.nextButtonText}>Next</Text>
-          <Icon name="arrow-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -627,6 +625,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    marginRight: 8,
   },
 });

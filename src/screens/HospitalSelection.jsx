@@ -188,7 +188,6 @@ const HospitalSelection = ({navigation, route}) => {
           onPress={handleNext}
           disabled={!selectedHospital}>
           <Text style={styles.nextButtonText}>Next</Text>
-          <Icon name="arrow-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -424,6 +423,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    marginRight: 8,
   },
 });
