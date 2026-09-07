@@ -10,15 +10,15 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {launchImageLibrary, requestMediaLibraryPermissions} from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import {useAddFamilyMember, useUpdateFamilyMember} from '../api/mutations';
 import {useFamilyMember} from '../api/queries';
 import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
+import {requestGalleryPermission} from '../utils/permissions';
 
 const AddFamilyMember = ({navigation, route}) => {
   const {memberId, redirectBack} = route.params || {};
@@ -59,25 +59,29 @@ const AddFamilyMember = ({navigation, route}) => {
 
   const handleImagePick = async () => {
     try {
-      // Request permission for media library
-      const permissionResult = await requestMediaLibraryPermissions({
-        mediaType: 'photo',
-      });
-
-      if (permissionResult.granted === false) {
-        Alert.alert('Permission Required', 'Please grant permission to access your photo library.');
+      const granted = await requestGalleryPermission();
+      if (!granted) {
+        Alert.alert(
+          'Permission Required',
+          'Please allow photo library access to add a photo.',
+        );
         return;
       }
 
-      const options = {
+      const result = await launchImageLibrary({
         mediaType: 'photo',
-        quality: 1,
-        includeBase64: false,
+        quality: 0.8,
         selectionLimit: 1,
-      };
+      });
 
-      const result = await launchImageLibrary(options);
-      if (result.assets && result.assets[0]) {
+      if (result.didCancel) {
+        return;
+      }
+      if (result.errorCode) {
+        Alert.alert('Error', result.errorMessage || 'Failed to open image picker');
+        return;
+      }
+      if (result.assets?.[0]?.uri) {
         setImageUri(result.assets[0].uri);
       }
     } catch (error) {

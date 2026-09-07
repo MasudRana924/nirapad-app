@@ -12,7 +12,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import LinearGradient from 'react-native-linear-gradient';
-import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import {requestAppPermissions} from '../utils/permissions';
 
 const WelcomeScreen = ({navigation}) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -37,25 +37,10 @@ const WelcomeScreen = ({navigation}) => {
 
   const handleGetStarted = async () => {
     try {
-      // Request location permission
-      await request(
-        Platform.OS === 'android'
-          ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-          : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-      );
-
-      // Request notification permission
-      await request(
-        Platform.OS === 'android'
-          ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
-          : PERMISSIONS.IOS.NOTIFICATIONS,
-      );
-
-      // Navigate to Login screen
-      navigation?.navigate('Login');
+      await requestAppPermissions();
     } catch (error) {
       console.error('Permission error:', error);
-      // Navigate to Login screen even if permissions are denied
+    } finally {
       navigation?.navigate('Login');
     }
   };
@@ -80,7 +65,7 @@ const WelcomeScreen = ({navigation}) => {
         translucent={false}
       />
 
-      {/* Step Indicators and Skip - Fixed Top */}
+      {/* Step Indicators and Skip */}
       <View style={styles.stepIndicatorsTop} pointerEvents="box-none">
         <View style={styles.stepIndicatorsRow}>
           {[0, 1, 2].map(step => (
@@ -93,13 +78,15 @@ const WelcomeScreen = ({navigation}) => {
             />
           ))}
         </View>
-        {currentStep < 2 && (
+        {currentStep < 2 ? (
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.skipButtonTop}
             onPress={handleSkip}>
             <Text style={styles.skipText}>Skip</Text>
           </TouchableOpacity>
+        ) : (
+          <View style={styles.skipPlaceholder} />
         )}
       </View>
 
@@ -246,22 +233,24 @@ const styles = StyleSheet.create({
     paddingBottom: 26,
   },
 
-  // Step Indicators - Fixed Top (centered; Skip overlays right)
+  // Step Indicators - left; Skip - right (with clear gap)
   stepIndicatorsTop: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 50 : 40,
     left: 0,
     right: 0,
-    height: 40,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
     zIndex: 10,
   },
 
   stepIndicatorsRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 1,
+    marginRight: 16,
   },
 
   stepIndicators: {
@@ -272,25 +261,27 @@ const styles = StyleSheet.create({
   },
 
   stepIndicator: {
-    width: 70,
+    width: 56,
     height: 4,
     borderRadius: 2,
     backgroundColor: '#D1D5DB',
-    marginHorizontal: 6,
+    marginRight: 8,
   },
 
   stepIndicatorActive: {
     backgroundColor: '#008178',
-    width: 70,
+    width: 56,
   },
 
   skipButtonTop: {
-    position: 'absolute',
-    right: 24,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
+    paddingVertical: 8,
+    minWidth: 48,
+    alignItems: 'flex-end',
+  },
+
+  skipPlaceholder: {
+    minWidth: 48,
   },
 
   skipButton: {

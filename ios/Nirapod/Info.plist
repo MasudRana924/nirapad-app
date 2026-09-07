@@ -39,9 +39,9 @@
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Stay updated with booking confirmations, caregiver arrivals, and important alerts.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>We need camera access to take photos for family member profiles.</string>
+	<string>We need camera access to take photos for your profile and family members.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need photo library access to select photos for family member profiles.</string>
+	<string>We need photo library access to select photos for your profile and family members.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We need permission to save photos to your library.</string>
 	<key>UILaunchStoryboardName</key>
