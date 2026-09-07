@@ -7,7 +7,6 @@ import {
   TextInput,
   ScrollView,
   Image,
-  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -36,11 +35,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
 
   const caregivers = caregiversData?.data || [];
 
-  const handleFilterSelect = (filterId) => {
+  const handleFilterSelect = filterId => {
     setSelectedFilter(filterId === selectedFilter ? '' : filterId);
   };
 
-  const handleSearch = (text) => {
+  const handleSearch = text => {
     setSearch(text);
   };
 
@@ -65,28 +64,27 @@ const SelectCaregiverScreen = ({navigation, route}) => {
         {/* ================= SEARCH ================= */}
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
-            <Icon name="search" size={23} color="#7D8BA5" />
+            <Icon name="search" size={20} color="#8190A7" />
             <TextInput
               value={search}
               onChangeText={handleSearch}
               placeholder="Search by name..."
-              placeholderTextColor="#7D8BA5"
+              placeholderTextColor="#8190A7"
               style={styles.searchInput}
             />
           </View>
           <TouchableOpacity activeOpacity={0.85} style={styles.filterButton}>
-            <Icon name="options-outline" size={23} color="#FFFFFF" />
+            <Icon name="options-outline" size={22} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
-        {/* Location Filter */}
         <View style={styles.locationFilter}>
-          <Icon name="location-outline" size={18} color="#7D8BA5" />
+          <Icon name="location-outline" size={18} color="#8190A7" />
           <TextInput
             value={location}
             onChangeText={setLocation}
             placeholder="Filter by location..."
-            placeholderTextColor="#7D8BA5"
+            placeholderTextColor="#8190A7"
             style={styles.locationInput}
           />
         </View>
@@ -98,14 +96,14 @@ const SelectCaregiverScreen = ({navigation, route}) => {
           contentContainerStyle={styles.filterScroll}>
           {filters.map(filter => {
             const selected = selectedFilter === filter.id;
-
             return (
               <TouchableOpacity
                 key={filter.id}
                 activeOpacity={0.8}
                 onPress={() => handleFilterSelect(filter.id)}
                 style={[styles.filterChip, selected && styles.filterChipActive]}>
-                <Text style={[styles.filterText, selected && styles.filterTextActive]}>
+                <Text
+                  style={[styles.filterText, selected && styles.filterTextActive]}>
                   {filter.label}
                 </Text>
               </TouchableOpacity>
@@ -115,9 +113,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
 
         {/* ================= RESULT HEADER ================= */}
         <View style={styles.resultHeader}>
-          <Text style={styles.availableText}>{caregivers.length} caregivers available</Text>
+          <Text style={styles.resultCount}>
+            {caregivers.length} caregivers available
+          </Text>
           <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
-            <Icon name="swap-vertical" size={19} color="#1473DC" />
+            <Icon name="swap-vertical" size={18} color="#008178" />
             <Text style={styles.sortText}>Sort</Text>
           </TouchableOpacity>
         </View>
@@ -135,105 +135,127 @@ const SelectCaregiverScreen = ({navigation, route}) => {
           </View>
         ) : (
           <View style={styles.caregiverList}>
-            {caregivers.map(caregiver => (
-              <TouchableOpacity
-              key={caregiver.id}
-              activeOpacity={0.9}
-              style={[
-                styles.caregiverCard,
-                selectedCaregiver?.id === caregiver.id && styles.selectedCard,
-              ]}
-              onPress={() => setSelectedCaregiver(caregiver)}>
-              {/* Top Section */}
-              <View style={styles.topSection}>
-                <View style={styles.imageContainer}>
-                  {caregiver.profile_photo ? (
-                    <Image source={{uri: caregiver.profile_photo}} style={styles.profileImage} />
-                  ) : (
-                    <View style={styles.placeholderImage}>
-                      <Icon name="person" size={24} color="#8190A7" />
+            {caregivers.map(caregiver => {
+              const isSelected = selectedCaregiver?.id === caregiver.id;
+              const rate = caregiver.hourly_rate ?? caregiver.price;
+
+              return (
+                <TouchableOpacity
+                  key={caregiver.id}
+                  activeOpacity={0.85}
+                  style={[
+                    styles.caregiverCard,
+                    isSelected && styles.selectedCard,
+                  ]}
+                  onPress={() => setSelectedCaregiver(caregiver)}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.avatarContainer}>
+                      {caregiver.profile_photo ? (
+                        <Image
+                          source={{uri: caregiver.profile_photo}}
+                          style={styles.avatar}
+                        />
+                      ) : (
+                        <View style={styles.placeholderAvatar}>
+                          <Icon name="person" size={24} color="#8190A7" />
+                        </View>
+                      )}
+                      {caregiver.is_available && (
+                        <View style={styles.onlineDot} />
+                      )}
                     </View>
-                  )}
-                  {caregiver.is_available && <View style={styles.onlineDot} />}
-                </View>
-                <View style={styles.mainInfo}>
-                  <View style={styles.nameRow}>
-                    <View style={styles.nameContainer}>
-                      <Text style={styles.name} numberOfLines={1}>
-                        {caregiver.name}
-                      </Text>
+
+                    <View style={styles.userInfo}>
+                      <View style={styles.nameRow}>
+                        <Text style={styles.name} numberOfLines={1}>
+                          {caregiver.name}
+                        </Text>
+                        {caregiver.is_available && (
+                          <View style={styles.availableBadge}>
+                            <Text style={styles.availableBadgeText}>
+                              Available
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+
+                      <View style={styles.infoRow}>
+                        <Icon name="star" size={14} color="#F59E0B" />
+                        <Text style={styles.infoText}>
+                          {caregiver.rating ?? '—'}
+                          {caregiver.completed_bookings != null
+                            ? ` (${caregiver.completed_bookings})`
+                            : ''}
+                          {' · '}
+                          {caregiver.experience_years ?? 0} yrs exp
+                        </Text>
+                      </View>
+
+                      <View style={styles.infoRow}>
+                        <Icon name="location-outline" size={14} color="#303944" />
+                        <Text style={styles.infoText} numberOfLines={1}>
+                          {caregiver.service_areas?.join(', ') || 'No location'}
+                        </Text>
+                      </View>
                     </View>
-                    {caregiver.is_available && (
-                      <View style={styles.availableBadge}>
-                        <Text style={styles.availableText}>Available</Text>
+
+                    {isSelected && (
+                      <View style={styles.selectedBadge}>
+                        <Icon
+                          name="checkmark-circle"
+                          size={24}
+                          color="#008178"
+                        />
                       </View>
                     )}
                   </View>
-                  <Text style={styles.title}>{caregiver.bio || 'Caregiver'}</Text>
-                  <View style={styles.statsRow}>
-                    <View style={styles.statItem}>
-                      <Icon name="star" size={16} color="#F59E0B" />
-                      <Text style={styles.ratingText}>{caregiver.rating}</Text>
-                      <Text style={styles.reviewText}>({caregiver.completed_bookings})</Text>
-                    </View>
-                    <View style={styles.separator}>•</View>
-                    <View style={styles.statItem}>
-                      <Icon name="briefcase-outline" size={15} color="#1E293B" />
-                      <Text style={styles.statText}>{caregiver.experience_years} yrs exp</Text>
-                    </View>
-                    <View style={styles.separator}>•</View>
-                  </View>
-                  <View style={styles.tripsRow}>
-                    <Icon name="add-square-outline" size={15} color="#008F72" />
-                    <Text style={styles.tripsText}>{caregiver.service_areas?.join(', ') || 'No location'}</Text>
-                  </View>
-                </View>
-              </View>
 
-              {/* Description */}
-              {caregiver.bio && (
-                <View style={styles.descriptionBox}>
-                  <Text style={styles.description}>{caregiver.bio}</Text>
-                </View>
-              )}
+                  {!!caregiver.bio && (
+                    <Text style={styles.bioText} numberOfLines={2}>
+                      {caregiver.bio}
+                    </Text>
+                  )}
 
-              {/* Bottom Price Section */}
-              <View style={styles.bottomSection}>
-                <View style={styles.priceContainer}>
-                  <View style={styles.priceRow}>
-                    <Text style={styles.price}>{caregiver.price}</Text>
-                    <Text style={styles.perHour}>/ hr</Text>
+                  <View style={styles.cardFooter}>
+                    {rate != null && rate !== '' ? (
+                      <View style={styles.priceBlock}>
+                        <Text style={styles.price}>
+                          ৳{rate}
+                          <Text style={styles.perHour}> / hr</Text>
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.priceBlock} />
+                    )}
+
+                    <View
+                      style={[
+                        styles.selectPill,
+                        isSelected && styles.selectPillActive,
+                      ]}>
+                      <Text
+                        style={[
+                          styles.selectPillText,
+                          isSelected && styles.selectPillTextActive,
+                        ]}>
+                        {isSelected ? 'Selected' : 'Select'}
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={styles.estimatedPrice}>
-                    {caregiver.estimated} for 3 hrs estimated
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  activeOpacity={0.75}
-                  style={[
-                    styles.selectButton,
-                    selectedCaregiver?.id === caregiver.id && styles.selectedButton,
-                  ]}>
-                  <Text
-                    style={[
-                      styles.selectText,
-                      selectedCaregiver?.id === caregiver.id && styles.selectedButtonText,
-                    ]}>
-                    {selectedCaregiver?.id === caregiver.id ? 'Selected' : 'Select'}
-                  </Text>
                 </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-            ))}
+              );
+            })}
           </View>
         )}
       </ScrollView>
 
-      {/* ================= BOTTOM BUTTON ================= */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
-          style={[styles.nextButton, !selectedCaregiver && styles.disabledButton]}
+          style={[
+            styles.nextButton,
+            !selectedCaregiver && styles.disabledButton,
+          ]}
           onPress={handleNext}
           disabled={!selectedCaregiver}>
           <Text style={styles.nextButtonText}>Next</Text>
@@ -249,12 +271,131 @@ export default SelectCaregiverScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
   },
 
-  // ================= LOADING =================
-  loadingContainer: {
+  scrollContent: {
+    paddingTop: 14,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+
+  searchRow: {
+    width: '100%',
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  searchBox: {
     flex: 1,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#F6F6F6',
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 13,
+  },
+
+  searchInput: {
+    flex: 1,
+    height: '100%',
+    paddingHorizontal: 8,
+    paddingVertical: 0,
+    color: '#172333',
+    fontSize: 15,
+  },
+
+  filterButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#008178',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+  },
+
+  locationFilter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingHorizontal: 14,
+    height: 44,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+  },
+
+  locationInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 14,
+    color: '#172333',
+  },
+
+  filterScroll: {
+    paddingTop: 14,
+    paddingBottom: 4,
+    paddingRight: 10,
+  },
+
+  filterChip: {
+    height: 36,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+
+  filterChipActive: {
+    backgroundColor: '#008178',
+    borderColor: '#008178',
+  },
+
+  filterText: {
+    fontSize: 13,
+    color: '#8190A7',
+    fontWeight: '500',
+  },
+
+  filterTextActive: {
+    color: '#FFFFFF',
+  },
+
+  resultHeader: {
+    height: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  resultCount: {
+    fontSize: 13,
+    color: '#8190A7',
+    fontWeight: '400',
+  },
+
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  sortText: {
+    color: '#008178',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 3,
+  },
+
+  loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
@@ -265,9 +406,7 @@ const styles = StyleSheet.create({
     color: '#8190A7',
   },
 
-  // ================= EMPTY STATE =================
   emptyState: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
@@ -286,200 +425,53 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-  // =====================================================
-  // SCROLL
-  // =====================================================
-
-  scrollContent: {
-    paddingTop: 14,
-    paddingHorizontal: 19,
-    paddingBottom: 24,
-  },
-
-  // =====================================================
-  // SEARCH
-  // =====================================================
-
-  searchRow: {
-    width: '100%',
-    height: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  searchBox: {
-    flex: 1,
-    height: 48,
-    borderRadius: 25,
-    backgroundColor: '#F0F2F7',
-    borderWidth: 1,
-    borderColor: '#E0E5EE',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 13,
-  },
-
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    paddingHorizontal: 8,
-    paddingVertical: 0,
-    color: '#273447',
-    fontSize: 16,
-  },
-
-  filterButton: {
-    width: 49,
-    height: 49,
-    borderRadius: 25,
-    backgroundColor: '#1473DC',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 9,
-  },
-
-  // ================= LOCATION FILTER =================
-  locationFilter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    paddingHorizontal: 14,
-    height: 44,
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
-  },
-
-  locationInput: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#172333',
-  },
-
-  // =====================================================
-  // FILTERS
-  // =====================================================
-
-  filterScroll: {
-    paddingTop: 13,
-    paddingBottom: 2,
-    paddingRight: 10,
-  },
-
-  filterChip: {
-    height: 36,
-    borderRadius: 19,
-    paddingHorizontal: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DFE5EE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 9,
-  },
-
-  filterChipActive: {
-    backgroundColor: '#008178',
-    borderColor: '#008178',
-  },
-
-  filterText: {
-    fontSize: 13,
-    color: '#7D8BA5',
-    fontWeight: '500',
-  },
-
-  filterTextActive: {
-    color: '#FFFFFF',
-  },
-
-  // =====================================================
-  // RESULT HEADER
-  // =====================================================
-
-  resultHeader: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  availableText: {
-    fontSize: 14,
-    color: '#7D8BA5',
-    fontWeight: '400',
-  },
-
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  sortText: {
-    color: '#1473DC',
-    fontSize: 14,
-    fontWeight: '700',
-    marginLeft: 3,
-  },
-
-  // =====================================================
-  // CAREGIVER LIST
-  // =====================================================
-
   caregiverList: {
     flexDirection: 'column',
   },
 
   caregiverCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 13,
-    marginBottom: 16,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 18,
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 16,
+    paddingBottom: 14,
     borderWidth: 1,
-    borderColor: '#F0F1F4',
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
-    elevation: 1,
+    borderColor: '#F6F6F6',
+    marginBottom: 12,
   },
 
   selectedCard: {
     borderWidth: 2,
     borderColor: '#008178',
+    backgroundColor: '#FFFFFF',
   },
 
-  // ================= TOP SECTION =================
-  topSection: {
-    flexDirection: 'row',
+  cardHeader: {
     width: '100%',
-    minHeight: 88,
+    minHeight: 58,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
 
-  imageContainer: {
-    width: 67,
-    height: 67,
+  avatarContainer: {
+    width: 58,
+    height: 58,
     position: 'relative',
     marginRight: 13,
   },
 
-  profileImage: {
-    width: 67,
-    height: 67,
-    borderRadius: 34,
-    backgroundColor: '#E5E7EB',
+  avatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#E5E5E5',
   },
 
-  placeholderImage: {
-    width: 67,
-    height: 67,
-    borderRadius: 34,
+  placeholderAvatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: '#E3E8F0',
     alignItems: 'center',
     justifyContent: 'center',
@@ -487,220 +479,127 @@ const styles = StyleSheet.create({
 
   onlineDot: {
     position: 'absolute',
-    right: -3,
-    bottom: -2,
-    width: 15,
-    height: 15,
-    borderRadius: 8,
+    right: 0,
+    bottom: 0,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: '#13C875',
     borderWidth: 2,
     borderColor: '#FFFFFF',
   },
 
-  mainInfo: {
+  userInfo: {
     flex: 1,
+    paddingTop: 1,
     minWidth: 0,
   },
 
   nameRow: {
-    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  nameContainer: {
-    flex: 1,
-    paddingRight: 6,
+    marginBottom: 3,
   },
 
   name: {
-    fontSize: 19,
-    lineHeight: 23,
-    fontWeight: '600',
-    color: '#101820',
+    flex: 1,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
+    color: '#111820',
+    marginRight: 8,
   },
 
   availableBadge: {
     height: 22,
-    paddingHorizontal: 9,
-    borderRadius: 12,
-    backgroundColor: '#EDF3FF',
+    paddingHorizontal: 8,
+    borderRadius: 11,
+    backgroundColor: '#E6F4F3',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  availableText: {
+  availableBadgeText: {
     fontSize: 11,
     lineHeight: 14,
-    color: '#43658B',
-    fontWeight: '500',
+    color: '#008178',
+    fontWeight: '600',
   },
 
-  title: {
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '500',
-    color: '#008F72',
-    marginTop: 0,
-  },
-
-  statsRow: {
+  infoRow: {
+    minHeight: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    height: 22,
-    marginTop: 1,
+    marginBottom: 2,
   },
 
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  ratingText: {
+  infoText: {
+    marginLeft: 5,
+    flex: 1,
     fontSize: 12,
-    color: '#17202A',
-    marginLeft: 3,
-    fontWeight: '500',
-  },
-
-  reviewText: {
-    fontSize: 12,
-    color: '#17202A',
-    marginLeft: 2,
-  },
-
-  statText: {
-    fontSize: 12,
-    color: '#17202A',
-    marginLeft: 4,
-  },
-
-  separator: {
-    fontSize: 13,
-    color: '#27313D',
-    marginHorizontal: 7,
-  },
-
-  tripsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 19,
-    marginTop: 1,
-  },
-
-  tripsText: {
-    fontSize: 13,
     lineHeight: 17,
-    color: '#008F72',
-    marginLeft: 5,
-    fontWeight: '500',
+    fontWeight: '400',
+    color: '#303944',
   },
 
-  // ================= DESCRIPTION BOX =================
-  descriptionBox: {
-    width: '100%',
-    backgroundColor: '#EEF3FF',
-    borderRadius: 8,
+  selectedBadge: {
+    marginLeft: 8,
+    marginTop: 2,
+  },
+
+  bioText: {
     marginTop: 10,
-    paddingHorizontal: 12,
-    paddingTop: 11,
-    paddingBottom: 10,
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#8190A7',
   },
 
-  description: {
-    fontSize: 15,
-    lineHeight: 23,
-    color: '#17283D',
-    fontWeight: '400',
-  },
-
-  languageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 7,
-  },
-
-  languageText: {
-    fontSize: 12,
-    lineHeight: 16,
-    color: '#26364A',
-    marginLeft: 5,
-    fontWeight: '400',
-  },
-
-  // ================= BOTTOM SECTION =================
-  bottomSection: {
+  cardFooter: {
+    marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 14,
   },
 
-  priceContainer: {
-    justifyContent: 'center',
-  },
-
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
+  priceBlock: {
+    flex: 1,
   },
 
   price: {
-    fontSize: 21,
-    lineHeight: 25,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#101820',
+    color: '#111820',
   },
 
   perHour: {
-    fontSize: 12,
-    color: '#26313C',
-    marginLeft: 3,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#8190A7',
   },
 
-  estimatedPrice: {
-    fontSize: 11,
-    lineHeight: 15,
-    color: '#26313C',
-    marginTop: 0,
-  },
-
-  selectButton: {
-    width: 86,
-    height: 47,
+  selectPill: {
+    minWidth: 88,
+    height: 40,
+    paddingHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: '#DDE9FF',
+    backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 1,
   },
 
-  selectedButton: {
+  selectPillActive: {
     backgroundColor: '#008178',
   },
 
-  selectText: {
+  selectPillText: {
     fontSize: 14,
-    lineHeight: 18,
-    color: '#102238',
-    fontWeight: '500',
+    fontWeight: '600',
+    color: '#008178',
   },
 
-  selectedButtonText: {
+  selectPillTextActive: {
     color: '#FFFFFF',
   },
-
-  // =====================================================
-  // BOTTOM BUTTON
-  // =====================================================
 
   bottomContainer: {
     width: '100%',

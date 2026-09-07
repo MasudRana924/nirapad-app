@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -44,7 +43,6 @@ const HospitalSelection = ({navigation, route}) => {
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header title="Select Hospital" onBack={() => navigation?.goBack()} />
 
-      {/* ================= SEARCH FILTERS ================= */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -70,7 +68,6 @@ const HospitalSelection = ({navigation, route}) => {
           />
         </View>
 
-        {/* ================= HOSPITAL LIST ================= */}
         {isLoading ? (
           <HospitalSkeleton />
         ) : hospitals.length === 0 ? (
@@ -81,50 +78,106 @@ const HospitalSelection = ({navigation, route}) => {
           </View>
         ) : (
           <View style={styles.hospitalGrid}>
-          {hospitals.map(hospital => (
-            <TouchableOpacity
-              key={hospital.id}
-              activeOpacity={0.85}
-              style={[
-                styles.hospitalCard,
-                selectedHospital?.id === hospital.id && styles.selectedCard,
-              ]}
-              onPress={() => setSelectedHospital(hospital)}>
-              <View style={styles.cardContent}>
-                <View style={styles.cardLeft}>
-                  <View style={styles.iconContainer}>
-                    <Icon name="medkit" size={24} color="#19B57A" />
-                  </View>
-                </View>
+            {hospitals.map(hospital => {
+              const isSelected = selectedHospital?.id === hospital.id;
+              const locationLine = [hospital.city, hospital.district]
+                .filter(Boolean)
+                .join(', ');
 
-                <View style={styles.cardRight}>
-                  <View style={styles.nameRow}>
-                    <Text style={styles.hospitalName}>{hospital.name}</Text>
-                    {hospital.is_verified && (
-                      <View style={styles.popularBadge}>
-                        <Text style={styles.popularText}>Verified</Text>
+              return (
+                <TouchableOpacity
+                  key={hospital.id}
+                  activeOpacity={0.85}
+                  style={[
+                    styles.hospitalCard,
+                    isSelected && styles.selectedCard,
+                  ]}
+                  onPress={() => setSelectedHospital(hospital)}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.avatarContainer}>
+                      <View style={styles.placeholderAvatar}>
+                        <Icon name="medkit" size={24} color="#008178" />
+                      </View>
+                    </View>
+
+                    <View style={styles.userInfo}>
+                      <View style={styles.nameRow}>
+                        <Text style={styles.name} numberOfLines={1}>
+                          {hospital.name}
+                        </Text>
+                        {hospital.is_verified && (
+                          <View style={styles.availableBadge}>
+                            <Text style={styles.availableBadgeText}>
+                              Verified
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+
+                      <View style={styles.infoRow}>
+                        <Icon name="star" size={14} color="#F59E0B" />
+                        <Text style={styles.infoText}>
+                          {hospital.rating ?? '—'}
+                          {hospital.type ? ` · ${hospital.type}` : ''}
+                        </Text>
+                      </View>
+
+                      <View style={styles.infoRow}>
+                        <Icon name="location-outline" size={14} color="#303944" />
+                        <Text style={styles.infoText} numberOfLines={1}>
+                          {locationLine || hospital.address || 'No location'}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {isSelected && (
+                      <View style={styles.selectedBadge}>
+                        <Icon
+                          name="checkmark-circle"
+                          size={24}
+                          color="#008178"
+                        />
                       </View>
                     )}
                   </View>
 
-                  <Text style={styles.locationText}>
-                    {hospital.address} · {hospital.city}, {hospital.district}
-                  </Text>
-                  <Text style={styles.typeText}>{hospital.type}</Text>
-                </View>
+                  {!!hospital.address && (
+                    <Text style={styles.bioText} numberOfLines={2}>
+                      {hospital.address}
+                    </Text>
+                  )}
 
-                <View style={styles.ratingSection}>
-                  <Text style={styles.ratingText}>{hospital.rating}</Text>
-                  <Icon name="star" size={16} color="#F6A900" />
-                </View>
-              </View>
-            </TouchableOpacity>
-            ))}
+                  <View style={styles.cardFooter}>
+                    <View style={styles.priceBlock}>
+                      {hospital.rating != null && hospital.rating !== '' ? (
+                        <Text style={styles.price}>
+                          {hospital.rating}
+                          <Text style={styles.perHour}> rating</Text>
+                        </Text>
+                      ) : null}
+                    </View>
+
+                    <View
+                      style={[
+                        styles.selectPill,
+                        isSelected && styles.selectPillActive,
+                      ]}>
+                      <Text
+                        style={[
+                          styles.selectPillText,
+                          isSelected && styles.selectPillTextActive,
+                        ]}>
+                        {isSelected ? 'Selected' : 'Select'}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
       </ScrollView>
 
-      {/* ================= NEXT BUTTON ================= */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -147,10 +200,9 @@ export default HospitalSelection;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
 
-  // ================= SEARCH SECTION =================
   searchSection: {
     flexDirection: 'row',
     marginBottom: 16,
@@ -161,9 +213,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // ================= EMPTY STATE =================
   emptyState: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
@@ -182,7 +232,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
-  // ================= SCROLL =================
   scrollView: {
     flex: 1,
   },
@@ -192,98 +241,163 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
 
-  // ================= HOSPITAL GRID =================
   hospitalGrid: {
     flexDirection: 'column',
   },
 
   hospitalCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 12,
+    width: '100%',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 14,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F6F6F6',
+    marginBottom: 12,
   },
 
   selectedCard: {
+    borderWidth: 2,
     borderColor: '#008178',
+    backgroundColor: '#FFFFFF',
   },
 
-  cardContent: {
+  cardHeader: {
+    width: '100%',
+    minHeight: 58,
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    alignItems: 'flex-start',
   },
 
-  cardLeft: {
-    marginRight: 12,
+  avatarContainer: {
+    width: 58,
+    height: 58,
+    position: 'relative',
+    marginRight: 13,
   },
 
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: '#E8F5E9',
+  placeholderAvatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  cardRight: {
+  userInfo: {
     flex: 1,
+    paddingTop: 1,
+    minWidth: 0,
   },
 
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 3,
   },
 
-  hospitalName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#172333',
+  name: {
+    flex: 1,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
+    color: '#111820',
     marginRight: 8,
   },
 
-  popularBadge: {
-    backgroundColor: '#E8F5E9',
+  availableBadge: {
+    height: 22,
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: 11,
+    backgroundColor: '#E6F4F3',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
-  popularText: {
+  availableBadgeText: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#19B57A',
-  },
-
-  locationText: {
-    fontSize: 13,
-    color: '#8190A7',
-  },
-
-  typeText: {
-    fontSize: 12,
+    lineHeight: 14,
     color: '#008178',
-    fontWeight: '500',
+    fontWeight: '600',
+  },
+
+  infoRow: {
+    minHeight: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+
+  infoText: {
+    marginLeft: 5,
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '400',
+    color: '#303944',
+  },
+
+  selectedBadge: {
+    marginLeft: 8,
     marginTop: 2,
   },
 
-  ratingSection: {
+  bioText: {
+    marginTop: 10,
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#8190A7',
+  },
+
+  cardFooter: {
+    marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+    justifyContent: 'space-between',
   },
 
-  ratingText: {
-    fontSize: 15,
+  priceBlock: {
+    flex: 1,
+  },
+
+  price: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111820',
+  },
+
+  perHour: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#8190A7',
+  },
+
+  selectPill: {
+    minWidth: 88,
+    height: 40,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  selectPillActive: {
+    backgroundColor: '#008178',
+  },
+
+  selectPillText: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#172333',
-    marginRight: 4,
+    color: '#008178',
   },
 
-  // ================= BOTTOM =================
+  selectPillTextActive: {
+    color: '#FFFFFF',
+  },
+
   bottomContainer: {
     width: '100%',
     backgroundColor: '#FFFFFF',

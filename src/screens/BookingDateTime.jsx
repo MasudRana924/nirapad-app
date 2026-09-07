@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,40 @@ import Header from '../components/common/Header';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
 
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+const buildUpcomingDates = (count = 7) => {
+  const result = [];
+  const today = new Date();
+  for (let i = 0; i < count; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    result.push({
+      id: i + 1,
+      day: DAY_LABELS[d.getDay()],
+      date: dd,
+      fullDate: `${yyyy}-${mm}-${dd}`,
+    });
+  }
+  return result;
+};
+
+const TIMES = [
+  {id: 1, time: '09:00 AM'},
+  {id: 2, time: '10:00 AM'},
+  {id: 3, time: '11:00 AM'},
+  {id: 4, time: '12:00 PM'},
+  {id: 5, time: '02:00 PM'},
+  {id: 6, time: '03:00 PM'},
+  {id: 7, time: '04:00 PM'},
+  {id: 8, time: '05:00 PM'},
+];
+
+const DURATIONS = [2, 3, 4, 5, 6, 8];
+
 const BookingDateTime = ({navigation}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -32,6 +66,7 @@ const BookingDateTime = ({navigation}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
+  const dates = useMemo(() => buildUpcomingDates(7), []);
   const createBooking = useCreateBooking();
 
   useEffect(() => {
@@ -53,30 +88,12 @@ const BookingDateTime = ({navigation}) => {
     }
   };
 
-  const dates = [
-    {id: 1, day: 'Mon', date: '15', fullDate: '2024-01-15'},
-    {id: 2, day: 'Tue', date: '16', fullDate: '2024-01-16'},
-    {id: 3, day: 'Wed', date: '17', fullDate: '2024-01-17'},
-    {id: 4, day: 'Thu', date: '18', fullDate: '2024-01-18'},
-    {id: 5, day: 'Fri', date: '19', fullDate: '2024-01-19'},
-    {id: 6, day: 'Sat', date: '20', fullDate: '2024-01-20'},
-    {id: 7, day: 'Sun', date: '21', fullDate: '2024-01-21'},
-  ];
-
-  const times = [
-    {id: 1, time: '09:00 AM'},
-    {id: 2, time: '10:00 AM'},
-    {id: 3, time: '11:00 AM'},
-    {id: 4, time: '12:00 PM'},
-    {id: 5, time: '02:00 PM'},
-    {id: 6, time: '03:00 PM'},
-    {id: 7, time: '04:00 PM'},
-    {id: 8, time: '05:00 PM'},
-  ];
-
   const handleBook = async () => {
     if (!selectedMember || !selectedCaregiver || !selectedHospital) {
-      Alert.alert('Error', 'Missing booking information. Please go back and select family member, caregiver, and hospital.');
+      Alert.alert(
+        'Error',
+        'Missing booking information. Please go back and select family member, caregiver, and hospital.',
+      );
       return;
     }
 
@@ -124,8 +141,6 @@ const BookingDateTime = ({navigation}) => {
       notes: notes,
     };
 
-    console.log('Booking Request Body:', JSON.stringify(bookingData, null, 2));
-
     try {
       const response = await createBooking.mutateAsync(bookingData);
       await storage.clearBookingData();
@@ -141,6 +156,30 @@ const BookingDateTime = ({navigation}) => {
     }
   };
 
+  const summaryItems = [
+    {
+      key: 'patient',
+      label: 'Patient',
+      value: selectedMember?.name,
+      icon: 'person-outline',
+    },
+    {
+      key: 'caregiver',
+      label: 'Caregiver',
+      value: selectedCaregiver?.name,
+      icon: 'medkit-outline',
+    },
+    {
+      key: 'hospital',
+      label: 'Hospital',
+      value: selectedHospital?.name,
+      icon: 'business-outline',
+    },
+  ];
+
+  const canBook =
+    !!selectedDate && !!selectedTime && !isSubmitting;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header title="Book Appointment" onBack={() => navigation?.goBack()} />
@@ -148,202 +187,205 @@ const BookingDateTime = ({navigation}) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
         {isLoadingData ? (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Loading booking details...</Text>
           </View>
         ) : (
           <>
-        {/* ================= SELECTED INFO ================= */}
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>Selected Details</Text>
-          {selectedMember && (
-            <View style={styles.infoItem}>
-              <Icon name="person-outline" size={18} color="#008178" />
-              <Text style={styles.infoText}>{selectedMember.name}</Text>
+            {/* Summary */}
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryTitle}>Booking summary</Text>
+              {summaryItems.map(item => (
+                <View key={item.key} style={styles.summaryRow}>
+                  <View style={styles.summaryIcon}>
+                    <Icon name={item.icon} size={18} color="#008178" />
+                  </View>
+                  <View style={styles.summaryTextBlock}>
+                    <Text style={styles.summaryLabel}>{item.label}</Text>
+                    <Text style={styles.summaryValue} numberOfLines={1}>
+                      {item.value || 'Not selected'}
+                    </Text>
+                  </View>
+                </View>
+              ))}
             </View>
-          )}
-          {selectedCaregiver && (
-            <View style={styles.infoItem}>
-              <Icon name="medkit-outline" size={18} color="#008178" />
-              <Text style={styles.infoText}>{selectedCaregiver.name}</Text>
+
+            {/* Date */}
+            <Text style={styles.sectionTitle}>Select date</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.dateScroll}>
+              {dates.map(date => {
+                const selected = selectedDate?.id === date.id;
+                return (
+                  <TouchableOpacity
+                    key={date.id}
+                    activeOpacity={0.85}
+                    style={[styles.dateCard, selected && styles.dateCardSelected]}
+                    onPress={() => setSelectedDate(date)}>
+                    <Text
+                      style={[
+                        styles.dayText,
+                        selected && styles.dateTextSelected,
+                      ]}>
+                      {date.day}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.dateNumber,
+                        selected && styles.dateTextSelected,
+                      ]}>
+                      {date.date}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            {/* Time */}
+            <Text style={styles.sectionTitle}>Select time</Text>
+            <View style={styles.chipGrid}>
+              {TIMES.map(time => {
+                const selected = selectedTime?.id === time.id;
+                return (
+                  <TouchableOpacity
+                    key={time.id}
+                    activeOpacity={0.85}
+                    style={[styles.chip, selected && styles.chipSelected]}
+                    onPress={() => setSelectedTime(time)}>
+                    <Text
+                      style={[
+                        styles.chipText,
+                        selected && styles.chipTextSelected,
+                      ]}>
+                      {time.time}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-          )}
-          {selectedHospital && (
-            <View style={styles.infoItem}>
-              <Icon name="business-outline" size={18} color="#008178" />
-              <Text style={styles.infoText}>{selectedHospital.name}</Text>
+
+            {/* Duration */}
+            <Text style={styles.sectionTitle}>Duration</Text>
+            <View style={styles.chipGrid}>
+              {DURATIONS.map(hours => {
+                const selected = durationHours === hours;
+                return (
+                  <TouchableOpacity
+                    key={hours}
+                    activeOpacity={0.85}
+                    style={[styles.chip, selected && styles.chipSelected]}
+                    onPress={() => setDurationHours(hours)}>
+                    <Text
+                      style={[
+                        styles.chipText,
+                        selected && styles.chipTextSelected,
+                      ]}>
+                      {hours}h
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-          )}
-        </View>
 
-        {/* ================= SELECT DATE ================= */}
-        <Text style={styles.sectionTitle}>Select Date</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.dateScroll}>
-          {dates.map(date => (
-            <TouchableOpacity
-              key={date.id}
-              activeOpacity={0.85}
-              style={[
-                styles.dateCard,
-                selectedDate?.id === date.id && styles.selectedDateCard,
-              ]}
-              onPress={() => setSelectedDate(date)}>
-              <Text
-                style={[
-                  styles.dayText,
-                  selectedDate?.id === date.id && styles.selectedDayText,
-                ]}>
-                {date.day}
+            {/* Pickup */}
+            <View style={styles.formBlock}>
+              <Text style={styles.sectionTitle}>Pickup location</Text>
+              <Text style={styles.sectionHint}>
+                Where should the caregiver meet the patient?
               </Text>
-              <Text
-                style={[
-                  styles.dateText,
-                  selectedDate?.id === date.id && styles.selectedDateText,
-                ]}>
-                {date.date}
+
+              <View style={styles.inputContainer}>
+                <Icon name="location-outline" size={18} color="#8190A7" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Street address"
+                  placeholderTextColor="#8190A7"
+                  value={pickupAddress}
+                  onChangeText={setPickupAddress}
+                />
+              </View>
+
+              <SearchableDropdown
+                data={bangladeshCities}
+                label="City"
+                placeholder="Select city"
+                value={pickupCity}
+                onSelect={setPickupCity}
+                icon="business-outline"
+              />
+              <SearchableDropdown
+                data={bangladeshDistricts}
+                label="District"
+                placeholder="Select district"
+                value={pickupDistrict}
+                onSelect={setPickupDistrict}
+                icon="location-outline"
+              />
+
+              <View style={styles.inputContainer}>
+                <Icon name="map-outline" size={18} color="#8190A7" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Division (optional)"
+                  placeholderTextColor="#8190A7"
+                  value={pickupDivision}
+                  onChangeText={setPickupDivision}
+                />
+              </View>
+            </View>
+
+            {/* Patient details */}
+            <View style={styles.formBlock}>
+              <Text style={styles.sectionTitle}>Patient details</Text>
+              <Text style={styles.sectionHint}>
+                Share needs so the caregiver can prepare.
               </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
 
-        {/* ================= SELECT TIME ================= */}
-        <Text style={styles.sectionTitle}>Select Time</Text>
-        <View style={styles.timeGrid}>
-          {times.map(time => (
-            <TouchableOpacity
-              key={time.id}
-              activeOpacity={0.85}
-              style={[
-                styles.timeCard,
-                selectedTime?.id === time.id && styles.selectedTimeCard,
-              ]}
-              onPress={() => setSelectedTime(time)}>
-              <Text
-                style={[
-                  styles.timeText,
-                  selectedTime?.id === time.id && styles.selectedTimeText,
-                ]}>
-                {time.time}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+              <View style={styles.textAreaContainer}>
+                <TextInput
+                  style={styles.textArea}
+                  placeholder="Requirements, conditions, mobility needs..."
+                  placeholderTextColor="#8190A7"
+                  value={patientRequirements}
+                  onChangeText={setPatientRequirements}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
 
-        {/* ================= DURATION ================= */}
-        <Text style={styles.sectionTitle}>Duration (Hours)</Text>
-        <View style={styles.durationContainer}>
-          {[2, 3, 4, 5, 6, 8].map(hours => (
-            <TouchableOpacity
-              key={hours}
-              activeOpacity={0.85}
-              style={[
-                styles.durationCard,
-                durationHours === hours && styles.selectedDurationCard,
-              ]}
-              onPress={() => setDurationHours(hours)}>
-              <Text
-                style={[
-                  styles.durationText,
-                  durationHours === hours && styles.selectedDurationText,
-                ]}>
-                {hours}h
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* ================= PICKUP LOCATION ================= */}
-        <Text style={styles.sectionTitle}>Pickup Location</Text>
-        <View style={styles.inputContainer}>
-          <Icon name="location-outline" size={18} color="#7D8BA5" />
-          <TextInput
-            style={styles.input}
-            placeholder="Address"
-            placeholderTextColor="#7D8BA5"
-            value={pickupAddress}
-            onChangeText={setPickupAddress}
-          />
-        </View>
-        <SearchableDropdown
-          data={bangladeshCities}
-          label="City"
-          placeholder="Select city"
-          value={pickupCity}
-          onSelect={setPickupCity}
-          icon="business-outline"
-        />
-        <SearchableDropdown
-          data={bangladeshDistricts}
-          label="District"
-          placeholder="Select district"
-          value={pickupDistrict}
-          onSelect={setPickupDistrict}
-          icon="location-outline"
-        />
-        <View style={styles.inputContainer}>
-          <Icon name="map-outline" size={18} color="#7D8BA5" />
-          <TextInput
-            style={styles.input}
-            placeholder="Division (optional)"
-            placeholderTextColor="#7D8BA5"
-            value={pickupDivision}
-            onChangeText={setPickupDivision}
-          />
-        </View>
-
-        {/* ================= PATIENT REQUIREMENTS ================= */}
-        <Text style={styles.sectionTitle}>Patient Requirements</Text>
-        <View style={styles.textAreaContainer}>
-          <TextInput
-            style={styles.textArea}
-            placeholder="Describe patient needs, medical conditions, special requirements..."
-            placeholderTextColor="#7D8BA5"
-            value={patientRequirements}
-            onChangeText={setPatientRequirements}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-
-        {/* ================= NOTES ================= */}
-        <Text style={styles.sectionTitle}>Additional Notes (Optional)</Text>
-        <View style={styles.textAreaContainer}>
-          <TextInput
-            style={styles.textArea}
-            placeholder="Any additional notes for the caregiver..."
-            placeholderTextColor="#7D8BA5"
-            value={notes}
-            onChangeText={setNotes}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-          />
-        </View>
-        </>
+              <Text style={styles.fieldLabel}>Additional notes (optional)</Text>
+              <View style={[styles.textAreaContainer, styles.textAreaShort]}>
+                <TextInput
+                  style={[styles.textArea, styles.textAreaShortInput]}
+                  placeholder="Anything else for the caregiver..."
+                  placeholderTextColor="#8190A7"
+                  value={notes}
+                  onChangeText={setNotes}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                />
+              </View>
+            </View>
+          </>
         )}
       </ScrollView>
 
-      {/* ================= BOOK BUTTON ================= */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
-          style={[
-            styles.bookButton,
-            (!selectedDate || !selectedTime || isSubmitting) && styles.disabledButton,
-          ]}
+          style={[styles.bookButton, !canBook && styles.disabledButton]}
           onPress={handleBook}
-          disabled={!selectedDate || !selectedTime || isSubmitting}>
-          {isSubmitting ? (
-            <Text style={styles.bookButtonText}>Booking...</Text>
-          ) : (
-            <Text style={styles.bookButtonText}>Book Appointment</Text>
-          )}
+          disabled={!canBook}>
+          <Text style={styles.bookButtonText}>
+            {isSubmitting ? 'Booking...' : 'Book Appointment'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -355,38 +397,19 @@ export default BookingDateTime;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
 
-  // ================= INFO CARD =================
-  infoCard: {
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
+  scrollView: {
+    flex: 1,
+  },
+
+  scrollContent: {
     padding: 16,
-    marginBottom: 20,
-  },
-
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#172333',
-    marginBottom: 12,
-  },
-
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-
-  infoText: {
-    fontSize: 14,
-    color: '#172333',
-    marginLeft: 8,
+    paddingBottom: 28,
   },
 
   loadingContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
@@ -397,25 +420,166 @@ const styles = StyleSheet.create({
     color: '#8190A7',
   },
 
-  // ================= SCROLL =================
-  scrollView: {
-    flex: 1,
-  },
-
-  scrollContent: {
+  summaryCard: {
+    backgroundColor: '#F6F6F6',
+    borderRadius: 18,
     padding: 16,
-    paddingBottom: 24,
+    marginBottom: 22,
+    borderWidth: 1,
+    borderColor: '#F6F6F6',
   },
 
-  // ================= INPUTS =================
+  summaryTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#172333',
+    marginBottom: 12,
+  },
+
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  summaryIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+
+  summaryTextBlock: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  summaryLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#8190A7',
+    marginBottom: 2,
+  },
+
+  summaryValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111820',
+  },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#172333',
+    marginBottom: 6,
+  },
+
+  sectionHint: {
+    fontSize: 13,
+    color: '#8190A7',
+    marginBottom: 12,
+    lineHeight: 18,
+  },
+
+  dateScroll: {
+    paddingRight: 8,
+    marginBottom: 22,
+  },
+
+  dateCard: {
+    width: 68,
+    height: 78,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+  },
+
+  dateCardSelected: {
+    backgroundColor: '#008178',
+    borderColor: '#008178',
+  },
+
+  dayText: {
+    fontSize: 12,
+    color: '#8190A7',
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+
+  dateNumber: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#172333',
+  },
+
+  dateTextSelected: {
+    color: '#FFFFFF',
+  },
+
+  chipGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 22,
+    marginHorizontal: -4,
+  },
+
+  chip: {
+    width: '31%',
+    marginHorizontal: '1.16%',
+    height: 48,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+  },
+
+  chipSelected: {
+    backgroundColor: '#008178',
+    borderColor: '#008178',
+  },
+
+  chipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#172333',
+  },
+
+  chipTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+
+  formBlock: {
+    marginBottom: 8,
+  },
+
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#172333',
+    marginBottom: 8,
+  },
+
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     paddingHorizontal: 14,
     height: 48,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
   },
 
   input: {
@@ -426,147 +590,37 @@ const styles = StyleSheet.create({
   },
 
   textAreaContainer: {
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    marginBottom: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+  },
+
+  textAreaShort: {
+    marginBottom: 8,
   },
 
   textArea: {
     fontSize: 14,
     color: '#172333',
-    minHeight: 100,
+    minHeight: 96,
   },
 
-  // ================= DURATION =================
-  durationContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 24,
+  textAreaShortInput: {
+    minHeight: 72,
   },
 
-  durationCard: {
-    width: '31%',
-    height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-  },
-
-  selectedDurationCard: {
-    borderColor: '#008178',
-    backgroundColor: '#EAF2FE',
-  },
-
-  durationText: {
-    fontSize: 14,
-    color: '#172333',
-  },
-
-  selectedDurationText: {
-    color: '#008178',
-    fontWeight: '600',
-  },
-
-  // ================= SECTION TITLE =================
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#172333',
-    marginBottom: 12,
-  },
-
-  // ================= DATE =================
-  dateScroll: {
-    paddingRight: 16,
-    marginBottom: 24,
-  },
-
-  dateCard: {
-    width: 70,
-    height: 80,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-  },
-
-  selectedDateCard: {
-    borderColor: '#008178',
-    backgroundColor: '#EAF2FE',
-  },
-
-  dayText: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginBottom: 4,
-  },
-
-  selectedDayText: {
-    color: '#008178',
-    fontWeight: '600',
-  },
-
-  dateText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#172333',
-  },
-
-  selectedDateText: {
-    color: '#008178',
-  },
-
-  // ================= TIME =================
-  timeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-
-  timeCard: {
-    width: '31%',
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-  },
-
-  selectedTimeCard: {
-    borderColor: '#008178',
-    backgroundColor: '#EAF2FE',
-  },
-
-  timeText: {
-    fontSize: 13,
-    color: '#172333',
-  },
-
-  selectedTimeText: {
-    color: '#008178',
-    fontWeight: '600',
-  },
-
-  // ================= BOTTOM =================
   bottomContainer: {
     width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F2F5',
   },
 
   bookButton: {
