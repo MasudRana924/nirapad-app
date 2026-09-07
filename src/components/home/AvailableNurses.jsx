@@ -11,7 +11,7 @@ const NURSES = [
     reviews: 120,
     specialty: 'General Nursing',
     experience: '8 Yrs Exp',
-    status: 'ACTIVE',
+    status: 'Available',
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const NURSES = [
     reviews: 85,
     specialty: 'ICU Specialist',
     experience: '5 Yrs Exp',
-    status: 'ACTIVE',
+    status: 'Available',
   },
   {
     id: 3,
@@ -31,7 +31,7 @@ const NURSES = [
     reviews: 64,
     specialty: 'Pediatric Care',
     experience: '6 Yrs Exp',
-    status: 'ACTIVE',
+    status: 'Available',
   },
 ];
 
@@ -39,11 +39,11 @@ const AvailableNurses = ({navigation}) => {
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Available Nurses</Text>
+        <Text style={styles.sectionTitle}>Available nurses</Text>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => navigation?.navigate('SelectNurse')}>
-          <Text style={styles.seeAll}>See All</Text>
+          <Text style={styles.seeAll}>See all</Text>
         </TouchableOpacity>
       </View>
 
@@ -52,32 +52,35 @@ const AvailableNurses = ({navigation}) => {
           <TouchableOpacity
             activeOpacity={0.85}
             key={nurse.id}
-            style={styles.row}
-            onPress={() => navigation?.navigate('NurseDetails', {nurse})}>
-            <Image source={{uri: nurse.image}} style={styles.avatar} />
+            style={styles.card}
+            onPress={() => navigation?.navigate('SelectNurse')}>
+            <View style={styles.cardHeader}>
+              <Image source={{uri: nurse.image}} style={styles.avatar} />
 
-            <View style={styles.info}>
-              <View style={styles.nameRow}>
-                <Text style={styles.name}>{nurse.name}</Text>
-                <View style={styles.activeBadge}>
-                  <Text style={styles.activeBadgeText}>{nurse.status}</Text>
+              <View style={styles.userInfo}>
+                <View style={styles.nameRow}>
+                  <Text style={styles.name} numberOfLines={1}>
+                    {nurse.name}
+                  </Text>
+                  <View style={styles.availableBadge}>
+                    <Text style={styles.availableBadgeText}>{nurse.status}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Icon name="star" size={14} color="#F59E0B" />
+                  <Text style={styles.infoText}>
+                    {nurse.rating} ({nurse.reviews}) · {nurse.experience}
+                  </Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                  <Icon name="medkit-outline" size={14} color="#303944" />
+                  <Text style={styles.infoText} numberOfLines={1}>
+                    {nurse.specialty}
+                  </Text>
                 </View>
               </View>
-
-              <Text style={styles.specialty}>
-                {nurse.specialty} • {nurse.experience}
-              </Text>
-
-              <View style={styles.ratingRow}>
-                <Icon name="star" size={12} color="#F6A900" />
-                <Text style={styles.ratingText}>
-                  {nurse.rating} ({nurse.reviews} reviews)
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.chevron}>
-              <Icon name="chevron-forward" size={18} color="#0d9488" />
             </View>
           </TouchableOpacity>
         ))}
@@ -93,96 +96,99 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 30,
-    marginBottom: 15,
+    marginTop: 22,
+    marginBottom: 14,
   },
 
   sectionTitle: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: '700',
-    color: '#172333',
+    color: '#111820',
   },
 
   seeAll: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#1473DC',
+    color: '#008178',
   },
 
   list: {
-    gap: 10,
+    gap: 12,
   },
 
-  row: {
+  card: {
+    width: '100%',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#F6F6F6',
+  },
+
+  cardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0fdfa',
-    borderRadius: 16,
-    padding: 14,
+    alignItems: 'flex-start',
   },
 
   avatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#E3E8F0',
+    marginRight: 13,
   },
 
-  info: {
+  userInfo: {
     flex: 1,
-    marginLeft: 12,
+    minWidth: 0,
   },
 
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 3,
   },
 
   name: {
-    fontSize: 15,
+    flex: 1,
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: '700',
-    color: '#172333',
+    color: '#111820',
+    marginRight: 8,
   },
 
-  activeBadge: {
-    backgroundColor: '#E6F9F1',
-    borderRadius: 6,
+  availableBadge: {
+    height: 22,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    borderRadius: 11,
+    backgroundColor: '#E6F4F3',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
-  activeBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#19B57A',
+  availableBadgeText: {
+    fontSize: 11,
+    lineHeight: 14,
+    color: '#008178',
+    fontWeight: '600',
   },
 
-  specialty: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginTop: 3,
-  },
-
-  ratingRow: {
+  infoRow: {
+    minHeight: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginBottom: 2,
   },
 
-  ratingText: {
+  infoText: {
+    marginLeft: 5,
+    flex: 1,
     fontSize: 12,
-    fontWeight: '600',
-    color: '#172333',
-    marginLeft: 4,
-  },
-
-  chevron: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    lineHeight: 17,
+    fontWeight: '400',
+    color: '#303944',
   },
 });

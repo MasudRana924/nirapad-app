@@ -39,20 +39,25 @@ const Tab = createBottomTabNavigator();
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
+  // Manual bottom inset so tab bar sits above system nav (not under it)
+  const bottomInset = insets.bottom > 0 ? insets.bottom : 12;
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
+        // Disable auto inset — we apply it ourselves to avoid underlap/double-gap
+        safeAreaInsets: {bottom: 0},
         tabBarStyle: {
-          height: 65,
-          paddingBottom: 8,
-          paddingTop: 4,
-          backgroundColor: '#FFF',
-          position: 'absolute',
-          bottom:  0+ insets.bottom,
-          borderTopWidth: 0,
+          height: 56 + bottomInset,
+          paddingBottom: bottomInset,
+          paddingTop: 8,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#E3E8F0',
+          elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarLabelStyle: {
           fontSize: 11,

@@ -3,13 +3,13 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const SERVICES = [
-  {title: 'Hospital', icon: 'business'},
-  {title: 'Book Nurse', icon: 'fitness'},
+  {title: 'Hospital', icon: 'business-outline'},
+  {title: 'Book Nurse', icon: 'fitness-outline'},
   {title: 'Elderly Care', icon: 'heart-outline'},
   {title: 'Medicine', icon: 'medkit-outline'},
   {title: 'Reports', icon: 'document-text-outline'},
   {title: 'Doctor', icon: 'person-outline'},
-  {title: 'Physio', icon: 'pulse'},
+  {title: 'Physio', icon: 'pulse-outline'},
   {title: 'More', icon: 'grid-outline'},
 ];
 
@@ -27,7 +27,7 @@ const QuickServices = ({navigation}) => {
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Quick Services</Text>
+        <Text style={styles.sectionTitle}>Quick services</Text>
       </View>
 
       <View style={styles.grid}>
@@ -38,9 +38,11 @@ const QuickServices = ({navigation}) => {
             style={styles.item}
             onPress={() => handlePress(service.title)}>
             <View style={styles.iconCircle}>
-              <Icon name={service.icon} size={24} color="#1473DC" />
+              <Icon name={service.icon} size={22} color="#008178" />
             </View>
-            <Text style={styles.label}>{service.title}</Text>
+            <Text style={styles.label} numberOfLines={1}>
+              {service.title}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -52,15 +54,15 @@ export default QuickServices;
 
 const styles = StyleSheet.create({
   sectionHeader: {
-    marginTop: 30,
-    marginBottom: 15,
+    marginTop: 26,
+    marginBottom: 14,
   },
 
   sectionTitle: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: '700',
-    color: '#172333',
+    color: '#111820',
   },
 
   grid: {
@@ -70,24 +72,25 @@ const styles = StyleSheet.create({
   },
 
   item: {
-    width: '24%',
+    width: '23%',
     alignItems: 'center',
-    marginBottom: 9,
+    marginBottom: 14,
   },
 
   iconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E9F1FC',
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   label: {
-    fontSize: 9.5,
-    color: '#172333',
-    marginTop: 5,
+    fontSize: 11,
+    color: '#303944',
+    marginTop: 7,
     textAlign: 'center',
+    fontWeight: '500',
   },
 });

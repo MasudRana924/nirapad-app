@@ -14,7 +14,6 @@ const HomeScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data loading
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);
@@ -51,11 +50,11 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
   },
 
   scrollContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 85,
+    paddingHorizontal: 16,
+    paddingBottom: 28,
   },
 });
