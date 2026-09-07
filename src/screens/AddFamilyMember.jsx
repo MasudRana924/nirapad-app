@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
 
   input: {
     height: 50,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F6F6F6',
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
     color: '#172333',
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F6F6F6',
   },
 
   textArea: {

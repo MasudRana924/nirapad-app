@@ -101,11 +101,11 @@ const FamilyScreen = ({navigation}) => {
                         {member.relationship} · {calculateAge(member.date_of_birth)} years
                       </Text>
                     </View>
-                    {member.emergency_contact_phone && (
+                    {!!member.emergency_contact_phone && (
                       <View style={styles.infoRow}>
                         <Icon name="call-outline" size={14} color="#303944" />
-                        <Text style={styles.infoText}>
-                          Emergency: {member.emergency_contact_phone}
+                        <Text style={styles.infoText} numberOfLines={1}>
+                          {member.emergency_contact_phone}
                         </Text>
                       </View>
                     )}
@@ -209,12 +209,12 @@ const styles = StyleSheet.create({
 
   familyCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F6F6',
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingTop: 16,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F6F6F6',
     paddingBottom: 10,
     marginBottom: 12,
   },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   // ================= CARD HEADER =================
   cardHeader: {
     width: '100%',
-    height: 81,
+    minHeight: 58,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 20,
+    fontSize: 16,
     lineHeight: 24,
     fontWeight: '700',
     color: '#111820',
@@ -306,14 +306,15 @@ const styles = StyleSheet.create({
   },
 
   infoRow: {
-    height: 20,
+    minHeight: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
 
   infoText: {
     marginLeft: 5,
-    fontSize: 13,
+    fontSize: 12,
     lineHeight: 17,
     fontWeight: '400',
     color: '#303944',
