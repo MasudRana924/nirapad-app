@@ -132,7 +132,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Spinner visible={loading} textStyle={styles.spinnerText} />
+      <Spinner visible={loading} color="#008178" size="large" />
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#F8F9FC"

@@ -57,7 +57,7 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Spinner visible={loading} color="#FFFFFF" />
+      <Spinner visible={loading} color="#008178" size="large" />
 
       <StatusBar
         barStyle="dark-content"
