@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     height: 54,
-    borderRadius: 16,
+    borderRadius: 12,
     backgroundColor: '#F0F2F7',
     borderWidth: 1,
     borderColor: '#F0F2F7',
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
 
   createButton: {
     height: 52,
-    borderRadius: 17,
+    borderRadius: 12,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',

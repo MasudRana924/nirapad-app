@@ -12,7 +12,7 @@ import {
   Platform,
   PermissionsAndroid,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary, requestMediaLibraryPermissions} from 'react-native-image-picker';
 import {useAddFamilyMember, useUpdateFamilyMember} from '../api/mutations';
@@ -21,7 +21,6 @@ import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
 
 const AddFamilyMember = ({navigation, route}) => {
-  const insets = useSafeAreaInsets();
   const {memberId, redirectBack} = route.params || {};
   const isEditMode = !!memberId;
   
@@ -146,7 +145,7 @@ const AddFamilyMember = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'undefined'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardContainer}>
         <Header 
           title={isEditMode ? 'Edit Family Member' : 'Add Family Member'} 
@@ -156,7 +155,8 @@ const AddFamilyMember = ({navigation, route}) => {
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
           {/* Image Upload */}
           <TouchableOpacity
             activeOpacity={0.7}
@@ -245,8 +245,8 @@ const AddFamilyMember = ({navigation, route}) => {
           </View>
         </ScrollView>
 
-        {/* Submit Button */}
-        <View style={[styles.bottomContainer, {paddingBottom: insets.bottom + 16}]}>
+        {/* Submit Button — pinned to bottom, full width */}
+        <View style={styles.bottomContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
             style={[styles.submitButton, (addMutation.isPending || updateMutation.isPending) && styles.disabledButton]}
@@ -275,7 +275,7 @@ const AddFamilyMember = ({navigation, route}) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#fff',
   },
 
   keyboardContainer: {
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
 
   // ================= IMAGE UPLOAD =================
@@ -359,16 +359,15 @@ const styles = StyleSheet.create({
 
   // ================= BOTTOM =================
   bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 12,
+    // paddingBottom: 16,
   },
 
   submitButton: {
+    width: '100%',
     height: 53,
     backgroundColor: '#008178',
     borderRadius: 12,

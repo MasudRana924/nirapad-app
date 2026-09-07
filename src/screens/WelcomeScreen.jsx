@@ -80,8 +80,8 @@ const WelcomeScreen = ({navigation}) => {
         translucent={false}
       />
 
-      {/* Step Indicators and Skip - Absolute Top */}
-      <View style={styles.stepIndicatorsTop}>
+      {/* Step Indicators and Skip - Fixed Top */}
+      <View style={styles.stepIndicatorsTop} pointerEvents="box-none">
         <View style={styles.stepIndicatorsRow}>
           {[0, 1, 2].map(step => (
             <View
@@ -246,16 +246,15 @@ const styles = StyleSheet.create({
     paddingBottom: 26,
   },
 
-  // Step Indicators - Absolute Top
+  // Step Indicators - Fixed Top (centered; Skip overlays right)
   stepIndicatorsTop: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 50 : 40,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    height: 40,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
     zIndex: 10,
   },
 
@@ -285,13 +284,15 @@ const styles = StyleSheet.create({
     width: 70,
   },
 
-  // Skip Button Top
   skipButtonTop: {
+    position: 'absolute',
+    right: 24,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
   },
 
-  // Skip Button
   skipButton: {
     alignSelf: 'flex-end',
     marginBottom: 16,
@@ -300,7 +301,7 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#008178',
+    color: '#000000',
   },
 
   textSection: {
@@ -310,35 +311,25 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 30,
     lineHeight: 36,
-
     fontWeight: '700',
-
-    color: '#111827',
-
+    color: '#000000',
     letterSpacing: -0.5,
   },
 
   headingBlue: {
     fontSize: 30,
     lineHeight: 36,
-
     fontWeight: '700',
-
-    color: '#008178',
-
+    color: '#000000',
     letterSpacing: -0.5,
   },
 
   description: {
     marginTop: 12,
-
     fontSize: 17,
     lineHeight: 27,
-
     fontWeight: '400',
-
-    color: '#7A89A3',
-
+    color: '#000000',
     letterSpacing: 0.1,
   },
 
@@ -349,79 +340,57 @@ const styles = StyleSheet.create({
 
   primaryButton: {
     height: 52,
-
     width: '100%',
-
     borderRadius: 17,
-
     backgroundColor: '#008178',
-
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   primaryButtonText: {
     fontSize: 17,
-
     fontWeight: '600',
-
     color: '#FFFFFF',
   },
 
   secondaryButton: {
     height: 52,
-
     width: '100%',
-
     borderRadius: 17,
-
     backgroundColor: 'rgba(255,255,255,0.92)',
-
     borderWidth: 1.5,
-
     borderColor: '#008178',
-
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   secondaryButtonText: {
     fontSize: 17,
-
     fontWeight: '600',
-
-    color: '#008178',
+    color: '#000000',
   },
 
   termsContainer: {
     marginTop: 22,
-
     alignItems: 'center',
   },
 
   termsText: {
     fontSize: 14,
-
     lineHeight: 21,
-
-    color: '#8995A9',
-
+    color: '#000000',
     textAlign: 'center',
   },
 
   privacyText: {
     fontSize: 14,
-
     lineHeight: 21,
-
-    color: '#8995A9',
-
+    color: '#000000',
     textAlign: 'center',
   },
 
   linkText: {
-    color: '#008178',
-
+    color: '#000000',
     fontWeight: '500',
   },
 
