@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
 
   // ================= INPUTS =================
@@ -562,15 +562,11 @@ const styles = StyleSheet.create({
 
   // ================= BOTTOM =================
   bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 12,
     paddingBottom: 16,
-
   },
 
   bookButton: {

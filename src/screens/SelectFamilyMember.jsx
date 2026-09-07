@@ -21,7 +21,7 @@ const SelectFamilyMember = ({navigation, route}) => {
   const familyMembers = familyMembersData?.data || [];
 
   const calculateAge = (dateOfBirth) => {
-    if (!dateOfBirth) return '';
+    if (!dateOfBirth) return 'N/A';
     const birthDate = new Date(dateOfBirth);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -29,7 +29,7 @@ const SelectFamilyMember = ({navigation, route}) => {
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    return age;
+    return age.toString();
   };
 
   const handleNext = () => {
@@ -120,15 +120,20 @@ const SelectFamilyMember = ({navigation, route}) => {
                         {member.relationship} · {calculateAge(member.date_of_birth)} years
                       </Text>
                     </View>
-                    {member.emergency_contact_phone && (
+                    {!!member.emergency_contact_phone && (
                       <View style={styles.infoRow}>
                         <Icon name="call-outline" size={14} color="#303944" />
-                        <Text style={styles.infoText}>
-                          Emergency: {member.emergency_contact_phone}
+                        <Text style={styles.infoText} numberOfLines={1}>
+                          {member.emergency_contact_phone}
                         </Text>
                       </View>
                     )}
                   </View>
+                  {selectedMember?.id === member.id && (
+                    <View style={styles.selectedBadge}>
+                      <Icon name="checkmark-circle" size={24} color="#008178" />
+                    </View>
+                  )}
                 </View>
 
                 {/* Care Note */}
@@ -139,22 +144,6 @@ const SelectFamilyMember = ({navigation, route}) => {
                       <Text style={styles.careTitle}>Care Note</Text>
                     </View>
                     <Text style={styles.careDescription}>{member.medical_history}</Text>
-                  </View>
-                )}
-
-                {/* Footer */}
-                <View style={styles.footer}>
-                  <View style={styles.footerLeft}>
-                    <Icon name="medkit-outline" size={16} color="#36404C" />
-                    <Text style={styles.footerText}>
-                      ID: {member.id}
-                    </Text>
-                  </View>
-                </View>
-
-                {selectedMember?.id === member.id && (
-                  <View style={styles.selectedOverlay}>
-                    <Icon name="checkmark-circle" size={32} color="#008178" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -203,7 +192,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
 
   // ================= LOADING =================
@@ -264,7 +253,6 @@ const styles = StyleSheet.create({
 
   familyCard: {
     width: '100%',
-    height: 234,
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     paddingHorizontal: 16,
@@ -273,7 +261,6 @@ const styles = StyleSheet.create({
     borderColor: '#E3E8F0',
     paddingBottom: 10,
     marginBottom: 12,
-    position: 'relative',
   },
 
   selectedCard: {
@@ -281,29 +268,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
 
-  selectedOverlay: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+  selectedBadge: {
+    marginLeft: 8,
+    marginTop: 2,
   },
 
   // ================= CARD HEADER =================
   cardHeader: {
     width: '100%',
-    height: 81,
+    minHeight: 58,
     flexDirection: 'row',
     alignItems: 'flex-start',
-  },
-
-  placeholderAvatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#E3E8F0',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 
   avatarContainer: {
@@ -318,6 +293,15 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 29,
     backgroundColor: '#E5E5E5',
+  },
+
+  placeholderAvatar: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   bloodBadge: {
@@ -348,7 +332,7 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 20,
+    fontSize: 16,
     lineHeight: 24,
     fontWeight: '700',
     color: '#111820',
@@ -356,14 +340,15 @@ const styles = StyleSheet.create({
   },
 
   infoRow: {
-    height: 20,
+    minHeight: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
 
   infoText: {
     marginLeft: 5,
-    fontSize: 13,
+    fontSize: 12,
     lineHeight: 17,
     fontWeight: '400',
     color: '#303944',
@@ -403,52 +388,12 @@ const styles = StyleSheet.create({
     color: '#344052',
   },
 
-  // ================= FOOTER =================
-  footer: {
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    paddingBottom: 1,
-  },
-
-  footerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 1,
-  },
-
-  footerText: {
-    marginLeft: 5,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '400',
-    color: '#36404C',
-  },
-
-  editButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 0,
-  },
-
-  editText: {
-    marginRight: 2,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '500',
-    color: '#128D90',
-  },
-
   // ================= BOTTOM =================
   bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 12,
     paddingBottom: 16,
   },
 

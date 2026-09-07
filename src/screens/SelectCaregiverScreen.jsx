@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 14,
     paddingHorizontal: 19,
-    paddingBottom: 100,
+    paddingBottom: 24,
   },
 
   // =====================================================
@@ -703,15 +703,11 @@ const styles = StyleSheet.create({
   // =====================================================
 
   bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 12,
     paddingBottom: 16,
- 
   },
 
   nextButton: {
