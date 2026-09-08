@@ -108,7 +108,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Booking preview" onBack={() => navigation?.goBack()} />
+      <Header title="Booking Preview" onBack={() => navigation?.goBack()} />
 
       <ScrollView
         style={styles.scroll}
@@ -289,9 +289,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
-    backgroundColor: '#FFFFFF',
+
   },
   confirmButton: {
     height: 52,

@@ -321,9 +321,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
-    backgroundColor: '#FFFFFF',
+
+    
   },
   nextButton: {
     height: 52,
