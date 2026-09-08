@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -78,12 +79,15 @@ const CreateAccountScreen = ({navigation}) => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scrollContent}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={22} color="#111820" />
-          </TouchableOpacity>
+          <View style={styles.header}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.backButton}
+              onPress={() => navigation?.goBack()}>
+              <Icon name="arrow-back" size={22} color="#111820" />
+            </TouchableOpacity>
+            <Image source={require('../assets/auth.png')} style={styles.authImage} />
+          </View>
 
           <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>
@@ -193,6 +197,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 32,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    marginBottom: 24,
+    position: 'relative',
+  },
   backButton: {
     width: 40,
     height: 40,
@@ -200,8 +212,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
-    marginBottom: 24,
+    position: 'absolute',
+    left: 0,
+  },
+  authImage: {
+    width: 40,
+    height: 40,
   },
   title: {
     fontSize: 26,
