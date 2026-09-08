@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   SELECTED_FAMILY_MEMBER: 'selected_family_member',
   SELECTED_CAREGIVER: 'selected_caregiver',
   SELECTED_HOSPITAL: 'selected_hospital',
+  SELECTED_AREA: 'selected_area',
   AUTH_TOKEN: 'userToken',
 };
 
@@ -59,6 +60,36 @@ export const storage = {
       await AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_CAREGIVER);
     } catch (error) {
       console.error('Error clearing caregiver:', error);
+    }
+  },
+
+  // Area (district + thana)
+  saveSelectedArea: async area => {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.SELECTED_AREA,
+        JSON.stringify(area),
+      );
+    } catch (error) {
+      console.error('Error saving area:', error);
+    }
+  },
+
+  getSelectedArea: async () => {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEYS.SELECTED_AREA);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Error getting area:', error);
+      return null;
+    }
+  },
+
+  clearSelectedArea: async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_AREA);
+    } catch (error) {
+      console.error('Error clearing area:', error);
     }
   },
 
@@ -122,6 +153,7 @@ export const storage = {
         AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_FAMILY_MEMBER),
         AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_CAREGIVER),
         AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_HOSPITAL),
+        AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_AREA),
       ]);
     } catch (error) {
       console.error('Error clearing booking data:', error);

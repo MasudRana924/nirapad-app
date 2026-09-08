@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -13,11 +12,13 @@ import Header from '../components/common/Header';
 import NotificationSkeleton from '../components/home/NotificationSkeleton';
 
 const InboxScreen = ({navigation}) => {
-  const {data: notificationsData, isLoading} = useNotifications({page: 1, limit: 20});
+  const {data: notificationsData, isLoading} = useNotifications({
+    page: 1,
+    limit: 20,
+  });
   const notifications = notificationsData?.data?.notifications || [];
-  const unreadCount = notificationsData?.data?.unreadCount || 0;
 
-  const formatTime = (dateString) => {
+  const formatTime = dateString => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const now = new Date();
@@ -33,7 +34,7 @@ const InboxScreen = ({navigation}) => {
     return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
   };
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = type => {
     switch (type) {
       case 'BOOKING':
         return 'calendar-outline';
@@ -46,22 +47,9 @@ const InboxScreen = ({navigation}) => {
     }
   };
 
-  const getNotificationColor = (type) => {
-    switch (type) {
-      case 'BOOKING':
-        return '#008178';
-      case 'PAYMENT':
-        return '#F59E0B';
-      case 'CAREGIVER':
-        return '#3B82F6';
-      default:
-        return '#6B7280';
-    }
-  };
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Inbox" />
+      <Header title="Inbox" showBack={true} />
 
       <ScrollView
         style={styles.scrollView}
@@ -71,141 +59,142 @@ const InboxScreen = ({navigation}) => {
           <NotificationSkeleton />
         ) : notifications.length === 0 ? (
           <View style={styles.emptyState}>
-            <Icon name="mail-outline" size={64} color="#E3E8F0" />
-            <Text style={styles.emptyTitle}>No Notifications</Text>
+            <View style={styles.emptyIcon}>
+              <Icon name="notifications-outline" size={32} color="#008178" />
+            </View>
+            <Text style={styles.emptyTitle}>No notifications</Text>
             <Text style={styles.emptyText}>
-              You don't have any notifications yet
+              Updates about bookings and caregivers will show up here
             </Text>
           </View>
         ) : (
-          notifications.map(notification => (
-            <View
-              key={notification.id}
-              style={[
-                styles.notificationCard,
-                !notification.is_read && styles.unreadCard,
-              ]}>
-              <View style={styles.cardHeader}>
-                <View
-                  style={[
-                    styles.iconContainer,
-                    {backgroundColor: getNotificationColor(notification.type) + '15'},
-                  ]}>
+          notifications.map(notification => {
+            const unread = !notification.is_read;
+            return (
+              <View
+                key={notification.id}
+                style={[styles.card, unread && styles.cardUnread]}>
+                <View style={styles.iconWrap}>
                   <Icon
                     name={getNotificationIcon(notification.type)}
                     size={20}
-                    color={getNotificationColor(notification.type)}
+                    color="#008178"
                   />
                 </View>
-                <View style={styles.headerContent}>
-                    <Text style={styles.message}>{notification.message}</Text>
+
+                <View style={styles.content}>
+                  <View style={styles.topRow}>
+                    <Text
+                      style={[styles.message, unread && styles.messageUnread]}
+                      numberOfLines={3}>
+                      {notification.message}
+                    </Text>
+                    {unread && <View style={styles.unreadDot} />}
+                  </View>
+                  <Text style={styles.time}>
+                    {formatTime(notification.created_at)}
+                  </Text>
                 </View>
-                {!notification.is_read && <View style={styles.unreadDot} />}
               </View>
-            
-              <Text style={styles.time}>{formatTime(notification.created_at)}</Text>
-            </View>
-          ))
+            );
+          })
         )}
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+export default InboxScreen;
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   emptyState: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
+    paddingHorizontal: 24,
+  },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#172333',
-    marginTop: 16,
+    fontWeight: '700',
+    color: '#111820',
   },
   emptyText: {
-    fontSize: 14,
-    color: '#8190A7',
     marginTop: 8,
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#8190A7',
+    textAlign: 'center',
   },
-  notificationCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-  },
-  unreadCard: {
-    backgroundColor: '#F0F9FF',
-    borderColor: '#008178',
-  },
-  cardHeader: {
+  card: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
   },
-  iconContainer: {
+  cardUnread: {
+    backgroundColor: '#E6F4F3',
+  },
+  iconWrap: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
-  headerContent: {
+  content: {
     flex: 1,
+    minWidth: 0,
   },
-  title: {
-    fontSize: 15,
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  message: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#303944',
+    fontWeight: '400',
+  },
+  messageUnread: {
+    color: '#111820',
     fontWeight: '600',
-    color: '#172333',
-    marginBottom: 4,
-  },
-  unreadTitle: {
-    fontWeight: '700',
-  },
-  time: {
-    fontSize: 12,
-    color: '#8190A7',
   },
   unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: '#008178',
+    marginLeft: 8,
+    marginTop: 6,
   },
-  message: {
+  time: {
+    marginTop: 8,
     fontSize: 12,
-    color: '#172333',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  typeBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: '#F5F5F5',
-  },
-  typeText: {
-    fontSize: 11,
-    fontWeight: '600',
     color: '#8190A7',
-    textTransform: 'uppercase',
   },
 });
-
-export default InboxScreen;

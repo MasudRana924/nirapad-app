@@ -42,9 +42,10 @@ const SelectFamilyMember = ({navigation, route}) => {
           selectedCaregiver,
         });
       } else {
-        // Normal flow: go to caregiver selection
-        navigation?.navigate('SelectCaregiver', {
+        // Normal flow: family -> area -> caregiver
+        navigation?.navigate('AreaSelect', {
           selectedMember,
+          serviceType: route.params?.serviceType || 'caregiver',
         });
       }
     }

@@ -3,25 +3,39 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const SERVICES = [
-  {title: 'Hospital', icon: 'business-outline'},
-  {title: 'Book Nurse', icon: 'fitness-outline'},
-  {title: 'Elderly Care', icon: 'heart-outline'},
-  {title: 'Medicine', icon: 'medkit-outline'},
-  {title: 'Reports', icon: 'document-text-outline'},
-  {title: 'Doctor', icon: 'person-outline'},
-  {title: 'Physio', icon: 'pulse-outline'},
-  {title: 'More', icon: 'grid-outline'},
+  {
+    id: 'caregiver',
+    title: 'Caregiver',
+    icon: 'people-outline',
+  },
+  {
+    id: 'nurse',
+    title: 'Nurse',
+    icon: 'medkit-outline',
+  },
+  {
+    id: 'autistic',
+    title: 'Autistic care',
+    icon: 'happy-outline',
+  },
+  {
+    id: 'physio',
+    title: 'Physio',
+    icon: 'fitness-outline',
+  },
 ];
 
 const QuickServices = ({navigation}) => {
-  const handlePress = title => {
-    if (title === 'Elderly Care') {
-      navigation?.navigate('SelectCaregiver');
-    } else if (title === 'Book Nurse') {
+  const handlePress = service => {
+    if (service.id === 'nurse') {
       navigation?.navigate('SelectNurse');
-    } else if (title === 'Medicine') {
-      navigation?.navigate('Medicine');
+      return;
     }
+
+    // Caregiver / autistic / physio share family -> area -> caregiver flow
+    navigation?.navigate('SelectFamilyMember', {
+      serviceType: service.id,
+    });
   };
 
   return (
@@ -31,16 +45,16 @@ const QuickServices = ({navigation}) => {
       </View>
 
       <View style={styles.grid}>
-        {SERVICES.map((service, index) => (
+        {SERVICES.map(service => (
           <TouchableOpacity
             activeOpacity={0.75}
-            key={index}
+            key={service.id}
             style={styles.item}
-            onPress={() => handlePress(service.title)}>
+            onPress={() => handlePress(service)}>
             <View style={styles.iconCircle}>
               <Icon name={service.icon} size={22} color="#008178" />
             </View>
-            <Text style={styles.label} numberOfLines={1}>
+            <Text style={styles.label} numberOfLines={2}>
               {service.title}
             </Text>
           </TouchableOpacity>

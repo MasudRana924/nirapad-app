@@ -16,10 +16,11 @@ import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations
 import {storage} from '../utils/storage';
 
 const HospitalSelection = ({navigation, route}) => {
+  const {selectedMember, selectedCaregiver, selectedArea, serviceType} =
+    route.params || {};
   const [selectedHospital, setSelectedHospital] = useState(null);
-  const [district, setDistrict] = useState('');
-  const [city, setCity] = useState('');
-  const {selectedMember, selectedCaregiver} = route.params || {};
+  const [district, setDistrict] = useState(selectedArea?.district || '');
+  const [city, setCity] = useState(selectedArea?.thana || '');
 
   const {data: hospitalsData, isLoading} = useSearchHospitals({
     district,
@@ -35,6 +36,8 @@ const HospitalSelection = ({navigation, route}) => {
         selectedMember,
         selectedCaregiver,
         selectedHospital,
+        selectedArea,
+        serviceType,
       });
     }
   };

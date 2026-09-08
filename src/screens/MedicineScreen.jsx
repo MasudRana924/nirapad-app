@@ -5,12 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
   Image,
   TextInput,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Header from '../components/common/Header';
 
 const medicines = [
   {
@@ -18,7 +18,7 @@ const medicines = [
     name: 'Paracetamol 500mg',
     description: 'Pain reliever & fever reducer',
     price: 25,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Pain Relief',
   },
   {
@@ -26,7 +26,7 @@ const medicines = [
     name: 'Amoxicillin 250mg',
     description: 'Antibiotic for infections',
     price: 120,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Antibiotics',
   },
   {
@@ -34,7 +34,7 @@ const medicines = [
     name: 'Omeprazole 20mg',
     description: 'Acid reflux & heartburn',
     price: 85,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Digestive',
   },
   {
@@ -42,7 +42,7 @@ const medicines = [
     name: 'Metformin 500mg',
     description: 'Diabetes management',
     price: 45,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Diabetes',
   },
   {
@@ -50,7 +50,7 @@ const medicines = [
     name: 'Cetirizine 10mg',
     description: 'Allergy relief',
     price: 35,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Allergy',
   },
   {
@@ -58,7 +58,7 @@ const medicines = [
     name: 'Ibuprofen 400mg',
     description: 'Anti-inflammatory pain relief',
     price: 40,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Pain Relief',
   },
   {
@@ -66,7 +66,7 @@ const medicines = [
     name: 'Vitamin D3 1000IU',
     description: 'Bone health supplement',
     price: 150,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Supplements',
   },
   {
@@ -74,15 +74,44 @@ const medicines = [
     name: 'Aspirin 75mg',
     description: 'Blood thinner',
     price: 30,
-    image: 'https://via.placeholder.com/60',
+    image: null,
     category: 'Heart',
   },
 ];
 
-const categories = ['All', 'Pain Relief', 'Antibiotics', 'Digestive', 'Supplements'];
+const categories = [
+  'All',
+  'Pain Relief',
+  'Antibiotics',
+  'Digestive',
+  'Supplements',
+  'Diabetes',
+  'Allergy',
+  'Heart',
+];
+
+const MedicineThumb = ({image, size = 64}) => {
+  if (image) {
+    return (
+      <Image
+        source={{uri: image}}
+        style={{width: size, height: size, borderRadius: 14}}
+      />
+    );
+  }
+
+  return (
+    <View
+      style={[
+        styles.thumbPlaceholder,
+        {width: size, height: size, borderRadius: size * 0.22},
+      ]}>
+      <Icon name="medkit-outline" size={size * 0.38} color="#008178" />
+    </View>
+  );
+};
 
 const MedicineScreen = ({navigation}) => {
-  const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [cart, setCart] = useState({});
   const [search, setSearch] = useState('');
@@ -90,7 +119,9 @@ const MedicineScreen = ({navigation}) => {
   const filteredMedicines = medicines.filter(item => {
     const matchesCategory =
       selectedCategory === 'All' || item.category === selectedCategory;
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(search.toLowerCase().trim());
     return matchesCategory && matchesSearch;
   });
 
@@ -103,150 +134,177 @@ const MedicineScreen = ({navigation}) => {
 
   const removeFromCart = medicineId => {
     setCart(prev => {
-      const newCart = {...prev};
-      if (newCart[medicineId] > 1) {
-        newCart[medicineId]--;
+      const next = {...prev};
+      if (next[medicineId] > 1) {
+        next[medicineId]--;
       } else {
-        delete newCart[medicineId];
+        delete next[medicineId];
       }
-      return newCart;
+      return next;
     });
   };
 
-  const getCartCount = () => {
-    return Object.values(cart).reduce((sum, count) => sum + count, 0);
-  };
+  const cartCount = Object.values(cart).reduce((sum, count) => sum + count, 0);
+  const totalPrice = Object.entries(cart).reduce((sum, [id, count]) => {
+    const medicine = medicines.find(m => m.id === parseInt(id, 10));
+    return sum + (medicine ? medicine.price * count : 0);
+  }, 0);
 
-  const getTotalPrice = () => {
-    return Object.entries(cart).reduce((sum, [id, count]) => {
-      const medicine = medicines.find(m => m.id === parseInt(id));
-      return sum + (medicine ? medicine.price * count : 0);
-    }, 0);
-  };
+  const goToCart = () => navigation?.navigate('Cart', {cart, medicines});
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
-
-      {/* ================= HEADER ================= */}
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={27} color="#182331" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>All Medicines</Text>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.cartButton}
-          onPress={() => navigation?.navigate('Cart', {cart, medicines})}>
-          <Icon name="cart-outline" size={24} color="#182331" />
-
-          {getCartCount() > 0 && (
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>{getCartCount()}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {/* ================= SEARCH & FILTER ================= */}
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header
+        title="Medicines"
+        onBack={() => navigation?.goBack()}
+        rightComponent={
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.cartHeaderBtn}
+            onPress={goToCart}>
+            <Icon name="cart-outline" size={22} color="#111820" />
+            {cartCount > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>
+                  {cartCount > 9 ? '9+' : cartCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        }
+      />
 
       <View style={styles.searchRow}>
-        <View style={styles.searchContainer}>
-          <Icon
-            name="search"
-            size={22}
-            color="#7D8BA3"
-            style={styles.searchIcon}
-          />
-
+        <View style={styles.searchBox}>
+          <Icon name="search-outline" size={18} color="#8190A7" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search medicines..."
-            placeholderTextColor="#7D8BA3"
+            placeholderTextColor="#8190A7"
             value={search}
             onChangeText={setSearch}
           />
+          {!!search && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setSearch('')}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              <Icon name="close-circle" size={18} color="#8190A7" />
+            </TouchableOpacity>
+          )}
         </View>
-
-        <TouchableOpacity activeOpacity={0.85} style={styles.filterButton}>
-          <Icon name="options-outline" size={23} color="#FFFFFF" />
-        </TouchableOpacity>
       </View>
 
-      {/* ================= MEDICINE LIST ================= */}
-
       <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.medicineList}>
-        {filteredMedicines.map(medicine => (
-          <View key={medicine.id} style={styles.medicineCard}>
-            <Image source={{uri: medicine.image}} style={styles.medicineImage} />
-
-            <View style={styles.medicineInfo}>
-              <Text style={styles.medicineName}>{medicine.name}</Text>
-              <Text style={styles.medicineDescription}>{medicine.description}</Text>
-              <Text style={styles.medicineCategory}>{medicine.category}</Text>
-
-              <View style={styles.medicineBottom}>
-                <Text style={styles.medicinePrice}>৳{medicine.price}</Text>
-
-                <View style={styles.quantityControl}>
-                  {cart[medicine.id] ? (
-                    <>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={styles.quantityButton}
-                        onPress={() => removeFromCart(medicine.id)}>
-                        <Icon name="remove" size={16} color="#1473DC" />
-                      </TouchableOpacity>
-
-                      <Text style={styles.quantityText}>{cart[medicine.id]}</Text>
-
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={styles.quantityButton}
-                        onPress={() => addToCart(medicine)}>
-                        <Icon name="add" size={16} color="#1473DC" />
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      style={styles.addButton}
-                      onPress={() => addToCart(medicine)}>
-                      <Icon name="add" size={16} color="#FFFFFF" />
-                      <Text style={styles.addButtonText}>Add</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-            </View>
-          </View>
-        ))}
+        horizontal
+        style={styles.categoryList}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoryScroll}>
+        {categories.map(category => {
+          const active = selectedCategory === category;
+          return (
+            <TouchableOpacity
+              key={category}
+              activeOpacity={0.85}
+              style={[styles.categoryChip, active && styles.categoryChipActive]}
+              onPress={() => setSelectedCategory(category)}>
+              <Text
+                style={[
+                  styles.categoryText,
+                  active && styles.categoryTextActive,
+                ]}>
+                {category}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
-      {/* ================= BOTTOM BAR ================= */}
-
-      {getCartCount() > 0 && (
-        <View style={[styles.bottomBar, {bottom: insets.bottom}]}>
-          <View style={styles.bottomInfo}>
-            <Text style={styles.bottomLabel}>Total</Text>
-            <Text style={styles.bottomPrice}>৳{getTotalPrice()}</Text>
+      <ScrollView
+        style={styles.list}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}>
+        {filteredMedicines.length === 0 ? (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIcon}>
+              <Icon name="search-outline" size={28} color="#008178" />
+            </View>
+            <Text style={styles.emptyTitle}>No medicines found</Text>
+            <Text style={styles.emptyText}>Try another search or category</Text>
           </View>
+        ) : (
+          filteredMedicines.map(medicine => {
+            const qty = cart[medicine.id] || 0;
+            return (
+              <View key={medicine.id} style={styles.card}>
+                <MedicineThumb image={medicine.image} />
 
+                <View style={styles.cardBody}>
+                  <View style={styles.cardTop}>
+                    <Text style={styles.name} numberOfLines={1}>
+                      {medicine.name}
+                    </Text>
+                    <View style={styles.categoryTag}>
+                      <Text style={styles.categoryTagText}>
+                        {medicine.category}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.description} numberOfLines={1}>
+                    {medicine.description}
+                  </Text>
+
+                  <View style={styles.cardBottom}>
+                    <Text style={styles.price}>৳{medicine.price}</Text>
+
+                    {qty > 0 ? (
+                      <View style={styles.qtyRow}>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          style={styles.qtyBtn}
+                          onPress={() => removeFromCart(medicine.id)}>
+                          <Icon name="remove" size={16} color="#008178" />
+                        </TouchableOpacity>
+                        <Text style={styles.qtyText}>{qty}</Text>
+                        <TouchableOpacity
+                          activeOpacity={0.85}
+                          style={styles.qtyBtn}
+                          onPress={() => addToCart(medicine)}>
+                          <Icon name="add" size={16} color="#008178" />
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        activeOpacity={0.85}
+                        style={styles.addBtn}
+                        onPress={() => addToCart(medicine)}>
+                        <Icon name="add" size={16} color="#FFFFFF" />
+                        <Text style={styles.addBtnText}>Add</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              </View>
+            );
+          })
+        )}
+      </ScrollView>
+
+      {cartCount > 0 && (
+        <View style={styles.bottomBar}>
+          <View>
+            <Text style={styles.bottomLabel}>
+              {cartCount} item{cartCount > 1 ? 's' : ''}
+            </Text>
+            <Text style={styles.bottomPrice}>৳{totalPrice}</Text>
+          </View>
           <TouchableOpacity
             activeOpacity={0.85}
-            style={styles.checkoutButton}
-            onPress={() => navigation?.navigate('Cart', {cart, medicines})}>
-            <Text style={styles.checkoutButtonText}>
-              Checkout ({getCartCount()} items)
-            </Text>
+            style={styles.checkoutBtn}
+            onPress={goToCart}>
+            <Text style={styles.checkoutBtnText}>View cart</Text>
+            <Icon name="arrow-forward" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       )}
@@ -259,294 +317,238 @@ export default MedicineScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
   },
-
-  // =====================================================
-  // HEADER
-  // =====================================================
-
-  header: {
-    height: 55,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 18,
-  },
-
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 20,
-    backgroundColor: '#E9EEF5',
+  cartHeaderBtn: {
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
   },
-
-  headerTitle: {
-   fontSize: 15,
-    fontWeight: 'bold',
-    color: '#11182e',
+  cartBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 0,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#008178',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  cartBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  searchRow: {
+    paddingHorizontal: 20,
+    marginBottom: 12,
+  },
+  searchBox: {
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#F6F6F6',
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  searchInput: {
     flex: 1,
-    textAlign: 'center',
+    height: '100%',
+    fontSize: 15,
+    color: '#111820',
+    paddingVertical: 0,
   },
-
-  cartButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+  categoryList: {
+    flexGrow: 0,
+    marginBottom: 14,
+  },
+  categoryScroll: {
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  categoryChip: {
+    height: 36,
+    paddingHorizontal: 14,
+    borderRadius: 18,
+    backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E3E8F0',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
   },
-
-  cartBadge: {
-    position: 'absolute',
-    right: -5,
-    top: -5,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#E34242',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  cartBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-
-  // =====================================================
-  // SEARCH
-  // =====================================================
-
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingTop: 14,
-    paddingBottom: 8,
-  },
-
-  searchContainer: {
-    flex: 1,
-    height: 50,
-    borderRadius: 17,
-    backgroundColor: '#EFF2F7',
-    borderWidth: 1,
-    borderColor: '#EFF2F7',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    marginRight: 9,
-  },
-
-  searchIcon: {
-    marginRight: 10,
-  },
-
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    fontSize: 16,
-    color: '#172033',
-  },
-
-  filterButton: {
-    width: 49,
-    height: 49,
-    borderRadius: 25,
-    backgroundColor: '#1473DC',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // =====================================================
-  // CATEGORIES
-  // =====================================================
-
-  categoryScroll: {
-    paddingHorizontal: 18,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-
-  categoryChip: {
-    height: 36,
-    borderRadius: 19,
-    paddingHorizontal: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DFE5EE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 9,
-  },
-
   categoryChipActive: {
     backgroundColor: '#008178',
     borderColor: '#008178',
   },
-
   categoryText: {
     fontSize: 13,
-    color: '#7D8BA5',
     fontWeight: '500',
+    color: '#8190A7',
   },
-
   categoryTextActive: {
     color: '#FFFFFF',
+    fontWeight: '600',
   },
-
-  // =====================================================
-  // MEDICINE LIST
-  // =====================================================
-
-  medicineList: {
-    paddingHorizontal: 18,
-    paddingBottom: 20,
-  },
-
-  medicineCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#DDE4EE',
-    marginBottom: 12,
-    padding: 12,
-  },
-
-  medicineImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
-    backgroundColor: '#E9EDF3',
-    marginRight: 12,
-  },
-
-  medicineInfo: {
+  list: {
     flex: 1,
   },
-
-  medicineName: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#182331',
-    marginBottom: 2,
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-
-  medicineDescription: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginBottom: 4,
-  },
-
-  medicineCategory: {
-    fontSize: 11,
-    color: '#1473DC',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-
-  medicineBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  emptyState: {
     alignItems: 'center',
+    paddingTop: 64,
   },
-
-  medicinePrice: {
+  emptyIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1473DC',
+    color: '#111820',
+    marginBottom: 4,
   },
-
-  quantityControl: {
+  emptyText: {
+    fontSize: 14,
+    color: '#8190A7',
+  },
+  card: {
     flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 12,
   },
-
-  quantityButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#E9F1FC',
+  thumbPlaceholder: {
+    backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  quantityText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#182331',
-    marginHorizontal: 10,
+  cardBody: {
+    flex: 1,
+    marginLeft: 12,
+    minWidth: 0,
   },
-
-  addButton: {
+  cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#008178',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
+    gap: 8,
+    marginBottom: 4,
   },
-
-  addButtonText: {
-    fontSize: 12,
+  name: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111820',
+  },
+  categoryTag: {
+    backgroundColor: '#E6F4F3',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  categoryTagText: {
+    fontSize: 10,
     fontWeight: '600',
-    color: '#FFFFFF',
-    marginLeft: 4,
+    color: '#008178',
   },
-
-  // =====================================================
-  // BOTTOM BAR
-  // =====================================================
-
-  bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#DDE4EE',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
+  description: {
+    fontSize: 12,
+    color: '#8190A7',
+    marginBottom: 10,
+  },
+  cardBottom: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-
-  bottomInfo: {
-    flex: 1,
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111820',
   },
-
+  qtyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  qtyBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D7E8E6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qtyText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111820',
+    minWidth: 16,
+    textAlign: 'center',
+  },
+  addBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 32,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: '#008178',
+    gap: 4,
+  },
+  addBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F2F5',
+    backgroundColor: '#FFFFFF',
+  },
   bottomLabel: {
     fontSize: 12,
     color: '#8190A7',
+    marginBottom: 2,
   },
-
   bottomPrice: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#1473DC',
+    color: '#111820',
   },
-
-  checkoutButton: {
+  checkoutBtn: {
+    height: 48,
+    paddingHorizontal: 18,
+    borderRadius: 14,
     backgroundColor: '#008178',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-
-  checkoutButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
+  checkoutBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
 });

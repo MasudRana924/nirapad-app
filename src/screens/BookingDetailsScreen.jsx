@@ -13,12 +13,20 @@ import {useBookingDetails} from '../api/queries';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 
+const STATUS_STYLES = {
+  PENDING_PAYMENT: {bg: '#FFF4E5', text: '#D97706'},
+  CONFIRMED: {bg: '#E6F4F3', text: '#008178'},
+  IN_PROGRESS: {bg: '#E6F4F3', text: '#008178'},
+  COMPLETED: {bg: '#E6F4F3', text: '#008178'},
+  CANCELLED: {bg: '#FEECEC', text: '#DC2626'},
+};
+
 const BookingDetailsScreen = ({navigation, route}) => {
   const {bookingId} = route.params || {};
   const {data: bookingData, isLoading} = useBookingDetails(bookingId);
   const booking = bookingData?.data;
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '--';
     try {
       const date = new Date(dateString);
@@ -34,11 +42,11 @@ const BookingDetailsScreen = ({navigation, route}) => {
     }
   };
 
-  const formatTime = (timeString) => {
+  const formatTime = timeString => {
     if (!timeString) return '--';
     try {
       const [hours, minutes] = timeString.split(':');
-      const hour = parseInt(hours);
+      const hour = parseInt(hours, 10);
       const ampm = hour >= 12 ? 'PM' : 'AM';
       const hour12 = hour % 12 || 12;
       return `${hour12}:${minutes} ${ampm}`;
@@ -47,27 +55,15 @@ const BookingDetailsScreen = ({navigation, route}) => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return '#F59E0B';
-      case 'CONFIRMED':
-        return '#10B981';
-      case 'IN_PROGRESS':
-        return '#3B82F6';
-      case 'COMPLETED':
-        return '#10B981';
-      case 'CANCELLED':
-        return '#EF4444';
-      default:
-        return '#6B7280';
-    }
-  };
+  const statusStyle =
+    STATUS_STYLES[booking?.status] || {bg: '#F0F2F5', text: '#8190A7'};
+  const statusLabel = (booking?.status || '').replace(/_/g, ' ');
+  const showPayButton = booking?.payment_status === 'PENDING';
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Booking Details" onBack={() => navigation?.goBack()} />
+        <Header title="Booking details" onBack={() => navigation?.goBack()} />
         <BookingDetailsSkeleton />
       </SafeAreaView>
     );
@@ -76,205 +72,195 @@ const BookingDetailsScreen = ({navigation, route}) => {
   if (!booking) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Booking Details" onBack={() => navigation?.goBack()} />
+        <Header title="Booking details" onBack={() => navigation?.goBack()} />
         <View style={styles.errorContainer}>
-          <Icon name="alert-circle-outline" size={64} color="#E3E8F0" />
+          <View style={styles.errorIcon}>
+            <Icon name="alert-circle-outline" size={32} color="#008178" />
+          </View>
           <Text style={styles.errorTitle}>Booking not found</Text>
+          <Text style={styles.errorText}>
+            This booking may have been removed or is unavailable
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
+  const infoRows = [
+    {label: 'Booking number', value: booking.booking_number},
+    {label: 'Date', value: formatDate(booking.booking_date)},
+    {
+      label: 'Time',
+      value: `${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`,
+    },
+    {label: 'Duration', value: `${booking.duration_hours} hours`},
+    {
+      label: 'Service',
+      value: (booking.service_type || '').replace(/_/g, ' '),
+    },
+    {
+      label: 'Payment',
+      value: (booking.payment_status || '').replace(/_/g, ' '),
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Booking Details" onBack={() => navigation?.goBack()} />
+      <Header title="Booking details" onBack={() => navigation?.goBack()} />
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        {/* Booking Info Card */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Booking Information</Text>
-            <View
-              style={[styles.statusBadge, {backgroundColor: getStatusColor(booking.status)}]}>
-              <Text style={styles.statusText}>{booking.status}</Text>
+        <View style={styles.heroCard}>
+          <View style={styles.heroTop}>
+            <View style={styles.heroLeft}>
+              <Text style={styles.heroLabel}>Total amount</Text>
+              <Text style={styles.heroAmount}>৳{booking.total_amount}</Text>
+            </View>
+            <View style={[styles.statusBadge, {backgroundColor: statusStyle.bg}]}>
+              <Text style={[styles.statusText, {color: statusStyle.text}]}>
+                {statusLabel}
+              </Text>
             </View>
           </View>
-          <View style={styles.divider} />
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Booking Number</Text>
-            <Text style={styles.infoValue}>{booking.booking_number}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Date</Text>
-            <Text style={styles.infoValue}>{formatDate(booking.booking_date)}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Time</Text>
-            <Text style={styles.infoValue}>
-              {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
-            </Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Duration</Text>
-            <Text style={styles.infoValue}>{booking.duration_hours} hours</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Service Type</Text>
-            <Text style={styles.infoValue}>{booking.service_type}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Payment Status</Text>
-            <Text style={styles.infoValue}>{booking.payment_status}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Total Amount</Text>
-            <Text style={styles.infoValue}>৳{booking.total_amount}</Text>
-          </View>
+
+          <View style={styles.heroDivider} />
+
+          {infoRows.map((row, index) => (
+            <View
+              key={row.label}
+              style={[
+                styles.infoRow,
+                index === infoRows.length - 1 && styles.infoRowLast,
+              ]}>
+              <Text style={styles.infoLabel}>{row.label}</Text>
+              <Text style={styles.infoValue} numberOfLines={1}>
+                {row.value || '--'}
+              </Text>
+            </View>
+          ))}
         </View>
 
-        {/* Family Member Card */}
         {booking.family_member && (
           <View style={styles.card}>
-            <Text style={styles.subcardTitle}>Family Member</Text>
-            <View style={styles.divider} />
-            <View style={styles.memberCard}>
-              <View style={styles.avatarContainer}>
-                {booking.family_member.photo ? (
-                  <Image
-                    source={{uri: booking.family_member.photo}}
-                    style={styles.avatar}
-                  />
-                ) : (
-                  <View style={styles.placeholderAvatar}>
-                    <Icon name="person" size={32} color="#8190A7" />
-                  </View>
-                )}
-                {booking.family_member.blood_group && (
-                  <View style={styles.bloodBadge}>
-                    <Text style={styles.bloodText}>{booking.family_member.blood_group}</Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.memberInfo}>
-                <Text style={styles.memberName}>{booking.family_member.name}</Text>
-                <View style={styles.memberDetail}>
-                  <Icon name="person-outline" size={16} color="#7D8BA5" />
-                  <Text style={styles.memberDetailText}>{booking.family_member.relationship}</Text>
+            <Text style={styles.sectionTitle}>Patient</Text>
+            <View style={styles.personRow}>
+              {booking.family_member.photo ? (
+                <Image
+                  source={{uri: booking.family_member.photo}}
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Icon name="person" size={22} color="#008178" />
                 </View>
+              )}
+              <View style={styles.personInfo}>
+                <Text style={styles.personName}>{booking.family_member.name}</Text>
+                <Text style={styles.personMeta}>
+                  {booking.family_member.relationship}
+                  {booking.family_member.blood_group
+                    ? ` · ${booking.family_member.blood_group}`
+                    : ''}
+                </Text>
               </View>
             </View>
           </View>
         )}
 
-        {/* Caregiver Card */}
         {booking.caregiver && (
           <View style={styles.card}>
-            <Text style={styles.subcardTitle}>Caregiver</Text>
-            <View style={styles.divider} />
-            <View style={styles.memberCard}>
-              <View style={styles.avatarContainer}>
-                {booking.caregiver.profile_photo ? (
-                  <Image
-                    source={{uri: booking.caregiver.profile_photo}}
-                    style={styles.avatar}
-                  />
-                ) : (
-                  <View style={styles.placeholderAvatar}>
-                    <Icon name="medkit" size={32} color="#8190A7" />
-                  </View>
-                )}
-              </View>
-              <View style={styles.memberInfo}>
-                <Text style={styles.memberName}>{booking.caregiver.name}</Text>
-                {booking.caregiver.rating && (
-                  <View style={styles.ratingContainer}>
-                    <Icon name="star" size={16} color="#F6A900" />
-                    <Text style={styles.ratingText}>{booking.caregiver.rating}</Text>
-                  </View>
-                )}
-                {booking.caregiver.experience_years && (
-                  <View style={styles.memberDetail}>
-                    <Icon name="briefcase-outline" size={16} color="#7D8BA5" />
-                    <Text style={styles.memberDetailText}>
-                      {booking.caregiver.experience_years} years experience
+            <Text style={styles.sectionTitle}>Caregiver</Text>
+            <View style={styles.personRow}>
+              {booking.caregiver.profile_photo ? (
+                <Image
+                  source={{uri: booking.caregiver.profile_photo}}
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Icon name="medkit" size={22} color="#008178" />
+                </View>
+              )}
+              <View style={styles.personInfo}>
+                <Text style={styles.personName}>{booking.caregiver.name}</Text>
+                <View style={styles.metaRow}>
+                  {!!booking.caregiver.rating && (
+                    <View style={styles.metaChip}>
+                      <Icon name="star" size={12} color="#F6A900" />
+                      <Text style={styles.metaChipText}>
+                        {booking.caregiver.rating}
+                      </Text>
+                    </View>
+                  )}
+                  {!!booking.caregiver.experience_years && (
+                    <Text style={styles.personMeta}>
+                      {booking.caregiver.experience_years} yrs exp
                     </Text>
-                  </View>
-                )}
-                {booking.caregiver.education && (
-                  <View style={styles.memberDetail}>
-                    <Icon name="school-outline" size={16} color="#7D8BA5" />
-                    <Text style={styles.memberDetailText}>{booking.caregiver.education}</Text>
-                  </View>
+                  )}
+                </View>
+                {!!booking.caregiver.education && (
+                  <Text style={styles.personMeta} numberOfLines={1}>
+                    {booking.caregiver.education}
+                  </Text>
                 )}
               </View>
             </View>
-            {booking.caregiver.bio && (
-              <View style={styles.bioSection}>
-                <Text style={styles.bioText}>{booking.caregiver.bio}</Text>
-              </View>
+            {!!booking.caregiver.bio && (
+              <Text style={styles.bodyText}>{booking.caregiver.bio}</Text>
             )}
           </View>
         )}
 
-        {/* Hospital Card */}
         {booking.hospital && (
           <View style={styles.card}>
-            <Text style={styles.subcardTitle}>Hospital</Text>
-            <View style={styles.divider} />
-            <View style={styles.memberCard}>
-              <View style={styles.avatarContainer}>
-                {booking.hospital.photo ? (
-                  <Image source={{uri: booking.hospital.photo}} style={styles.avatar} />
-                ) : (
-                  <View style={styles.placeholderAvatar}>
-                    <Icon name="business" size={32} color="#8190A7" />
-                  </View>
-                )}
-              </View>
-              <View style={styles.memberInfo}>
-                <Text style={styles.memberName}>{booking.hospital.name}</Text>
-                <View style={styles.memberDetail}>
-                  <Icon name="location-outline" size={16} color="#7D8BA5" />
-                  <Text style={styles.memberDetailText}>{booking.hospital.address}</Text>
+            <Text style={styles.sectionTitle}>Hospital</Text>
+            <View style={styles.personRow}>
+              {booking.hospital.photo ? (
+                <Image
+                  source={{uri: booking.hospital.photo}}
+                  style={styles.avatar}
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Icon name="business" size={22} color="#008178" />
                 </View>
-                {booking.hospital.phone && (
-                  <View style={styles.memberDetail}>
-                    <Icon name="call-outline" size={16} color="#7D8BA5" />
-                    <Text style={styles.memberDetailText}>{booking.hospital.phone}</Text>
-                  </View>
+              )}
+              <View style={styles.personInfo}>
+                <Text style={styles.personName}>{booking.hospital.name}</Text>
+                {!!booking.hospital.address && (
+                  <Text style={styles.personMeta} numberOfLines={2}>
+                    {booking.hospital.address}
+                  </Text>
+                )}
+                {!!booking.hospital.phone && (
+                  <Text style={styles.personMeta}>{booking.hospital.phone}</Text>
                 )}
               </View>
             </View>
           </View>
         )}
 
-        {/* Patient Requirements */}
-        {booking.patient_requirements && (
+        {!!booking.patient_requirements && (
           <View style={styles.card}>
-            <Text style={styles.subcardTitle}>Patient Requirements</Text>
-            <View style={styles.divider} />
-            <Text style={styles.requirementsText}>{booking.patient_requirements}</Text>
+            <Text style={styles.sectionTitle}>Patient needs</Text>
+            <Text style={styles.bodyText}>{booking.patient_requirements}</Text>
           </View>
         )}
 
-        {/* Notes */}
-        {booking.notes && (
+        {!!booking.notes && (
           <View style={styles.card}>
-            <Text style={styles.subcardTitle}>Additional Notes</Text>
-            <View style={styles.divider} />
-            <Text style={styles.notesText}>{booking.notes}</Text>
+            <Text style={styles.sectionTitle}>Notes</Text>
+            <Text style={styles.bodyText}>{booking.notes}</Text>
           </View>
         )}
       </ScrollView>
 
-      {/* Pay Now Button */}
-      {booking.payment_status === 'PENDING' && (
-        <View style={styles.payButtonContainer}>
-          <TouchableOpacity style={styles.payButton}>
-            <Text style={styles.payButtonText}>Pay Now</Text>
+      {showPayButton && (
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity activeOpacity={0.85} style={styles.payButton}>
+            <Text style={styles.payButtonText}>Pay now</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -282,202 +268,196 @@ const BookingDetailsScreen = ({navigation, route}) => {
   );
 };
 
+export default BookingDetailsScreen;
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#8190A7',
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   errorContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 80,
+    paddingHorizontal: 32,
+  },
+  errorIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   errorTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#172333',
-    marginTop: 16,
+    fontWeight: '700',
+    color: '#111820',
+    marginBottom: 6,
   },
-  card: {
-    backgroundColor: '#F5F5F5',
+  errorText: {
+    fontSize: 14,
+    color: '#8190A7',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  heroCard: {
+    backgroundColor: '#F6F6F6',
     borderRadius: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#F5F5F5',
-    overflow: 'hidden',
+    padding: 16,
+    marginBottom: 14,
   },
-  cardHeader: {
+  heroTop: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
+    marginBottom: 14,
   },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#172333',
-    // padding: 16,
-    paddingBottom: 8,
+  heroLeft: {
+    flex: 1,
+    paddingRight: 12,
   },
-  subcardTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#172333',
-    padding: 16,
-    paddingBottom: 8,
+  heroLabel: {
+    fontSize: 12,
+    color: '#8190A7',
+    marginBottom: 4,
+  },
+  heroAmount: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#111820',
   },
   statusBadge: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
   },
   statusText: {
-    fontSize: 8,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#FFFFFF',
+    textTransform: 'capitalize',
+  },
+  heroDivider: {
+    height: 1,
+    backgroundColor: '#EAEAEA',
+    marginBottom: 10,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingVertical: 8,
+    gap: 12,
+  },
+  infoRowLast: {
+    paddingBottom: 0,
   },
   infoLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#8190A7',
   },
   infoValue: {
-    fontSize: 12,
+    flex: 1,
+    textAlign: 'right',
+    fontSize: 13,
     fontWeight: '600',
-    color: '#172333',
+    color: '#111820',
+    textTransform: 'capitalize',
   },
-  memberCard: {
-    flexDirection: 'row',
+  card: {
+    backgroundColor: '#F6F6F6',
+    borderRadius: 16,
     padding: 16,
+    marginBottom: 14,
   },
-  avatarContainer: {
-    position: 'relative',
-    marginRight: 12,
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111820',
+    marginBottom: 12,
+  },
+  personRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    marginRight: 12,
   },
-  placeholderAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#F5F7FA',
+  avatarPlaceholder: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  personInfo: {
+    flex: 1,
+    minWidth: 0,
+  },
+  personName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111820',
+    marginBottom: 3,
+  },
+  personMeta: {
+    fontSize: 13,
+    color: '#8190A7',
+    lineHeight: 18,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+  },
+  metaChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#111820',
+  },
+  bodyText: {
+    marginTop: 12,
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#4A5568',
+  },
+  bottomContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F2F5',
+    backgroundColor: '#FFFFFF',
+  },
+  payButton: {
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bloodBadge: {
-    position: 'absolute',
-    bottom: -4,
-    right: -4,
-    backgroundColor: '#EF4444',
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  bloodText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  memberInfo: {
-    flex: 1,
-  },
-  memberName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#172333',
-    marginBottom: 4,
-  },
-  memberDetail: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  memberDetailText: {
-    fontSize: 13,
-    color: '#8190A7',
-    marginLeft: 4,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  ratingText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#172333',
-    marginLeft: 4,
-  },
-  bioSection: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  bioText: {
-    fontSize: 14,
-    color: '#8190A7',
-    lineHeight: 20,
-  },
-  requirementsText: {
-    fontSize: 14,
-    color: '#172333',
-    lineHeight: 20,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  notesText: {
-    fontSize: 14,
-    color: '#8190A7',
-    lineHeight: 20,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  payButtonContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFFFFF',
-    // padding: 16,
-
-  },
-  payButton: {
-    backgroundColor: '#008178',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
   payButtonText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#FFFFFF',
   },
 });
-
-export default BookingDetailsScreen;

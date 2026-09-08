@@ -78,9 +78,16 @@ const BookingDateTime = ({navigation}) => {
       const member = await storage.getSelectedFamilyMember();
       const caregiver = await storage.getSelectedCaregiver();
       const hospital = await storage.getSelectedHospital();
+      const area = await storage.getSelectedArea();
       setSelectedMember(member);
       setSelectedCaregiver(caregiver);
       setSelectedHospital(hospital);
+      if (area?.district) {
+        setPickupDistrict(area.district);
+      }
+      if (area?.thana) {
+        setPickupCity(area.thana);
+      }
     } catch (error) {
       console.error('Error loading booking data:', error);
     } finally {
@@ -177,12 +184,11 @@ const BookingDateTime = ({navigation}) => {
     },
   ];
 
-  const canBook =
-    !!selectedDate && !!selectedTime && !isSubmitting;
+  const canBook = !!selectedDate && !!selectedTime && !isSubmitting;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Book Appointment" onBack={() => navigation?.goBack()} />
+      <Header title="Book appointment" onBack={() => navigation?.goBack()} />
 
       <ScrollView
         style={styles.scrollView}
@@ -195,11 +201,14 @@ const BookingDateTime = ({navigation}) => {
           </View>
         ) : (
           <>
-            {/* Summary */}
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>Booking summary</Text>
-              {summaryItems.map(item => (
-                <View key={item.key} style={styles.summaryRow}>
+              {summaryItems.map((item, index) => (
+                <View
+                  key={item.key}
+                  style={[
+                    styles.summaryRow,
+                    index === summaryItems.length - 1 && styles.summaryRowLast,
+                  ]}>
                   <View style={styles.summaryIcon}>
                     <Icon name={item.icon} size={18} color="#008178" />
                   </View>
@@ -213,8 +222,7 @@ const BookingDateTime = ({navigation}) => {
               ))}
             </View>
 
-            {/* Date */}
-            <Text style={styles.sectionTitle}>Select date</Text>
+            <Text style={styles.sectionTitle}>Date</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -225,19 +233,19 @@ const BookingDateTime = ({navigation}) => {
                   <TouchableOpacity
                     key={date.id}
                     activeOpacity={0.85}
-                    style={[styles.dateCard, selected && styles.dateCardSelected]}
+                    style={[styles.dateCard, selected && styles.chipSelected]}
                     onPress={() => setSelectedDate(date)}>
                     <Text
                       style={[
                         styles.dayText,
-                        selected && styles.dateTextSelected,
+                        selected && styles.chipTextSelected,
                       ]}>
                       {date.day}
                     </Text>
                     <Text
                       style={[
                         styles.dateNumber,
-                        selected && styles.dateTextSelected,
+                        selected && styles.chipTextSelected,
                       ]}>
                       {date.date}
                     </Text>
@@ -246,16 +254,15 @@ const BookingDateTime = ({navigation}) => {
               })}
             </ScrollView>
 
-            {/* Time */}
-            <Text style={styles.sectionTitle}>Select time</Text>
-            <View style={styles.chipGrid}>
+            <Text style={styles.sectionTitle}>Time</Text>
+            <View style={styles.chipRow}>
               {TIMES.map(time => {
                 const selected = selectedTime?.id === time.id;
                 return (
                   <TouchableOpacity
                     key={time.id}
                     activeOpacity={0.85}
-                    style={[styles.chip, selected && styles.chipSelected]}
+                    style={[styles.timeChip, selected && styles.chipSelected]}
                     onPress={() => setSelectedTime(time)}>
                     <Text
                       style={[
@@ -269,16 +276,15 @@ const BookingDateTime = ({navigation}) => {
               })}
             </View>
 
-            {/* Duration */}
             <Text style={styles.sectionTitle}>Duration</Text>
-            <View style={styles.chipGrid}>
+            <View style={styles.chipRow}>
               {DURATIONS.map(hours => {
                 const selected = durationHours === hours;
                 return (
                   <TouchableOpacity
                     key={hours}
                     activeOpacity={0.85}
-                    style={[styles.chip, selected && styles.chipSelected]}
+                    style={[styles.durationChip, selected && styles.chipSelected]}
                     onPress={() => setDurationHours(hours)}>
                     <Text
                       style={[
@@ -292,99 +298,82 @@ const BookingDateTime = ({navigation}) => {
               })}
             </View>
 
-            {/* Pickup */}
-            <View style={styles.formBlock}>
-              <Text style={styles.sectionTitle}>Pickup location</Text>
-              <Text style={styles.sectionHint}>
-                Where should the caregiver meet the patient?
-              </Text>
-
-              <View style={styles.inputContainer}>
-                <Icon name="location-outline" size={18} color="#8190A7" />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Street address"
-                  placeholderTextColor="#8190A7"
-                  value={pickupAddress}
-                  onChangeText={setPickupAddress}
-                />
-              </View>
-
-              <SearchableDropdown
-                data={bangladeshCities}
-                label="City"
-                placeholder="Select city"
-                value={pickupCity}
-                onSelect={setPickupCity}
-                icon="business-outline"
+            <Text style={styles.sectionTitle}>Pickup location</Text>
+            <Text style={styles.label}>Address</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="location-outline" size={18} color="#8190A7" />
+              <TextInput
+                style={styles.input}
+                placeholder="Street address"
+                placeholderTextColor="#8190A7"
+                value={pickupAddress}
+                onChangeText={setPickupAddress}
               />
-              <SearchableDropdown
-                data={bangladeshDistricts}
-                label="District"
-                placeholder="Select district"
-                value={pickupDistrict}
-                onSelect={setPickupDistrict}
-                icon="location-outline"
-              />
-
-              <View style={styles.inputContainer}>
-                <Icon name="map-outline" size={18} color="#8190A7" />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Division (optional)"
-                  placeholderTextColor="#8190A7"
-                  value={pickupDivision}
-                  onChangeText={setPickupDivision}
-                />
-              </View>
             </View>
 
-            {/* Patient details */}
-            <View style={styles.formBlock}>
-              <Text style={styles.sectionTitle}>Patient details</Text>
-              <Text style={styles.sectionHint}>
-                Share needs so the caregiver can prepare.
-              </Text>
+            <SearchableDropdown
+              data={bangladeshCities}
+              label="City"
+              placeholder="Select city"
+              value={pickupCity}
+              onSelect={setPickupCity}
+              icon="business-outline"
+            />
+            <SearchableDropdown
+              data={bangladeshDistricts}
+              label="District"
+              placeholder="Select district"
+              value={pickupDistrict}
+              onSelect={setPickupDistrict}
+              icon="location-outline"
+            />
 
-              <View style={styles.textAreaContainer}>
-                <TextInput
-                  style={styles.textArea}
-                  placeholder="Requirements, conditions, mobility needs..."
-                  placeholderTextColor="#8190A7"
-                  value={patientRequirements}
-                  onChangeText={setPatientRequirements}
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-              </View>
-
-              <Text style={styles.fieldLabel}>Additional notes (optional)</Text>
-              <View style={[styles.textAreaContainer, styles.textAreaShort]}>
-                <TextInput
-                  style={[styles.textArea, styles.textAreaShortInput]}
-                  placeholder="Anything else for the caregiver..."
-                  placeholderTextColor="#8190A7"
-                  value={notes}
-                  onChangeText={setNotes}
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
-                />
-              </View>
+            <Text style={styles.label}>Division (optional)</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="map-outline" size={18} color="#8190A7" />
+              <TextInput
+                style={styles.input}
+                placeholder="Division"
+                placeholderTextColor="#8190A7"
+                value={pickupDivision}
+                onChangeText={setPickupDivision}
+              />
             </View>
+
+            <Text style={styles.sectionTitle}>Patient needs</Text>
+            <Text style={styles.label}>Requirements *</Text>
+            <TextInput
+              style={styles.textArea}
+              placeholder="Conditions, mobility needs, special care..."
+              placeholderTextColor="#8190A7"
+              value={patientRequirements}
+              onChangeText={setPatientRequirements}
+              multiline
+              textAlignVertical="top"
+            />
+
+            <Text style={styles.label}>Notes (optional)</Text>
+            <TextInput
+              style={[styles.textArea, styles.textAreaShort]}
+              placeholder="Anything else for the caregiver..."
+              placeholderTextColor="#8190A7"
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              textAlignVertical="top"
+            />
           </>
         )}
       </ScrollView>
 
       <View style={styles.bottomContainer}>
         <TouchableOpacity
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           style={[styles.bookButton, !canBook && styles.disabledButton]}
           onPress={handleBook}
           disabled={!canBook}>
           <Text style={styles.bookButtonText}>
-            {isSubmitting ? 'Booking...' : 'Book Appointment'}
+            {isSubmitting ? 'Booking...' : 'Confirm booking'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -399,49 +388,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   scrollView: {
     flex: 1,
   },
-
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 20,
     paddingBottom: 28,
   },
-
   loadingContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 80,
   },
-
   loadingText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#8190A7',
   },
-
   summaryCard: {
     backgroundColor: '#F6F6F6',
-    borderRadius: 18,
-    padding: 16,
+    borderRadius: 16,
+    padding: 14,
     marginBottom: 22,
-    borderWidth: 1,
-    borderColor: '#F6F6F6',
   },
-
-  summaryTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#172333',
-    marginBottom: 12,
-  },
-
   summaryRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
   },
-
+  summaryRowLast: {
+    marginBottom: 0,
+  },
   summaryIcon: {
     width: 36,
     height: 36,
@@ -451,193 +426,153 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
-
   summaryTextBlock: {
     flex: 1,
     minWidth: 0,
   },
-
   summaryLabel: {
     fontSize: 11,
-    fontWeight: '500',
     color: '#8190A7',
     marginBottom: 2,
   },
-
   summaryValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: '#111820',
   },
-
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#172333',
-    marginBottom: 6,
-  },
-
-  sectionHint: {
-    fontSize: 13,
-    color: '#8190A7',
+    color: '#111820',
     marginBottom: 12,
-    lineHeight: 18,
+    marginTop: 4,
   },
-
   dateScroll: {
     paddingRight: 8,
-    marginBottom: 22,
+    marginBottom: 20,
   },
-
   dateCard: {
-    width: 68,
-    height: 78,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
+    width: 56,
+    height: 68,
+    borderRadius: 14,
+    backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
-
-  dateCardSelected: {
-    backgroundColor: '#008178',
-    borderColor: '#008178',
-  },
-
   dayText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#8190A7',
     marginBottom: 4,
     fontWeight: '500',
   },
-
   dateNumber: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#172333',
+    color: '#111820',
   },
-
-  dateTextSelected: {
-    color: '#FFFFFF',
-  },
-
-  chipGrid: {
+  chipRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 22,
-    marginHorizontal: -4,
+    gap: 8,
+    marginBottom: 20,
   },
-
-  chip: {
-    width: '31%',
-    marginHorizontal: '1.16%',
-    height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
+  timeChip: {
+    paddingHorizontal: 14,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
+  durationChip: {
+    width: 52,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#F6F6F6',
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   chipSelected: {
     backgroundColor: '#008178',
     borderColor: '#008178',
   },
-
   chipText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#172333',
+    color: '#111820',
   },
-
   chipTextSelected: {
     color: '#FFFFFF',
     fontWeight: '600',
   },
-
-  formBlock: {
-    marginBottom: 8,
-  },
-
-  fieldLabel: {
-    fontSize: 13,
+  label: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#172333',
+    color: '#111820',
     marginBottom: 8,
   },
-
   inputContainer: {
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: '#F6F6F6',
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
     paddingHorizontal: 14,
-    height: 48,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
+    marginBottom: 14,
+    gap: 10,
   },
-
   input: {
     flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#172333',
+    height: '100%',
+    fontSize: 15,
+    color: '#111820',
+    paddingVertical: 0,
   },
-
-  textAreaContainer: {
-    backgroundColor: '#FFFFFF',
+  textArea: {
+    minHeight: 96,
     borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 16,
+    backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E3E8F0',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#111820',
+    marginBottom: 14,
   },
-
   textAreaShort: {
-    marginBottom: 8,
-  },
-
-  textArea: {
-    fontSize: 14,
-    color: '#172333',
-    minHeight: 96,
-  },
-
-  textAreaShortInput: {
     minHeight: 72,
   },
-
   bottomContainer: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
     borderTopWidth: 1,
     borderTopColor: '#F0F2F5',
+    backgroundColor: '#FFFFFF',
   },
-
   bookButton: {
+    height: 52,
+    borderRadius: 14,
     backgroundColor: '#008178',
-    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
   },
-
   disabledButton: {
     backgroundColor: '#B5C0D0',
   },
-
   bookButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

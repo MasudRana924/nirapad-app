@@ -2,31 +2,26 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const Skeleton = ({style}) => {
-  return (
-    <LinearGradient
-      colors={['#E5E7EB', '#F3F4F6', '#E5E7EB']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 0}}
-      style={[styles.skeleton, style]}
-    />
-  );
-};
+const Skeleton = ({style}) => (
+  <LinearGradient
+    colors={['#E5E7EB', '#F3F4F6', '#E5E7EB']}
+    start={{x: 0, y: 0}}
+    end={{x: 1, y: 0}}
+    style={[styles.skeleton, style]}
+  />
+);
 
 const NotificationSkeleton = () => {
   return (
     <View style={styles.container}>
       {[1, 2, 3, 4, 5].map(i => (
-        <View key={i} style={styles.notificationCard}>
-          <View style={styles.cardHeader}>
-            <Skeleton style={styles.icon} />
-            <View style={styles.headerContent}>
-              <Skeleton style={styles.title} />
-              <Skeleton style={styles.time} />
-            </View>
+        <View key={i} style={styles.card}>
+          <Skeleton style={styles.icon} />
+          <View style={styles.content}>
+            <Skeleton style={styles.line} />
+            <Skeleton style={styles.lineShort} />
+            <Skeleton style={styles.time} />
           </View>
-          <Skeleton style={styles.message} />
-          <Skeleton style={styles.type} />
         </View>
       ))}
     </View>
@@ -35,53 +30,42 @@ const NotificationSkeleton = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    width: '100%',
   },
   skeleton: {
     backgroundColor: '#E5E7EB',
   },
-  notificationCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-  },
-  cardHeader: {
+  card: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
   },
   icon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     marginRight: 12,
   },
-  headerContent: {
+  content: {
     flex: 1,
   },
-  title: {
-    width: 150,
-    height: 16,
-    borderRadius: 4,
-    marginBottom: 6,
-  },
-  time: {
-    width: 80,
-    height: 12,
-    borderRadius: 4,
-  },
-  message: {
-    width: '100%',
+  line: {
+    width: '95%',
     height: 14,
-    borderRadius: 4,
+    borderRadius: 6,
     marginBottom: 8,
   },
-  type: {
+  lineShort: {
+    width: '70%',
+    height: 14,
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  time: {
     width: 60,
-    height: 12,
+    height: 10,
     borderRadius: 4,
   },
 });

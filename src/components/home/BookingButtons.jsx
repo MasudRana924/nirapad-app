@@ -8,11 +8,15 @@ const BookingButtons = ({navigation}) => {
       <TouchableOpacity
         activeOpacity={0.85}
         style={styles.button}
-        onPress={() => navigation?.navigate('SelectFamilyMember')}>
+        onPress={() =>
+          navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'})
+        }>
         <View style={styles.iconWrap}>
-          <Icon name="person-add" size={20} color="#008178" />
+          <Icon name="person-add" size={18} color="#008178" />
         </View>
-        <Text style={styles.buttonText}>Book Caregiver</Text>
+        <Text style={styles.buttonText} numberOfLines={1}>
+          Book Caregiver
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -20,9 +24,11 @@ const BookingButtons = ({navigation}) => {
         style={styles.button}
         onPress={() => navigation?.navigate('SelectNurse')}>
         <View style={styles.iconWrap}>
-          <Icon name="medical" size={20} color="#008178" />
+          <Icon name="medical" size={18} color="#008178" />
         </View>
-        <Text style={styles.buttonText}>Book Nurse</Text>
+        <Text style={styles.buttonText} numberOfLines={1}>
+          Book Nurse
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -43,26 +49,24 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#F6F6F6',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
   },
 
   iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 8,
   },
 
   buttonText: {
-    flex: 1,
+    flexShrink: 1,
     color: '#111820',
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 });

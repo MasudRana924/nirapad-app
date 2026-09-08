@@ -5,7 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 const Skeleton = ({style}) => {
   return (
     <LinearGradient
-      colors={['#E5E7EB', '#F3F4F6', '#E5E7EB']}
+      colors={['#E8ECF1', '#F3F5F8', '#E8ECF1']}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 0}}
       style={[styles.skeleton, style]}
@@ -16,14 +16,16 @@ const Skeleton = ({style}) => {
 const BookingDetailsSkeleton = () => {
   return (
     <View style={styles.container}>
-      {/* Booking Info Card */}
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Skeleton style={styles.title} />
-          <Skeleton style={styles.statusBadge} />
+        <View style={styles.heroTop}>
+          <View>
+            <Skeleton style={styles.amountLabel} />
+            <Skeleton style={styles.amount} />
+          </View>
+          <Skeleton style={styles.status} />
         </View>
         <View style={styles.divider} />
-        {[1, 2, 3, 4, 5, 6, 7].map(i => (
+        {[1, 2, 3, 4, 5, 6].map(i => (
           <View key={i} style={styles.infoRow}>
             <Skeleton style={styles.infoLabel} />
             <Skeleton style={styles.infoValue} />
@@ -31,157 +33,115 @@ const BookingDetailsSkeleton = () => {
         ))}
       </View>
 
-      {/* Family Member Card */}
-      <View style={styles.card}>
-        <Skeleton style={styles.cardTitle} />
-        <View style={styles.divider} />
-        <View style={styles.memberCard}>
-          <Skeleton style={styles.avatar} />
-          <View style={styles.memberInfo}>
-            <Skeleton style={styles.memberName} />
-            <Skeleton style={styles.memberDetail} />
-            <Skeleton style={styles.memberDetail} />
+      {[1, 2, 3].map(i => (
+        <View key={i} style={styles.card}>
+          <Skeleton style={styles.sectionTitle} />
+          <View style={styles.personRow}>
+            <Skeleton style={styles.avatar} />
+            <View style={styles.personInfo}>
+              <Skeleton style={styles.name} />
+              <Skeleton style={styles.meta} />
+              <Skeleton style={styles.metaShort} />
+            </View>
           </View>
         </View>
-      </View>
-
-      {/* Caregiver Card */}
-      <View style={styles.card}>
-        <Skeleton style={styles.cardTitle} />
-        <View style={styles.divider} />
-        <View style={styles.memberCard}>
-          <Skeleton style={styles.avatar} />
-          <View style={styles.memberInfo}>
-            <Skeleton style={styles.memberName} />
-            <Skeleton style={styles.memberDetail} />
-            <Skeleton style={styles.memberDetail} />
-            <Skeleton style={styles.memberDetail} />
-          </View>
-        </View>
-        <Skeleton style={styles.bio} />
-      </View>
-
-      {/* Hospital Card */}
-      <View style={styles.card}>
-        <Skeleton style={styles.cardTitle} />
-        <View style={styles.divider} />
-        <View style={styles.memberCard}>
-          <Skeleton style={styles.avatar} />
-          <View style={styles.memberInfo}>
-            <Skeleton style={styles.memberName} />
-            <Skeleton style={styles.memberDetail} />
-            <Skeleton style={styles.memberDetail} />
-          </View>
-        </View>
-      </View>
-
-      {/* Patient Requirements */}
-      <View style={styles.card}>
-        <Skeleton style={styles.cardTitle} />
-        <View style={styles.divider} />
-        <Skeleton style={styles.requirements} />
-      </View>
+      ))}
     </View>
   );
 };
 
+export default BookingDetailsSkeleton;
+
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingTop: 4,
   },
   skeleton: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#E8ECF1',
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F6F6',
     borderRadius: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-    overflow: 'hidden',
+    padding: 16,
+    marginBottom: 14,
   },
-  cardHeader: {
+  heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
+    alignItems: 'flex-start',
+    marginBottom: 14,
   },
-  title: {
-    width: 150,
-    height: 20,
-    borderRadius: 4,
-  },
-  statusBadge: {
+  amountLabel: {
     width: 80,
-    height: 24,
-    borderRadius: 12,
+    height: 12,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  amount: {
+    width: 110,
+    height: 28,
+    borderRadius: 8,
+  },
+  status: {
+    width: 88,
+    height: 28,
+    borderRadius: 14,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E3E8F0',
-    marginHorizontal: 16,
+    backgroundColor: '#EAEAEA',
+    marginBottom: 10,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   infoLabel: {
-    width: 80,
-    height: 16,
-    borderRadius: 4,
+    width: 90,
+    height: 14,
+    borderRadius: 6,
   },
   infoValue: {
-    width: 100,
-    height: 16,
-    borderRadius: 4,
+    width: 120,
+    height: 14,
+    borderRadius: 6,
   },
-  cardTitle: {
-    height: 20,
-    width: 150,
-    borderRadius: 4,
-    margin: 16,
-    marginBottom: 8,
+  sectionTitle: {
+    width: 90,
+    height: 14,
+    borderRadius: 6,
+    marginBottom: 12,
   },
-  memberCard: {
+  personRow: {
     flexDirection: 'row',
-    padding: 16,
+    alignItems: 'center',
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     marginRight: 12,
   },
-  memberInfo: {
+  personInfo: {
     flex: 1,
   },
-  memberName: {
-    width: 120,
-    height: 20,
-    borderRadius: 4,
+  name: {
+    width: 130,
+    height: 16,
+    borderRadius: 6,
     marginBottom: 8,
   },
-  memberDetail: {
-    width: 150,
-    height: 14,
-    borderRadius: 4,
-    marginBottom: 4,
+  meta: {
+    width: 160,
+    height: 12,
+    borderRadius: 6,
+    marginBottom: 6,
   },
-  bio: {
-    height: 60,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 4,
-  },
-  requirements: {
-    height: 80,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 4,
+  metaShort: {
+    width: 100,
+    height: 12,
+    borderRadius: 6,
   },
 });
-
-export default BookingDetailsSkeleton;

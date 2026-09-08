@@ -115,9 +115,26 @@ export const caregiverService = {
     apiRequest(`/caregivers/${id}`, 'GET'),
 
   searchCaregivers: (params = {}) => {
-    const {page = 1, limit = 20, location, gender, name} = params;
-    const queryParams = new URLSearchParams({page: page.toString(), limit: limit.toString()});
-    if (location) queryParams.append('location', location);
+    const {
+      page = 1,
+      limit = 20,
+      location,
+      gender,
+      name,
+      district,
+      thana,
+    } = params;
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (district) queryParams.append('district', district);
+    if (thana) queryParams.append('thana', thana);
+    // Backward-compatible location filter for older APIs
+    const locationFilter =
+      location ||
+      (thana && district ? `${thana}, ${district}` : thana || district || '');
+    if (locationFilter) queryParams.append('location', locationFilter);
     if (gender) queryParams.append('gender', gender);
     if (name) queryParams.append('name', name);
     return apiRequest(`/caregiver/search?${queryParams.toString()}`, 'GET');

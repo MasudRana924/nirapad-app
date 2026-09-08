@@ -17,10 +17,18 @@ import {storage} from '../utils/storage';
 
 const SelectCaregiverScreen = ({navigation, route}) => {
   const [search, setSearch] = useState('');
-  const [location, setLocation] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
   const [selectedCaregiver, setSelectedCaregiver] = useState(null);
-  const {selectedMember} = route.params || {};
+  const {
+    selectedMember,
+    district = '',
+    thana = '',
+    selectedArea,
+    serviceType = 'caregiver',
+  } = route.params || {};
+
+  const selectedDistrict = district || selectedArea?.district || '';
+  const selectedThana = thana || selectedArea?.thana || '';
 
   const filters = [
     {id: 'all', label: 'All'},
@@ -30,7 +38,8 @@ const SelectCaregiverScreen = ({navigation, route}) => {
 
   const {data: caregiversData, isLoading} = useSearchCaregivers({
     name: search,
-    location,
+    district: selectedDistrict,
+    thana: selectedThana,
     gender: selectedFilter === 'all' ? '' : selectedFilter,
   });
 
@@ -50,6 +59,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
       navigation?.navigate('HospitalSelection', {
         selectedMember,
         selectedCaregiver,
+        selectedArea: {
+          district: selectedDistrict,
+          thana: selectedThana,
+        },
+        serviceType,
       });
     }
   };
@@ -74,21 +88,22 @@ const SelectCaregiverScreen = ({navigation, route}) => {
               style={styles.searchInput}
             />
           </View>
-          <TouchableOpacity activeOpacity={0.85} style={styles.filterButton}>
-            <Icon name="options-outline" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
         </View>
 
-        <View style={styles.locationFilter}>
-          <Icon name="location-outline" size={18} color="#8190A7" />
-          <TextInput
-            value={location}
-            onChangeText={setLocation}
-            placeholder="Filter by location..."
-            placeholderTextColor="#8190A7"
-            style={styles.locationInput}
-          />
-        </View>
+        {(!!selectedDistrict || !!selectedThana) && (
+          <View style={styles.areaBanner}>
+            <Icon name="location-outline" size={16} color="#008178" />
+            <Text style={styles.areaBannerText} numberOfLines={1}>
+              {[selectedThana, selectedDistrict].filter(Boolean).join(', ')}
+            </Text>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => navigation?.goBack()}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              <Text style={styles.changeAreaText}>Change</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* ================= FILTER CHIPS ================= */}
         <ScrollView
@@ -128,9 +143,22 @@ const SelectCaregiverScreen = ({navigation, route}) => {
           <CaregiverSkeleton />
         ) : caregivers.length === 0 ? (
           <View style={styles.emptyState}>
-            <Icon name="people-outline" size={64} color="#E3E8F0" />
-            <Text style={styles.emptyTitle}>No Caregivers Found</Text>
-            <Text style={styles.emptyText}>Try adjusting your filters</Text>
+            <View style={styles.emptyIcon}>
+              <Icon name="people-outline" size={32} color="#008178" />
+            </View>
+            <Text style={styles.emptyTitle}>No caregiver found</Text>
+            <Text style={styles.emptyText}>
+              No caregivers are available in{' '}
+              {[selectedThana, selectedDistrict].filter(Boolean).join(', ') ||
+                'this area'}
+              . Try another district or thana.
+            </Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.changeAreaButton}
+              onPress={() => navigation?.goBack()}>
+              <Text style={styles.changeAreaButtonText}>Change area</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.caregiverList}>
@@ -335,6 +363,55 @@ const styles = StyleSheet.create({
     color: '#172333',
   },
 
+  areaBanner: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E6F4F3',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+
+  areaBannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#008178',
+  },
+
+  changeAreaText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#008178',
+  },
+
+  emptyIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  changeAreaButton: {
+    marginTop: 18,
+    height: 44,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    backgroundColor: '#008178',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  changeAreaButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+
   filterScroll: {
     paddingTop: 14,
     paddingBottom: 4,
@@ -407,13 +484,14 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 80,
+    paddingVertical: 64,
+    paddingHorizontal: 24,
   },
 
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#172333',
+    fontWeight: '700',
+    color: '#111820',
     marginTop: 16,
   },
 
@@ -421,6 +499,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8190A7',
     marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 
   caregiverList: {

@@ -23,8 +23,12 @@ import {requestGalleryPermission} from '../utils/permissions';
 const EditProfile = ({navigation}) => {
   const {data: profileData} = useUserProfile();
   const updateMutation = useUpdateProfile();
-  
-  const [toast, setToast] = useState({visible: false, message: '', type: 'success'});
+
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'success',
+  });
   const [imageUri, setImageUri] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -36,7 +40,6 @@ const EditProfile = ({navigation}) => {
 
   const user = profileData?.data || {};
 
-  // Populate form when user data loads
   React.useEffect(() => {
     if (user.name) {
       setFormData({
@@ -69,11 +72,12 @@ const EditProfile = ({navigation}) => {
         selectionLimit: 1,
       });
 
-      if (result.didCancel) {
-        return;
-      }
+      if (result.didCancel) return;
       if (result.errorCode) {
-        Alert.alert('Error', result.errorMessage || 'Failed to open image picker');
+        Alert.alert(
+          'Error',
+          result.errorMessage || 'Failed to open image picker',
+        );
         return;
       }
       if (result.assets?.[0]?.uri) {
@@ -83,6 +87,10 @@ const EditProfile = ({navigation}) => {
       console.error('Image picker error:', error);
       Alert.alert('Error', 'Failed to open image picker');
     }
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({visible: true, message, type});
   };
 
   const handleSaveProfile = async () => {
@@ -104,7 +112,7 @@ const EditProfile = ({navigation}) => {
       if (phone) data.append('phone', phone);
       if (address) data.append('address', address);
       if (date_of_birth) data.append('date_of_birth', date_of_birth);
-      
+
       if (imageUri) {
         data.append('profile_photo', {
           uri: imageUri,
@@ -122,113 +130,102 @@ const EditProfile = ({navigation}) => {
     }
   };
 
-  const showToast = (message, type = 'success') => {
-    setToast({visible: true, message, type});
-  };
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'undefined'}
-        style={styles.keyboardContainer}>
-        <Header title="Edit Profile" onBack={() => navigation?.goBack()} />
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.flex}>
+        <Header title="Edit profile" onBack={() => navigation?.goBack()} />
 
         <ScrollView
-          style={styles.scrollView}
+          style={styles.flex}
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}>
-          {/* Image Upload */}
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.imageUploadContainer}
-            onPress={handleImagePick}>
-            {imageUri ? (
-              <Image source={{uri: imageUri}} style={styles.uploadedImage} />
-            ) : (
-              <View style={styles.imagePlaceholder}>
-                <Icon name="camera-outline" size={32} color="#8190A7" />
-                <Text style={styles.imagePlaceholderText}>Add Photo</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
-          {/* Form Fields */}
-          <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Name *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.name}
-                onChangeText={text => setFormData({...formData, name: text})}
-                placeholder="Enter name"
-                placeholderTextColor="#8190A7"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.email}
-                onChangeText={text => setFormData({...formData, email: text})}
-                placeholder="Enter email"
-                placeholderTextColor="#8190A7"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Phone</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.phone}
-                onChangeText={text => setFormData({...formData, phone: text})}
-                placeholder="Enter phone number"
-                placeholderTextColor="#8190A7"
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Address</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.address}
-                onChangeText={text => setFormData({...formData, address: text})}
-                placeholder="Enter address"
-                placeholderTextColor="#8190A7"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Date of Birth</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.date_of_birth}
-                onChangeText={text => setFormData({...formData, date_of_birth: text})}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#8190A7"
-              />
-            </View>
-          </View>
-        </ScrollView>
-
-        {/* Submit Button */}
-        <View style={styles.bottomContainer}>
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
           <TouchableOpacity
             activeOpacity={0.8}
-            style={[styles.submitButton, updateMutation.isPending && styles.disabledButton]}
+            style={styles.photoWrap}
+            onPress={handleImagePick}>
+            {imageUri ? (
+              <Image source={{uri: imageUri}} style={styles.photo} />
+            ) : (
+              <View style={styles.photoEmpty}>
+                <Icon name="camera-outline" size={28} color="#008178" />
+              </View>
+            )}
+            <View style={styles.cameraBadge}>
+              <Icon name="pencil" size={12} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.photoHint}>Tap to change photo</Text>
+
+          <Text style={styles.label}>Name *</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.name}
+            onChangeText={text => setFormData({...formData, name: text})}
+            placeholder="Enter name"
+            placeholderTextColor="#8190A7"
+          />
+
+          <Text style={styles.label}>Email *</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.email}
+            onChangeText={text => setFormData({...formData, email: text})}
+            placeholder="Enter email"
+            placeholderTextColor="#8190A7"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <Text style={styles.label}>Phone</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.phone}
+            onChangeText={text => setFormData({...formData, phone: text})}
+            placeholder="Enter phone number"
+            placeholderTextColor="#8190A7"
+            keyboardType="phone-pad"
+          />
+
+          <Text style={styles.label}>Address</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.address}
+            onChangeText={text => setFormData({...formData, address: text})}
+            placeholder="Enter address"
+            placeholderTextColor="#8190A7"
+          />
+
+          <Text style={styles.label}>Date of birth</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.date_of_birth}
+            onChangeText={text =>
+              setFormData({...formData, date_of_birth: text})
+            }
+            placeholder="YYYY-MM-DD"
+            placeholderTextColor="#8190A7"
+          />
+        </ScrollView>
+
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={[
+              styles.submitButton,
+              updateMutation.isPending && styles.disabledButton,
+            ]}
             onPress={handleSaveProfile}
             disabled={updateMutation.isPending}>
             <Text style={styles.submitButtonText}>
-              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              {updateMutation.isPending ? 'Saving...' : 'Save changes'}
             </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
 
-      {/* Toast */}
       <Toast
         visible={toast.visible}
         message={toast.message}
@@ -239,113 +236,97 @@ const EditProfile = ({navigation}) => {
   );
 };
 
+export default EditProfile;
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
   },
-
-  keyboardContainer: {
+  flex: {
     flex: 1,
   },
-
-  // ================= SCROLL =================
-  scrollView: {
-    flex: 1,
-  },
-
   scrollContent: {
-    padding: 16,
-    paddingBottom: 100,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
-
-  // ================= IMAGE UPLOAD =================
-  imageUploadContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+  photoWrap: {
+    width: 96,
+    height: 96,
     alignSelf: 'center',
-    marginBottom: 24,
-    overflow: 'hidden',
+    marginTop: 8,
+    marginBottom: 8,
   },
-
-  uploadedImage: {
-    width: '100%',
-    height: '100%',
+  photo: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
   },
-
-  imagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#E3E8F0',
+  photoEmpty: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cameraBadge: {
+    position: 'absolute',
+    right: 2,
+    bottom: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#D8E7FA',
-    borderStyle: 'dashed',
+    borderColor: '#FFFFFF',
   },
-
-  imagePlaceholderText: {
-    fontSize: 12,
+  photoHint: {
+    textAlign: 'center',
+    fontSize: 13,
     color: '#8190A7',
-    marginTop: 8,
+    marginBottom: 24,
   },
-
-  // ================= FORM =================
-  formContainer: {
-    marginTop: 8,
-  },
-
-  inputGroup: {
-    marginBottom: 16,
-  },
-
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#172333',
+    color: '#111820',
     marginBottom: 8,
   },
-
   input: {
-    height: 50,
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#172333',
+    height: 52,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    fontSize: 15,
+    color: '#111820',
     borderWidth: 1,
     borderColor: '#E3E8F0',
+    marginBottom: 16,
   },
-
-  // ================= BOTTOM =================
   bottomContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F2F5',
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingTop: 16,
   },
-
   submitButton: {
-    height: 53,
+    height: 52,
     backgroundColor: '#008178',
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   disabledButton: {
     backgroundColor: '#B5C0D0',
   },
-
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
   },
 });
-
-export default EditProfile;
