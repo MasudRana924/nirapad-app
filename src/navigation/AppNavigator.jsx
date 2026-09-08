@@ -34,6 +34,8 @@ import BookingsScreen from '../screens/BookingsScreen';
 import BookingDetailsScreen from '../screens/BookingDetailsScreen';
 import InboxScreen from '../screens/InboxScreen';
 import AreaSelectScreen from '../screens/AreaSelectScreen';
+import SelectServiceScreen from '../screens/SelectServiceScreen';
+import BookingPreviewScreen from '../screens/BookingPreviewScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -174,11 +176,13 @@ function AppNavigator() {
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
             <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
             <Stack.Screen name="SelectFamilyMember" component={SelectFamilyMember} />
+            <Stack.Screen name="SelectService" component={SelectServiceScreen} />
             <Stack.Screen name="AreaSelect" component={AreaSelectScreen} />
             <Stack.Screen name="AddFamilyMember" component={AddFamilyMember} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
             <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
+            <Stack.Screen name="BookingPreview" component={BookingPreviewScreen} />
             <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
             <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
           </>

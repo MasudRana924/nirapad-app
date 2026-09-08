@@ -36,14 +36,13 @@ const SelectFamilyMember = ({navigation, route}) => {
     if (selectedMember) {
       storage.saveSelectedFamilyMember(selectedMember);
       if (selectedCaregiver) {
-        // Skip caregiver selection, go directly to hospital selection
-        navigation?.navigate('HospitalSelection', {
+        navigation?.navigate('SelectService', {
           selectedMember,
           selectedCaregiver,
+          serviceType: route.params?.serviceType,
         });
       } else {
-        // Normal flow: family -> area -> caregiver
-        navigation?.navigate('AreaSelect', {
+        navigation?.navigate('SelectService', {
           selectedMember,
           serviceType: route.params?.serviceType || 'caregiver',
         });

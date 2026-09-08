@@ -5,11 +5,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 const SplashScreen = ({onFinish}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onFinish();
+      onFinish?.();
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [onFinish]);
+    // Only run once on mount — avoid resetting when parent recreates onFinish
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

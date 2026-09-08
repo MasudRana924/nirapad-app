@@ -27,12 +27,6 @@ const SERVICES = [
 
 const QuickServices = ({navigation}) => {
   const handlePress = service => {
-    if (service.id === 'nurse') {
-      navigation?.navigate('SelectNurse');
-      return;
-    }
-
-    // Caregiver / autistic / physio share family -> area -> caregiver flow
     navigation?.navigate('SelectFamilyMember', {
       serviceType: service.id,
     });

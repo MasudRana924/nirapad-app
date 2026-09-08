@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   SELECTED_CAREGIVER: 'selected_caregiver',
   SELECTED_HOSPITAL: 'selected_hospital',
   SELECTED_AREA: 'selected_area',
+  SELECTED_SERVICE: 'selected_service',
   AUTH_TOKEN: 'userToken',
 };
 
@@ -93,6 +94,36 @@ export const storage = {
     }
   },
 
+  // Service
+  saveSelectedService: async service => {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.SELECTED_SERVICE,
+        JSON.stringify(service),
+      );
+    } catch (error) {
+      console.error('Error saving service:', error);
+    }
+  },
+
+  getSelectedService: async () => {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEYS.SELECTED_SERVICE);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Error getting service:', error);
+      return null;
+    }
+  },
+
+  clearSelectedService: async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_SERVICE);
+    } catch (error) {
+      console.error('Error clearing service:', error);
+    }
+  },
+
   // Hospital
   saveSelectedHospital: async (hospital) => {
     try {
@@ -154,6 +185,7 @@ export const storage = {
         AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_CAREGIVER),
         AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_HOSPITAL),
         AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_AREA),
+        AsyncStorage.removeItem(STORAGE_KEYS.SELECTED_SERVICE),
       ]);
     } catch (error) {
       console.error('Error clearing booking data:', error);

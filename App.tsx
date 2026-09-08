@@ -4,18 +4,17 @@
  * @format
  */
 
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AuthProvider, useAuth} from './src/context/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import SplashScreen from './src/screens/SplashScreen';
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       retry: 1,
       refetchOnWindowFocus: false,
     },
@@ -29,11 +28,11 @@ function AppContent() {
   const {isLoading} = useAuth();
   const [showSplash, setShowSplash] = useState(true);
 
-  const handleSplashFinish = () => {
+  const handleSplashFinish = useCallback(() => {
     setShowSplash(false);
-  };
+  }, []);
 
-  // Show splash screen while loading auth or during 2 second delay
+  // Keep splash visible until auth is ready AND splash timer finishes
   if (showSplash || isLoading) {
     return <SplashScreen onFinish={handleSplashFinish} />;
   }

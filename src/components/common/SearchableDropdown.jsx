@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,11 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Modal,
-  FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const SearchableDropdown = ({
-  data,
+  data = [],
   placeholder,
   value,
   onSelect,
@@ -23,27 +21,28 @@ const SearchableDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState(data);
-  const dropdownRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    if (value) {
-      setSearchText(value);
-    }
+    setSearchText(value || '');
   }, [value]);
 
   useEffect(() => {
-    setFilteredData(data);
+    setFilteredData(data || []);
   }, [data]);
 
-  const handleSearch = (text) => {
+  const handleSearch = text => {
     setSearchText(text);
-    const filtered = data.filter(item =>
+    if (!isOpen) {
+      setIsOpen(true);
+    }
+    const filtered = (data || []).filter(item =>
       item.toLowerCase().includes(text.toLowerCase()),
     );
     setFilteredData(filtered);
   };
 
-  const handleSelect = (item) => {
+  const handleSelect = item => {
     onSelect(item);
     setSearchText(item);
     setIsOpen(false);
@@ -52,181 +51,188 @@ const SearchableDropdown = ({
   const handleClear = () => {
     setSearchText('');
     onSelect('');
-    setFilteredData(data);
+    setFilteredData(data || []);
+    setIsOpen(true);
   };
 
-  const renderItem = ({item}) => (
-    <TouchableOpacity
-      style={styles.dropdownItem}
-      onPress={() => handleSelect(item)}>
-      <Text style={styles.dropdownItemText}>{item}</Text>
-      {searchText === item && (
-        <Icon name="checkmark" size={20} color="#008178" />
-      )}
-    </TouchableOpacity>
-  );
+  const handleToggle = () => {
+    setIsOpen(prev => !prev);
+    if (!isOpen) {
+      setFilteredData(data || []);
+    }
+  };
 
   return (
-    <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View
+      ref={containerRef}
+      style={[styles.container, isOpen && styles.containerOpen, containerStyle]}>
+      {!!label && <Text style={styles.label}>{label}</Text>}
+
       <TouchableOpacity
-        style={styles.dropdownButton}
-        activeOpacity={0.8}
-        onPress={() => setIsOpen(true)}>
+        style={[styles.dropdownButton, isOpen && styles.dropdownButtonOpen]}
+        activeOpacity={0.85}
+        onPress={handleToggle}>
         <View style={styles.buttonContent}>
-          <Icon name={icon} size={18} color="#7D8BA5" />
+          <Icon name={icon} size={18} color="#8190A7" />
           <TextInput
             style={styles.input}
             placeholder={placeholder}
-            placeholderTextColor="#7D8BA5"
+            placeholderTextColor="#8190A7"
             value={searchText}
             onChangeText={handleSearch}
-            onFocus={() => setIsOpen(true)}
-            editable={isOpen}
+            onFocus={() => {
+              setIsOpen(true);
+              setFilteredData(data || []);
+            }}
           />
           {searchText ? (
-            <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-              <Icon name="close-circle" size={18} color="#7D8BA5" />
+            <TouchableOpacity
+              onPress={handleClear}
+              style={styles.clearButton}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              <Icon name="close-circle" size={18} color="#8190A7" />
             </TouchableOpacity>
           ) : (
-            <Icon name="chevron-down" size={18} color="#7D8BA5" />
+            <Icon
+              name={isOpen ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#8190A7"
+            />
           )}
         </View>
       </TouchableOpacity>
 
-      <Modal
-        visible={isOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setIsOpen(false)}>
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setIsOpen(false)}>
-          <View style={styles.modalContent}>
-            <View style={styles.searchHeader}>
-              <Icon name={icon} size={18} color="#7D8BA5" />
-              <TextInput
-                style={styles.searchInput}
-                placeholder={`Search ${label || placeholder}...`}
-                placeholderTextColor="#7D8BA5"
-                value={searchText}
-                onChangeText={handleSearch}
-                autoFocus
-              />
-              {searchText && (
-                <TouchableOpacity onPress={handleClear}>
-                  <Icon name="close-circle" size={18} color="#7D8BA5" />
-                </TouchableOpacity>
-              )}
+      {isOpen && (
+        <View style={styles.dropdownPanel}>
+          {filteredData.length > 0 ? (
+            <ScrollView
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+              style={styles.dropdownList}
+              showsVerticalScrollIndicator={false}>
+              {filteredData.map((item, index) => {
+                const selected = searchText === item || value === item;
+                return (
+                  <TouchableOpacity
+                    key={`${item}-${index}`}
+                    style={[
+                      styles.dropdownItem,
+                      index === filteredData.length - 1 && styles.dropdownItemLast,
+                    ]}
+                    onPress={() => handleSelect(item)}
+                    activeOpacity={0.75}>
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        selected && styles.dropdownItemTextSelected,
+                      ]}
+                      numberOfLines={1}>
+                      {item}
+                    </Text>
+                    {selected && (
+                      <Icon name="checkmark" size={18} color="#008178" />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          ) : (
+            <View style={styles.noResults}>
+              <Text style={styles.noResultsText}>No results found</Text>
             </View>
-            {filteredData.length > 0 ? (
-              <FlatList
-                data={filteredData}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                style={styles.dropdownList}
-                keyboardShouldPersistTaps="handled"
-              />
-            ) : (
-              <View style={styles.noResults}>
-                <Icon name="search-outline" size={40} color="#E3E8F0" />
-                <Text style={styles.noResultsText}>No results found</Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+          )}
+        </View>
+      )}
     </View>
   );
 };
 
+export default SearchableDropdown;
+
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: 14,
+    zIndex: 1,
+  },
+  containerOpen: {
+    zIndex: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#172333',
-    marginBottom: 6,
+    fontWeight: '600',
+    color: '#111820',
+    marginBottom: 8,
   },
   dropdownButton: {
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#E3E8F0',
+  },
+  dropdownButtonOpen: {
+    borderColor: '#008178',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    height: 44,
+    height: 52,
+    gap: 10,
   },
   input: {
     flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#172333',
+    height: '100%',
+    fontSize: 15,
+    color: '#111820',
+    paddingVertical: 0,
   },
   clearButton: {
-    padding: 4,
+    padding: 2,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-start',
-    paddingTop: 100,
-  },
-  modalContent: {
+  dropdownPanel: {
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    borderRadius: 16,
-    maxHeight: 400,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderTopWidth: 0,
+    borderColor: '#008178',
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
+    maxHeight: 220,
     overflow: 'hidden',
   },
-  searchHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E3E8F0',
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#172333',
-  },
   dropdownList: {
-    maxHeight: 350,
+    maxHeight: 220,
   },
   dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F7FA',
+    borderBottomColor: '#F0F2F5',
+  },
+  dropdownItemLast: {
+    borderBottomWidth: 0,
   },
   dropdownItemText: {
+    flex: 1,
     fontSize: 14,
-    color: '#172333',
+    color: '#111820',
+    paddingRight: 8,
+  },
+  dropdownItemTextSelected: {
+    color: '#008178',
+    fontWeight: '600',
   },
   noResults: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: 20,
   },
   noResultsText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#8190A7',
-    marginTop: 12,
   },
 });
-
-export default SearchableDropdown;

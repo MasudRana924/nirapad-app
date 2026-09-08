@@ -21,6 +21,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   const [selectedCaregiver, setSelectedCaregiver] = useState(null);
   const {
     selectedMember,
+    selectedService,
     district = '',
     thana = '',
     selectedArea,
@@ -56,10 +57,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   const handleNext = () => {
     if (selectedCaregiver) {
       storage.saveSelectedCaregiver(selectedCaregiver);
-      navigation?.navigate('HospitalSelection', {
+      navigation?.navigate('BookingDateTime', {
         selectedMember,
         selectedCaregiver,
-        selectedArea: {
+        selectedService,
+        selectedArea: selectedArea || {
           district: selectedDistrict,
           thana: selectedThana,
         },
