@@ -23,15 +23,17 @@ const LoginScreen = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const {login} = useAuth();
 
   const handleLogin = async () => {
+    setError('');
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email');
+      setError('Please enter your email');
       return;
     }
     if (!password.trim()) {
-      Alert.alert('Error', 'Please enter your password');
+      setError('Please enter your password');
       return;
     }
 
@@ -45,10 +47,10 @@ const LoginScreen = ({navigation}) => {
           response.data.user,
         );
       } else {
-        Alert.alert('Error', response.message || 'Login failed');
+        setError(response.message || 'Login failed');
       }
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      setError('Something went wrong. Please try again.');
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -135,6 +137,7 @@ const LoginScreen = ({navigation}) => {
               <Text style={styles.footerLink}> Register</Text>
             </TouchableOpacity>
           </View>
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -235,5 +238,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#008178',
+  },
+  errorText: {
+    fontSize: 13,
+    color: '#DC2626',
+    textAlign: 'center',
+    marginTop: 12,
   },
 });

@@ -17,18 +17,18 @@ const FamilySkeleton = () => {
     <View style={styles.container}>
       {[1, 2, 3].map(i => (
         <View key={i} style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={styles.avatarContainer}>
-              <Skeleton style={styles.avatar} />
-              <Skeleton style={styles.bloodBadge} />
+          <View style={styles.cardContent}>
+            <View style={styles.cardLeft}>
+              <View style={styles.avatarContainer}>
+                <Skeleton style={styles.avatar} />
+              </View>
+              <View style={styles.userInfo}>
+                <Skeleton style={styles.name} />
+                <Skeleton style={styles.relation} />
+              </View>
             </View>
-            <View style={styles.userInfo}>
-              <Skeleton style={styles.name} />
-              <Skeleton style={styles.infoRow} />
-              <Skeleton style={styles.infoRowShort} />
-            </View>
+            <Skeleton style={styles.rightArrow} />
           </View>
-          {i !== 3 && <Skeleton style={styles.careNote} />}
         </View>
       ))}
     </View>
@@ -44,66 +44,52 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: '#F6F6F6',
-    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 14,
+    paddingVertical: 16,
     borderWidth: 1,
-    borderColor: '#F6F6F6',
+    borderColor: '#E3E8F0',
     marginBottom: 12,
   },
-  cardHeader: {
-    width: '100%',
-    minHeight: 58,
+  cardContent: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   avatarContainer: {
-    width: 58,
-    height: 58,
-    position: 'relative',
-    marginRight: 13,
+    width: 56,
+    height: 56,
+    marginRight: 12,
   },
   avatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-  },
-  bloodBadge: {
-    position: 'absolute',
-    right: -2,
-    bottom: -2,
-    width: 29,
-    height: 18,
-    borderRadius: 10,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
   userInfo: {
     flex: 1,
-    paddingTop: 1,
   },
   name: {
     width: '70%',
     height: 18,
     borderRadius: 6,
-    marginBottom: 8,
-  },
-  infoRow: {
-    width: '85%',
-    height: 12,
-    borderRadius: 4,
     marginBottom: 6,
   },
-  infoRowShort: {
-    width: '55%',
-    height: 12,
+  relation: {
+    width: '45%',
+    height: 14,
     borderRadius: 4,
   },
-  careNote: {
-    width: '100%',
-    height: 72,
-    borderRadius: 13,
-    marginTop: 12,
+  rightArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
 });
 

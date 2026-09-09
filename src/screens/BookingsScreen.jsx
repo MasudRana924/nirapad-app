@@ -84,58 +84,38 @@ const BookingsScreen = ({navigation}) => {
           </View>
         ) : (
           bookings.map(booking => (
-            <View key={booking.id} style={styles.bookingCard}>
-              <View style={styles.cardHeader}>
-                <View style={styles.bookingNumberContainer}>
-                  <Text style={styles.bookingNumberLabel}>Booking ID</Text>
-                  <Text style={styles.bookingNumber}>{booking.booking_number}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.seeDetailsButton}
-                  onPress={() =>
-                    navigation?.navigate('BookingDetails', {bookingId: booking.id})
-                  }>
-                  <Text style={styles.seeDetailsText}>See Details</Text>
-                  <Icon name="chevron-forward" size={20} color="#008178" />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={styles.cardBody}>
-                <View style={styles.infoRow}>
-                  <Icon name="calendar-outline" size={18} color="#7D8BA5" />
-                  <Text style={styles.infoLabel}>Date</Text>
-                  <Text style={styles.infoValue}>{formatDate(booking.booking_date)}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <Icon name="time-outline" size={18} color="#7D8BA5" />
-                  <Text style={styles.infoLabel}>Time</Text>
-                  <Text style={styles.infoValue}>
-                    {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
-                  </Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <Icon name="hourglass-outline" size={18} color="#7D8BA5" />
-                  <Text style={styles.infoLabel}>Duration</Text>
-                  <Text style={styles.infoValue}>{booking.duration_hours} hours</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <Icon name="card-outline" size={18} color="#7D8BA5" />
-                  <Text style={styles.infoLabel}>Payment</Text>
-                  <View
-                    style={[
-                      styles.paymentBadge,
-                      {backgroundColor: getPaymentStatusColor(booking.payment_status)},
-                    ]}>
-                    <Text style={styles.paymentText}>{booking.payment_status}</Text>
+            <TouchableOpacity
+              key={booking.id}
+              activeOpacity={0.85}
+              style={styles.bookingCard}
+              onPress={() =>
+                navigation?.navigate('BookingDetails', {bookingId: booking.id})
+              }>
+              <View style={styles.cardContent}>
+                <View style={styles.cardLeft}>
+                  <View style={styles.bookingInfo}>
+                    <Text style={styles.bookingIdLabel}>Booking ID</Text>
+                    <Text style={styles.bookingId}>{booking.booking_number}</Text>
+                  </View>
+                  <View style={styles.dateInfo}>
+                    <Icon name="calendar-outline" size={18} color="#8190A7" />
+                    <Text style={styles.dateText}>{formatDate(booking.booking_date)}</Text>
                   </View>
                 </View>
+                <View style={styles.rightArrow}>
+                  <Icon name="chevron-forward" size={20} color="#8190A7" />
+                </View>
               </View>
-            </View>
+              <View style={styles.paymentBadgeContainer}>
+                <View
+                  style={[
+                    styles.paymentBadge,
+                    {backgroundColor: getPaymentStatusColor(booking.payment_status)},
+                  ]}>
+                  <Text style={styles.paymentText}>{booking.payment_status}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
           ))
         )}
       </ScrollView>
@@ -182,82 +162,77 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   bookingCard: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderWidth: 1,
-    borderColor: '#F5F5F5',
-    overflow: 'hidden',
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-  },
-  bookingNumberContainer: {
-    flex: 1,
-  },
-  seeDetailsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bookingNumberLabel: {
-    fontSize: 10,
-    color: '#8190A7',
-    marginBottom: 4,
-  },
-  bookingNumber: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#172333',
-  },
-  statusContainer: {},
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-
-  cardBody: {
-    padding: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    borderColor: '#E3E8F0',
     marginBottom: 12,
   },
-  infoLabel: {
-    fontSize: 14,
-    color: '#8190A7',
-    marginLeft: 8,
+
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  cardLeft: {
+    flexDirection: 'column',
     flex: 1,
   },
-  infoValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#172333',
+
+  bookingInfo: {
+    marginBottom: 6,
   },
+
+  bookingIdLabel: {
+    fontSize: 11,
+    color: '#8190A7',
+    marginBottom: 2,
+  },
+
+  bookingId: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111820',
+  },
+
+  dateInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  dateText: {
+    fontSize: 13,
+    color: '#8190A7',
+    marginLeft: 6,
+  },
+
+  rightArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F6F6F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  paymentBadgeContainer: {
+    marginTop: 8,
+  },
+
   paymentBadge: {
+    alignSelf: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 10,
   },
+
   paymentText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#FFFFFF',
-  },
-  seeDetailsText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#008178',
-    marginRight: 4,
   },
 });
 

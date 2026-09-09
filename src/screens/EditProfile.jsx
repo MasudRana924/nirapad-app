@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Loader from '../components/common/Loader';
 import {useUserProfile} from '../api/queries';
 import {useUpdateProfile} from '../api/mutations';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -132,6 +133,7 @@ const EditProfile = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Loader visible={updateMutation.isPending} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}>
@@ -213,15 +215,10 @@ const EditProfile = ({navigation}) => {
         <View style={styles.bottomContainer}>
           <TouchableOpacity
             activeOpacity={0.85}
-            style={[
-              styles.submitButton,
-              updateMutation.isPending && styles.disabledButton,
-            ]}
+            style={styles.submitButton}
             onPress={handleSaveProfile}
             disabled={updateMutation.isPending}>
-            <Text style={styles.submitButtonText}>
-              {updateMutation.isPending ? 'Saving...' : 'Save changes'}
-            </Text>
+            <Text style={styles.submitButtonText}>Save changes</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

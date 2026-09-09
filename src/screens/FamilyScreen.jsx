@@ -27,6 +27,12 @@ const FamilyScreen = ({navigation}) => {
     setToast({visible: true, message, type});
   };
 
+  const handleViewDetails = (member) => {
+    navigation?.navigate('FamilyMemberDetails', {
+      memberId: member.id,
+    });
+  };
+
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A';
     const birthDate = new Date(dateOfBirth);
@@ -76,60 +82,28 @@ const FamilyScreen = ({navigation}) => {
               <TouchableOpacity
                 key={member.id}
                 activeOpacity={0.85}
-                style={styles.familyCard}>
-                {/* Header */}
-                <View style={styles.cardHeader}>
-                  <View style={styles.avatarContainer}>
-                    {member.photo ? (
-                      <Image source={{uri: member.photo}} style={styles.avatar} />
-                    ) : (
-                      <View style={styles.placeholderAvatar}>
-                        <Icon name="person" size={24} color="#8190A7" />
-                      </View>
-                    )}
-                    {member.blood_group && (
-                      <View style={styles.bloodBadge}>
-                        <Text style={styles.bloodText}>{member.blood_group}</Text>
-                      </View>
-                    )}
-                  </View>
-                  <View style={styles.userInfo}>
-                    <Text style={styles.name}>{member.name}</Text>
-                    <View style={styles.infoRow}>
-                      <Icon name="person-outline" size={15} color="#303944" />
-                      <Text style={styles.infoText}>
-                        {member.relationship} · {calculateAge(member.date_of_birth)} years
-                      </Text>
+                style={styles.familyCard}
+                onPress={() => handleViewDetails(member)}>
+                <View style={styles.cardContent}>
+                  <View style={styles.cardLeft}>
+                    <View style={styles.avatarContainer}>
+                      {member.photo ? (
+                        <Image source={{uri: member.photo}} style={styles.avatar} />
+                      ) : (
+                        <View style={styles.placeholderAvatar}>
+                          <Icon name="person" size={24} color="#8190A7" />
+                        </View>
+                      )}
                     </View>
-                    {!!member.emergency_contact_phone && (
-                      <View style={styles.infoRow}>
-                        <Icon name="call-outline" size={14} color="#303944" />
-                        <Text style={styles.infoText} numberOfLines={1}>
-                          {member.emergency_contact_phone}
-                        </Text>
-                      </View>
-                    )}
+                    <View style={styles.userInfo}>
+                      <Text style={styles.name}>{member.name}</Text>
+                      <Text style={styles.relation}>{member.relationship}</Text>
+                    </View>
                   </View>
-                  <TouchableOpacity 
-                    activeOpacity={0.7} 
-                    style={styles.editButtonTop}
-                    onPress={() => navigation?.navigate('AddFamilyMember', {memberId: member.id})}>
-                    <Text style={styles.editText}>Edit details</Text>
-                    <Icon name="chevron-forward" size={17} color="#128D90" />
-                  </TouchableOpacity>
+                  <View style={styles.rightArrow}>
+                    <Icon name="chevron-forward" size={24} color="#8190A7" />
+                  </View>
                 </View>
-
-                {/* Care Note */}
-                {member.medical_history && (
-                  <View style={styles.careNote}>
-                    <View style={styles.careHeader}>
-                      <Icon name="ear-outline" size={19} color="#159B9A" />
-                      <Text style={styles.careTitle}>Care Note</Text>
-                    </View>
-                    <Text style={styles.careDescription}>{member.medical_history}</Text>
-                  </View>
-                )}
-
               </TouchableOpacity>
             ))}
           </View>
@@ -209,14 +183,25 @@ const styles = StyleSheet.create({
 
   familyCard: {
     width: '100%',
-    backgroundColor: '#F6F6F6',
-    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingVertical: 16,
     borderWidth: 1,
-    borderColor: '#F6F6F6',
-    paddingBottom: 10,
+    borderColor: '#E3E8F0',
     marginBottom: 12,
+  },
+
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  cardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
 
   emptyState: {
@@ -248,123 +233,49 @@ const styles = StyleSheet.create({
   },
 
   avatarContainer: {
-    width: 58,
-    height: 58,
-    position: 'relative',
-    marginRight: 13,
+    width: 56,
+    height: 56,
+    marginRight: 12,
   },
 
   avatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#E5E5E5',
   },
 
   placeholderAvatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#E3E8F0',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  bloodBadge: {
-    position: 'absolute',
-    right: -2,
-    bottom: -2,
-    minWidth: 29,
-    height: 18,
-    paddingHorizontal: 5,
-    borderRadius: 10,
-    backgroundColor: '#EAF3FF',
-    borderWidth: 1,
-    borderColor: '#D8E7FA',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  bloodText: {
-    fontSize: 10,
-    lineHeight: 12,
-    fontWeight: '600',
-    color: '#43658B',
-  },
-
   userInfo: {
     flex: 1,
-    paddingTop: 1,
   },
 
   name: {
     fontSize: 16,
-    lineHeight: 24,
     fontWeight: '700',
     color: '#111820',
-    marginBottom: 3,
+    marginBottom: 4,
   },
 
-  infoRow: {
-    minHeight: 20,
-    flexDirection: 'row',
+  relation: {
+    fontSize: 14,
+    color: '#8190A7',
+  },
+
+  rightArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F6F6F6',
     alignItems: 'center',
-    marginBottom: 2,
-  },
-
-  infoText: {
-    marginLeft: 5,
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: '#303944',
-  },
-
-  // ================= CARE NOTE =================
-  careNote: {
-    width: '100%',
-    height: 82,
-    backgroundColor: '#E3EDFF',
-    borderRadius: 13,
-    paddingHorizontal: 12,
-    paddingTop: 9,
-    marginTop: 10,
-  },
-
-  careHeader: {
-    height: 22,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  careTitle: {
-    marginLeft: 8,
-    fontSize: 13,
-    lineHeight: 17,
-    fontWeight: '600',
-    color: '#168C91',
-  },
-
-  careDescription: {
-    marginLeft: 23,
-    marginTop: 1,
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '400',
-    color: '#344052',
-  },
-
-  editButtonTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 0,
-  },
-
-  editText: {
-    marginRight: 2,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '500',
-    color: '#128D90',
+    justifyContent: 'center',
   },
 });

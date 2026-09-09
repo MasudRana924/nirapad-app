@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Spinner from 'react-native-loading-spinner-overlay';
+import Loader from '../components/common/Loader';
 import {registerUser} from '../services/api';
 
 const CreateAccountScreen = ({navigation}) => {
@@ -69,7 +69,7 @@ const CreateAccountScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
-      <Spinner visible={loading} color="#008178" size="large" />
+      <Loader visible={loading} />
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       <KeyboardAvoidingView

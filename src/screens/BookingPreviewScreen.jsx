@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Loader from '../components/common/Loader';
 import Header from '../components/common/Header';
 import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
@@ -108,6 +109,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Loader visible={isSubmitting} />
       <Header title="Booking Preview" onBack={() => navigation?.goBack()} />
 
       <ScrollView
@@ -185,12 +187,10 @@ const BookingPreviewScreen = ({navigation, route}) => {
       <View style={styles.bottomContainer}>
         <TouchableOpacity
           activeOpacity={0.85}
-          style={[styles.confirmButton, isSubmitting && styles.disabledButton]}
+          style={styles.confirmButton}
           onPress={handleConfirm}
           disabled={isSubmitting}>
-          <Text style={styles.confirmButtonText}>
-            {isSubmitting ? 'Confirming...' : 'Confirm booking'}
-          </Text>
+          <Text style={styles.confirmButtonText}>Confirm booking</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

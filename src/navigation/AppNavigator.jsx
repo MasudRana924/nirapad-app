@@ -18,6 +18,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile';
 import FamilyScreen from '../screens/FamilyScreen';
 import AddFamilyMember from '../screens/AddFamilyMember';
+import FamilyMemberDetails from '../screens/FamilyMemberDetails';
 import SelectCaregiverScreen from '../screens/SelectCaregiverScreen';
 import SelectFamilyMember from '../screens/SelectFamilyMember';
 import HospitalSelection from '../screens/HospitalSelection';
@@ -179,6 +180,7 @@ function AppNavigator() {
             <Stack.Screen name="SelectService" component={SelectServiceScreen} />
             <Stack.Screen name="AreaSelect" component={AreaSelectScreen} />
             <Stack.Screen name="AddFamilyMember" component={AddFamilyMember} />
+            <Stack.Screen name="FamilyMemberDetails" component={FamilyMemberDetails} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
             <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
