@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'http://192.168.10.78:8000/api/v1';
-// const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
+// const BASE_URL = 'http://192.168.10.78:8000/api/v1';
+const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
 
 const AUTH_SKIP_REFRESH = [
   '/auth/login',
