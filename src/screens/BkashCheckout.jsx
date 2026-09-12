@@ -267,8 +267,12 @@ const BkashCheckout = ({route, navigation}) => {
         {!currentButtonLoading &&
         statusMessage &&
         statusMessage !== 'Payment successful!' ? (
-          <TouchableOpacity style={styles.button} onPress={handlePayment}>
-            <Text style={styles.buttonText}>Try again</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('BookingDetails', {bookingId})
+            }>
+            <Text style={styles.buttonText}>Go Back</Text>
           </TouchableOpacity>
         ) : null}
 
