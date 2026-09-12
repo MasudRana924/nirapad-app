@@ -63,6 +63,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
     selectedDate,
     selectedTime,
     durationHours = 4,
+    notes = '',
   } = route.params || {};
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,11 +101,17 @@ const BookingPreviewScreen = ({navigation, route}) => {
       return;
     }
 
+    if (!selectedHospital?.id) {
+      Alert.alert('Error', 'Please select a hospital to continue');
+      return;
+    }
+
     setIsSubmitting(true);
 
     const bookingData = {
       family_member_id: selectedMember.id || selectedMember.uuid,
       provider_id: selectedCaregiver.id || selectedCaregiver.uuid,
+      hospital_id: selectedHospital.id,
       booking_date: selectedDate.fullDate,
       start_time: toStartTime(selectedTime.time),
       duration_hours: durationHours,
@@ -112,12 +119,8 @@ const BookingPreviewScreen = ({navigation, route}) => {
       patient_requirements: selectedService?.title
         ? `${selectedService.title} service requested`
         : 'Home care service',
-      notes: selectedService?.description || '',
+      notes: notes || '',
     };
-
-    if (selectedHospital?.id) {
-      bookingData.hospital_id = selectedHospital.id;
-    }
 
     try {
       const response = await createBooking.mutateAsync(bookingData);
@@ -186,6 +189,16 @@ const BookingPreviewScreen = ({navigation, route}) => {
           />
         </View>
 
+        {!!selectedHospital?.name && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Icon name="business-outline" size={18} color="#008178" />
+              <Text style={styles.cardTitle}>Hospital</Text>
+            </View>
+            <Text style={styles.locationText}>{selectedHospital.name}</Text>
+          </View>
+        )}
+
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Icon name="location-outline" size={18} color="#008178" />
@@ -201,6 +214,16 @@ const BookingPreviewScreen = ({navigation, route}) => {
           </View>
           <Text style={styles.locationText}>{scheduleText}</Text>
         </View>
+
+        {!!notes && (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Icon name="document-text-outline" size={18} color="#008178" />
+              <Text style={styles.cardTitle}>Notes</Text>
+            </View>
+            <Text style={styles.locationText}>{notes}</Text>
+          </View>
+        )}
 
         <View style={styles.pricingCard}>
           <Text style={styles.pricingLabel}>Estimated pricing</Text>

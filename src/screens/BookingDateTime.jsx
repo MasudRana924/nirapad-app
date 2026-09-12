@@ -6,6 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -229,6 +232,7 @@ const BookingDateTime = ({navigation, route}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [durationHours, setDurationHours] = useState(4);
+  const [notes, setNotes] = useState('');
 
   const canContinue = !!selectedDate && !!selectedTime;
 
@@ -248,11 +252,15 @@ const BookingDateTime = ({navigation, route}) => {
       selectedDate,
       selectedTime,
       durationHours,
+      notes: notes.trim(),
     });
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Header title="Book appointment" onBack={() => navigation?.goBack()} />
 
       <ScrollView
@@ -319,6 +327,17 @@ const BookingDateTime = ({navigation, route}) => {
             })}
           </View>
         </View>
+
+        <Text style={[styles.sectionTitle, styles.notesTitle]}>Notes</Text>
+        <TextInput
+          style={styles.notesInput}
+          value={notes}
+          onChangeText={setNotes}
+          placeholder="Write any extra details for the caregiver..."
+          placeholderTextColor="#8190A7"
+          multiline
+          textAlignVertical="top"
+        />
       </ScrollView>
 
       <View style={styles.bottomContainer}>
@@ -330,6 +349,7 @@ const BookingDateTime = ({navigation, route}) => {
           <Text style={styles.nextButtonText}>Preview booking</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -340,6 +360,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  flex: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -503,6 +526,24 @@ const styles = StyleSheet.create({
   },
   chipTextSelected: {
     color: '#FFFFFF',
+  },
+  notesTitle: {
+    marginTop: 8,
+    paddingHorizontal: 8,
+  },
+  notesInput: {
+    minHeight: 110,
+    marginHorizontal: 8,
+    marginBottom: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+    backgroundColor: '#F6F6F6',
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 12,
+    fontSize: 15,
+    color: '#111820',
   },
   bottomContainer: {
     paddingHorizontal: 20,

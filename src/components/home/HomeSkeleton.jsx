@@ -41,6 +41,7 @@ const HomeSkeleton = () => {
       </View>
 
       {/* Quick Services Skeleton */}
+      {/*
       <View style={styles.sectionHeader}>
         <Skeleton style={styles.sectionTitle} />
       </View>
@@ -52,8 +53,10 @@ const HomeSkeleton = () => {
           </View>
         ))}
       </View>
+      */}
 
       {/* Top Caregivers Skeleton */}
+      {/*
       <View style={styles.sectionHeader}>
         <Skeleton style={styles.sectionTitle} />
         <Skeleton style={styles.seeAll} />
@@ -71,8 +74,10 @@ const HomeSkeleton = () => {
           </View>
         ))}
       </View>
+      */}
 
-      {/* Available Nurses Skeleton */}
+      {/* Available Nurses / Top Nurses Skeleton */}
+      {/*
       <View style={styles.sectionHeader}>
         <Skeleton style={styles.sectionTitle} />
         <Skeleton style={styles.seeAll} />
@@ -90,6 +95,7 @@ const HomeSkeleton = () => {
           </View>
         ))}
       </View>
+      */}
     </View>
   );
 };

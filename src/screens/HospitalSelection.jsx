@@ -16,7 +16,7 @@ import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations
 import {storage} from '../utils/storage';
 
 const HospitalSelection = ({navigation, route}) => {
-  const {selectedMember, selectedCaregiver, selectedArea, serviceType} =
+  const {selectedMember, selectedCaregiver, selectedService, selectedArea, serviceType} =
     route.params || {};
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [district, setDistrict] = useState(selectedArea?.district || '');
@@ -36,6 +36,7 @@ const HospitalSelection = ({navigation, route}) => {
       navigation?.navigate('BookingDateTime', {
         selectedMember,
         selectedCaregiver,
+        selectedService,
         selectedHospital,
         selectedArea,
         serviceType,

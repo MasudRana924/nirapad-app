@@ -59,7 +59,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   const handleNext = () => {
     if (selectedCaregiver) {
       storage.saveSelectedCaregiver(selectedCaregiver);
-      navigation?.navigate('BookingDateTime', {
+      navigation?.navigate('HospitalSelection', {
         selectedMember,
         selectedCaregiver,
         selectedService,
