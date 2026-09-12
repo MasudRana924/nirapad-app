@@ -8,7 +8,7 @@ import {
   onTokenRefresh,
   getInitialNotification,
 } from '@react-native-firebase/messaging';
-import {Platform, Alert} from 'react-native';
+import {Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import {apiRequest} from './api';
@@ -25,6 +25,16 @@ const safeUnsubscribe = unsubscribe => {
 class NotificationService {
   constructor() {
     this.isInitialized = false;
+    this.foregroundBannerHandler = null;
+  }
+
+  setForegroundBannerHandler(handler) {
+    this.foregroundBannerHandler = handler;
+    return () => {
+      if (this.foregroundBannerHandler === handler) {
+        this.foregroundBannerHandler = null;
+      }
+    };
   }
 
   /**
@@ -224,7 +234,7 @@ class NotificationService {
         messagingInstance,
         remoteMessage => {
           console.log('📱 Notification opened app:', remoteMessage);
-          this.handleNotification(remoteMessage, navigation);
+          this.navigateToScreen(remoteMessage?.data || {}, navigation);
         },
       );
 
@@ -232,7 +242,7 @@ class NotificationService {
         .then(remoteMessage => {
           if (remoteMessage) {
             console.log('📱 Initial notification (app killed):', remoteMessage);
-            this.handleNotification(remoteMessage, navigation);
+            this.navigateToScreen(remoteMessage?.data || {}, navigation);
           }
         })
         .catch(error => {
@@ -267,15 +277,18 @@ class NotificationService {
 
     console.log('🔔 Notification:', {title, body, data});
 
-    // Show alert for foreground notifications
+    if (typeof this.foregroundBannerHandler === 'function') {
+      this.foregroundBannerHandler({
+        title: title || 'Notification',
+        body: body || '',
+        data,
+        navigation,
+      });
+      return;
+    }
+
     if (navigation) {
-      Alert.alert(title || 'Notification', body || '', [
-        {
-          text: 'View',
-          onPress: () => this.navigateToScreen(data, navigation),
-        },
-        {text: 'Close', style: 'cancel'},
-      ]);
+      this.navigateToScreen(data, navigation);
     }
   }
 

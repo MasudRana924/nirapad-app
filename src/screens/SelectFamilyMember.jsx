@@ -130,11 +130,11 @@ const SelectFamilyMember = ({navigation, route}) => {
                     <Icon name="chevron-forward" size={24} color="#8190A7" />
                   </TouchableOpacity>
                 </View>
-                {selectedMember?.id === member.id && (
+                {/* {selectedMember?.id === member.id && (
                   <View style={styles.selectedBadge}>
                     <Icon name="checkmark-circle" size={24} color="#008178" />
                   </View>
-                )}
+                )} */}
               </TouchableOpacity>
             ))}
           </View>

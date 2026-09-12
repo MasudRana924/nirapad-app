@@ -12,6 +12,9 @@ import AppNavigator from './src/navigation/AppNavigator';
 import SplashScreen from './src/screens/SplashScreen';
 import notificationService from './src/services/notificationService';
 import {NavigationContainer} from '@react-navigation/native';
+import NotificationBanner from './src/components/common/NotificationBanner';
+import {handleNotificationClick, parseNotificationData} from './src/utils/notificationHandler';
+import {queryKeys} from './src/api/queryKeys';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +34,12 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
   const navigationRef = useRef<any>(null);
   const listenersCleanupRef = useRef<(() => void) | null>(null);
+  const [banner, setBanner] = useState({
+    visible: false,
+    title: '',
+    body: '',
+    data: null as any,
+  });
 
   const handleSplashFinish = useCallback(() => {
     setShowSplash(false);
@@ -43,6 +52,22 @@ function AppContent() {
     listenersCleanupRef.current = notificationService.setupMessageHandlers(
       navigationRef.current,
     );
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = notificationService.setForegroundBannerHandler(
+      payload => {
+        queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
+        queryClient.invalidateQueries({queryKey: queryKeys.bookings.all});
+        setBanner({
+          visible: true,
+          title: payload?.title || 'Notification',
+          body: payload?.body || '',
+          data: payload?.data || null,
+        });
+      },
+    );
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -72,9 +97,26 @@ function AppContent() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef} onReady={setupNotificationListeners}>
-      <AppNavigator />
-    </NavigationContainer>
+    <>
+      <NavigationContainer ref={navigationRef} onReady={setupNotificationListeners}>
+        <AppNavigator />
+      </NavigationContainer>
+      <NotificationBanner
+        visible={banner.visible}
+        title={banner.title}
+        body={banner.body}
+        onHide={() => setBanner(prev => ({...prev, visible: false}))}
+        onPress={() => {
+          const nav = navigationRef.current;
+          if (nav) {
+            handleNotificationClick(
+              parseNotificationData(banner.data),
+              nav,
+            );
+          }
+        }}
+      />
+    </>
   );
 }
 

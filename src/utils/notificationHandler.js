@@ -1,4 +1,4 @@
-import {Alert} from 'react-native';
+import notificationService from '../services/notificationService';
 
 const getBookingId = data =>
   data?.booking_id || data?.bookingId || data?.reference_id || null;
@@ -76,13 +76,13 @@ export const handleForegroundNotification = (remoteMessage, navigation) => {
     remoteMessage.data || notification.data,
   );
 
-  Alert.alert(notification.title || 'Notification', notification.body || '', [
+  notificationService.handleNotification(
     {
-      text: 'View',
-      onPress: () => handleNotificationClick(data, navigation),
+      notification,
+      data,
     },
-    {text: 'Close', style: 'cancel'},
-  ]);
+    navigation,
+  );
 };
 
 /**

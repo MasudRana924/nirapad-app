@@ -171,11 +171,11 @@ const BookingDetailsScreen = ({navigation, route}) => {
               <Text style={styles.heroLabel}>Total amount</Text>
               <Text style={styles.heroAmount}>৳{booking.total_amount}</Text>
             </View>
-            <View style={[styles.statusBadge, {backgroundColor: statusStyle.bg}]}>
+            {/* <View style={[styles.statusBadge, {backgroundColor: statusStyle.bg}]}>
               <Text style={[styles.statusText, {color: statusStyle.text}]}>
                 {statusLabel}
               </Text>
-            </View>
+            </View> */}
           </View>
 
           <View style={styles.heroDivider} />
@@ -325,23 +325,21 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
       {(showPayButton || canCancel) && (
         <View style={styles.bottomContainer}>
-          {showPayButton && (
-            <TouchableOpacity activeOpacity={0.85} style={styles.payButton}>
-              <Text style={styles.payButtonText}>Pay now</Text>
-            </TouchableOpacity>
-          )}
           {canCancel && (
             <TouchableOpacity
               activeOpacity={0.85}
-              style={[styles.payButton, showPayButton && styles.cancelButton]}
+              style={[styles.actionButton, styles.cancelButton]}
               onPress={handleCancel}>
-              <Text
-                style={[
-                  styles.payButtonText,
-                  showPayButton && styles.cancelButtonText,
-                ]}>
-                Cancel booking
+              <Text style={[styles.payButtonText, styles.cancelButtonText]}>
+                Cancel
               </Text>
+            </TouchableOpacity>
+          )}
+          {showPayButton && (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[styles.actionButton, styles.payButton]}>
+              <Text style={styles.payButtonText}>Pay now</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -523,19 +521,24 @@ const styles = StyleSheet.create({
     color: '#4A5568',
   },
   bottomContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
+   
     backgroundColor: '#FFFFFF',
   },
-  payButton: {
+  actionButton: {
+    flex: 1,
     height: 52,
     borderRadius: 14,
-    backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  payButton: {
+    backgroundColor: '#008178',
   },
   payButtonText: {
     fontSize: 16,
@@ -546,7 +549,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#DC2626',
-    marginTop: 10,
   },
   cancelButtonText: {
     color: '#DC2626',
