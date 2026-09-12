@@ -65,6 +65,12 @@ export const ENDPOINTS = {
     READ_ALL: '/inbox/read-all',
   },
 
+  // Payments endpoints
+  PAYMENTS: {
+    BKASH_CREATE: '/payments/bkash/create',
+    BKASH_EXECUTE: '/payments/bkash/execute',
+  },
+
   // FCM token endpoints
   NOTIFICATION_TOKENS: {
     LIST: '/notifications/tokens',

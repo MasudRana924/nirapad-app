@@ -338,7 +338,10 @@ const BookingDetailsScreen = ({navigation, route}) => {
           {showPayButton && (
             <TouchableOpacity
               activeOpacity={0.85}
-              style={[styles.actionButton, styles.payButton]}>
+              style={[styles.actionButton, styles.payButton]}
+              onPress={() =>
+                navigation.navigate('BkashCheckout', {bookingId})
+              }>
               <Text style={styles.payButtonText}>Pay now</Text>
             </TouchableOpacity>
           )}

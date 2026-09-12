@@ -186,6 +186,17 @@ export const markAllInboxAsRead = async () => {
   return apiRequest('/inbox/read-all', 'PUT');
 };
 
+export const createBkashPayment = async bookingId => {
+  return apiRequest('/payments/bkash/create', 'POST', {booking_id: bookingId});
+};
+
+export const executeBkashPayment = async (paymentID, bookingId) => {
+  return apiRequest('/payments/bkash/execute', 'POST', {
+    paymentID,
+    booking_id: bookingId,
+  });
+};
+
 /** @deprecated Use markInboxAsRead */
 export const markNotificationAsRead = async notificationId => {
   return markInboxAsRead(notificationId);

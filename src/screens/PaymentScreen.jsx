@@ -17,51 +17,31 @@ const PaymentScreen = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
 
-  const processPayment = async (paymentMethod) => {
-    if (!bookingId || !amount) {
+  const processPayment = async paymentMethod => {
+    if (!bookingId) {
       Alert.alert('Error', 'Missing booking information');
+      return;
+    }
+
+    if (paymentMethod === 'bkash') {
+      navigation.navigate('BkashCheckout', {bookingId});
       return;
     }
 
     setLoading(true);
     try {
-      let endpoint;
-      let body;
-
-      if (paymentMethod === 'bkash') {
-        endpoint = '/payments/bkash';
-        body = {
-          amount: amount,
-          booking_id: bookingId,
-          currency: 'BDT',
-        };
-      } else if (paymentMethod === 'wallet') {
-        endpoint = '/payments/wallet';
-        body = {
-          amount: amount,
-          booking_id: bookingId,
-        };
-      } else {
-        throw new Error('Invalid payment method');
-      }
-
-      const response = await apiRequest(endpoint, 'POST', body);
+      const response = await apiRequest('/payments/wallet', 'POST', {
+        amount,
+        booking_id: bookingId,
+      });
 
       if (response.success) {
-        if (paymentMethod === 'bkash' && response.bkash_url) {
-          // Navigate to bKash checkout
-          navigation.navigate('BkashCheckout', {
-            paymentUrl: response.bkash_url,
-            bookingId: bookingId,
-          });
-        } else {
-          Alert.alert('Success', 'Payment processed successfully', [
-            {
-              text: 'OK',
-              onPress: () => navigation.navigate('BookingDetails', {bookingId}),
-            },
-          ]);
-        }
+        Alert.alert('Success', 'Payment processed successfully', [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('BookingDetails', {bookingId}),
+          },
+        ]);
       } else {
         Alert.alert('Error', response.message || 'Payment failed');
       }

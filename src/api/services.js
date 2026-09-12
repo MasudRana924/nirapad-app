@@ -298,6 +298,20 @@ export const bookingService = {
 };
 
 /**
+ * Payments Services
+ */
+export const paymentService = {
+  createBkashPayment: bookingId =>
+    apiRequest('/payments/bkash/create', 'POST', {booking_id: bookingId}),
+
+  executeBkashPayment: (paymentID, bookingId) =>
+    apiRequest('/payments/bkash/execute', 'POST', {
+      paymentID,
+      booking_id: bookingId,
+    }),
+};
+
+/**
  * Hospitals Services
  */
 export const hospitalService = {
@@ -324,6 +338,7 @@ export default {
   familyService,
   caregiverService,
   bookingService,
+  paymentService,
   hospitalService,
   inboxService,
   notificationService,

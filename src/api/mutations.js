@@ -4,7 +4,7 @@
  */
 
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {familyService, bookingService, authService, inboxService} from './services';
+import {familyService, bookingService, authService, inboxService, paymentService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -114,6 +114,29 @@ export const useCancelBooking = () => {
   });
 };
 
+export const useCreateBkashPayment = () => {
+  return useMutation({
+    mutationFn: bookingId => paymentService.createBkashPayment(bookingId),
+  });
+};
+
+export const useExecuteBkashPayment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({paymentID, bookingId}) =>
+      paymentService.executeBkashPayment(paymentID, bookingId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
+      if (variables?.bookingId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.bookings.detail(variables.bookingId),
+        });
+      }
+    },
+  });
+};
+
 export const useMarkInboxRead = () => {
   const queryClient = useQueryClient();
 
@@ -176,6 +199,8 @@ export default {
   useCreateBooking,
   useUpdateBooking,
   useCancelBooking,
+  useCreateBkashPayment,
+  useExecuteBkashPayment,
   useMarkInboxRead,
 
   // Auth
