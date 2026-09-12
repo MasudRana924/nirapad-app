@@ -4,19 +4,28 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNotifications} from '../api/queries';
 import Header from '../components/common/Header';
 import NotificationSkeleton from '../components/home/NotificationSkeleton';
+import {apiRequest} from '../services/api';
+import {
+  parseNotificationData,
+  handleNotificationClick,
+  resolveInboxBookingId,
+} from '../utils/notificationHandler';
 
 const InboxScreen = ({navigation}) => {
   const {data: notificationsData, isLoading} = useNotifications({
     page: 1,
     limit: 20,
   });
-  const notifications = notificationsData?.data?.notifications || [];
+  const notifications = Array.isArray(notificationsData?.data)
+    ? notificationsData.data
+    : [];
 
   const formatTime = dateString => {
     if (!dateString) return '';
@@ -37,6 +46,10 @@ const InboxScreen = ({navigation}) => {
   const getNotificationIcon = type => {
     switch (type) {
       case 'BOOKING':
+      case 'BOOKING_CREATED':
+      case 'BOOKING_ACCEPTED':
+      case 'BOOKING_REJECTED':
+      case 'BOOKING_CANCELLED':
         return 'calendar-outline';
       case 'PAYMENT':
         return 'card-outline';
@@ -44,6 +57,51 @@ const InboxScreen = ({navigation}) => {
         return 'person-outline';
       default:
         return 'notifications-outline';
+    }
+  };
+
+  const handleNotificationPress = async notification => {
+    try {
+      if (notification.id) {
+        await apiRequest(`/inbox/${notification.id}/read`, 'PUT');
+      }
+
+      let detail = notification;
+      if (notification.id) {
+        try {
+          const detailResponse = await apiRequest(
+            `/inbox/${notification.id}`,
+            'GET',
+          );
+          if (detailResponse?.data) {
+            detail = detailResponse.data;
+          }
+        } catch (error) {
+          console.log('Inbox detail fetch failed, using list item');
+        }
+      }
+
+      const nested = parseNotificationData(detail.data);
+      const bookingId = resolveInboxBookingId(detail);
+
+      if (bookingId) {
+        navigation.navigate('BookingDetails', {
+          bookingId,
+          inboxId: detail.id || notification.id,
+        });
+        return;
+      }
+
+      handleNotificationClick(
+        {
+          ...nested,
+          type: detail.type || nested.type,
+          inbox_id: detail.id || notification.id,
+        },
+        navigation,
+      );
+    } catch (error) {
+      console.error('Error handling notification press:', error);
     }
   };
 
@@ -71,9 +129,10 @@ const InboxScreen = ({navigation}) => {
           notifications.map(notification => {
             const unread = !notification.is_read;
             return (
-              <View
+              <TouchableOpacity
                 key={notification.id}
-                style={[styles.card, unread && styles.cardUnread]}>
+                style={[styles.card, unread && styles.cardUnread]}
+                onPress={() => handleNotificationPress(notification)}>
                 <View style={styles.iconWrap}>
                   <Icon
                     name={getNotificationIcon(notification.type)}
@@ -87,7 +146,9 @@ const InboxScreen = ({navigation}) => {
                     <Text
                       style={[styles.message, unread && styles.messageUnread]}
                       numberOfLines={3}>
-                      {notification.message}
+                      {notification.body ||
+                        notification.message ||
+                        notification.title}
                     </Text>
                     {unread && <View style={styles.unreadDot} />}
                   </View>
@@ -95,7 +156,7 @@ const InboxScreen = ({navigation}) => {
                     {formatTime(notification.created_at)}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })
         )}

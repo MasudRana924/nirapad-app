@@ -44,7 +44,9 @@ const SelectCaregiverScreen = ({navigation, route}) => {
     gender: selectedFilter === 'all' ? '' : selectedFilter,
   });
 
-  const caregivers = caregiversData?.data || [];
+  const caregivers = Array.isArray(caregiversData?.data)
+    ? caregiversData.data
+    : [];
 
   const handleFilterSelect = filterId => {
     setSelectedFilter(filterId === selectedFilter ? '' : filterId);
@@ -197,7 +199,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                     <View style={styles.userInfo}>
                       <View style={styles.nameRow}>
                         <Text style={styles.name} numberOfLines={1}>
-                          {caregiver.name}
+                          {caregiver.name || 'Caregiver'}
                         </Text>
                         {caregiver.is_available && (
                           <View style={styles.availableBadge}>
@@ -223,7 +225,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                       <View style={styles.infoRow}>
                         <Icon name="location-outline" size={14} color="#303944" />
                         <Text style={styles.infoText} numberOfLines={1}>
-                          {caregiver.service_areas?.join(', ') || 'No location'}
+                          {[caregiver.thana, caregiver.district]
+                            .filter(Boolean)
+                            .join(', ') ||
+                            caregiver.service_areas?.join(', ') ||
+                            'No location'}
                         </Text>
                       </View>
                     </View>

@@ -10,16 +10,54 @@ import {
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useCaregiver} from '../api/queries';
 
 const CaregiverDetailsScreen = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
-  const caregiver = route?.params?.caregiver || {
+  const routeCaregiver = route?.params?.caregiver || {};
+  const caregiverId = routeCaregiver.id || route?.params?.caregiverId;
+  const shouldFetch =
+    typeof caregiverId === 'string' && caregiverId.length > 10;
+
+  const {data: caregiverResponse} = useCaregiver(shouldFetch ? caregiverId : null);
+  const apiCaregiver = caregiverResponse?.data || {};
+
+  const hourlyRate =
+    apiCaregiver.hourly_rate ||
+    routeCaregiver.hourly_rate ||
+    routeCaregiver.price;
+  const photo =
+    apiCaregiver.profile_photo ||
+    routeCaregiver.profile_photo ||
+    routeCaregiver.image;
+
+  const caregiver = {
     name: 'Rahim Ahmed',
     image: 'https://randomuser.me/api/portraits/men/32.jpg',
     rating: '4.9',
     jobs: '142 jobs',
     experience: '4 yrs',
     price: '৳800',
+    ...routeCaregiver,
+    ...apiCaregiver,
+    name:
+      apiCaregiver.name ||
+      routeCaregiver.name ||
+      'Caregiver',
+    image: photo || 'https://randomuser.me/api/portraits/men/32.jpg',
+    rating: apiCaregiver.rating ?? routeCaregiver.rating ?? '—',
+    jobs:
+      routeCaregiver.jobs ||
+      (apiCaregiver.completed_bookings != null
+        ? `${apiCaregiver.completed_bookings} jobs`
+        : '—'),
+    experience:
+      routeCaregiver.experience ||
+      (apiCaregiver.experience_years != null
+        ? `${apiCaregiver.experience_years} yrs`
+        : '—'),
+    price: hourlyRate ? `৳${hourlyRate}` : routeCaregiver.price || '৳800',
+    bio: apiCaregiver.bio || routeCaregiver.bio,
   };
 
   return (
@@ -142,9 +180,8 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
           <Text style={styles.sectionTitle}>About</Text>
 
           <Text style={styles.aboutText}>
-            Experienced hospital attendant with 4 years of service across major Dhaka
-            hospitals. Speaks Bengali and basic English. Calm, trustworthy and
-            patient-focused.
+            {caregiver.bio ||
+              'Experienced hospital attendant with 4 years of service across major Dhaka hospitals. Speaks Bengali and basic English. Calm, trustworthy and patient-focused.'}
           </Text>
         </View>
 

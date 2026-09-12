@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,8 @@ import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
 import {requestGalleryPermission} from '../utils/permissions';
 import FamilyDetailsSkeleton from '../components/home/FamilyDetailsSkeleton';
+import {bangladeshDistricts} from '../data/bangladeshLocations';
+import {getThanasByDistrict} from '../data/bangladeshThanas';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const RELATIONSHIPS = ['Father', 'Mother', 'Spouse', 'Son', 'Daughter', 'Brother', 'Sister', 'Grandfather', 'Grandmother', 'Other'];
@@ -48,8 +50,11 @@ const AddFamilyMember = ({navigation, route}) => {
     blood_group: '',
     date_of_birth: '',
     gender: '',
-    address_id: '',
+    district: '',
+    thana: '',
+    house: '',
     emergency_contact_name: '',
+    emergency_contact_phone: '',
     medical_history: '',
     existing_conditions: '',
     allergies: '',
@@ -62,14 +67,17 @@ const AddFamilyMember = ({navigation, route}) => {
       setFormData({
         name: member.name || '',
         relationship: member.relationship || '',
-        phone: member.emergency_contact_phone || '',
+        phone: member.phone || '',
         blood_group: member.blood_group || '',
         date_of_birth: member.date_of_birth
           ? String(member.date_of_birth).split('T')[0]
           : '',
         gender: member.gender || '',
-        address_id: member.address_id ? String(member.address_id) : '',
+        district: member.district || '',
+        thana: member.thana || '',
+        house: member.house || '',
         emergency_contact_name: member.emergency_contact_name || '',
+        emergency_contact_phone: member.emergency_contact_phone || '',
         medical_history: member.medical_history || '',
         existing_conditions: member.existing_conditions || '',
         allergies: member.allergies || '',
@@ -80,6 +88,11 @@ const AddFamilyMember = ({navigation, route}) => {
       }
     }
   }, [isEditMode, memberData]);
+
+  const thanaOptions = useMemo(
+    () => getThanasByDistrict(formData.district),
+    [formData.district],
+  );
 
   const handleImagePick = async () => {
     try {
@@ -127,8 +140,11 @@ const AddFamilyMember = ({navigation, route}) => {
       blood_group,
       date_of_birth,
       gender,
-      address_id,
+      district,
+      thana,
+      house,
       emergency_contact_name,
+      emergency_contact_phone,
       medical_history,
       existing_conditions,
       allergies,
@@ -156,14 +172,17 @@ const AddFamilyMember = ({navigation, route}) => {
       if (blood_group) data.append('blood_group', blood_group);
       if (date_of_birth) data.append('date_of_birth', date_of_birth);
       if (gender) data.append('gender', gender.toLowerCase());
-      if (address_id) data.append('address_id', address_id);
+      if (district) data.append('district', district);
+      if (thana) data.append('thana', thana);
+      if (house) data.append('house', house);
       if (emergency_contact_name) data.append('emergency_contact_name', emergency_contact_name);
+      if (emergency_contact_phone) data.append('emergency_contact_phone', emergency_contact_phone);
       if (medical_history) data.append('medical_history', medical_history);
       if (existing_conditions) data.append('existing_conditions', existing_conditions);
       if (allergies) data.append('allergies', allergies);
       if (current_medications) data.append('current_medications', current_medications);
 
-      if (imageUri) {
+      if (imageUri && !String(imageUri).startsWith('http')) {
         data.append('photo', {
           uri: imageUri,
           type: 'image/jpeg',
@@ -182,9 +201,10 @@ const AddFamilyMember = ({navigation, route}) => {
     } catch (error) {
       console.error('Failed to save family member:', error);
       showToast(
-        isEditMode
-          ? 'Failed to update family member'
-          : 'Failed to add family member',
+        error?.message ||
+          (isEditMode
+            ? 'Failed to update family member'
+            : 'Failed to add family member'),
         'error',
       );
     }
@@ -294,14 +314,35 @@ const AddFamilyMember = ({navigation, route}) => {
             icon="person-outline"
           />
 
-          <Text style={styles.label}>Address ID</Text>
+          <Text style={styles.label}>District</Text>
+          <SearchableDropdown
+            data={bangladeshDistricts}
+            placeholder="Select district"
+            value={formData.district}
+            onSelect={value =>
+              setFormData({...formData, district: value, thana: ''})
+            }
+            icon="location-outline"
+          />
+
+          <Text style={styles.label}>Thana</Text>
+          <SearchableDropdown
+            data={thanaOptions}
+            placeholder={
+              formData.district ? 'Select thana' : 'Select district first'
+            }
+            value={formData.thana}
+            onSelect={value => setFormData({...formData, thana: value})}
+            icon="navigate-outline"
+          />
+
+          <Text style={styles.label}>House</Text>
           <TextInput
             style={styles.input}
-            value={formData.address_id}
-            onChangeText={text => setFormData({...formData, address_id: text})}
-            placeholder="Enter address ID"
+            value={formData.house}
+            onChangeText={text => setFormData({...formData, house: text})}
+            placeholder="House, road, block..."
             placeholderTextColor="#8190A7"
-            keyboardType="number-pad"
           />
 
           <Text style={styles.label}>Emergency contact name</Text>
@@ -311,6 +352,18 @@ const AddFamilyMember = ({navigation, route}) => {
             onChangeText={text => setFormData({...formData, emergency_contact_name: text})}
             placeholder="Enter emergency contact name"
             placeholderTextColor="#8190A7"
+          />
+
+          <Text style={styles.label}>Emergency contact phone</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.emergency_contact_phone}
+            onChangeText={text =>
+              setFormData({...formData, emergency_contact_phone: text})
+            }
+            placeholder="Enter emergency contact phone"
+            placeholderTextColor="#8190A7"
+            keyboardType="phone-pad"
           />
 
           <Text style={styles.label}>Medical history</Text>

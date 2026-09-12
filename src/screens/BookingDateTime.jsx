@@ -222,6 +222,7 @@ const BookingDateTime = ({navigation, route}) => {
     selectedCaregiver,
     selectedService,
     selectedArea,
+    selectedHospital,
     serviceType,
   } = route.params || {};
 
@@ -242,6 +243,7 @@ const BookingDateTime = ({navigation, route}) => {
       selectedCaregiver,
       selectedService,
       selectedArea,
+      selectedHospital,
       serviceType,
       selectedDate,
       selectedTime,

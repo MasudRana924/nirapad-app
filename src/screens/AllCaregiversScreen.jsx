@@ -32,7 +32,9 @@ const AllCaregiversScreen = ({navigation}) => {
     gender: selectedFilter === 'all' ? '' : selectedFilter,
   });
 
-  const caregivers = caregiversData?.data || [];
+  const caregivers = Array.isArray(caregiversData?.data)
+    ? caregiversData.data
+    : [];
 
   const handleFilterSelect = (filterId) => {
     setSelectedFilter(filterId === selectedFilter ? '' : filterId);
@@ -138,7 +140,9 @@ const AllCaregiversScreen = ({navigation}) => {
 
                   <View style={styles.cardRight}>
                     <View style={styles.nameRow}>
-                      <Text style={styles.caregiverName}>{caregiver.name}</Text>
+                      <Text style={styles.caregiverName}>
+                        {caregiver.name || 'Caregiver'}
+                      </Text>
                       {caregiver.is_available && (
                         <View style={styles.availableBadge}>
                           <Text style={styles.availableBadgeText}>Available</Text>
@@ -147,7 +151,12 @@ const AllCaregiversScreen = ({navigation}) => {
                     </View>
 
                     <Text style={styles.locationText}>
-                      {caregiver.experience_years} yrs exp · {caregiver.service_areas?.join(', ') || 'No location'}
+                      {caregiver.experience_years} yrs exp ·{' '}
+                      {[caregiver.thana, caregiver.district]
+                        .filter(Boolean)
+                        .join(', ') ||
+                        caregiver.service_areas?.join(', ') ||
+                        'No location'}
                     </Text>
                     <Text style={styles.priceText}>৳{caregiver.hourly_rate}/hr</Text>
                   </View>

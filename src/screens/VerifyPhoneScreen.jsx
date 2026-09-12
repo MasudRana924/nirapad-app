@@ -13,8 +13,9 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
-import {verifyOtp, resendOtp} from '../services/api';
+import {verifyOtp, resendOtp, extractAuthPayload} from '../services/api';
 import {useAuth} from '../context/AuthContext';
+import notificationService from '../services/notificationService';
 
 const OTP_LENGTH = 4;
 
@@ -98,15 +99,46 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
     setLoading(true);
     try {
+      console.log('🔍 Verifying OTP...');
       const response = await verifyOtp(email, enteredOtp);
-      if (response.success && response.token) {
-        await login(response.token, response.refreshToken, response.user);
+
+      const {token, refreshToken, user} = extractAuthPayload(response);
+      if (response.success && token) {
+        console.log('✅ OTP verification response received');
+
+        // Step 1: Store authentication tokens (data.token, data.refreshToken, data.user)
+        await login(token, refreshToken, user);
+        console.log('✅ Auth tokens stored locally');
+
+        // Step 2: Initialize notification service
+        console.log('🔔 Initializing notification service...');
+        const notificationInitialized = await notificationService.initialize(
+          token,
+        );
+
+        if (notificationInitialized) {
+          console.log('✅ Notification service initialized');
+        } else {
+          console.log('⚠️ Notification service initialization failed');
+        }
+
+        // Step 3: Register FCM token with server
+        console.log('📱 Registering FCM token with server...');
+        const tokenRegistered = await notificationService.registerTokenWithServer(
+          token,
+        );
+
+        if (tokenRegistered) {
+          console.log('✅ FCM token registered successfully');
+        } else {
+          console.log('⚠️ FCM token registration failed');
+        }
       } else {
         Alert.alert('Error', response.message || 'OTP verification failed');
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
-      console.error('Verify OTP error:', error);
+      console.error('❌ Verify OTP error:', error);
     } finally {
       setLoading(false);
     }

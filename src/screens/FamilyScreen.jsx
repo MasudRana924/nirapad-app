@@ -21,7 +21,9 @@ const FamilyScreen = ({navigation}) => {
   // React Query hooks
   const {data: familyMembersData, isLoading} = useFamilyMembers();
 
-  const familyMembers = familyMembersData?.data || [];
+  const familyMembers = Array.isArray(familyMembersData?.data)
+    ? familyMembersData.data
+    : [];
 
   const showToast = (message, type = 'success') => {
     setToast({visible: true, message, type});

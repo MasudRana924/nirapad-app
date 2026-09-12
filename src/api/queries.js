@@ -4,7 +4,7 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService, notificationService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -87,11 +87,37 @@ export const useBookingDetails = (id, options = {}) => {
 };
 
 /**
- * Notifications Queries
+ * Inbox Queries
  */
+export const useInbox = (params = {}, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.inbox.list(params),
+    queryFn: () => inboxService.getInbox(params),
+    ...options,
+  });
+};
+
+export const useInboxItem = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.inbox.detail(id),
+    queryFn: () => inboxService.getInboxItem(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export const useInboxUnreadCount = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.inbox.unreadCount(),
+    queryFn: () => inboxService.getUnreadCount(),
+    ...options,
+  });
+};
+
+/** @deprecated Use useInbox */
 export const useNotifications = (params = {}, options = {}) => {
   return useQuery({
-    queryKey: queryKeys.notifications.lists(),
+    queryKey: queryKeys.inbox.list(params),
     queryFn: () => notificationService.getNotifications(params),
     ...options,
   });

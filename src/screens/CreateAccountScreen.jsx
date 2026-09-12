@@ -16,6 +16,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
 import {registerUser} from '../services/api';
+import notificationService from '../services/notificationService';
 
 const CreateAccountScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);

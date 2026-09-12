@@ -24,10 +24,11 @@ const HospitalSelection = ({navigation, route}) => {
 
   const {data: hospitalsData, isLoading} = useSearchHospitals({
     district,
-    city,
   });
 
-  const hospitals = hospitalsData?.data || [];
+  const hospitals = Array.isArray(hospitalsData?.data)
+    ? hospitalsData.data
+    : [];
 
   const handleNext = () => {
     if (selectedHospital) {
@@ -83,7 +84,7 @@ const HospitalSelection = ({navigation, route}) => {
           <View style={styles.hospitalGrid}>
             {hospitals.map(hospital => {
               const isSelected = selectedHospital?.id === hospital.id;
-              const locationLine = [hospital.city, hospital.district]
+              const locationLine = [hospital.thana, hospital.district]
                 .filter(Boolean)
                 .join(', ');
 
@@ -108,13 +109,13 @@ const HospitalSelection = ({navigation, route}) => {
                         <Text style={styles.name} numberOfLines={1}>
                           {hospital.name}
                         </Text>
-                        {hospital.is_verified && (
+                        {hospital.is_verified || hospital.is_active ? (
                           <View style={styles.availableBadge}>
                             <Text style={styles.availableBadgeText}>
                               Verified
                             </Text>
                           </View>
-                        )}
+                        ) : null}
                       </View>
 
                       <View style={styles.infoRow}>

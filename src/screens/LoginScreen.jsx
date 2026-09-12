@@ -15,8 +15,9 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
-import {loginUser} from '../services/api';
+import {loginUser, extractAuthPayload} from '../services/api';
 import {useAuth} from '../context/AuthContext';
+import notificationService from '../services/notificationService';
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -39,19 +40,56 @@ const LoginScreen = ({navigation}) => {
 
     setLoading(true);
     try {
+      console.log('🔐 Starting login process...');
       const response = await loginUser(email.trim(), password);
-      if (response.success && response.data?.token) {
-        await login(
-          response.data.token,
-          response.data.refreshToken,
-          response.data.user,
+
+      const {token, refreshToken, user} = extractAuthPayload(response);
+      if (response.success && token) {
+        console.log('✅ Login API response received');
+
+        // Step 1: Store authentication tokens (data.token, data.refreshToken, data.user)
+        await login(token, refreshToken, user);
+        console.log('✅ Auth tokens stored locally');
+
+        // Step 2: Initialize notification service
+        console.log('🔔 Initializing notification service...');
+        const notificationInitialized = await notificationService.initialize(
+          token,
         );
+
+        if (notificationInitialized) {
+          console.log('✅ Notification service initialized');
+        } else {
+          console.log('⚠️ Notification service initialization failed, but continuing...');
+        }
+
+        // Step 3: Register FCM token with server
+        console.log('📱 Registering FCM token with server...');
+        const tokenRegistered = await notificationService.registerTokenWithServer(
+          token,
+        );
+
+        if (tokenRegistered) {
+          console.log('✅ FCM token registered successfully');
+        } else {
+          console.log('⚠️ FCM token registration failed, but login successful');
+        }
       } else {
-        setError(response.message || 'Login failed');
+        const message = response.message || 'Login failed';
+        const needsVerify =
+          response.errors?.some?.(e =>
+            String(e?.message || e)
+              .toLowerCase()
+              .includes('verify'),
+          ) || message.toLowerCase().includes('verify');
+        if (needsVerify) {
+          navigation?.navigate('VerifyPhone', {email: email.trim()});
+        }
+        setError(message);
       }
     } catch (error) {
       setError('Something went wrong. Please try again.');
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
     } finally {
       setLoading(false);
     }

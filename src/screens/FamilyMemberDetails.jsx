@@ -127,13 +127,23 @@ const FamilyMemberDetails = ({navigation, route}) => {
           />
           <DetailRow
             label="Phone"
-            value={member.emergency_contact_phone || '—'}
+            value={member.phone || '—'}
             icon="call-outline"
           />
           <DetailRow
-            label="Address ID"
-            value={member.address_id || '—'}
+            label="District"
+            value={member.district || '—'}
             icon="location-outline"
+          />
+          <DetailRow
+            label="Thana"
+            value={member.thana || '—'}
+            icon="navigate-outline"
+          />
+          <DetailRow
+            label="House"
+            value={member.house || '—'}
+            icon="home-outline"
           />
         </View>
 
@@ -144,6 +154,11 @@ const FamilyMemberDetails = ({navigation, route}) => {
             label="Contact Name"
             value={member.emergency_contact_name || '—'}
             icon="person-circle-outline"
+          />
+          <DetailRow
+            label="Contact Phone"
+            value={member.emergency_contact_phone || '—'}
+            icon="call-outline"
           />
         </View>
 

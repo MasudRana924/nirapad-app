@@ -14,6 +14,38 @@ import Header from '../components/common/Header';
 import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
 
+const toStartTime = timeValue => {
+  if (!timeValue) {
+    return '';
+  }
+  const raw = String(timeValue).trim();
+  const match = raw.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if (!match) {
+    return raw.replace(/\s*(AM|PM)$/i, '');
+  }
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const meridiem = match[3]?.toUpperCase();
+  if (meridiem === 'PM' && hours < 12) {
+    hours += 12;
+  }
+  if (meridiem === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  return `${String(hours).padStart(2, '0')}:${minutes}`;
+};
+
+const mapServiceType = (selectedService, selectedHospital) => {
+  if (selectedHospital) {
+    return 'HOSPITAL_ASSISTANCE';
+  }
+  const key = selectedService?.id || selectedService?.category || '';
+  if (key === 'hospital_companion') {
+    return 'HOSPITAL_ASSISTANCE';
+  }
+  return 'HOME_CARE';
+};
+
 const Row = ({label, value, last}) => (
   <View style={[styles.row, last && styles.rowLast]}>
     <Text style={styles.rowLabel}>{label}</Text>
@@ -27,6 +59,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
     selectedCaregiver,
     selectedService,
     selectedArea,
+    selectedHospital,
     selectedDate,
     selectedTime,
     durationHours = 4,
@@ -70,27 +103,21 @@ const BookingPreviewScreen = ({navigation, route}) => {
     setIsSubmitting(true);
 
     const bookingData = {
-      service_type: 'HOME_CARE',
       family_member_id: selectedMember.id || selectedMember.uuid,
-      provider_type: 'CAREGIVER',
       provider_id: selectedCaregiver.id || selectedCaregiver.uuid,
       booking_date: selectedDate.fullDate,
-      start_time: selectedTime.time.replace(' AM', '').replace(' PM', ''),
+      start_time: toStartTime(selectedTime.time),
       duration_hours: durationHours,
-      pickup_location: {
-        address: selectedArea?.fullAddress || '',
-        city: selectedArea?.thana || '',
-        district: selectedArea?.district || '',
-        division: selectedArea?.district || '',
-        latitude: 23.8103,
-        longitude: 90.4125,
-      },
+      service_type: mapServiceType(selectedService, selectedHospital),
       patient_requirements: selectedService?.title
         ? `${selectedService.title} service requested`
         : 'Home care service',
       notes: selectedService?.description || '',
-      estimated_amount: estimatedTotal,
     };
+
+    if (selectedHospital?.id) {
+      bookingData.hospital_id = selectedHospital.id;
+    }
 
     try {
       const response = await createBooking.mutateAsync(bookingData);
@@ -101,7 +128,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
         bookingNumber: response.data?.booking_number,
       });
     } catch (error) {
-      Alert.alert('Error', 'Failed to create booking. Please try again.');
+      Alert.alert('Error', error?.message || 'Failed to create booking. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

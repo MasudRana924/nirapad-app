@@ -1,5 +1,6 @@
 import React, {createContext, useState, useEffect, useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import notificationService from '../services/notificationService';
 
 const AuthContext = createContext();
 
@@ -53,12 +54,20 @@ export const AuthProvider = ({children}) => {
 
   const logout = async () => {
     try {
+      console.log('🚪 Handling logout...');
+
+      // Deactivate notification tokens
+      await notificationService.handleLogout(userToken);
+
+      // Clear local storage
       await AsyncStorage.removeItem('userToken');
       await AsyncStorage.removeItem('refreshToken');
       await AsyncStorage.removeItem('user');
       setUserToken(null);
       setRefreshToken(null);
       setUser(null);
+
+      console.log('✅ Logout completed successfully');
     } catch (error) {
       console.error('Failed to remove token:', error);
     }

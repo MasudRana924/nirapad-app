@@ -18,7 +18,9 @@ const SelectFamilyMember = ({navigation, route}) => {
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
   const {selectedCaregiver} = route.params || {};
   const {data: familyMembersData, isLoading} = useFamilyMembers();
-  const familyMembers = familyMembersData?.data || [];
+  const familyMembers = Array.isArray(familyMembersData?.data)
+    ? familyMembersData.data
+    : [];
 
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A';

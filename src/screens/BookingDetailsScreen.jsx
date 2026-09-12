@@ -6,15 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookingDetails} from '../api/queries';
+import {useCancelBooking} from '../api/mutations';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
+import Loader from '../components/common/Loader';
 
 const STATUS_STYLES = {
   PENDING_PAYMENT: {bg: '#FFF4E5', text: '#D97706'},
+  PROVIDER_ASSIGNED: {bg: '#E6F4F3', text: '#008178'},
   CONFIRMED: {bg: '#E6F4F3', text: '#008178'},
   IN_PROGRESS: {bg: '#E6F4F3', text: '#008178'},
   COMPLETED: {bg: '#E6F4F3', text: '#008178'},
@@ -24,6 +28,7 @@ const STATUS_STYLES = {
 const BookingDetailsScreen = ({navigation, route}) => {
   const {bookingId} = route.params || {};
   const {data: bookingData, isLoading} = useBookingDetails(bookingId);
+  const cancelBooking = useCancelBooking();
   const booking = bookingData?.data;
 
   const formatDate = dateString => {
@@ -59,6 +64,53 @@ const BookingDetailsScreen = ({navigation, route}) => {
     STATUS_STYLES[booking?.status] || {bg: '#F0F2F5', text: '#8190A7'};
   const statusLabel = (booking?.status || '').replace(/_/g, ' ');
   const showPayButton = booking?.payment_status === 'PENDING';
+  const canCancel =
+    booking?.status &&
+    !['CANCELLED', 'COMPLETED'].includes(booking.status);
+
+  const familyName =
+    booking?.family_member_name || booking?.family_member?.name;
+  const familyMeta = [
+    booking?.family_member?.relationship,
+    booking?.family_member?.blood_group,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  const familyAddress = [
+    booking?.family_member_house,
+    booking?.family_member_thana,
+    booking?.family_member_district,
+  ]
+    .filter(Boolean)
+    .join(', ');
+  const caregiverName =
+    booking?.caregiver_name || booking?.caregiver?.name;
+  const hospitalName =
+    booking?.hospital_name || booking?.hospital?.name;
+
+  const handleCancel = () => {
+    Alert.alert('Cancel booking', 'Do you want to cancel this booking?', [
+      {text: 'Keep', style: 'cancel'},
+      {
+        text: 'Cancel booking',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await cancelBooking.mutateAsync({
+              id: bookingId,
+              reason: 'Plans changed',
+            });
+            Alert.alert('Cancelled', 'Booking cancelled successfully');
+          } catch (error) {
+            Alert.alert(
+              'Error',
+              error?.message || 'Failed to cancel booking',
+            );
+          }
+        },
+      },
+    ]);
+  };
 
   if (isLoading) {
     return (
@@ -106,6 +158,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Loader visible={cancelBooking.isPending} />
       <Header title="Booking details" onBack={() => navigation?.goBack()} />
 
       <ScrollView
@@ -142,11 +195,11 @@ const BookingDetailsScreen = ({navigation, route}) => {
           ))}
         </View>
 
-        {booking.family_member && (
+        {!!familyName && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Patient</Text>
             <View style={styles.personRow}>
-              {booking.family_member.photo ? (
+              {booking.family_member?.photo ? (
                 <Image
                   source={{uri: booking.family_member.photo}}
                   style={styles.avatar}
@@ -157,23 +210,23 @@ const BookingDetailsScreen = ({navigation, route}) => {
                 </View>
               )}
               <View style={styles.personInfo}>
-                <Text style={styles.personName}>{booking.family_member.name}</Text>
-                <Text style={styles.personMeta}>
-                  {booking.family_member.relationship}
-                  {booking.family_member.blood_group
-                    ? ` · ${booking.family_member.blood_group}`
-                    : ''}
-                </Text>
+                <Text style={styles.personName}>{familyName}</Text>
+                {!!familyMeta && (
+                  <Text style={styles.personMeta}>{familyMeta}</Text>
+                )}
+                {!!familyAddress && (
+                  <Text style={styles.personMeta}>{familyAddress}</Text>
+                )}
               </View>
             </View>
           </View>
         )}
 
-        {booking.caregiver && (
+        {!!caregiverName && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Caregiver</Text>
             <View style={styles.personRow}>
-              {booking.caregiver.profile_photo ? (
+              {booking.caregiver?.profile_photo ? (
                 <Image
                   source={{uri: booking.caregiver.profile_photo}}
                   style={styles.avatar}
@@ -184,9 +237,9 @@ const BookingDetailsScreen = ({navigation, route}) => {
                 </View>
               )}
               <View style={styles.personInfo}>
-                <Text style={styles.personName}>{booking.caregiver.name}</Text>
+                <Text style={styles.personName}>{caregiverName}</Text>
                 <View style={styles.metaRow}>
-                  {!!booking.caregiver.rating && (
+                  {!!booking.caregiver?.rating && (
                     <View style={styles.metaChip}>
                       <Icon name="star" size={12} color="#F6A900" />
                       <Text style={styles.metaChipText}>
@@ -194,30 +247,30 @@ const BookingDetailsScreen = ({navigation, route}) => {
                       </Text>
                     </View>
                   )}
-                  {!!booking.caregiver.experience_years && (
+                  {!!booking.caregiver?.experience_years && (
                     <Text style={styles.personMeta}>
                       {booking.caregiver.experience_years} yrs exp
                     </Text>
                   )}
                 </View>
-                {!!booking.caregiver.education && (
+                {!!booking.caregiver?.education && (
                   <Text style={styles.personMeta} numberOfLines={1}>
                     {booking.caregiver.education}
                   </Text>
                 )}
               </View>
             </View>
-            {!!booking.caregiver.bio && (
+            {!!booking.caregiver?.bio && (
               <Text style={styles.bodyText}>{booking.caregiver.bio}</Text>
             )}
           </View>
         )}
 
-        {booking.hospital && (
+        {!!hospitalName && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Hospital</Text>
             <View style={styles.personRow}>
-              {booking.hospital.photo ? (
+              {booking.hospital?.photo ? (
                 <Image
                   source={{uri: booking.hospital.photo}}
                   style={styles.avatar}
@@ -228,13 +281,13 @@ const BookingDetailsScreen = ({navigation, route}) => {
                 </View>
               )}
               <View style={styles.personInfo}>
-                <Text style={styles.personName}>{booking.hospital.name}</Text>
-                {!!booking.hospital.address && (
+                <Text style={styles.personName}>{hospitalName}</Text>
+                {!!booking.hospital?.address && (
                   <Text style={styles.personMeta} numberOfLines={2}>
                     {booking.hospital.address}
                   </Text>
                 )}
-                {!!booking.hospital.phone && (
+                {!!booking.hospital?.phone && (
                   <Text style={styles.personMeta}>{booking.hospital.phone}</Text>
                 )}
               </View>
@@ -255,13 +308,42 @@ const BookingDetailsScreen = ({navigation, route}) => {
             <Text style={styles.bodyText}>{booking.notes}</Text>
           </View>
         )}
+
+        {Array.isArray(booking.history) && booking.history.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>History</Text>
+            {booking.history.map((item, index) => (
+              <Text key={`${item.new_status}-${index}`} style={styles.bodyText}>
+                {(item.old_status || '—').replace(/_/g, ' ')} →{' '}
+                {(item.new_status || '—').replace(/_/g, ' ')}
+                {item.note ? ` · ${item.note}` : ''}
+              </Text>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
-      {showPayButton && (
+      {(showPayButton || canCancel) && (
         <View style={styles.bottomContainer}>
-          <TouchableOpacity activeOpacity={0.85} style={styles.payButton}>
-            <Text style={styles.payButtonText}>Pay now</Text>
-          </TouchableOpacity>
+          {showPayButton && (
+            <TouchableOpacity activeOpacity={0.85} style={styles.payButton}>
+              <Text style={styles.payButtonText}>Pay now</Text>
+            </TouchableOpacity>
+          )}
+          {canCancel && (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[styles.payButton, showPayButton && styles.cancelButton]}
+              onPress={handleCancel}>
+              <Text
+                style={[
+                  styles.payButtonText,
+                  showPayButton && styles.cancelButtonText,
+                ]}>
+                Cancel booking
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </SafeAreaView>
@@ -459,5 +541,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  cancelButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#DC2626',
+    marginTop: 10,
+  },
+  cancelButtonText: {
+    color: '#DC2626',
   },
 });

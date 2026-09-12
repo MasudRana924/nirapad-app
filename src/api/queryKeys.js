@@ -44,11 +44,21 @@ export const queryKeys = {
     detail: (id) => ['bookings', 'detail', id],
   },
 
-  // Notifications keys
+  // Inbox keys
+  inbox: {
+    all: ['inbox'],
+    lists: () => ['inbox', 'list'],
+    list: filters => ['inbox', 'list', filters],
+    details: () => ['inbox', 'detail'],
+    detail: id => ['inbox', 'detail', id],
+    unreadCount: () => ['inbox', 'unread-count'],
+  },
+
+  // Notifications keys (alias of inbox for existing hooks)
   notifications: {
-    all: ['notifications'],
-    lists: () => ['notifications', 'list'],
-    list: (filters) => ['notifications', 'list', filters],
+    all: ['inbox'],
+    lists: () => ['inbox', 'list'],
+    list: filters => ['inbox', 'list', filters],
   },
 
   // Hospitals keys

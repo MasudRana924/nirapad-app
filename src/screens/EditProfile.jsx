@@ -47,14 +47,23 @@ const EditProfile = ({navigation}) => {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        address: '',
-        date_of_birth: '',
+        address: user.address || '',
+        date_of_birth: user.date_of_birth
+          ? String(user.date_of_birth).split('T')[0]
+          : '',
       });
       if (user.profile_photo) {
         setImageUri(user.profile_photo);
       }
     }
-  }, [user.name, user.email, user.phone, user.profile_photo]);
+  }, [
+    user.name,
+    user.email,
+    user.phone,
+    user.address,
+    user.date_of_birth,
+    user.profile_photo,
+  ]);
 
   const handleImagePick = async () => {
     try {
@@ -114,7 +123,7 @@ const EditProfile = ({navigation}) => {
       if (address) data.append('address', address);
       if (date_of_birth) data.append('date_of_birth', date_of_birth);
 
-      if (imageUri) {
+      if (imageUri && !String(imageUri).startsWith('http')) {
         data.append('profile_photo', {
           uri: imageUri,
           type: 'image/jpeg',
@@ -127,7 +136,7 @@ const EditProfile = ({navigation}) => {
       navigation?.goBack();
     } catch (error) {
       console.error('Failed to update profile:', error);
-      showToast('Failed to update profile', 'error');
+      showToast(error?.message || 'Failed to update profile', 'error');
     }
   };
 

@@ -4,7 +4,7 @@
  */
 
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService} from './services';
+import {familyService, bookingService, authService, inboxService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -98,13 +98,29 @@ export const useCancelBooking = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id) => bookingService.cancelBooking(id),
+    mutationFn: variables => {
+      const id = typeof variables === 'object' ? variables.id : variables;
+      const reason =
+        typeof variables === 'object' ? variables.reason : 'Plans changed';
+      return bookingService.cancelBooking(id, reason);
+    },
     onSuccess: (data, variables) => {
-      // Invalidate bookings list and specific detail
+      const id = typeof variables === 'object' ? variables.id : variables;
       queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
       queryClient.invalidateQueries({
-        queryKey: queryKeys.bookings.detail(variables.id),
+        queryKey: queryKeys.bookings.detail(id),
       });
+    },
+  });
+};
+
+export const useMarkInboxRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: id => inboxService.markAsRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
     },
   });
 };
@@ -116,9 +132,8 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({email, password}) => familyService.login(email, password),
+    mutationFn: ({email, password}) => authService.login(email, password),
     onSuccess: () => {
-      // Invalidate auth queries
       queryClient.invalidateQueries({queryKey: queryKeys.auth.all});
     },
   });
@@ -128,9 +143,9 @@ export const useRegister = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({name, email, password}) => familyService.register(name, email, password),
+    mutationFn: ({name, email, password}) =>
+      authService.register(name, email, password),
     onSuccess: () => {
-      // Invalidate auth queries
       queryClient.invalidateQueries({queryKey: queryKeys.auth.all});
     },
   });
@@ -161,6 +176,7 @@ export default {
   useCreateBooking,
   useUpdateBooking,
   useCancelBooking,
+  useMarkInboxRead,
 
   // Auth
   useLogin,

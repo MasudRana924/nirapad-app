@@ -14,7 +14,7 @@ import BookingSkeleton from '../components/home/BookingSkeleton';
 
 const BookingsScreen = ({navigation}) => {
   const {data: bookingsData, isLoading} = useBookings({page: 1, limit: 20});
-  const bookings = bookingsData?.data || [];
+  const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -36,6 +36,8 @@ const BookingsScreen = ({navigation}) => {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'PROVIDER_ASSIGNED':
+        return '#008178';
       case 'PENDING_PAYMENT':
         return '#F59E0B';
       case 'CONFIRMED':

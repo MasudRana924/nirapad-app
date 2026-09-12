@@ -1,5 +1,4 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -37,6 +36,10 @@ import InboxScreen from '../screens/InboxScreen';
 import AreaSelectScreen from '../screens/AreaSelectScreen';
 import SelectServiceScreen from '../screens/SelectServiceScreen';
 import BookingPreviewScreen from '../screens/BookingPreviewScreen';
+import PaymentScreen from '../screens/PaymentScreen';
+import BkashCheckout from '../screens/BkashCheckout';
+import ReviewScreen from '../screens/ReviewScreen';
+import PaymentHistory from '../screens/PaymentHistory';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -153,52 +156,54 @@ function AppNavigator() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}>
-        {userToken ? (
-          // Authenticated — show main app
-          <>
-            <Stack.Screen
-              name="Main"
-              component={MainTabs}
-              options={{gestureEnabled: false}}
-            />
-            <Stack.Screen name="SelectCaregiver" component={SelectCaregiverScreen} />
-            <Stack.Screen name="CaregiverDetails" component={CaregiverDetailsScreen} />
-            <Stack.Screen name="NewBooking" component={NewBookingScreen} />
-            <Stack.Screen name="SelectNurse" component={SelectNurseScreen} />
-            <Stack.Screen name="NurseDetails" component={CaregiverDetailsScreen} />
-            <Stack.Screen name="Medicine" component={MedicineScreen} />
-            <Stack.Screen name="Cart" component={CartScreen} />
-            <Stack.Screen name="Checkout" component={CheckoutScreen} />
-            <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
-            <Stack.Screen name="SelectFamilyMember" component={SelectFamilyMember} />
-            <Stack.Screen name="SelectService" component={SelectServiceScreen} />
-            <Stack.Screen name="AreaSelect" component={AreaSelectScreen} />
-            <Stack.Screen name="AddFamilyMember" component={AddFamilyMember} />
-            <Stack.Screen name="FamilyMemberDetails" component={FamilyMemberDetails} />
-            <Stack.Screen name="EditProfile" component={EditProfile} />
-            <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
-            <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
-            <Stack.Screen name="BookingPreview" component={BookingPreviewScreen} />
-            <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
-            <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
-          </>
-        ) : (
-          // Not authenticated — show auth screens
-          <>
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={CreateAccountScreen} />
-            <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+      }}>
+      {userToken ? (
+        // Authenticated — show main app
+        <>
+          <Stack.Screen
+            name="Main"
+            component={MainTabs}
+            options={{gestureEnabled: false}}
+          />
+          <Stack.Screen name="SelectCaregiver" component={SelectCaregiverScreen} />
+          <Stack.Screen name="CaregiverDetails" component={CaregiverDetailsScreen} />
+          <Stack.Screen name="NewBooking" component={NewBookingScreen} />
+          <Stack.Screen name="SelectNurse" component={SelectNurseScreen} />
+          <Stack.Screen name="NurseDetails" component={CaregiverDetailsScreen} />
+          <Stack.Screen name="Medicine" component={MedicineScreen} />
+          <Stack.Screen name="Cart" component={CartScreen} />
+          <Stack.Screen name="Checkout" component={CheckoutScreen} />
+          <Stack.Screen name="BookingConfirmed" component={BookingConfirmedScreen} />
+          <Stack.Screen name="SelectFamilyMember" component={SelectFamilyMember} />
+          <Stack.Screen name="SelectService" component={SelectServiceScreen} />
+          <Stack.Screen name="AreaSelect" component={AreaSelectScreen} />
+          <Stack.Screen name="AddFamilyMember" component={AddFamilyMember} />
+          <Stack.Screen name="FamilyMemberDetails" component={FamilyMemberDetails} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
+          <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
+          <Stack.Screen name="BookingPreview" component={BookingPreviewScreen} />
+          <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
+          <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
+          <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+          <Stack.Screen name="BkashCheckout" component={BkashCheckout} />
+          <Stack.Screen name="ReviewScreen" component={ReviewScreen} />
+          <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
+        </>
+      ) : (
+        // Not authenticated — show auth screens
+        <>
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={CreateAccountScreen} />
+          <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
+        </>
+      )}
+    </Stack.Navigator>
   );
 }
 
