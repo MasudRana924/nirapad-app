@@ -36,18 +36,6 @@ const FamilyMemberDetails = ({navigation, route}) => {
     });
   };
 
-  const calculateAge = (dateOfBirth) => {
-    if (!dateOfBirth) return 'N/A';
-    const birthDate = new Date(dateOfBirth);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age.toString();
-  };
-
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
@@ -99,91 +87,19 @@ const FamilyMemberDetails = ({navigation, route}) => {
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{member.name}</Text>
             <Text style={styles.profileRelation}>{member.relationship}</Text>
-            {member.blood_group && (
-              <View style={styles.bloodBadge}>
-                <Text style={styles.bloodText}>{member.blood_group}</Text>
-              </View>
-            )}
           </View>
         </View>
 
-        {/* Personal Information */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Personal Information</Text>
           <DetailRow
             label="Gender"
-            value={member.gender ? member.gender.charAt(0).toUpperCase() + member.gender.slice(1) : '—'}
-            icon="person-outline"
-          />
-          <DetailRow
-            label="Date of Birth"
-            value={member.date_of_birth ? member.date_of_birth.split('T')[0] : '—'}
-            icon="calendar-outline"
-          />
-          <DetailRow
-            label="Age"
-            value={calculateAge(member.date_of_birth)}
-            icon="hourglass-outline"
-          />
-          <DetailRow
-            label="Phone"
-            value={member.phone || '—'}
-            icon="call-outline"
-          />
-          <DetailRow
-            label="District"
-            value={member.district || '—'}
-            icon="location-outline"
-          />
-          <DetailRow
-            label="Thana"
-            value={member.thana || '—'}
-            icon="navigate-outline"
-          />
-          <DetailRow
-            label="House"
-            value={member.house || '—'}
-            icon="home-outline"
-          />
-        </View>
-
-        {/* Emergency Contact */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Emergency Contact</Text>
-          <DetailRow
-            label="Contact Name"
-            value={member.emergency_contact_name || '—'}
-            icon="person-circle-outline"
-          />
-          <DetailRow
-            label="Contact Phone"
-            value={member.emergency_contact_phone || '—'}
-            icon="call-outline"
-          />
-        </View>
-
-        {/* Medical Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medical Information</Text>
-          <DetailRow
-            label="Medical History"
-            value={member.medical_history || 'None'}
-            icon="medkit-outline"
-          />
-          <DetailRow
-            label="Existing Conditions"
-            value={member.existing_conditions || 'None'}
-            icon="pulse-outline"
-          />
-          <DetailRow
-            label="Allergies"
-            value={member.allergies || 'None'}
-            icon="alert-circle-outline"
-          />
-          <DetailRow
-            label="Current Medications"
-            value={member.current_medications || 'None'}
-            icon="medication-outline"
+            value={
+              member.gender
+                ? member.gender.charAt(0).toUpperCase() + member.gender.slice(1)
+                : '—'
+            }
+            icon="male-female-outline"
           />
         </View>
       </ScrollView>
@@ -252,21 +168,6 @@ const styles = StyleSheet.create({
   profileRelation: {
     fontSize: 15,
     color: '#8190A7',
-    marginBottom: 8,
-  },
-  bloodBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#EAF3FF',
-    borderWidth: 1,
-    borderColor: '#D8E7FA',
-  },
-  bloodText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#43658B',
   },
   section: {
     paddingHorizontal: 20,

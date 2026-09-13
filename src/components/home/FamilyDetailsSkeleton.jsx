@@ -21,25 +21,9 @@ const FamilyDetailsSkeleton = () => {
         <View style={styles.profileInfo}>
           <Skeleton style={styles.profileName} />
           <Skeleton style={styles.profileRelation} />
-          <Skeleton style={styles.bloodBadge} />
         </View>
       </View>
 
-      {/* Personal Information Section */}
-      <View style={styles.section}>
-        <Skeleton style={styles.sectionTitle} />
-        {[1, 2, 3, 4, 5].map(i => (
-          <View key={i} style={styles.detailRow}>
-            <View style={styles.detailRowLeft}>
-              <Skeleton style={styles.detailIcon} />
-              <Skeleton style={styles.detailLabel} />
-            </View>
-            <Skeleton style={styles.detailValue} />
-          </View>
-        ))}
-      </View>
-
-      {/* Emergency Contact Section */}
       <View style={styles.section}>
         <Skeleton style={styles.sectionTitle} />
         <View style={styles.detailRow}>
@@ -49,20 +33,6 @@ const FamilyDetailsSkeleton = () => {
           </View>
           <Skeleton style={styles.detailValue} />
         </View>
-      </View>
-
-      {/* Medical Information Section */}
-      <View style={styles.section}>
-        <Skeleton style={styles.sectionTitle} />
-        {[1, 2, 3, 4].map(i => (
-          <View key={i} style={styles.detailRow}>
-            <View style={styles.detailRowLeft}>
-              <Skeleton style={styles.detailIcon} />
-              <Skeleton style={styles.detailLabel} />
-            </View>
-            <Skeleton style={styles.detailValue} />
-          </View>
-        ))}
       </View>
     </View>
   );
@@ -102,12 +72,6 @@ const styles = StyleSheet.create({
     width: '40%',
     height: 16,
     borderRadius: 4,
-    marginBottom: 10,
-  },
-  bloodBadge: {
-    width: 60,
-    height: 24,
-    borderRadius: 12,
   },
   section: {
     paddingHorizontal: 20,
