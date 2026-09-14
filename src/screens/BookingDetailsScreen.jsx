@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,13 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookingDetails} from '../api/queries';
 import {useCancelBooking} from '../api/mutations';
+import {paymentService} from '../api/services';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 import Loader from '../components/common/Loader';
@@ -29,7 +31,34 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const {bookingId} = route.params || {};
   const {data: bookingData, isLoading} = useBookingDetails(bookingId);
   const cancelBooking = useCancelBooking();
-  const booking = bookingData?.data;
+  const rawData = bookingData?.data;
+  const booking = rawData?.booking || rawData;
+  const [payLoading, setPayLoading] = useState(false);
+  console.log('BookingDetails payment_status:', booking?.payment_status, 'status:', booking?.status);
+
+  const handlePayNow = async () => {
+    if (!bookingId || payLoading) return;
+    setPayLoading(true);
+    try {
+      const response = await paymentService.createBkashPayment(bookingId);
+      const data = response?.data || response || {};
+      const createdPaymentID = data.paymentID || data.paymentId;
+      const amount = String(data.amount ?? '');
+      if (createdPaymentID) {
+        navigation.navigate('BkashCheckout', {
+          bookingId,
+          paymentID: createdPaymentID,
+          amount,
+        });
+      } else {
+        Alert.alert('Error', response?.message || 'Payment creation failed. Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'Payment failed. Please try again.');
+    } finally {
+      setPayLoading(false);
+    }
+  };
 
   const formatDate = dateString => {
     if (!dateString) return '--';
@@ -160,7 +189,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Loader visible={cancelBooking.isPending} />
+      <Loader visible={cancelBooking.isPending || payLoading} />
       <Header title="Booking details" onBack={() => navigation?.goBack()} />
 
       <ScrollView
@@ -350,9 +379,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
             <TouchableOpacity
               activeOpacity={0.85}
               style={[styles.actionButton, styles.payButton]}
-              onPress={() =>
-                navigation.navigate('BkashCheckout', {bookingId})
-              }>
+              onPress={handlePayNow}>
               <Text style={styles.payButtonText}>Pay now</Text>
             </TouchableOpacity>
           )}

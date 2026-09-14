@@ -5,12 +5,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Modal,
   Linking,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {WebView} from 'react-native-webview';
-import Header from '../components/common/Header';
 import {paymentService} from '../api/services';
 import {useQueryClient} from '@tanstack/react-query';
 import {queryKeys} from '../api/queryKeys';
@@ -18,30 +16,35 @@ import {queryKeys} from '../api/queryKeys';
 const getPaymentData = payload => payload?.data || payload || {};
 
 const BkashCheckout = ({route, navigation}) => {
-  const {bookingId} = route.params || {};
+  const {bookingId, paymentID: prePaymentID, amount: preAmount} =
+    route.params || {};
   const queryClient = useQueryClient();
-  const [currentButtonLoading, setCurrentButtonLoading] = useState(null);
-  const [paymentID, setPaymentID] = useState(null);
-  const [showWebView, setShowWebView] = useState(false);
-  const [webViewUrl, setWebViewUrl] = useState('');
+  const [isExecuting, setIsExecuting] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [webViewHtml, setWebViewHtml] = useState('');
   const webViewRef = useRef(null);
-  const startedRef = useRef(false);
-  const paymentIDRef = useRef(null);
+  const paymentIDRef = useRef(prePaymentID || null);
   const bookingIdRef = useRef(bookingId);
   const executingRef = useRef(false);
+  const startedRef = useRef(false);
 
   useEffect(() => {
     bookingIdRef.current = bookingId;
   }, [bookingId]);
 
   useEffect(() => {
-    if (!bookingId || startedRef.current) {
-      return;
-    }
+    if (startedRef.current) return;
     startedRef.current = true;
-    handlePayment();
-  }, [bookingId]);
+
+    if (prePaymentID) {
+      // Payment already created by BookingDetailsScreen — show WebView directly
+      paymentIDRef.current = prePaymentID;
+      setWebViewHtml(generateBkashHtml(preAmount || '', prePaymentID));
+    } else {
+      // Fallback: create payment here (direct navigation without pre-creation)
+      handlePayment();
+    }
+  }, []);
 
   const handlePayment = async () => {
     if (!bookingId) {
@@ -50,9 +53,6 @@ const BkashCheckout = ({route, navigation}) => {
     }
 
     try {
-      setCurrentButtonLoading(1);
-      setStatusMessage('');
-
       const createPaymentResponse = await paymentService.createBkashPayment(
         bookingId,
       );
@@ -61,8 +61,6 @@ const BkashCheckout = ({route, navigation}) => {
 
       if (createdPaymentID) {
         paymentIDRef.current = createdPaymentID;
-        setPaymentID(createdPaymentID);
-
         const amount = String(data.amount ?? '');
 
         const deeplink = `bkash://checkout?paymentID=${createdPaymentID}`;
@@ -71,8 +69,7 @@ const BkashCheckout = ({route, navigation}) => {
         if (supported) {
           await Linking.openURL(deeplink);
         } else {
-          setWebViewUrl(generateBkashHtml(amount, createdPaymentID));
-          setShowWebView(true);
+          setWebViewHtml(generateBkashHtml(amount, createdPaymentID));
         }
       } else {
         setStatusMessage(
@@ -83,8 +80,6 @@ const BkashCheckout = ({route, navigation}) => {
     } catch (error) {
       console.error('Payment error:', error);
       setStatusMessage(error?.message || 'Payment failed. Please try again.');
-    } finally {
-      setCurrentButtonLoading(null);
     }
   };
 
@@ -96,30 +91,10 @@ const BkashCheckout = ({route, navigation}) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://scripts.sandbox.bka.sh/versions/1.2.0-beta/checkout/bKash-checkout-sandbox.js"></script>
         <style>
-          body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: #f5f5f5;
-          }
-          .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3B82F6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
+          body { margin: 0; background: #FFFFFF; }
         </style>
       </head>
       <body>
-        <div id="loader" class="loader"></div>
         <button id="bKash_button" style="display:none;"></button>
         <script>
           function initBkash() {
@@ -140,19 +115,14 @@ const BkashCheckout = ({route, navigation}) => {
                 window.ReactNativeWebView.postMessage('CLOSED');
               }
             });
-            
-            // Trigger the payment UI
             setTimeout(function() {
               document.getElementById('bKash_button').click();
-              document.getElementById('loader').style.display = 'none';
             }, 1000);
           }
           
-          // Check if bKash is loaded
           if (typeof bKash !== 'undefined') {
             initBkash();
           } else {
-            // Poll for bKash script to load
             var checkCount = 0;
             var interval = setInterval(function() {
               if (typeof bKash !== 'undefined') {
@@ -166,7 +136,6 @@ const BkashCheckout = ({route, navigation}) => {
             }, 500);
           }
           
-          // Error handling for bKash
           window.addEventListener('error', function(e) {
             window.ReactNativeWebView.postMessage('ERROR: ' + e.message);
           });
@@ -182,15 +151,14 @@ const BkashCheckout = ({route, navigation}) => {
     if (message === 'SUCCESS') {
       executePayment();
     } else if (message === 'CLOSED') {
-      setShowWebView(false);
-      setStatusMessage('Payment was cancelled.');
+      navigation.replace('PaymentCancelled', {bookingId: bookingIdRef.current || bookingId});
     } else if (message === 'LOAD_FAILED') {
-      setShowWebView(false);
       setStatusMessage('Failed to load payment system. Please try again.');
+      setWebViewHtml('');
     } else if (typeof message === 'string' && message.startsWith('ERROR:')) {
       console.error('WebView Error:', message);
-      setShowWebView(false);
       setStatusMessage('An error occurred during payment.');
+      setWebViewHtml('');
     }
   };
 
@@ -199,7 +167,7 @@ const BkashCheckout = ({route, navigation}) => {
       return;
     }
 
-    const activePaymentID = paymentIDRef.current || paymentID;
+    const activePaymentID = paymentIDRef.current;
     const activeBookingId = bookingIdRef.current || bookingId;
     if (!activePaymentID || !activeBookingId) {
       setStatusMessage('Payment verification failed. Please contact support.');
@@ -209,7 +177,7 @@ const BkashCheckout = ({route, navigation}) => {
     executingRef.current = true;
 
     try {
-      setCurrentButtonLoading(-1);
+      setIsExecuting(true);
       const response = await paymentService.executeBkashPayment(
         activePaymentID,
         activeBookingId,
@@ -217,13 +185,13 @@ const BkashCheckout = ({route, navigation}) => {
       const data = getPaymentData(response);
 
       if (data?.paymentID || data?.paymentId || response?.success) {
-        setShowWebView(false);
         queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
         queryClient.invalidateQueries({
           queryKey: queryKeys.bookings.detail(activeBookingId),
         });
         navigation.replace('PaymentSuccess');
       } else {
+        setWebViewHtml('');
         setStatusMessage(
           response?.message ||
             'Payment verification failed. Please contact support.',
@@ -231,30 +199,63 @@ const BkashCheckout = ({route, navigation}) => {
       }
     } catch (error) {
       console.error('Execute payment error:', error);
-      setShowWebView(false);
+      setWebViewHtml('');
       setStatusMessage(
         error?.message ||
           'Payment verification failed. Please contact support.',
       );
     } finally {
       executingRef.current = false;
-      setCurrentButtonLoading(null);
+      setIsExecuting(false);
     }
   };
 
+  // Show WebView full-screen when HTML is ready
+  if (webViewHtml) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        {isExecuting && (
+          <View style={styles.executingOverlay}>
+            <ActivityIndicator size="large" color="#E2136E" />
+            <Text style={styles.executingText}>Verifying payment...</Text>
+          </View>
+        )}
+        <WebView
+          ref={webViewRef}
+          source={{html: webViewHtml}}
+          style={styles.webView}
+          onMessage={handleWebViewMessage}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          mixedContentMode="always"
+          originWhitelist={['*']}
+          allowsInlineMediaPlayback={true}
+          mediaPlaybackRequiresUserAction={false}
+          thirdPartyCookiesEnabled={true}
+          injectedJavaScript={`
+            window.addEventListener('error', function(e) {
+              window.ReactNativeWebView.postMessage('ERROR: ' + e.message);
+            });
+            true;
+          `}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  // Fallback: error / status message screen
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      {/* <Header title="bKash payment" onBack={() => navigation.goBack()} /> */}
       <View style={styles.container}>
-        {currentButtonLoading ? (
+        {!statusMessage && (
           <ActivityIndicator size="large" color="#E2136E" />
-        ) : null}
+        )}
 
         {statusMessage ? (
           <Text style={styles.statusMessage}>{statusMessage}</Text>
         ) : null}
 
-        {!currentButtonLoading && statusMessage ? (
+        {statusMessage ? (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
@@ -263,41 +264,6 @@ const BkashCheckout = ({route, navigation}) => {
             <Text style={styles.buttonText}>Go Back</Text>
           </TouchableOpacity>
         ) : null}
-
-        <Modal
-          visible={showWebView}
-          animationType="slide"
-          onRequestClose={() => setShowWebView(false)}
-          transparent={false}>
-          <SafeAreaView style={styles.safeArea}>
-
-            <WebView
-              ref={webViewRef}
-              source={{html: webViewUrl}}
-              style={styles.webView}
-              onMessage={handleWebViewMessage}
-              javaScriptEnabled={true}
-              domStorageEnabled={true}
-              startInLoadingState={true}
-              mixedContentMode="always"
-              originWhitelist={['*']}
-              allowsInlineMediaPlayback={true}
-              mediaPlaybackRequiresUserAction={false}
-              thirdPartyCookiesEnabled={true}
-              injectedJavaScript={`
-                window.addEventListener('error', function(e) {
-                  window.ReactNativeWebView.postMessage('ERROR: ' + e.message);
-                });
-                true;
-              `}
-              renderLoading={() => (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" color="#3B82F6" />
-                </View>
-              )}
-            />
-          </SafeAreaView>
-        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -336,11 +302,22 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
+  executingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+  },
+  executingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#5B6B7C',
+    fontWeight: '500',
   },
 });
 

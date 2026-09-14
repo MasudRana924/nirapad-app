@@ -9,12 +9,15 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PaymentSuccessScreen = ({navigation}) => {
-  const handleGoHome = () => {
-    navigation?.reset({
-      index: 0,
-      routes: [{name: 'Main'}],
-    });
+const PaymentCancelledScreen = ({navigation, route}) => {
+  const {bookingId} = route.params || {};
+
+  const handleGoBack = () => {
+    if (bookingId) {
+      navigation?.navigate('BookingDetails', {bookingId});
+    } else {
+      navigation?.goBack();
+    }
   };
 
   return (
@@ -25,24 +28,24 @@ const PaymentSuccessScreen = ({navigation}) => {
         <View style={styles.content}>
           <View style={styles.iconOuter}>
             <View style={styles.iconInner}>
-              <Icon name="checkmark" size={44} color="#FFFFFF" />
+              <Icon name="close" size={44} color="#FFFFFF" />
             </View>
           </View>
 
-          <Text style={styles.title}>Payment Successful!</Text>
+          <Text style={styles.title}>Payment Cancelled</Text>
           <Text style={styles.subtitle}>
-            Your payment has been processed successfully. Thank you for using
-            Nirapod.
+            Your payment was not completed. You can try again from the booking
+            details page.
           </Text>
         </View>
 
         <View style={styles.bottomSection}>
           <TouchableOpacity
             activeOpacity={0.85}
-            style={styles.goHomeButton}
-            onPress={handleGoHome}>
-            {/* <Icon name="home-outline" size={20} color="#FFFFFF" /> */}
-            <Text style={styles.goHomeText}>Go Home</Text>
+            style={styles.goBackButton}
+            onPress={handleGoBack}>
+            <Icon name="arrow-back-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.goBackText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -50,7 +53,7 @@ const PaymentSuccessScreen = ({navigation}) => {
   );
 };
 
-export default PaymentSuccessScreen;
+export default PaymentCancelledScreen;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -71,7 +74,7 @@ const styles = StyleSheet.create({
     width: 110,
     height: 110,
     borderRadius: 55,
-    backgroundColor: '#E6F4F3',
+    backgroundColor: '#FEECEC',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 28,
@@ -80,7 +83,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#008178',
+    backgroundColor: '#DC2626',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 22,
     color: '#8190A7',
     textAlign: 'center',
@@ -101,16 +104,16 @@ const styles = StyleSheet.create({
   bottomSection: {
     paddingBottom: 16,
   },
-  goHomeButton: {
+  goBackButton: {
     height: 54,
     borderRadius: 16,
-    backgroundColor: '#008178',
+    backgroundColor: '#DC2626',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
   },
-  goHomeText: {
+  goBackText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',

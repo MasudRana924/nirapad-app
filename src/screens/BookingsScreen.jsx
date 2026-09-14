@@ -40,28 +40,58 @@ const isPending = booking =>
   booking?.status !== 'COMPLETED' && booking?.status !== 'CANCELLED';
 
 const getStatusMeta = booking => {
-  if (booking?.status === 'COMPLETED') {
-    return {
-      label: 'Completed',
-      icon: 'checkmark-circle',
-      color: '#0F8A7A',
-      bg: '#E7F6F1',
-    };
+  switch (booking?.status) {
+    case 'COMPLETED':
+      return {
+        label: 'Completed',
+        icon: 'checkmark-circle',
+        color: '#0F8A7A',
+        bg: '#E7F6F1',
+      };
+    case 'CANCELLED':
+      return {
+        label: 'Cancelled',
+        icon: 'close-circle',
+        color: '#DC2626',
+        bg: '#FEECEC',
+      };
+    case 'PROVIDER_ACCEPTED':
+      return {
+        label: 'Accepted',
+        icon: 'checkmark-done',
+        color: '#008178',
+        bg: '#E6F4F3',
+      };
+    case 'CONFIRMED':
+      return {
+        label: 'Confirmed',
+        icon: 'shield-checkmark',
+        color: '#008178',
+        bg: '#E6F4F3',
+      };
+    case 'IN_PROGRESS':
+      return {
+        label: 'In Progress',
+        icon: 'play-circle',
+        color: '#2563EB',
+        bg: '#E8F1FB',
+      };
+    case 'PROVIDER_ASSIGNED':
+      return {
+        label: 'Assigned',
+        icon: 'person-circle',
+        color: '#7C3AED',
+        bg: '#EEE8FB',
+      };
+    case 'PENDING_PAYMENT':
+    default:
+      return {
+        label: 'Pending',
+        icon: 'time',
+        color: '#D97706',
+        bg: '#FEF3C7',
+      };
   }
-  if (booking?.status === 'CANCELLED') {
-    return {
-      label: 'Cancelled',
-      icon: 'close-circle',
-      color: '#DC2626',
-      bg: '#FEECEC',
-    };
-  }
-  return {
-    label: 'Pending',
-    icon: 'time',
-    color: '#D97706',
-    bg: '#FEF3C7',
-  };
 };
 
 const getServiceLabel = booking => {
