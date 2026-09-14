@@ -206,7 +206,9 @@ const BookingsScreen = ({navigation}) => {
                     </View>
 
                     <View style={styles.bookingInfo}>
-                      <Text style={styles.bookingIdLabel}>Booking ID</Text>
+                      <Text style={styles.serviceTitle} numberOfLines={1}>
+                        {serviceLabel}
+                      </Text>
                       <Text style={styles.bookingId} numberOfLines={1}>
                         {booking.booking_number}
                       </Text>
@@ -233,13 +235,7 @@ const BookingsScreen = ({navigation}) => {
                     </View>
                   </View>
 
-                  {/* <View
-                    style={[styles.serviceBar, {backgroundColor: theme.bar}]}>
-                    <Icon name="person-outline" size={14} color={theme.service} />
-                    <Text style={[styles.serviceText, {color: theme.service}]}>
-                      {serviceLabel}
-                    </Text>
-                  </View> */}
+
                 </TouchableOpacity>
               );
             })
@@ -391,15 +387,16 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
-  bookingIdLabel: {
-    fontSize: 11,
-    color: MUTED,
+  serviceTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: INK,
     marginBottom: 2,
   },
   bookingId: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: INK,
+    fontSize: 12,
+    fontWeight: '400',
+    color: MUTED,
   },
   dateInfo: {
     flexDirection: 'row',
@@ -425,19 +422,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 8,
     fontWeight: '700',
-  },
-  serviceBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  serviceText: {
-    fontSize: 13,
-    fontWeight: '600',
   },
 });
 

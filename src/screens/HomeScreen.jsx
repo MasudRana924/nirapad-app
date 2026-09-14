@@ -5,10 +5,11 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import HomeHeader from '../components/home/HomeHeader';
 import ActiveBookingCard from '../components/home/ActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
-// import QuickServices from '../components/home/QuickServices';
-// import TopCaregivers from '../components/home/TopCaregivers';
+import QuickServices from '../components/home/QuickServices';
+import TopCaregivers from '../components/home/TopCaregivers';
 // import AvailableNurses from '../components/home/AvailableNurses';
 import HomeSkeleton from '../components/home/HomeSkeleton';
+
 
 const HomeScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -37,8 +38,8 @@ const HomeScreen = ({navigation}) => {
         <HomeHeader navigation={navigation} />
         <ActiveBookingCard navigation={navigation} />
         <BookingButtons navigation={navigation} />
-        {/* <QuickServices navigation={navigation} /> */}
-        {/* <TopCaregivers navigation={navigation} /> */}
+        <QuickServices navigation={navigation} />
+        <TopCaregivers navigation={navigation} />
         {/* <AvailableNurses navigation={navigation} /> */}
       </ScrollView>
     </SafeAreaView>
