@@ -7,15 +7,62 @@ import {
   TextInput,
   ScrollView,
   Image,
+  StatusBar,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchCaregivers} from '../api/queries';
-import Header from '../components/common/Header';
 import CaregiverSkeleton from '../components/home/CaregiverSkeleton';
 import {storage} from '../utils/storage';
 
+const TEAL = '#008178';
+const INK = '#163532';
+const MUTED = '#7B9390';
+
+const SKILL_ICONS = {
+  'personal care': 'people-outline',
+  medication: 'medkit-outline',
+  'elderly support': 'heart-outline',
+  'hospital visit': 'business-outline',
+  companion: 'heart-outline',
+};
+
+const getCaregiverSkills = caregiver => {
+  const raw =
+    caregiver?.skills ||
+    caregiver?.specialties ||
+    caregiver?.tags ||
+    caregiver?.services ||
+    [];
+  if (Array.isArray(raw)) {
+    return raw
+      .map(item => (typeof item === 'string' ? item : item?.name || item?.title))
+      .filter(Boolean)
+      .slice(0, 3);
+  }
+  if (typeof raw === 'string') {
+    return raw
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+  }
+  return [];
+};
+
+const formatRate = rate => {
+  const numeric = Number(rate);
+  if (Number.isNaN(numeric)) {
+    return String(rate);
+  }
+  return numeric.toLocaleString('en-BD', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 const SelectCaregiverScreen = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
   const [selectedCaregiver, setSelectedCaregiver] = useState(null);
@@ -73,328 +120,410 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Select Caregiver" onBack={() => navigation?.goBack()} />
+    <View style={styles.page}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.backButton}
+            onPress={() => navigation?.goBack()}>
+            <Icon name="arrow-back" size={22} color={INK} />
+          </TouchableOpacity>
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>Select Caregiver</Text>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.scrollContent}>
-        {/* ================= SEARCH ================= */}
-        <View style={styles.searchRow}>
+          </View>
+          <View style={styles.headerSpacer} />
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}>
           <View style={styles.searchBox}>
-            <Icon name="search" size={20} color="#8190A7" />
+            <Icon name="search-outline" size={18} color={MUTED} />
             <TextInput
               value={search}
               onChangeText={handleSearch}
-              placeholder="Search by name..."
-              placeholderTextColor="#8190A7"
+              placeholder="Search by name"
+              placeholderTextColor={MUTED}
               style={styles.searchInput}
             />
           </View>
-        </View>
 
-        {(!!selectedDistrict || !!selectedThana) && (
-          <View style={styles.areaBanner}>
-            <Icon name="location-outline" size={16} color="#008178" />
-            <Text style={styles.areaBannerText} numberOfLines={1}>
-              {[selectedThana, selectedDistrict].filter(Boolean).join(', ')}
-            </Text>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => navigation?.goBack()}
-              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-              <Text style={styles.changeAreaText}>Change</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* ================= FILTER CHIPS ================= */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterScroll}>
-          {filters.map(filter => {
-            const selected = selectedFilter === filter.id;
-            return (
+          {(!!selectedDistrict || !!selectedThana) && (
+            <View style={styles.areaBanner}>
+              <Icon name="location" size={16} color={TEAL} />
+              <Text style={styles.areaBannerText} numberOfLines={1}>
+                {[selectedThana, selectedDistrict].filter(Boolean).join(', ')}
+              </Text>
               <TouchableOpacity
-                key={filter.id}
-                activeOpacity={0.8}
-                onPress={() => handleFilterSelect(filter.id)}
-                style={[styles.filterChip, selected && styles.filterChipActive]}>
-                <Text
-                  style={[styles.filterText, selected && styles.filterTextActive]}>
-                  {filter.label}
-                </Text>
+                activeOpacity={0.7}
+                onPress={() => navigation?.goBack()}
+                hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
+                style={styles.changeRow}>
+                <Text style={styles.changeAreaText}>Change</Text>
+                <Icon name="chevron-forward" size={14} color={TEAL} />
               </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
-        {/* ================= RESULT HEADER ================= */}
-        <View style={styles.resultHeader}>
-          <Text style={styles.resultCount}>
-            {caregivers.length} caregivers available
-          </Text>
-          <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
-            <Icon name="swap-vertical" size={18} color="#008178" />
-            <Text style={styles.sortText}>Sort</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* ================= CAREGIVER LIST ================= */}
-        {isLoading ? (
-          <CaregiverSkeleton />
-        ) : caregivers.length === 0 ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}>
-              <Icon name="people-outline" size={32} color="#008178" />
             </View>
-            <Text style={styles.emptyTitle}>No caregiver found</Text>
-            <Text style={styles.emptyText}>
-              No caregivers are available in{' '}
-              {[selectedThana, selectedDistrict].filter(Boolean).join(', ') ||
-                'this area'}
-              . Try another district or thana.
-            </Text>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={styles.changeAreaButton}
-              onPress={() => navigation?.goBack()}>
-              <Text style={styles.changeAreaButtonText}>Change area</Text>
+          )}
+
+          <View style={styles.filterRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterScroll}>
+              {filters.map(filter => {
+                const selected = selectedFilter === filter.id;
+                return (
+                  <TouchableOpacity
+                    key={filter.id}
+                    activeOpacity={0.8}
+                    onPress={() => handleFilterSelect(filter.id)}
+                    style={[
+                      styles.filterChip,
+                      selected && styles.filterChipActive,
+                    ]}>
+                    <Text
+                      style={[
+                        styles.filterText,
+                        selected && styles.filterTextActive,
+                      ]}>
+                      {filter.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+            <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
+              <Icon name="swap-vertical" size={16} color={TEAL} />
+              <Text style={styles.sortText}>Sort</Text>
+              <Icon name="chevron-down" size={14} color={TEAL} />
             </TouchableOpacity>
           </View>
-        ) : (
-          <View style={styles.caregiverList}>
-            {caregivers.map(caregiver => {
-              const isSelected = selectedCaregiver?.id === caregiver.id;
-              const rate = caregiver.hourly_rate ?? caregiver.price;
 
-              return (
-                <TouchableOpacity
-                  key={caregiver.id}
-                  activeOpacity={0.85}
-                  style={[
-                    styles.caregiverCard,
-                    isSelected && styles.selectedCard,
-                  ]}
-                  onPress={() => setSelectedCaregiver(caregiver)}>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.avatarContainer}>
-                      {caregiver.profile_photo ? (
-                        <Image
-                          source={{uri: caregiver.profile_photo}}
-                          style={styles.avatar}
-                        />
-                      ) : (
-                        <View style={styles.placeholderAvatar}>
-                          <Icon name="person" size={24} color="#8190A7" />
-                        </View>
-                      )}
-                      {caregiver.is_available && (
-                        <View style={styles.onlineDot} />
-                      )}
-                    </View>
+          <Text style={styles.resultCount}>
+            {caregivers.length} caregiver
+            {caregivers.length === 1 ? '' : 's'} available
+          </Text>
 
-                    <View style={styles.userInfo}>
-                      <View style={styles.nameRow}>
-                        <Text style={styles.name} numberOfLines={1}>
-                          {caregiver.name || 'Caregiver'}
-                        </Text>
-                        {caregiver.is_available && (
-                          <View style={styles.availableBadge}>
-                            <Text style={styles.availableBadgeText}>
-                              Available
-                            </Text>
+          {isLoading ? (
+            <CaregiverSkeleton />
+          ) : caregivers.length === 0 ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIcon}>
+                <Icon name="people-outline" size={32} color={TEAL} />
+              </View>
+              <Text style={styles.emptyTitle}>No caregiver found</Text>
+              <Text style={styles.emptyText}>
+                No caregivers are available in{' '}
+                {[selectedThana, selectedDistrict].filter(Boolean).join(', ') ||
+                  'this area'}
+                . Try another district or thana.
+              </Text>
+              <TouchableOpacity
+                activeOpacity={0.85}
+                style={styles.changeAreaButton}
+                onPress={() => navigation?.goBack()}>
+                <Text style={styles.changeAreaButtonText}>Change area</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.caregiverList}>
+              {caregivers.map(caregiver => {
+                const isSelected = selectedCaregiver?.id === caregiver.id;
+                const rate = caregiver.hourly_rate ?? caregiver.price;
+                const skills = getCaregiverSkills(caregiver);
+                const fallbackSkill = selectedService?.title;
+
+                return (
+                  <TouchableOpacity
+                    key={caregiver.id}
+                    activeOpacity={0.85}
+                    style={[
+                      styles.caregiverCard,
+                      isSelected && styles.selectedCard,
+                    ]}
+                    onPress={() => setSelectedCaregiver(caregiver)}>
+                    <View style={styles.cardHeader}>
+                      <View style={styles.avatarContainer}>
+                        {caregiver.profile_photo ? (
+                          <Image
+                            source={{uri: caregiver.profile_photo}}
+                            style={styles.avatar}
+                          />
+                        ) : (
+                          <View style={styles.placeholderAvatar}>
+                            <Icon name="person" size={28} color={MUTED} />
                           </View>
                         )}
+                        {caregiver.is_available ? (
+                          <View style={styles.onlineDot} />
+                        ) : null}
                       </View>
 
-                      <View style={styles.infoRow}>
-                        <Icon name="star" size={14} color="#F59E0B" />
-                        <Text style={styles.infoText}>
-                          {caregiver.rating ?? '—'}
-                          {caregiver.completed_bookings != null
-                            ? ` (${caregiver.completed_bookings})`
-                            : ''}
-                          {' · '}
-                          {caregiver.experience_years ?? 0} yrs exp
-                        </Text>
-                      </View>
+                      <View style={styles.userInfo}>
+                        <View style={styles.nameRow}>
+                          <Text style={styles.name} numberOfLines={1}>
+                            {caregiver.name || 'Caregiver'}
+                          </Text>
+                          {caregiver.is_available ? (
+                            <View style={styles.availableBadge}>
+                              <View style={styles.availableDot} />
+                              <Text style={styles.availableBadgeText}>
+                                Available
+                              </Text>
+                            </View>
+                          ) : null}
+                        </View>
 
-                      <View style={styles.infoRow}>
-                        <Icon name="location-outline" size={14} color="#303944" />
-                        <Text style={styles.infoText} numberOfLines={1}>
-                          {[caregiver.thana, caregiver.district]
-                            .filter(Boolean)
-                            .join(', ') ||
-                            caregiver.service_areas?.join(', ') ||
-                            'No location'}
-                        </Text>
+                        <View style={styles.infoRow}>
+                          <Icon name="star" size={14} color="#F6A900" />
+                          <Text style={styles.infoText}>
+                            {caregiver.rating ?? '0.00'}
+                            {caregiver.completed_bookings != null
+                              ? ` (${caregiver.completed_bookings})`
+                              : ' (0)'}
+                            {'  ·  '}
+                            {caregiver.experience_years ?? 0} yrs exp
+                          </Text>
+                        </View>
+
+                        <View style={styles.infoRow}>
+                          <Icon name="location-outline" size={14} color={MUTED} />
+                          <Text style={styles.infoText} numberOfLines={1}>
+                            {[caregiver.thana, caregiver.district]
+                              .filter(Boolean)
+                              .join(', ') ||
+                              caregiver.service_areas?.join(', ') ||
+                              'No location'}
+                          </Text>
+                        </View>
                       </View>
                     </View>
 
-                    {isSelected && (
-                      <View style={styles.selectedBadge}>
-                        <Icon
-                          name="checkmark-circle"
-                          size={24}
-                          color="#008178"
-                        />
+                    {(skills.length > 0 || fallbackSkill) && (
+                      <View style={styles.tagsRow}>
+                        {(skills.length > 0 ? skills : [fallbackSkill]).map(
+                          tag => (
+                            <View key={tag} style={styles.tag}>
+                              <Icon
+                                name={
+                                  SKILL_ICONS[String(tag).toLowerCase()] ||
+                                  'checkmark-circle-outline'
+                                }
+                                size={13}
+                                color={TEAL}
+                              />
+                              <Text style={styles.tagText}>{tag}</Text>
+                            </View>
+                          ),
+                        )}
                       </View>
                     )}
-                  </View>
 
-                  {!!caregiver.bio && (
-                    <Text style={styles.bioText} numberOfLines={2}>
-                      {caregiver.bio}
-                    </Text>
-                  )}
+                    <View style={styles.cardFooter}>
+                      {rate != null && rate !== '' ? (
+                        <View style={styles.priceBlock}>
+                          <View style={styles.rateIcon}>
+                            <Icon name="cash-outline" size={16} color={TEAL} />
+                          </View>
+                          <View>
+                            <Text style={styles.rateLabel}>Rate</Text>
+                            <Text style={styles.price}>
+                              ৳{formatRate(rate)}
+                              <Text style={styles.perHour}> / hr</Text>
+                            </Text>
+                          </View>
+                        </View>
+                      ) : (
+                        <View style={styles.priceBlock} />
+                      )}
 
-                  <View style={styles.cardFooter}>
-                    {rate != null && rate !== '' ? (
-                      <View style={styles.priceBlock}>
-                        <Text style={styles.price}>
-                          ৳{rate}
-                          <Text style={styles.perHour}> / hr</Text>
-                        </Text>
-                      </View>
-                    ) : (
-                      <View style={styles.priceBlock} />
-                    )}
-
-                    <View
-                      style={[
-                        styles.selectPill,
-                        isSelected && styles.selectPillActive,
-                      ]}>
-                      <Text
+                      <View
                         style={[
-                          styles.selectPillText,
-                          isSelected && styles.selectPillTextActive,
+                          styles.selectPill,
+                          isSelected && styles.selectPillActive,
                         ]}>
-                        {isSelected ? 'Selected' : 'Select'}
-                      </Text>
+                        <Text
+                          style={[
+                            styles.selectPillText,
+                            isSelected && styles.selectPillTextActive,
+                          ]}>
+                          {isSelected ? 'Selected' : 'Select'}
+                        </Text>
+                        {!isSelected ? (
+                          <Icon name="arrow-forward" size={14} color="#FFFFFF" />
+                        ) : null}
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </ScrollView>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </ScrollView>
 
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
+        <View
           style={[
-            styles.nextButton,
-            !selectedCaregiver && styles.disabledButton,
-          ]}
-          onPress={handleNext}
-          disabled={!selectedCaregiver}>
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+            styles.bottomContainer,
+            {paddingBottom: Math.max(16, insets.bottom + 8)},
+          ]}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.nextButton,
+              !selectedCaregiver && styles.disabledButton,
+            ]}
+            onPress={handleNext}
+            disabled={!selectedCaregiver}>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 };
 
 export default SelectCaregiverScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
+  page: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
+  flex: {
+    flex: 1,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    minHeight: 56,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: INK,
+  },
+  headerSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    color: MUTED,
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 36,
+  },
   scrollContent: {
-    paddingTop: 14,
+    paddingTop: 12,
     paddingHorizontal: 16,
     paddingBottom: 24,
   },
-
-  searchRow: {
-    width: '100%',
-    height: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
   searchBox: {
-    flex: 1,
     height: 48,
-    borderRadius: 14,
-    backgroundColor: '#F6F6F6',
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderRadius: 12,
+    backgroundColor: '#F4F7F6',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 13,
+    paddingHorizontal: 16,
+    gap: 8,
   },
-
   searchInput: {
     flex: 1,
     height: '100%',
-    paddingHorizontal: 8,
     paddingVertical: 0,
-    color: '#172333',
-    fontSize: 15,
-  },
-
-  filterButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
-  },
-
-  locationFilter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    paddingHorizontal: 14,
-    height: 44,
-    backgroundColor: '#F6F6F6',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-  },
-
-  locationInput: {
-    flex: 1,
-    marginLeft: 10,
+    color: INK,
     fontSize: 14,
-    color: '#172333',
   },
-
   areaBanner: {
     marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E6F4F3',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    backgroundColor: '#E8F6F2',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     gap: 8,
   },
-
   areaBannerText: {
     flex: 1,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#008178',
-  },
-
-  changeAreaText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#008178',
+    color: INK,
   },
-
+  changeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  changeAreaText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: TEAL,
+  },
+  filterRow: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterScroll: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingRight: 8,
+  },
+  filterChip: {
+    height: 34,
+    borderRadius: 17,
+    paddingHorizontal: 16,
+    backgroundColor: '#F4F7F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  filterChipActive: {
+    backgroundColor: TEAL,
+  },
+  filterText: {
+    fontSize: 13,
+    color: MUTED,
+    fontWeight: '600',
+  },
+  filterTextActive: {
+    color: '#FFFFFF',
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingLeft: 8,
+  },
+  sortText: {
+    color: TEAL,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  resultCount: {
+    marginTop: 14,
+    marginBottom: 12,
+    fontSize: 13,
+    color: MUTED,
+  },
   emptyIcon: {
     width: 64,
     height: 64,
@@ -403,315 +532,232 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   changeAreaButton: {
     marginTop: 18,
     height: 44,
     paddingHorizontal: 18,
     borderRadius: 12,
-    backgroundColor: '#008178',
+    backgroundColor: TEAL,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   changeAreaButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
   },
-
-  filterScroll: {
-    paddingTop: 14,
-    paddingBottom: 4,
-    paddingRight: 10,
-  },
-
-  filterChip: {
-    height: 36,
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-  },
-
-  filterChipActive: {
-    backgroundColor: '#008178',
-    borderColor: '#008178',
-  },
-
-  filterText: {
-    fontSize: 13,
-    color: '#8190A7',
-    fontWeight: '500',
-  },
-
-  filterTextActive: {
-    color: '#FFFFFF',
-  },
-
-  resultHeader: {
-    height: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  resultCount: {
-    fontSize: 13,
-    color: '#8190A7',
-    fontWeight: '400',
-  },
-
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  sortText: {
-    color: '#008178',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 3,
-  },
-
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-  },
-
-  loadingText: {
-    fontSize: 16,
-    color: '#8190A7',
-  },
-
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 64,
     paddingHorizontal: 24,
   },
-
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111820',
+    color: INK,
     marginTop: 16,
   },
-
   emptyText: {
     fontSize: 14,
-    color: '#8190A7',
+    color: MUTED,
     marginTop: 8,
     textAlign: 'center',
     lineHeight: 20,
   },
-
   caregiverList: {
     flexDirection: 'column',
   },
-
   caregiverCard: {
     width: '100%',
-    backgroundColor: '#F6F6F6',
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 14,
-    borderWidth: 1,
-    borderColor: '#F6F6F6',
-    marginBottom: 12,
-  },
-
-  selectedCard: {
-    borderWidth: 2,
-    borderColor: '#008178',
     backgroundColor: '#FFFFFF',
-  },
+    borderRadius: 22,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E8EEEC',
+    marginBottom: 12,
 
+  },
+  selectedCard: {
+    borderColor: TEAL,
+  },
   cardHeader: {
-    width: '100%',
-    minHeight: 58,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-
   avatarContainer: {
-    width: 58,
-    height: 58,
+    width: 78,
+    height: 78,
     position: 'relative',
-    marginRight: 13,
+    marginRight: 12,
   },
-
   avatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 78,
+    height: 78,
+    borderRadius: 18,
     backgroundColor: '#E5E5E5',
   },
-
   placeholderAvatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#E3E8F0',
+    width: 78,
+    height: 78,
+    borderRadius: 18,
+    backgroundColor: '#E8EEEC',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   onlineDot: {
     position: 'absolute',
-    right: 0,
-    bottom: 0,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#13C875',
+    right: 4,
+    bottom: 4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#22C55E',
     borderWidth: 2,
     borderColor: '#FFFFFF',
   },
-
   userInfo: {
     flex: 1,
-    paddingTop: 1,
     minWidth: 0,
+    paddingTop: 2,
   },
-
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 3,
+    marginBottom: 4,
+    gap: 8,
   },
-
   name: {
     flex: 1,
     fontSize: 16,
     lineHeight: 22,
-    fontWeight: '700',
-    color: '#111820',
-    marginRight: 8,
+    fontWeight: '800',
+    color: INK,
   },
-
   availableBadge: {
-    height: 22,
-    paddingHorizontal: 8,
-    borderRadius: 11,
-    backgroundColor: '#E6F4F3',
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
-
+  availableDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#22C55E',
+  },
   availableBadgeText: {
-    fontSize: 11,
-    lineHeight: 14,
-    color: '#008178',
-    fontWeight: '600',
+    fontSize: 12,
+    color: TEAL,
+    fontWeight: '700',
   },
-
   infoRow: {
     minHeight: 20,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 2,
   },
-
   infoText: {
     marginLeft: 5,
     flex: 1,
     fontSize: 12,
     lineHeight: 17,
-    fontWeight: '400',
-    color: '#303944',
+    color: MUTED,
   },
-
-  selectedBadge: {
-    marginLeft: 8,
-    marginTop: 2,
-  },
-
-  bioText: {
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
     marginTop: 10,
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#8190A7',
   },
-
+  tag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  tagText: {
+    fontSize: 12,
+    color: TEAL,
+    fontWeight: '600',
+  },
   cardFooter: {
     marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F4F3',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-
   priceBlock: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-
-  price: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111820',
-  },
-
-  perHour: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#8190A7',
-  },
-
-  selectPill: {
-    minWidth: 88,
-    height: 40,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: '#E6F4F3',
+  rateIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#E8F6F2',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  selectPillActive: {
-    backgroundColor: '#008178',
+  rateLabel: {
+    fontSize: 11,
+    color: MUTED,
+    marginBottom: 1,
   },
-
+  price: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: INK,
+  },
+  perHour: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: MUTED,
+  },
+  selectPill: {
+    minWidth: 96,
+    height: 40,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: TEAL,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 6,
+  },
+  selectPillActive: {
+    backgroundColor: TEAL,
+  },
   selectPillText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#008178',
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
-
   selectPillTextActive: {
     color: '#FFFFFF',
   },
-
   bottomContainer: {
     width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 16,
   },
-
   nextButton: {
-    backgroundColor: '#008178',
-    borderRadius: 12,
-    flexDirection: 'row',
+    backgroundColor: TEAL,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    height: 52,
   },
-
   disabledButton: {
-    backgroundColor: '#B5C0D0',
+    backgroundColor: '#C5CDD6',
   },
-
   nextButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
