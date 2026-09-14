@@ -1,36 +1,35 @@
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  ScrollView,
-  Image,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
+import AuthLayout, {
+  AuthField,
+  AuthPrimaryButton,
+  AuthOutlineButton,
+  AuthOrDivider,
+  AuthFooterLink,
+} from '../components/auth/AuthLayout';
 import {loginUser, extractAuthPayload} from '../services/api';
 import {useAuth} from '../context/AuthContext';
 import notificationService from '../services/notificationService';
 
 const LoginScreen = ({navigation}) => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isPhoneLogin, setIsPhoneLogin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const {login} = useAuth();
 
   const handleLogin = async () => {
     setError('');
-    if (!email.trim()) {
-      setError('Please enter your email');
+    if (!identifier.trim()) {
+      setError(
+        isPhoneLogin
+          ? 'Please enter your phone number'
+          : 'Please enter your email',
+      );
       return;
     }
     if (!password.trim()) {
@@ -41,17 +40,15 @@ const LoginScreen = ({navigation}) => {
     setLoading(true);
     try {
       console.log('🔐 Starting login process...');
-      const response = await loginUser(email.trim(), password);
+      const response = await loginUser(identifier.trim(), password);
 
       const {token, refreshToken, user} = extractAuthPayload(response);
       if (response.success && token) {
         console.log('✅ Login API response received');
 
-        // Step 1: Store authentication tokens (data.token, data.refreshToken, data.user)
         await login(token, refreshToken, user);
         console.log('✅ Auth tokens stored locally');
 
-        // Step 2: Initialize notification service
         console.log('🔔 Initializing notification service...');
         const notificationInitialized = await notificationService.initialize(
           token,
@@ -60,19 +57,21 @@ const LoginScreen = ({navigation}) => {
         if (notificationInitialized) {
           console.log('✅ Notification service initialized');
         } else {
-          console.log('⚠️ Notification service initialization failed, but continuing...');
+          console.log(
+            '⚠️ Notification service initialization failed, but continuing...',
+          );
         }
 
-        // Step 3: Register FCM token with server
         console.log('📱 Registering FCM token with server...');
-        const tokenRegistered = await notificationService.registerTokenWithServer(
-          token,
-        );
+        const tokenRegistered =
+          await notificationService.registerTokenWithServer(token);
 
         if (tokenRegistered) {
           console.log('✅ FCM token registered successfully');
         } else {
-          console.log('⚠️ FCM token registration failed, but login successful');
+          console.log(
+            '⚠️ FCM token registration failed, but login successful',
+          );
         }
       } else {
         const message = response.message || 'Login failed';
@@ -82,64 +81,46 @@ const LoginScreen = ({navigation}) => {
               .toLowerCase()
               .includes('verify'),
           ) || message.toLowerCase().includes('verify');
-        if (needsVerify) {
-          navigation?.navigate('VerifyPhone', {email: email.trim()});
+        if (needsVerify && !isPhoneLogin) {
+          navigation?.navigate('VerifyPhone', {email: identifier.trim()});
         }
         setError(message);
       }
-    } catch (error) {
+    } catch (err) {
       setError('Something went wrong. Please try again.');
-      console.error('❌ Login error:', error);
+      console.error('❌ Login error:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+    <>
       <Loader visible={loading} />
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <AuthLayout
+        title="Welcome Back"
+        subtitle="Sign in to continue caring for your loved ones">
+        <AuthField
+          icon={isPhoneLogin ? 'call-outline' : 'mail-outline'}
+          value={identifier}
+          onChangeText={setIdentifier}
+          placeholder={
+            isPhoneLogin
+              ? 'Enter your phone number'
+              : 'Enter your email address'
+          }
+          keyboardType={isPhoneLogin ? 'phone-pad' : 'email-address'}
+          autoCapitalize="none"
+        />
 
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}>
-          <Image source={require('../assets/auth.png')} style={styles.authImage} />
-
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>
-            Sign in to manage care for your loved ones
-          </Text>
-
-          <Text style={styles.label}>Email</Text>
-          <View style={styles.inputContainer}>
-            <Icon name="mail-outline" size={20} color="#8190A7" />
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor="#8190A7"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.inputContainer}>
-            <Icon name="lock-closed-outline" size={20} color="#8190A7" />
-            <TextInput
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter your password"
-              placeholderTextColor="#8190A7"
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
+        <AuthField
+          icon="lock-closed-outline"
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter your password"
+          secureTextEntry={!showPassword}
+          autoCapitalize="none"
+          right={
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => setShowPassword(!showPassword)}
@@ -147,134 +128,60 @@ const LoginScreen = ({navigation}) => {
               <Icon
                 name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                 size={20}
-                color="#8190A7"
+                color="#7E9390"
               />
             </TouchableOpacity>
-          </View>
+          }
+        />
 
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.forgotButton}
-            onPress={() => navigation?.navigate('ForgotPassword')}>
-            <Text style={styles.forgotText}>Forgot password?</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.forgotButton}
+          onPress={() => navigation?.navigate('ForgotPassword')}>
+          <Text style={styles.forgotText}>Forgot password?</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.primaryButton}
-            disabled={loading}
-            onPress={handleLogin}>
-            <Text style={styles.primaryButtonText}>Login</Text>
-          </TouchableOpacity>
+        <AuthPrimaryButton
+          title="Login"
+          disabled={loading}
+          onPress={handleLogin}
+        />
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('Register')}>
-              <Text style={styles.footerLink}> Register</Text>
-            </TouchableOpacity>
-          </View>
-          {error && <Text style={styles.errorText}>{error}</Text>}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {/* <AuthOrDivider /> */}
+
+        {/* <AuthOutlineButton
+          icon="call-outline"
+          title={isPhoneLogin ? 'Login with Email' : 'Login with Phone Number'}
+          onPress={() => {
+            setIsPhoneLogin(prev => !prev);
+            setIdentifier('');
+            setError('');
+          }}
+        /> */}
+
+        <AuthFooterLink
+          prompt="Don't have an account? "
+          actionLabel="Register"
+          onPress={() => navigation?.navigate('Register')}
+        />
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      </AuthLayout>
+    </>
   );
 };
 
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  flex: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 32,
-  },
-  authImage: {
-    width: 40,
-    height: 40,
-    marginTop: 10,
-    marginBottom: 24,
-    alignSelf: 'center',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#111820',
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    marginTop: 8,
-    marginBottom: 28,
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#8190A7',
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111820',
-    marginBottom: 8,
-  },
-  inputContainer: {
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#F6F6F6',
-    borderWidth: 1,
-    borderColor: '#E3E8F0',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    marginBottom: 16,
-    gap: 10,
-  },
-  input: {
-    flex: 1,
-    height: '100%',
-    fontSize: 15,
-    color: '#111820',
-    paddingVertical: 0,
-  },
   forgotButton: {
     alignSelf: 'flex-end',
-    marginBottom: 24,
+    marginBottom: 18,
+    marginTop: -2,
   },
   forgotText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#008178',
-  },
-  primaryButton: {
-    height: 52,
-    borderRadius: 12,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 28,
-  },
-  footerText: {
-    fontSize: 15,
-    color: '#8190A7',
-  },
-  footerLink: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: '#008178',
   },
   errorText: {

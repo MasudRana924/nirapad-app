@@ -3,16 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
   TouchableOpacity,
   TextInput,
   Keyboard,
   Alert,
-  Image,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
+import AuthLayout, {AuthPrimaryButton} from '../components/auth/AuthLayout';
 import {verifyOtp, resendOtp, extractAuthPayload} from '../services/api';
 import {useAuth} from '../context/AuthContext';
 import notificationService from '../services/notificationService';
@@ -124,9 +121,8 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
         // Step 3: Register FCM token with server
         console.log('📱 Registering FCM token with server...');
-        const tokenRegistered = await notificationService.registerTokenWithServer(
-          token,
-        );
+        const tokenRegistered =
+          await notificationService.registerTokenWithServer(token);
 
         if (tokenRegistered) {
           console.log('✅ FCM token registered successfully');
@@ -147,25 +143,15 @@ const VerifyPhoneScreen = ({navigation, route}) => {
   const isOtpComplete = otp.every(value => value !== '');
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+    <>
       <Loader visible={loading} />
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={22} color="#111820" />
-          </TouchableOpacity>
-          <Image source={require('../assets/auth.png')} style={styles.authImage} />
-        </View>
-
-        <Text style={styles.title}>Verify email</Text>
-        <Text style={styles.subtitle}>We sent a 4-digit code to</Text>
-        <Text style={styles.emailText}>{email}</Text>
-
+      <AuthLayout
+        showBack
+        onBack={() => navigation?.goBack()}
+        compactHero
+        title="Verify email"
+        subtitle="We sent a 4-digit code to your email"
+        extra={email ? <Text style={styles.emailText}>{email}</Text> : null}>
         <View style={styles.otpContainer}>
           {otp.map((value, index) => (
             <TextInput
@@ -180,10 +166,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
               maxLength={1}
               textAlign="center"
               selectionColor="#008178"
-              style={[
-                styles.otpInput,
-                value ? styles.otpInputFilled : null,
-              ]}
+              style={[styles.otpInput, value ? styles.otpInputFilled : null]}
             />
           ))}
         </View>
@@ -208,91 +191,44 @@ const VerifyPhoneScreen = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.85}
+        <AuthPrimaryButton
+          title="Verify"
           disabled={!isOtpComplete || loading}
           onPress={handleVerify}
-          style={[
-            styles.primaryButton,
-            !isOtpComplete && styles.primaryButtonDisabled,
-          ]}>
-          <Text style={styles.primaryButtonText}>Verify</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        />
+      </AuthLayout>
+    </>
   );
 };
 
 export default VerifyPhoneScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-    marginBottom: 24,
-    position: 'relative',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#F6F6F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    left: 0,
-  },
-  authImage: {
-    width: 40,
-    height: 40,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#111820',
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    marginTop: 8,
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#8190A7',
-  },
   emailText: {
     marginTop: 4,
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111820',
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1B3330',
   },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginTop: 32,
     gap: 10,
+    marginBottom: 8,
   },
   otpInput: {
-    width: 56,
-    height: 56,
+    width: 58,
+    height: 58,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
-    borderWidth: 1,
-    borderColor: '#F6F6F6',
+    backgroundColor: '#F4F8F6',
+    borderWidth: 1.5,
+    borderColor: '#E4EEEA',
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#111820',
+    color: '#163532',
     padding: 0,
   },
   otpInputFilled: {
@@ -303,35 +239,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: 16,
+    marginBottom: 10,
     flexWrap: 'wrap',
   },
   resendText: {
     fontSize: 14,
-    color: '#8190A7',
+    color: '#7B9390',
   },
   resendLink: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#008178',
   },
   resendLinkDisabled: {
-    color: '#8190A7',
-  },
-  primaryButton: {
-    height: 52,
-    borderRadius: 12,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 32,
-  },
-  primaryButtonDisabled: {
-    backgroundColor: '#B5C0D0',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#7B9390',
   },
 });
