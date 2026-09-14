@@ -9,7 +9,8 @@ export const CARE_SERVICES = [
     price: 800,
     priceUnit: 'visit',
     icon: 'business-outline',
-    badge: 'Most Booked',
+    badge: 'Most Popular',
+    image: require('../assets/service-hospital.png'),
     category: 'caregiver',
   },
   {
@@ -21,6 +22,7 @@ export const CARE_SERVICES = [
     price: 500,
     priceUnit: 'hr',
     icon: 'heart-outline',
+    image: require('../assets/service-elderly.png'),
     category: 'caregiver',
   },
   {
@@ -32,6 +34,7 @@ export const CARE_SERVICES = [
     price: 1500,
     priceUnit: 'session',
     icon: 'medkit-outline',
+    image: require('../assets/service-nurse.png'),
     category: 'nurse',
   },
   {
@@ -56,36 +59,7 @@ export const CARE_SERVICES = [
     icon: 'happy-outline',
     category: 'autistic',
   },
-  {
-    id: 'helping_hand',
-    title: 'Helping Hand',
-    description: 'Errands, shopping, bill payments and everyday assistance.',
-    priceLabel: 'From ৳400/hr',
-    price: 400,
-    priceUnit: 'hr',
-    icon: 'hand-left-outline',
-    category: 'caregiver',
-  },
-  {
-    id: 'day_care',
-    title: 'Day Care',
-    description: 'Full daytime care and companionship, 9 am to 5 pm.',
-    priceLabel: 'From ৳2,000/day',
-    price: 2000,
-    priceUnit: 'day',
-    icon: 'sunny-outline',
-    category: 'caregiver',
-  },
-  {
-    id: 'night_care',
-    title: 'Night Care',
-    description: 'Overnight caregiver for safety and comfort, 8 pm to 8 am.',
-    priceLabel: 'From ৳2,500/night',
-    price: 2500,
-    priceUnit: 'night',
-    icon: 'moon-outline',
-    category: 'caregiver',
-  },
+  
 ];
 
 export const getServiceById = id =>
