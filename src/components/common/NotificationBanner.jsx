@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const AUTO_HIDE_MS = 20 * 60 * 1000;
+const AUTO_HIDE_MS = 2 * 60 * 1000;
 
 const NotificationBanner = ({visible, title, body, onPress, onHide}) => {
   const insets = useSafeAreaInsets();
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     // borderWidth: 1,
     // borderColor: '#0606063e',
-    backgroundColor: '#0606063e',
+    backgroundColor: '#1F1F1F',
     justifyContent: 'center',
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -139,19 +139,19 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111820',
+    color: 'white',
   },
   title: {
     marginTop: 4,
     fontSize: 12,
     fontWeight: '400',
-    color: '#111820',
+    color: 'white',
   },
   body: {
     marginTop: 2,
     fontSize: 12,
     lineHeight: 16,
-    color: '#8190A7',
+    color: 'white',
   },
 });
 
