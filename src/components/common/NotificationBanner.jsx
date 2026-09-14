@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const AUTO_HIDE_MS = 2 * 60 * 1000;
+const AUTO_HIDE_MS = 2 * 1000;
 
 const NotificationBanner = ({visible, title, body, onPress, onHide}) => {
   const insets = useSafeAreaInsets();

@@ -17,6 +17,7 @@ import {paymentService} from '../api/services';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 import Loader from '../components/common/Loader';
+import ErrorModal from '../components/common/ErrorModal';
 
 const STATUS_STYLES = {
   PENDING_PAYMENT: {bg: '#FFF4E5', text: '#D97706'},
@@ -34,6 +35,8 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const rawData = bookingData?.data;
   const booking = rawData?.booking || rawData;
   const [payLoading, setPayLoading] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   console.log('BookingDetails payment_status:', booking?.payment_status, 'status:', booking?.status);
 
   const handlePayNow = async () => {
@@ -51,10 +54,12 @@ const BookingDetailsScreen = ({navigation, route}) => {
           amount,
         });
       } else {
-        Alert.alert('Error', response?.message || 'Payment creation failed. Please try again.');
+        setErrorMessage(response?.message || 'Payment creation failed. Please try again.');
+        setErrorModalVisible(true);
       }
     } catch (error) {
-      Alert.alert('Error', error?.message || 'Payment failed. Please try again.');
+      setErrorMessage(error?.message || 'Payment failed. Please try again.');
+      setErrorModalVisible(true);
     } finally {
       setPayLoading(false);
     }
@@ -190,6 +195,11 @@ const BookingDetailsScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={cancelBooking.isPending || payLoading} />
+      <ErrorModal
+        visible={errorModalVisible}
+        message={errorMessage}
+        onOk={() => setErrorModalVisible(false)}
+      />
       <Header title="Booking details" onBack={() => navigation?.goBack()} />
 
       <ScrollView
