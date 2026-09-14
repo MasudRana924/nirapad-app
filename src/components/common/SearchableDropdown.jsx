@@ -64,6 +64,7 @@ const SearchableDropdown = ({
   };
 
   const isPill = variant === 'pill';
+  const isLight = variant === 'light';
 
   return (
     <View
@@ -71,6 +72,7 @@ const SearchableDropdown = ({
       style={[
         styles.container,
         isPill && styles.pillContainer,
+        isLight && styles.lightContainer,
         isOpen && styles.containerOpen,
         containerStyle,
       ]}>
@@ -80,6 +82,7 @@ const SearchableDropdown = ({
         style={[
           styles.dropdownButton,
           isPill && styles.pillButton,
+          isLight && styles.lightButton,
           isOpen && styles.dropdownButtonOpen,
           isPill && isOpen && styles.pillButtonOpen,
         ]}
@@ -176,6 +179,9 @@ const styles = StyleSheet.create({
   pillContainer: {
     marginBottom: 0,
   },
+  lightContainer: {
+    marginBottom: 0,
+  },
   label: {
     fontSize: 14,
     fontWeight: '600',
@@ -193,6 +199,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#D7EBE6',
+  },
+  lightButton: {
+    backgroundColor: '#F7FBFA',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#DCEEE9',
   },
   dropdownButtonOpen: {
     borderColor: '#008178',

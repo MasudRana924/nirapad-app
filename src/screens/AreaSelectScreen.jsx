@@ -2,6 +2,7 @@ import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -9,16 +10,31 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Header from '../components/common/Header';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import {bangladeshDistricts} from '../data/bangladeshLocations';
 import {getThanasByDistrict} from '../data/bangladeshThanas';
 import {storage} from '../utils/storage';
 
+const TEAL = '#008178';
+const INK = '#163532';
+const MUTED = '#7B9390';
+const ADDRESS_MAX = 200;
+
+const FieldLabel = ({icon, title}) => (
+  <View style={styles.fieldLabelRow}>
+    <View style={styles.fieldIcon}>
+      <Icon name={icon} size={16} color={TEAL} />
+    </View>
+    <Text style={styles.fieldLabel}>{title}</Text>
+  </View>
+);
+
 const AreaSelectScreen = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
   const {
     selectedMember,
     selectedService,
@@ -35,8 +51,7 @@ const AreaSelectScreen = ({navigation, route}) => {
     setThana('');
   };
 
-  const canContinue =
-    !!district && !!thana && !!fullAddress.trim();
+  const canContinue = !!district && !!thana && !!fullAddress.trim();
 
   const handleNext = async () => {
     if (!district || !thana) {
@@ -66,90 +81,147 @@ const AreaSelectScreen = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Select location" onBack={() => navigation?.goBack()} />
-
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          <View style={styles.hero}>
-            <View style={styles.heroTop}>
-              <View style={styles.heroIcon}>
-                <Icon name="map-outline" size={22} color="#008178" />
-              </View>
-              <Text style={styles.heroTitle}>Where do you need care?</Text>
-            </View>
-            <Text style={styles.heroText}>
-              Select district, thana and enter your full address
-            </Text>
-          </View>
-
-          <SearchableDropdown
-            data={bangladeshDistricts}
-            label="District"
-            placeholder="Select district"
-            value={district}
-            onSelect={handleDistrictSelect}
-            icon="business-outline"
-          />
-
-          <SearchableDropdown
-            data={thanaOptions}
-            label="Thana"
-            placeholder={district ? 'Select thana' : 'Select district first'}
-            value={thana}
-            onSelect={setThana}
-            icon="location-outline"
-          />
-
-          <Text style={styles.label}>Full address</Text>
-          <View style={styles.addressBox}>
-            <Icon
-              name="home-outline"
-              size={18}
-              color="#8190A7"
-              style={styles.addressIcon}
-            />
-            <TextInput
-              style={styles.addressInput}
-              placeholder="House, road, block, landmark..."
-              placeholderTextColor="#8190A7"
-              value={fullAddress}
-              onChangeText={setFullAddress}
-              multiline
-              textAlignVertical="top"
-            />
-          </View>
-        </ScrollView>
-
-        <View style={styles.bottomContainer}>
+    <View style={styles.page}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
+        <View style={styles.topBar}>
           <TouchableOpacity
-            activeOpacity={0.85}
-            style={[styles.nextButton, !canContinue && styles.disabledButton]}
-            onPress={handleNext}
-            disabled={!canContinue}>
-            <Text style={styles.nextButtonText}>Next</Text>
+            activeOpacity={0.7}
+            style={styles.backButton}
+            onPress={() => navigation?.goBack()}>
+            <Icon name="arrow-back" size={22} color={INK} />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Select Location</Text>
+          <View style={styles.headerSpacer} />
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            <View style={styles.hero}>
+              <View style={styles.heroCopy}>
+                <View style={styles.heroTitleRow}>
+                  <View style={styles.heroIcon}>
+                    <Icon name="location" size={18} color={TEAL} />
+                  </View>
+                  <Text style={styles.heroTitle}>Where do you need care?</Text>
+                </View>
+                <Text style={styles.heroText}>
+                  Select district, thana and enter your full address to find the
+                  best caregiver near you.
+                </Text>
+              </View>
+              <Image
+                source={require('../assets/location-hero.png')}
+                style={styles.heroImage}
+                resizeMode="contain"
+              />
+            </View>
+
+            <FieldLabel icon="home-outline" title="District" />
+            <SearchableDropdown
+              data={bangladeshDistricts}
+              placeholder="Select district"
+              value={district}
+              onSelect={handleDistrictSelect}
+              icon="business-outline"
+              variant="light"
+            />
+
+            <View style={styles.fieldGap} />
+
+            <FieldLabel icon="location-outline" title="Thana" />
+            <SearchableDropdown
+              data={thanaOptions}
+              placeholder={district ? 'Select thana' : 'Select district first'}
+              value={thana}
+              onSelect={setThana}
+              icon="location-outline"
+              variant="light"
+            />
+
+            <View style={styles.fieldGap} />
+
+            <FieldLabel icon="home-outline" title="Full address" />
+            <View style={styles.addressBox}>
+              <Icon
+                name="home-outline"
+                size={18}
+                color={MUTED}
+                style={styles.addressIcon}
+              />
+              <TextInput
+                style={styles.addressInput}
+                placeholder="House, road, block, landmark..."
+                placeholderTextColor={MUTED}
+                value={fullAddress}
+                onChangeText={setFullAddress}
+                multiline
+                maxLength={ADDRESS_MAX}
+                textAlignVertical="top"
+              />
+            </View>
+            <Text style={styles.counter}>
+              {fullAddress.length}/{ADDRESS_MAX}
+            </Text>
+          </ScrollView>
+
+          <View
+            style={[
+              styles.bottomContainer,
+              {paddingBottom: Math.max(16, insets.bottom + 8)},
+            ]}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[styles.nextButton, !canContinue && styles.disabledButton]}
+              onPress={handleNext}
+              disabled={!canContinue}>
+              <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 export default AreaSelectScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
+  page: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
   flex: {
     flex: 1,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    minHeight: 44,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '800',
+    color: INK,
+  },
+  headerSpacer: {
+    width: 36,
   },
   scroll: {
     flex: 1,
@@ -159,48 +231,72 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   hero: {
-    backgroundColor: '#F6F6F6',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 22,
-  },
-  heroTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    marginBottom: 22,
+    marginTop: 8,
+  },
+  heroCopy: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  heroTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 8,
   },
   heroIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#E6F4F3',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#E8F6F2',
     alignItems: 'center',
     justifyContent: 'center',
   },
   heroTitle: {
     flex: 1,
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111820',
+    fontSize: 12,
+    fontWeight: '800',
+    color: INK,
   },
   heroText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#8190A7',
+    fontSize: 13,
+    lineHeight: 19,
+    color: MUTED,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111820',
-    marginBottom: 8,
+  heroImage: {
+    width: 108,
+    height: 108,
+  },
+  fieldLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+  },
+  fieldIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#E8F6F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fieldLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: INK,
+  },
+  fieldGap: {
+    height: 18,
   },
   addressBox: {
-    minHeight: 100,
-    borderRadius: 14,
-    backgroundColor: '#F6F6F6',
+    minHeight: 110,
+    borderRadius: 16,
+    backgroundColor: '#F7FBFA',
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#DCEEE9',
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: 14,
@@ -212,31 +308,34 @@ const styles = StyleSheet.create({
   },
   addressInput: {
     flex: 1,
-    minHeight: 76,
+    minHeight: 86,
     fontSize: 15,
-    color: '#111820',
+    color: INK,
     padding: 0,
+  },
+  counter: {
+    marginTop: 8,
+    textAlign: 'right',
+    fontSize: 12,
+    color: MUTED,
   },
   bottomContainer: {
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 16,
-
-
   },
   nextButton: {
     height: 52,
-    borderRadius: 14,
-    backgroundColor: '#008178',
+    borderRadius: 26,
+    backgroundColor: TEAL,
     alignItems: 'center',
     justifyContent: 'center',
   },
   disabledButton: {
-    backgroundColor: '#B5C0D0',
+    backgroundColor: '#C5CDD6',
   },
   nextButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#FFFFFF',
   },
 });
