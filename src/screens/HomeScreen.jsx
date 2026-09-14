@@ -38,8 +38,8 @@ const HomeScreen = ({navigation}) => {
         <HomeHeader navigation={navigation} />
         <ActiveBookingCard navigation={navigation} />
         <BookingButtons navigation={navigation} />
-        <QuickServices navigation={navigation} />
-        <TopCaregivers navigation={navigation} />
+        {/* <QuickServices navigation={navigation} />
+        <TopCaregivers navigation={navigation} /> */}
         {/* <AvailableNurses navigation={navigation} /> */}
       </ScrollView>
     </SafeAreaView>

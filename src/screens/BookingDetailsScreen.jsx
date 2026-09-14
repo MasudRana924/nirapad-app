@@ -64,9 +64,11 @@ const BookingDetailsScreen = ({navigation, route}) => {
     STATUS_STYLES[booking?.status] || {bg: '#F0F2F5', text: '#8190A7'};
   const statusLabel = (booking?.status || '').replace(/_/g, ' ');
   const showPayButton = booking?.payment_status === 'PENDING';
+  const isPaid = booking?.payment_status === 'PAID';
   const canCancel =
     booking?.status &&
-    !['CANCELLED', 'COMPLETED'].includes(booking.status);
+    !['CANCELLED', 'COMPLETED'].includes(booking.status) &&
+    !isPaid;
 
   const familyName =
     booking?.family_member_name || booking?.family_member?.name;
@@ -323,6 +325,15 @@ const BookingDetailsScreen = ({navigation, route}) => {
         )}
       </ScrollView>
 
+      {isPaid && booking?.status && !['CANCELLED', 'COMPLETED'].includes(booking.status) && (
+        <View style={styles.supportNote}>
+          <Icon name="information-circle-outline" size={18} color="#008178" />
+          <Text style={styles.supportNoteText}>
+            If you want to cancel this booking, please contact our support team.
+          </Text>
+        </View>
+      )}
+
       {(showPayButton || canCancel) && (
         <View style={styles.bottomContainer}>
           {canCancel && (
@@ -555,5 +566,23 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#DC2626',
+  },
+  supportNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E6F4F3',
+    marginHorizontal: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 10,
+    marginBottom: 12,
+  },
+  supportNoteText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#008178',
+    fontWeight: '500',
   },
 });

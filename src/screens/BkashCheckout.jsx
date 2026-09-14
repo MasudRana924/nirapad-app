@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
   Modal,
   Linking,
-  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {WebView} from 'react-native-webview';
@@ -219,20 +218,11 @@ const BkashCheckout = ({route, navigation}) => {
 
       if (data?.paymentID || data?.paymentId || response?.success) {
         setShowWebView(false);
-        setStatusMessage('Payment successful!');
         queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
         queryClient.invalidateQueries({
           queryKey: queryKeys.bookings.detail(activeBookingId),
         });
-        Alert.alert('Success', 'Payment successful!', [
-          {
-            text: 'OK',
-            onPress: () =>
-              navigation.navigate('BookingDetails', {
-                bookingId: activeBookingId,
-              }),
-          },
-        ]);
+        navigation.replace('PaymentSuccess');
       } else {
         setStatusMessage(
           response?.message ||
@@ -264,9 +254,7 @@ const BkashCheckout = ({route, navigation}) => {
           <Text style={styles.statusMessage}>{statusMessage}</Text>
         ) : null}
 
-        {!currentButtonLoading &&
-        statusMessage &&
-        statusMessage !== 'Payment successful!' ? (
+        {!currentButtonLoading && statusMessage ? (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>

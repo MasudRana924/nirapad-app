@@ -40,6 +40,7 @@ import PaymentScreen from '../screens/PaymentScreen';
 import BkashCheckout from '../screens/BkashCheckout';
 import ReviewScreen from '../screens/ReviewScreen';
 import PaymentHistory from '../screens/PaymentHistory';
+import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -193,6 +194,7 @@ function AppNavigator() {
           <Stack.Screen name="BkashCheckout" component={BkashCheckout} />
           <Stack.Screen name="ReviewScreen" component={ReviewScreen} />
           <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
+          <Stack.Screen name="PaymentSuccess" component={PaymentSuccessScreen} options={{gestureEnabled: false}} />
         </>
       ) : (
         // Not authenticated — show auth screens
