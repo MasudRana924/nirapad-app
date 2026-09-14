@@ -2,20 +2,45 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchHospitals} from '../api/queries';
-import Header from '../components/common/Header';
 import HospitalSkeleton from '../components/home/HospitalSkeleton';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
 import {storage} from '../utils/storage';
 
+const TEAL = '#008178';
+const INK = '#163532';
+const MUTED = '#7B9390';
+
+const formatMoney = value => {
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) {
+    return '0.00';
+  }
+  return numeric.toLocaleString('en-BD', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+const formatRating = value => {
+  const numeric = Number(value);
+  if (value == null || value === '' || Number.isNaN(numeric)) {
+    return '0.00';
+  }
+  return numeric.toFixed(2);
+};
+
 const HospitalSelection = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
   const {selectedMember, selectedCaregiver, selectedService, selectedArea, serviceType} =
     route.params || {};
   const [selectedHospital, setSelectedHospital] = useState(null);
@@ -45,388 +70,437 @@ const HospitalSelection = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Select Hospital" onBack={() => navigation?.goBack()} />
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.searchSection}>
-          <SearchableDropdown
-            data={bangladeshDistricts}
-            label="District"
-            placeholder="Select district"
-            value={district}
-            onSelect={setDistrict}
-            icon="location-outline"
-            containerStyle={styles.dropdownContainer}
-          />
-          <SearchableDropdown
-            data={bangladeshCities}
-            label="City"
-            placeholder="Select city"
-            value={city}
-            onSelect={setCity}
-            icon="business-outline"
-            containerStyle={styles.dropdownContainer}
-          />
+    <View style={styles.page}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.backButton}
+            onPress={() => navigation?.goBack()}>
+            <Icon name="arrow-back" size={22} color={INK} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Select Hospital</Text>
+          <View style={styles.headerSpacer} />
         </View>
+        <Text style={styles.headerSubtitle}>
+          Choose the hospital where you want to get care
+        </Text>
 
-        {isLoading ? (
-          <HospitalSkeleton />
-        ) : hospitals.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Icon name="medkit-outline" size={64} color="#E3E8F0" />
-            <Text style={styles.emptyTitle}>No Hospitals Found</Text>
-            <Text style={styles.emptyText}>Try adjusting your filters</Text>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.searchSection}>
+            <SearchableDropdown
+              data={bangladeshDistricts}
+              label="District"
+              placeholder="Select district"
+              value={district}
+              onSelect={setDistrict}
+              icon="location"
+              variant="pill"
+              containerStyle={styles.dropdownContainer}
+            />
+            <SearchableDropdown
+              data={bangladeshCities}
+              label="City"
+              placeholder="Select city"
+              value={city}
+              onSelect={setCity}
+              icon="business-outline"
+              variant="pill"
+              containerStyle={styles.dropdownContainer}
+            />
           </View>
-        ) : (
-          <View style={styles.hospitalGrid}>
-            {hospitals.map(hospital => {
-              const isSelected = selectedHospital?.id === hospital.id;
-              const locationLine = [hospital.thana, hospital.district]
-                .filter(Boolean)
-                .join(', ');
 
-              return (
-                <TouchableOpacity
-                  key={hospital.id}
-                  activeOpacity={0.85}
-                  style={[
-                    styles.hospitalCard,
-                    isSelected && styles.selectedCard,
-                  ]}
-                  onPress={() => setSelectedHospital(hospital)}>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.avatarContainer}>
-                      <View style={styles.placeholderAvatar}>
-                        <Icon name="medkit" size={24} color="#008178" />
-                      </View>
-                    </View>
+          {isLoading ? (
+            <HospitalSkeleton />
+          ) : hospitals.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Icon name="medkit-outline" size={64} color="#E3E8F0" />
+              <Text style={styles.emptyTitle}>No Hospitals Found</Text>
+              <Text style={styles.emptyText}>Try adjusting your filters</Text>
+            </View>
+          ) : (
+            <View style={styles.hospitalGrid}>
+              {hospitals.map(hospital => {
+                const isSelected = selectedHospital?.id === hospital.id;
+                const locationLine = [hospital.thana, hospital.district]
+                  .filter(Boolean)
+                  .join(', ');
+                const photo =
+                  hospital.photo || hospital.image || hospital.profile_photo;
+                const consultationFee =
+                  hospital.consultation_fee ?? hospital.fee ?? hospital.estimated_fee ?? 0;
+                const isVerified = hospital.is_verified || hospital.is_active;
 
-                    <View style={styles.userInfo}>
-                      <View style={styles.nameRow}>
-                        <Text style={styles.name} numberOfLines={1}>
-                          {hospital.name}
-                        </Text>
-                        {hospital.is_verified || hospital.is_active ? (
-                          <View style={styles.availableBadge}>
-                            <Text style={styles.availableBadgeText}>
-                              Verified
-                            </Text>
+                return (
+                  <TouchableOpacity
+                    key={hospital.id}
+                    activeOpacity={0.85}
+                    style={[
+                      styles.hospitalCard,
+                      isSelected && styles.selectedCard,
+                    ]}
+                    onPress={() => setSelectedHospital(hospital)}>
+                    <View style={styles.cardHeader}>
+                      {photo ? (
+                        <Image source={{uri: photo}} style={styles.hospitalImage} />
+                      ) : (
+                        <View style={styles.placeholderAvatar}>
+                          <Icon name="business" size={28} color={TEAL} />
+                        </View>
+                      )}
+
+                      <View style={styles.userInfo}>
+                        {isVerified ? (
+                          <View style={styles.verifiedBadge}>
+                            <Icon name="checkmark-circle" size={13} color={TEAL} />
+                            <Text style={styles.verifiedText}>Verified</Text>
                           </View>
                         ) : null}
-                      </View>
 
-                      <View style={styles.infoRow}>
-                        <Icon name="star" size={14} color="#F59E0B" />
-                        <Text style={styles.infoText}>
-                          {hospital.rating ?? '—'}
-                          {hospital.type ? ` · ${hospital.type}` : ''}
+                        <Text style={styles.name} numberOfLines={2}>
+                          {hospital.name}
                         </Text>
-                      </View>
 
-                      <View style={styles.infoRow}>
-                        <Icon name="location-outline" size={14} color="#303944" />
-                        <Text style={styles.infoText} numberOfLines={1}>
-                          {locationLine || hospital.address || 'No location'}
-                        </Text>
+                        <View style={styles.infoRow}>
+                          <Icon name="star" size={13} color="#F6A900" />
+                          <Text style={styles.infoText}>
+                            {formatRating(hospital.rating)}
+                            {hospital.completed_bookings != null
+                              ? ` (${hospital.completed_bookings})`
+                              : ' (0)'}
+                            {hospital.type ? `  ·  ${hospital.type}` : ''}
+                          </Text>
+                        </View>
+
+                        <View style={styles.infoRow}>
+                          <Icon name="location-outline" size={13} color={MUTED} />
+                          <Text style={styles.infoText} numberOfLines={1}>
+                            {locationLine || hospital.address || 'No location'}
+                          </Text>
+                        </View>
                       </View>
                     </View>
 
-                    {isSelected && (
-                      <View style={styles.selectedBadge}>
-                        <Icon
-                          name="checkmark-circle"
-                          size={24}
-                          color="#008178"
-                        />
+                    {!!hospital.address && (
+                      <View style={styles.addressRow}>
+                        <Icon name="notifications-outline" size={15} color={MUTED} />
+                        <Text style={styles.addressText} numberOfLines={2}>
+                          {hospital.address}
+                        </Text>
                       </View>
                     )}
-                  </View>
 
-                  {!!hospital.address && (
-                    <Text style={styles.bioText} numberOfLines={2}>
-                      {hospital.address}
-                    </Text>
-                  )}
+                    <View style={styles.cardFooter}>
+                      <View style={styles.statBlock}>
+                        <View style={styles.statIcon}>
+                          <Icon name="star-outline" size={15} color={TEAL} />
+                        </View>
+                        <View>
+                          <Text style={styles.statLabel}>Rating</Text>
+                          <Text style={styles.statValue}>
+                            {formatRating(hospital.rating)}
+                            <Text style={styles.statSuffix}> / 5.0</Text>
+                          </Text>
+                        </View>
+                      </View>
 
-                  <View style={styles.cardFooter}>
-                    <View style={styles.priceBlock}>
-                      {hospital.rating != null && hospital.rating !== '' ? (
-                        <Text style={styles.price}>
-                          {hospital.rating}
-                          <Text style={styles.perHour}> rating</Text>
-                        </Text>
-                      ) : null}
-                    </View>
+                      <View style={styles.statBlock}>
+                        <View style={styles.statIcon}>
+                          <Icon name="cash-outline" size={15} color={TEAL} />
+                        </View>
+                        <View>
+                          <Text style={styles.statLabel}>Consultation Fee</Text>
+                          <Text style={styles.statValue}>
+                            ৳{formatMoney(consultationFee)}
+                            <Text style={styles.statSuffix}> (est.)</Text>
+                          </Text>
+                        </View>
+                      </View>
 
-                    <View
-                      style={[
-                        styles.selectPill,
-                        isSelected && styles.selectPillActive,
-                      ]}>
-                      <Text
+                      <View
                         style={[
-                          styles.selectPillText,
-                          isSelected && styles.selectPillTextActive,
+                          styles.selectPill,
+                          isSelected && styles.selectPillActive,
                         ]}>
-                        {isSelected ? 'Selected' : 'Select'}
-                      </Text>
+                        <Text style={styles.selectPillText}>
+                          {isSelected ? 'Selected' : 'Select'}
+                        </Text>
+                        {!isSelected ? (
+                          <Icon name="arrow-forward" size={14} color="#FFFFFF" />
+                        ) : null}
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </ScrollView>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </ScrollView>
 
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
+        <View
           style={[
-            styles.nextButton,
-            !selectedHospital && styles.disabledButton,
-          ]}
-          onPress={handleNext}
-          disabled={!selectedHospital}>
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+            styles.bottomContainer,
+            {paddingBottom: Math.max(16, insets.bottom + 8)},
+          ]}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.nextButton,
+              !selectedHospital && styles.disabledButton,
+            ]}
+            onPress={handleNext}
+            disabled={!selectedHospital}>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 };
 
 export default HospitalSelection;
 
 const styles = StyleSheet.create({
-  safeArea: {
+  page: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
+  flex: {
+    flex: 1,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    minHeight: 44,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '800',
+    color: INK,
+  },
+  headerSpacer: {
+    width: 36,
+  },
+  headerSubtitle: {
+    paddingHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 8,
+    fontSize: 13,
+    lineHeight: 18,
+    color: MUTED,
+    textAlign: 'left',
+  },
   searchSection: {
     flexDirection: 'row',
     marginBottom: 16,
     gap: 10,
+    zIndex: 30,
   },
-
   dropdownContainer: {
     flex: 1,
   },
-
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 80,
   },
-
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#172333',
+    color: INK,
     marginTop: 16,
   },
-
   emptyText: {
     fontSize: 14,
-    color: '#8190A7',
+    color: MUTED,
     marginTop: 8,
   },
-
   scrollView: {
     flex: 1,
   },
-
   scrollContent: {
     padding: 16,
     paddingBottom: 24,
   },
-
   hospitalGrid: {
     flexDirection: 'column',
   },
-
   hospitalCard: {
     width: '100%',
-    backgroundColor: '#F6F6F6',
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 14,
-    borderWidth: 1,
-    borderColor: '#F6F6F6',
-    marginBottom: 12,
-  },
-
-  selectedCard: {
-    borderWidth: 2,
-    borderColor: '#008178',
     backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E8EEEC',
+    marginBottom: 12,
+  
   },
-
+  selectedCard: {
+    borderColor: TEAL,
+  },
   cardHeader: {
-    width: '100%',
-    minHeight: 58,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-
-  avatarContainer: {
-    width: 58,
-    height: 58,
-    position: 'relative',
-    marginRight: 13,
+  hospitalImage: {
+    width: 78,
+    height: 78,
+    borderRadius: 16,
+    backgroundColor: '#E8EEEC',
+    marginRight: 12,
   },
-
   placeholderAvatar: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#E6F4F3',
+    width: 78,
+    height: 78,
+    borderRadius: 16,
+    backgroundColor: '#E8F6F2',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 12,
   },
-
   userInfo: {
     flex: 1,
-    paddingTop: 1,
     minWidth: 0,
   },
-
-  nameRow: {
+  verifiedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 3,
-  },
-
-  name: {
-    flex: 1,
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: '700',
-    color: '#111820',
-    marginRight: 8,
-  },
-
-  availableBadge: {
-    height: 22,
+    alignSelf: 'flex-start',
+    gap: 4,
+    backgroundColor: '#E8F6F2',
     paddingHorizontal: 8,
-    borderRadius: 11,
-    backgroundColor: '#E6F4F3',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 3,
+    borderRadius: 12,
+    marginBottom: 6,
   },
-
-  availableBadgeText: {
+  verifiedText: {
     fontSize: 11,
-    lineHeight: 14,
-    color: '#008178',
-    fontWeight: '600',
+    fontWeight: '700',
+    color: TEAL,
   },
-
+  name: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: '800',
+    color: INK,
+    marginBottom: 4,
+  },
   infoRow: {
-    minHeight: 20,
+    minHeight: 18,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 2,
   },
-
   infoText: {
     marginLeft: 5,
     flex: 1,
     fontSize: 12,
     lineHeight: 17,
-    fontWeight: '400',
-    color: '#303944',
+    color: MUTED,
   },
-
-  selectedBadge: {
-    marginLeft: 8,
-    marginTop: 2,
+  addressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F4F3',
   },
-
-  bioText: {
-    marginTop: 10,
+  addressText: {
+    flex: 1,
     fontSize: 13,
-    lineHeight: 19,
-    color: '#8190A7',
+    color: MUTED,
   },
-
   cardFooter: {
     marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 8,
   },
-
-  priceBlock: {
+  statBlock: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minWidth: 0,
   },
-
-  price: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111820',
-  },
-
-  perHour: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#8190A7',
-  },
-
-  selectPill: {
-    minWidth: 88,
-    height: 40,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: '#E6F4F3',
+  statIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: '#E8F6F2',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
+  statLabel: {
+    fontSize: 10,
+    color: MUTED,
+  },
+  statValue: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: INK,
+  },
+  statSuffix: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: MUTED,
+  },
+  selectPill: {
+    minWidth: 86,
+    height: 38,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: TEAL,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 4,
+  },
   selectPillActive: {
-    backgroundColor: '#008178',
+    backgroundColor: TEAL,
   },
-
   selectPillText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#008178',
-  },
-
-  selectPillTextActive: {
+    fontSize: 13,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
-
   bottomContainer: {
     width: '100%',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 16,
   },
-
   nextButton: {
-    backgroundColor: '#008178',
-    borderRadius: 12,
-    flexDirection: 'row',
+    backgroundColor: TEAL,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
+    height: 52,
   },
-
   disabledButton: {
-    backgroundColor: '#B5C0D0',
+    backgroundColor: '#C5CDD6',
   },
-
   nextButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

@@ -17,6 +17,7 @@ const SearchableDropdown = ({
   label,
   icon = 'location-outline',
   containerStyle,
+  variant = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -62,29 +63,44 @@ const SearchableDropdown = ({
     }
   };
 
+  const isPill = variant === 'pill';
+
   return (
     <View
       ref={containerRef}
-      style={[styles.container, isOpen && styles.containerOpen, containerStyle]}>
-      {!!label && <Text style={styles.label}>{label}</Text>}
+      style={[
+        styles.container,
+        isPill && styles.pillContainer,
+        isOpen && styles.containerOpen,
+        containerStyle,
+      ]}>
+      {!!label && !isPill && <Text style={styles.label}>{label}</Text>}
 
       <TouchableOpacity
-        style={[styles.dropdownButton, isOpen && styles.dropdownButtonOpen]}
+        style={[
+          styles.dropdownButton,
+          isPill && styles.pillButton,
+          isOpen && styles.dropdownButtonOpen,
+          isPill && isOpen && styles.pillButtonOpen,
+        ]}
         activeOpacity={0.85}
         onPress={handleToggle}>
         <View style={styles.buttonContent}>
-          <Icon name={icon} size={18} color="#8190A7" />
-          <TextInput
-            style={styles.input}
-            placeholder={placeholder}
-            placeholderTextColor="#8190A7"
-            value={searchText}
-            onChangeText={handleSearch}
-            onFocus={() => {
-              setIsOpen(true);
-              setFilteredData(data || []);
-            }}
-          />
+          <Icon name={icon} size={18} color={isPill ? '#008178' : '#8190A7'} />
+          <View style={styles.inputWrap}>
+            {!!label && isPill && <Text style={styles.pillLabel}>{label}</Text>}
+            <TextInput
+              style={[styles.input, isPill && styles.pillInput]}
+              placeholder={placeholder}
+              placeholderTextColor="#8190A7"
+              value={searchText}
+              onChangeText={handleSearch}
+              onFocus={() => {
+                setIsOpen(true);
+                setFilteredData(data || []);
+              }}
+            />
+          </View>
           {searchText ? (
             <TouchableOpacity
               onPress={handleClear}
@@ -157,6 +173,9 @@ const styles = StyleSheet.create({
   containerOpen: {
     zIndex: 20,
   },
+  pillContainer: {
+    marginBottom: 0,
+  },
   label: {
     fontSize: 14,
     fontWeight: '600',
@@ -169,10 +188,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E3E8F0',
   },
+  pillButton: {
+    backgroundColor: '#F3FAF7',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#D7EBE6',
+  },
   dropdownButtonOpen: {
     borderColor: '#008178',
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
+  },
+  pillButtonOpen: {
+    borderColor: '#008178',
   },
   buttonContent: {
     flexDirection: 'row',
@@ -181,12 +209,28 @@ const styles = StyleSheet.create({
     height: 52,
     gap: 10,
   },
+  inputWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  pillLabel: {
+    fontSize: 11,
+    color: '#7B9390',
+    marginBottom: 1,
+  },
   input: {
     flex: 1,
     height: '100%',
     fontSize: 15,
     color: '#111820',
     paddingVertical: 0,
+  },
+  pillInput: {
+    flex: 0,
+    height: 20,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#163532',
   },
   clearButton: {
     padding: 2,
