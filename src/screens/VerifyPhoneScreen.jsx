@@ -148,7 +148,6 @@ const VerifyPhoneScreen = ({navigation, route}) => {
       <AuthLayout
         showBack
         onBack={() => navigation?.goBack()}
-        compactHero
         title="Verify email"
         subtitle="We sent a 4-digit code to your email"
         extra={email ? <Text style={styles.emailText}>{email}</Text> : null}>

@@ -12,7 +12,7 @@ import {
   TextInput,
   useWindowDimensions,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const TEAL = '#008178';
@@ -31,9 +31,7 @@ const AuthLayout = ({
 }) => {
   const insets = useSafeAreaInsets();
   const {width, height} = useWindowDimensions();
-  const heroHeight = compactHero
-    ? Math.min(width * 0.52, height * 0.28)
-    : Math.min(width * 0.7, height * 0.36);
+  const heroHeight = Math.min(width * 0.7, height * 0.36);
 
   return (
     <View style={styles.page}>
@@ -55,8 +53,13 @@ const AuthLayout = ({
               style={styles.heroImage}
               resizeMode="cover"
             />
+            <Image
+              source={require('../../assets/logo.png')}
+              style={[styles.logo, {top: Math.max(8, insets.top)}]}
+              resizeMode="contain"
+            />
 
-            <SafeAreaView edges={['top']} style={styles.heroOverlay}>
+            <View style={[styles.heroOverlay, {paddingTop: insets.top}]}>
               <View style={styles.heroTopRow}>
                 {showBack ? (
                   <TouchableOpacity
@@ -89,7 +92,7 @@ const AuthLayout = ({
                   </Text>
                 </View>
               )}
-            </SafeAreaView>
+            </View>
           </View>
 
           <View style={styles.card}>
@@ -184,6 +187,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
+  },
+  logo: {
+    position: 'absolute',
+    left: -30,
+    top: 8,
+    width: 150,
+    height: 150,
+    zIndex: 2,
   },
   heroOverlay: {
     flex: 1,

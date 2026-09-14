@@ -200,7 +200,11 @@ function AppNavigator() {
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={CreateAccountScreen} />
-          <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
+          <Stack.Screen
+            name="VerifyPhone"
+            component={VerifyPhoneScreen}
+            options={{safeAreaInsets: {top: 0}}}
+          />
         </>
       )}
     </Stack.Navigator>

@@ -162,7 +162,7 @@ const LoginScreen = ({navigation}) => {
         <AuthFooterLink
           prompt="Don't have an account? "
           actionLabel="Register"
-          onPress={() => navigation?.navigate('Register')}
+          onPress={() => navigation?.navigate('VerifyPhone')}
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
