@@ -16,6 +16,7 @@ import {
   parseNotificationData,
   handleNotificationClick,
   resolveInboxBookingId,
+  openBookingDetails,
 } from '../utils/notificationHandler';
 
 const InboxScreen = ({navigation}) => {
@@ -50,6 +51,8 @@ const InboxScreen = ({navigation}) => {
       case 'BOOKING_ACCEPTED':
       case 'BOOKING_REJECTED':
       case 'BOOKING_CANCELLED':
+      case 'SERVICE_STARTED':
+      case 'SERVICE_COMPLETED':
         return 'calendar-outline';
       case 'PAYMENT':
         return 'card-outline';
@@ -85,8 +88,7 @@ const InboxScreen = ({navigation}) => {
       const bookingId = resolveInboxBookingId(detail);
 
       if (bookingId) {
-        navigation.navigate('BookingDetails', {
-          bookingId,
+        openBookingDetails(bookingId, navigation, {
           inboxId: detail.id || notification.id,
         });
         return;

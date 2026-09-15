@@ -90,9 +90,14 @@ const NotificationBanner = ({visible, title, body, onPress, onHide}) => {
           />
           <View style={styles.textCol}>
             <Text style={styles.appName}>Nirapod</Text>
-            <Text style={styles.title} numberOfLines={2}>
+            <Text style={styles.title} numberOfLines={1}>
               {title || 'Notification'}
             </Text>
+            {!!body && (
+              <Text style={styles.body} numberOfLines={2}>
+                {body}
+              </Text>
+            )}
           </View>
         </View>
       </Pressable>
@@ -109,15 +114,12 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   card: {
-    height: 80,
+    minHeight: 80,
     borderRadius: 20,
-    // borderWidth: 1,
-    // borderColor: '#0606063e',
     backgroundColor: '#1F1F1F',
     justifyContent: 'center',
     paddingHorizontal: 14,
     paddingVertical: 12,
-   
   },
   left: {
     flex: 1,

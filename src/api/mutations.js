@@ -94,6 +94,22 @@ export const useUpdateBooking = () => {
   });
 };
 
+export const useSubmitBookingReview = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({id, rating}) => bookingService.submitReview(id, rating),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
+      if (variables?.id) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.bookings.detail(variables.id),
+        });
+      }
+    },
+  });
+};
+
 export const useCancelBooking = () => {
   const queryClient = useQueryClient();
 
@@ -199,6 +215,7 @@ export default {
   useCreateBooking,
   useUpdateBooking,
   useCancelBooking,
+  useSubmitBookingReview,
   useCreateBkashPayment,
   useExecuteBkashPayment,
   useMarkInboxRead,

@@ -48,6 +48,7 @@ export const ENDPOINTS = {
     DETAIL: id => `/bookings/${id}`,
     UPDATE: id => `/bookings/${id}`,
     CANCEL: id => `/bookings/${id}/cancel`,
+    REVIEW: id => `/bookings/${id}/review`,
   },
 
   // Hospitals endpoints

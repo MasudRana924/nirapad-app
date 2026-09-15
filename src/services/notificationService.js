@@ -272,23 +272,32 @@ class NotificationService {
    * Step 7: Handle incoming notifications
    */
   handleNotification(remoteMessage, navigation) {
-    const {title, body} = remoteMessage.notification || {};
+    const notification = remoteMessage.notification || {};
     const data = remoteMessage.data || {};
+    const title = notification.title;
+    const body = notification.body;
+    const type = data.type;
+    const id = data.booking_id || data.bookingId;
+    const payload = {
+      ...data,
+      type,
+      booking_id: id,
+    };
 
-    console.log('🔔 Notification:', {title, body, data});
+    console.log('🔔 Notification:', {title, body, type, id, data: payload});
 
     if (typeof this.foregroundBannerHandler === 'function') {
       this.foregroundBannerHandler({
         title: title || 'Notification',
         body: body || '',
-        data,
+        data: payload,
         navigation,
       });
       return;
     }
 
     if (navigation) {
-      this.navigateToScreen(data, navigation);
+      this.navigateToScreen(payload, navigation);
     }
   }
 
@@ -307,6 +316,27 @@ class NotificationService {
     const bookingId = data.booking_id || data.bookingId;
     const inboxId = data.inbox_id || data.inboxId;
     const type = data.type || data.action;
+    const openBooking =
+      type === 'SERVICE_STARTED' ||
+      type === 'SERVICE_COMPLETED' ||
+      type === 'OPEN_BOOKING' ||
+      data.action === 'OPEN_BOOKING' ||
+      data.screen === 'booking_details' ||
+      data.show_review === true ||
+      data.show_review === 'true';
+
+    if (openBooking) {
+      if (bookingId) {
+        navigation.navigate('BookingDetails', {
+          bookingId,
+          inboxId,
+          notificationOpenedAt: Date.now(),
+        });
+      } else {
+        navigation.navigate('Inbox', {inboxId});
+      }
+      return;
+    }
 
     if (data.showPaymentButton === 'true') {
       navigation.navigate('PaymentScreen', {
@@ -336,7 +366,11 @@ class NotificationService {
       case 'SERVICE_COMPLETED':
       case 'PATIENT_PICKED_UP':
         if (bookingId) {
-          navigation.navigate('BookingDetails', {bookingId, inboxId});
+          navigation.navigate('BookingDetails', {
+            bookingId,
+            inboxId,
+            notificationOpenedAt: Date.now(),
+          });
         } else {
           navigation.navigate('Inbox', {inboxId});
         }
@@ -352,7 +386,11 @@ class NotificationService {
 
       default:
         if (bookingId) {
-          navigation.navigate('BookingDetails', {bookingId, inboxId});
+          navigation.navigate('BookingDetails', {
+            bookingId,
+            inboxId,
+            notificationOpenedAt: Date.now(),
+          });
         } else {
           navigation.navigate('Inbox', {inboxId});
         }

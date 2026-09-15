@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,37 +7,114 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookingDetails} from '../api/queries';
-import {useCancelBooking} from '../api/mutations';
+import {useCancelBooking, useSubmitBookingReview} from '../api/mutations';
 import {paymentService} from '../api/services';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 import Loader from '../components/common/Loader';
 import ErrorModal from '../components/common/ErrorModal';
+import StarReviewModal from '../components/common/StarReviewModal';
+
+const COMPLETED_STATUSES = ['SERVICE_COMPLETED', 'COMPLETED'];
+const CLOSED_STATUSES = ['CANCELLED', ...COMPLETED_STATUSES];
+
+const shouldShowStarModal = booking => {
+  if (!booking) {
+    return false;
+  }
+  const canReview =
+    booking.can_review === true || booking.can_review === 'true';
+  return (
+    booking.status === 'SERVICE_COMPLETED' &&
+    canReview &&
+    booking.review == null
+  );
+};
 
 const STATUS_STYLES = {
   PENDING_PAYMENT: {bg: '#FFF4E5', text: '#D97706'},
   PROVIDER_ASSIGNED: {bg: '#E6F4F3', text: '#008178'},
   CONFIRMED: {bg: '#E6F4F3', text: '#008178'},
   IN_PROGRESS: {bg: '#E6F4F3', text: '#008178'},
+  SERVICE_IN_PROGRESS: {bg: '#E6F4F3', text: '#008178'},
   COMPLETED: {bg: '#E6F4F3', text: '#008178'},
+  SERVICE_COMPLETED: {bg: '#E6F4F3', text: '#008178'},
   CANCELLED: {bg: '#FEECEC', text: '#DC2626'},
 };
 
 const BookingDetailsScreen = ({navigation, route}) => {
-  const {bookingId} = route.params || {};
-  const {data: bookingData, isLoading} = useBookingDetails(bookingId);
+  const {bookingId, notificationOpenedAt} = route.params || {};
+  const {data: bookingData, isLoading, refetch} = useBookingDetails(bookingId, {
+    refetchOnMount: 'always',
+  });
   const cancelBooking = useCancelBooking();
+  const submitReview = useSubmitBookingReview();
   const rawData = bookingData?.data;
-  const booking = rawData?.booking || rawData;
+  const bookingBase = rawData?.booking || rawData;
+  const booking = bookingBase
+    ? {
+        ...bookingBase,
+        can_review: rawData?.can_review ?? bookingBase.can_review,
+        review:
+          rawData?.review !== undefined ? rawData.review : bookingBase.review,
+        status: rawData?.status ?? bookingBase.status,
+      }
+    : bookingBase;
   const [payLoading, setPayLoading] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [starModalVisible, setStarModalVisible] = useState(false);
+  const [reviewDismissed, setReviewDismissed] = useState(false);
   console.log('BookingDetails payment_status:', booking?.payment_status, 'status:', booking?.status);
+
+  useEffect(() => {
+    setReviewDismissed(false);
+    setStarModalVisible(false);
+    if (bookingId) {
+      refetch();
+    }
+  }, [bookingId, notificationOpenedAt, refetch]);
+
+  useEffect(() => {
+    if (reviewDismissed || isLoading || !booking) {
+      return;
+    }
+    if (shouldShowStarModal(booking)) {
+      setStarModalVisible(true);
+    } else {
+      setStarModalVisible(false);
+    }
+  }, [
+    booking?.id,
+    booking?.status,
+    booking?.can_review,
+    booking?.review,
+    isLoading,
+    reviewDismissed,
+  ]);
+
+  const closeStarModal = () => {
+    setStarModalVisible(false);
+    setReviewDismissed(true);
+  };
+
+  const handleSubmitReview = async rating => {
+    if (!bookingId || rating < 1 || rating > 5) {
+      return;
+    }
+    try {
+      await submitReview.mutateAsync({id: bookingId, rating});
+      closeStarModal();
+      Alert.alert('Thank you', 'Your rating has been submitted.');
+    } catch (error) {
+      setErrorMessage(error?.message || 'Failed to submit review. Please try again.');
+      setErrorModalVisible(true);
+    }
+  };
 
   const handlePayNow = async () => {
     if (!bookingId || payLoading) return;
@@ -101,8 +178,9 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const isPaid = booking?.payment_status === 'PAID';
   const canCancel =
     booking?.status &&
-    !['CANCELLED', 'COMPLETED'].includes(booking.status) &&
+    !CLOSED_STATUSES.includes(booking.status) &&
     !isPaid;
+  const canLeaveReview = shouldShowStarModal(booking);
 
   const familyName =
     booking?.family_member_name || booking?.family_member?.name;
@@ -199,6 +277,13 @@ const BookingDetailsScreen = ({navigation, route}) => {
         visible={errorModalVisible}
         message={errorMessage}
         onOk={() => setErrorModalVisible(false)}
+      />
+      <StarReviewModal
+        visible={starModalVisible}
+        bookingNumber={booking.booking_number}
+        submitting={submitReview.isPending}
+        onSubmit={handleSubmitReview}
+        onClose={closeStarModal}
       />
       <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
 
@@ -364,7 +449,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         )}
       </ScrollView>
 
-      {isPaid && booking?.status && !['CANCELLED', 'COMPLETED'].includes(booking.status) && (
+      {isPaid && booking?.status && !CLOSED_STATUSES.includes(booking.status) && (
         <View style={styles.supportNote}>
           <Icon name="information-circle-outline" size={18} color="#008178" />
           <Text style={styles.supportNoteText}>
@@ -373,7 +458,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         </View>
       )}
 
-      {(showPayButton || canCancel) && (
+      {(showPayButton || canCancel || canLeaveReview) && (
         <View style={styles.bottomContainer}>
           {canCancel && (
             <TouchableOpacity
@@ -391,6 +476,17 @@ const BookingDetailsScreen = ({navigation, route}) => {
               style={[styles.actionButton, styles.payButton]}
               onPress={handlePayNow}>
               <Text style={styles.payButtonText}>Pay now</Text>
+            </TouchableOpacity>
+          )}
+          {canLeaveReview && (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[styles.actionButton, styles.payButton]}
+              onPress={() => {
+                setReviewDismissed(false);
+                setStarModalVisible(true);
+              }}>
+              <Text style={styles.payButtonText}>Rate service</Text>
             </TouchableOpacity>
           )}
         </View>

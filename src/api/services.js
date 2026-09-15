@@ -285,6 +285,9 @@ export const bookingService = {
 
   getBookingDetails: id => apiRequest(`/bookings/${id}`, 'GET'),
 
+  submitReview: (id, rating) =>
+    apiRequest(`/bookings/${id}/review`, 'POST', {rating}),
+
   createBooking: bookingData =>
     apiRequest('/bookings', 'POST', bookingData, false),
 

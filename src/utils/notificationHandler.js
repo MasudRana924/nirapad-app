@@ -7,6 +7,39 @@ const getInboxId = data => data?.inbox_id || data?.inboxId || data?.id || null;
 
 const getType = data => data?.type || data?.action;
 
+const isTrue = value => value === true || value === 'true';
+
+/**
+ * Open booking details. Star modal is decided after GET /bookings/{id}.
+ */
+export const openBookingDetails = (bookingId, navigation, extra = {}) => {
+  if (!navigation) {
+    return;
+  }
+  if (bookingId) {
+    navigation.navigate('BookingDetails', {
+      ...extra,
+      bookingId,
+      notificationOpenedAt: Date.now(),
+    });
+    return;
+  }
+  navigation.navigate('Inbox', extra.inboxId ? {inboxId: extra.inboxId} : undefined);
+};
+
+const shouldOpenBookingDetails = data => {
+  const type = getType(data);
+  const screen = data?.screen;
+  return (
+    type === 'SERVICE_STARTED' ||
+    type === 'SERVICE_COMPLETED' ||
+    type === 'OPEN_BOOKING' ||
+    data?.action === 'OPEN_BOOKING' ||
+    screen === 'booking_details' ||
+    isTrue(data?.show_review)
+  );
+};
+
 /**
  * Handle notification click and navigate to appropriate screen
  * @param {Object} data - Notification data
@@ -18,6 +51,11 @@ export const handleNotificationClick = (data, navigation) => {
   const bookingId = getBookingId(data);
   const inboxId = getInboxId(data);
   const type = getType(data);
+
+  if (shouldOpenBookingDetails(data)) {
+    openBookingDetails(bookingId, navigation, {inboxId});
+    return;
+  }
 
   if (data?.showPaymentButton === 'true') {
     navigation.navigate('PaymentScreen', {
@@ -40,11 +78,7 @@ export const handleNotificationClick = (data, navigation) => {
     case 'BOOKING_CANCELLED':
     case 'SERVICE_STARTED':
     case 'SERVICE_COMPLETED':
-      if (bookingId) {
-        navigation.navigate('BookingDetails', {bookingId, inboxId});
-      } else {
-        navigation.navigate('Inbox', {inboxId});
-      }
+      openBookingDetails(bookingId, navigation, {inboxId});
       break;
 
     case 'PAYMENT_SUCCESS':
@@ -57,11 +91,7 @@ export const handleNotificationClick = (data, navigation) => {
       break;
 
     default:
-      if (bookingId) {
-        navigation.navigate('BookingDetails', {bookingId, inboxId});
-      } else {
-        navigation.navigate('Inbox', {inboxId});
-      }
+      openBookingDetails(bookingId, navigation, {inboxId});
   }
 };
 

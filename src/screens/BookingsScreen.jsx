@@ -35,13 +35,17 @@ const formatDate = dateString => {
   });
 };
 
-const isCompleted = booking => booking?.status === 'COMPLETED';
+const isCompleted = booking =>
+  booking?.status === 'COMPLETED' || booking?.status === 'SERVICE_COMPLETED';
 const isPending = booking =>
-  booking?.status !== 'COMPLETED' && booking?.status !== 'CANCELLED';
+  booking?.status !== 'COMPLETED' &&
+  booking?.status !== 'SERVICE_COMPLETED' &&
+  booking?.status !== 'CANCELLED';
 
 const getStatusMeta = booking => {
   switch (booking?.status) {
     case 'COMPLETED':
+    case 'SERVICE_COMPLETED':
       return {
         label: 'Completed',
         icon: 'checkmark-circle',
@@ -70,6 +74,7 @@ const getStatusMeta = booking => {
         bg: '#E6F4F3',
       };
     case 'IN_PROGRESS':
+    case 'SERVICE_IN_PROGRESS':
       return {
         label: 'In Progress',
         icon: 'play-circle',
