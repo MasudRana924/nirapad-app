@@ -151,7 +151,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Booking details" onBack={() => navigation?.goBack()} />
+        <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
         <BookingDetailsSkeleton />
       </SafeAreaView>
     );
@@ -160,7 +160,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
   if (!booking) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Booking details" onBack={() => navigation?.goBack()} />
+        <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
         <View style={styles.errorContainer}>
           <View style={styles.errorIcon}>
             <Icon name="alert-circle-outline" size={32} color="#008178" />
@@ -200,7 +200,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         message={errorMessage}
         onOk={() => setErrorModalVisible(false)}
       />
-      <Header title="Booking details" onBack={() => navigation?.goBack()} />
+      <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
 
       <ScrollView
         style={styles.scrollView}

@@ -44,7 +44,7 @@ const PaymentCancelledScreen = ({navigation, route}) => {
             activeOpacity={0.85}
             style={styles.goBackButton}
             onPress={handleGoBack}>
-            <Icon name="arrow-back-outline" size={20} color="#FFFFFF" />
+            {/* <Icon name="arrow-back-outline" size={20} color="#FFFFFF" /> */}
             <Text style={styles.goBackText}>Go Back</Text>
           </TouchableOpacity>
         </View>

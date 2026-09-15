@@ -146,19 +146,6 @@ const LoginScreen = ({navigation}) => {
           disabled={loading}
           onPress={handleLogin}
         />
-
-        {/* <AuthOrDivider /> */}
-
-        {/* <AuthOutlineButton
-          icon="call-outline"
-          title={isPhoneLogin ? 'Login with Email' : 'Login with Phone Number'}
-          onPress={() => {
-            setIsPhoneLogin(prev => !prev);
-            setIdentifier('');
-            setError('');
-          }}
-        /> */}
-
         <AuthFooterLink
           prompt="Don't have an account? "
           actionLabel="Register"
