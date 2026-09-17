@@ -1,0 +1,78 @@
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import AppModal from '../components/common/AppModal';
+
+const ModalContext = createContext();
+
+export const ModalProvider = ({ children }) => {
+  const [modalState, setModalState] = useState({
+    visible: false,
+    type: 'error',
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    confirmDestructive: false,
+    onConfirm: undefined,
+    onClose: undefined,
+  });
+
+  const showModal = useCallback((options) => {
+    setModalState({
+      visible: true,
+      type: options.type || 'error',
+      title: options.title || '',
+      message: options.message || '',
+      confirmText: options.confirmText || 'Confirm',
+      cancelText: options.cancelText || 'Cancel',
+      confirmDestructive: options.confirmDestructive || false,
+      onConfirm: options.onConfirm,
+      onClose: options.onClose,
+    });
+  }, []);
+
+  const hideModal = useCallback(() => {
+    setModalState((prev) => ({
+      ...prev,
+      visible: false,
+    }));
+  }, []);
+
+  const handleClose = () => {
+    if (modalState.onClose) {
+      modalState.onClose();
+    }
+    hideModal();
+  };
+
+  const handleConfirm = () => {
+    if (modalState.onConfirm) {
+      modalState.onConfirm();
+    }
+    hideModal();
+  };
+
+  return (
+    <ModalContext.Provider value={{ showModal, hideModal }}>
+      {children}
+      <AppModal
+        visible={modalState.visible}
+        type={modalState.type}
+        title={modalState.title}
+        message={modalState.message}
+        confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+        confirmDestructive={modalState.confirmDestructive}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+      />
+    </ModalContext.Provider>
+  );
+};
+
+export const useAppModal = () => {
+  const context = useContext(ModalContext);
+  if (!context) {
+    throw new Error('useAppModal must be used within a ModalProvider');
+  }
+  return context;
+};

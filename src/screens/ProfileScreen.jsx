@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -15,11 +14,13 @@ import {useAuth} from '../context/AuthContext';
 import {useUserProfile} from '../api/queries';
 import Toast from '../components/common/Toast';
 import {storage} from '../utils/storage';
+import {useAppModal} from '../contexts/ModalContext';
 
 const LANG_KEY = 'app_language';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useAuth();
+  const {showModal} = useAppModal();
   const {data: profileData, isLoading} = useUserProfile();
   const [language, setLanguage] = useState('en');
   const [toast, setToast] = useState({

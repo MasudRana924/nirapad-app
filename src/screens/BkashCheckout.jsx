@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,16 @@ import {
   ActivityIndicator,
   Linking,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {WebView} from 'react-native-webview';
-import {paymentService} from '../api/services';
-import {useQueryClient} from '@tanstack/react-query';
-import {queryKeys} from '../api/queryKeys';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
+import { paymentService } from '../api/services';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '../api/queryKeys';
 
 const getPaymentData = payload => payload?.data || payload || {};
 
-const BkashCheckout = ({route, navigation}) => {
-  const {bookingId, paymentID: prePaymentID, amount: preAmount} =
+const BkashCheckout = ({ route, navigation }) => {
+  const { bookingId, paymentID: prePaymentID, amount: preAmount } =
     route.params || {};
   const queryClient = useQueryClient();
   const [isExecuting, setIsExecuting] = useState(false);
@@ -75,7 +75,7 @@ const BkashCheckout = ({route, navigation}) => {
       } else {
         setStatusMessage(
           createPaymentResponse?.message ||
-            'Payment creation failed. Please try again.',
+          'Payment creation failed. Please try again.',
         );
       }
     } catch (error) {
@@ -152,7 +152,7 @@ const BkashCheckout = ({route, navigation}) => {
     if (message === 'SUCCESS') {
       executePayment();
     } else if (message === 'CLOSED') {
-      navigation.replace('PaymentCancelled', {bookingId: bookingIdRef.current || bookingId});
+      navigation.replace('PaymentCancelled', { bookingId: bookingIdRef.current || bookingId });
     } else if (message === 'LOAD_FAILED') {
       setStatusMessage('Failed to load payment system. Please try again.');
       setWebViewHtml('');
@@ -186,7 +186,7 @@ const BkashCheckout = ({route, navigation}) => {
       const data = getPaymentData(response);
 
       if (data?.paymentID || data?.paymentId || response?.success) {
-        queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
+        queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
         queryClient.invalidateQueries({
           queryKey: queryKeys.bookings.detail(activeBookingId),
         });
@@ -195,7 +195,7 @@ const BkashCheckout = ({route, navigation}) => {
         setWebViewHtml('');
         setStatusMessage(
           response?.message ||
-            'Payment verification failed. Please contact support.',
+          'Payment verification failed. Please contact support.',
         );
       }
     } catch (error) {
@@ -203,7 +203,7 @@ const BkashCheckout = ({route, navigation}) => {
       setWebViewHtml('');
       setStatusMessage(
         error?.message ||
-          'Payment verification failed. Please contact support.',
+        'Payment verification failed. Please contact support.',
       );
     } finally {
       executingRef.current = false;
@@ -217,19 +217,27 @@ const BkashCheckout = ({route, navigation}) => {
       <SafeAreaView style={styles.safeArea}>
         {isExecuting && (
           <View style={styles.executingOverlay}>
-            <ActivityIndicator size="large" color="#E2136E" />
-            <Text style={styles.executingText}>Verifying payment...</Text>
+            <ActivityIndicator
+              size="large"
+              color="#E2136E"
+              style={{ transform: [{ scale: 1.8 }] }}
+            />
+
           </View>
         )}
         {webViewLoading && !isExecuting && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#E2136E" />
-            <Text style={styles.loadingText}>Loading bKash...</Text>
+            <ActivityIndicator
+              size="large"
+              color="#E2136E"
+              style={{ transform: [{ scale: 1.8 }] }}
+            />
+
           </View>
         )}
         <WebView
           ref={webViewRef}
-          source={{html: webViewHtml}}
+          source={{ html: webViewHtml }}
           style={styles.webView}
           onMessage={handleWebViewMessage}
           onLoadStart={() => setWebViewLoading(true)}
@@ -268,7 +276,7 @@ const BkashCheckout = ({route, navigation}) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
-              navigation.navigate('BookingDetails', {bookingId})
+              navigation.navigate('BookingDetails', { bookingId })
             }>
             <Text style={styles.buttonText}>Go Back</Text>
           </TouchableOpacity>

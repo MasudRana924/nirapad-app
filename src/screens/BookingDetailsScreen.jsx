@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,9 +15,8 @@ import {paymentService} from '../api/services';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 import Loader from '../components/common/Loader';
-import ErrorModal from '../components/common/ErrorModal';
 import StarReviewModal from '../components/common/StarReviewModal';
-import SuccessModal from '../components/common/SuccessModal';
+import {useAppModal} from '../contexts/ModalContext';
 
 const COMPLETED_STATUSES = ['SERVICE_COMPLETED', 'COMPLETED'];
 const CLOSED_STATUSES = ['CANCELLED', ...COMPLETED_STATUSES];
@@ -66,11 +64,9 @@ const BookingDetailsScreen = ({navigation, route}) => {
       }
     : bookingBase;
   const [payLoading, setPayLoading] = useState(false);
-  const [errorModalVisible, setErrorModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const {showModal} = useAppModal();
   const [starModalVisible, setStarModalVisible] = useState(false);
   const [reviewDismissed, setReviewDismissed] = useState(false);
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
   console.log('BookingDetails payment_status:', booking?.payment_status, 'status:', booking?.status);
 
   useEffect(() => {
@@ -111,10 +107,9 @@ const BookingDetailsScreen = ({navigation, route}) => {
     try {
       await submitReview.mutateAsync({id: bookingId, rating});
       closeStarModal();
-      setSuccessModalVisible(true);
+      showModal({type: 'success', title: 'Thank You!', message: 'Your rating has been submitted successfully. We appreciate your feedback!'});
     } catch (error) {
-      setErrorMessage(error?.message || 'Failed to submit review. Please try again.');
-      setErrorModalVisible(true);
+      showModal({type: 'error', title: 'Error', message: error?.message || 'Failed to submit review. Please try again.'});
     }
   };
 
@@ -133,12 +128,10 @@ const BookingDetailsScreen = ({navigation, route}) => {
           amount,
         });
       } else {
-        setErrorMessage(response?.message || 'Payment creation failed. Please try again.');
-        setErrorModalVisible(true);
+        showModal({type: 'error', title: 'Error', message: response?.message || 'Payment creation failed. Please try again.'});
       }
     } catch (error) {
-      setErrorMessage(error?.message || 'Payment failed. Please try again.');
-      setErrorModalVisible(true);
+      showModal({type: 'error', title: 'Error', message: error?.message || 'Payment failed. Please try again.'});
     } finally {
       setPayLoading(false);
     }
@@ -205,27 +198,25 @@ const BookingDetailsScreen = ({navigation, route}) => {
     booking?.hospital_name || booking?.hospital?.name;
 
   const handleCancel = () => {
-    Alert.alert('Cancel booking', 'Do you want to cancel this booking?', [
-      {text: 'Keep', style: 'cancel'},
-      {
-        text: 'Cancel booking',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await cancelBooking.mutateAsync({
-              id: bookingId,
-              reason: 'Plans changed',
-            });
-            Alert.alert('Cancelled', 'Booking cancelled successfully');
-          } catch (error) {
-            Alert.alert(
-              'Error',
-              error?.message || 'Failed to cancel booking',
-            );
-          }
-        },
+    showModal({
+      type: 'confirm',
+      title: 'Cancel Booking',
+      message: 'Do you want to cancel this booking?',
+      cancelText: 'Keep',
+      confirmText: 'Cancel Booking',
+      confirmDestructive: true,
+      onConfirm: async () => {
+        try {
+          await cancelBooking.mutateAsync({
+            id: bookingId,
+            reason: 'Plans changed',
+          });
+          showModal({type: 'success', title: 'Cancelled', message: 'Booking cancelled successfully'});
+        } catch (error) {
+          showModal({type: 'error', title: 'Error', message: error?.message || 'Failed to cancel booking'});
+        }
       },
-    ]);
+    });
   };
 
   if (isLoading) {
@@ -275,11 +266,6 @@ const BookingDetailsScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={cancelBooking.isPending || payLoading} />
-      <ErrorModal
-        visible={errorModalVisible}
-        message={errorMessage}
-        onOk={() => setErrorModalVisible(false)}
-      />
       <StarReviewModal
         visible={starModalVisible}
         bookingNumber={booking.booking_number}
@@ -287,12 +273,6 @@ const BookingDetailsScreen = ({navigation, route}) => {
         submitting={submitReview.isPending}
         onSubmit={handleSubmitReview}
         onClose={closeStarModal}
-      />
-      <SuccessModal
-        visible={successModalVisible}
-        title="Thank You!"
-        message="Your rating has been submitted successfully. We appreciate your feedback!"
-        onClose={() => setSuccessModalVisible(false)}
       />
       <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
 

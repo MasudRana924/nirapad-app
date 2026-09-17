@@ -15,6 +15,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import NotificationBanner from './src/components/common/NotificationBanner';
 import {handleNotificationClick, parseNotificationData} from './src/utils/notificationHandler';
 import {queryKeys} from './src/api/queryKeys';
+import {ModalProvider} from './src/contexts/ModalContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -125,7 +126,9 @@ function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AppContent />
+          <ModalProvider>
+            <AppContent />
+          </ModalProvider>
         </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

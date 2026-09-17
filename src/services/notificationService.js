@@ -8,10 +8,11 @@ import {
   onTokenRefresh,
   getInitialNotification,
 } from '@react-native-firebase/messaging';
-import {Platform} from 'react-native';
+import {NativeModules, Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import {apiRequest} from './api';
+import {requestNotificationPermission} from '../utils/permissions';
 
 const AUTHORIZED = 1;
 const PROVISIONAL = 2;
@@ -55,11 +56,20 @@ class NotificationService {
         }
 
         return enabled;
-      } else {
-        // Android permissions are handled in AndroidManifest.xml
-        console.log('✅ Android notification permissions');
-        return true;
       }
+
+      const androidGranted = await requestNotificationPermission();
+      if (androidGranted) {
+        console.log('✅ Android notification permission granted');
+      } else {
+        console.log('❌ Android notification permission denied');
+      }
+      try {
+        await NativeModules.LocalNotification?.createChannel();
+      } catch (channelError) {
+        console.log('⚠️ Notification channel create failed:', channelError);
+      }
+      return androidGranted;
     } catch (error) {
       console.error('❌ Permission request error:', error);
       return false;

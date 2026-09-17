@@ -66,12 +66,24 @@ export const requestLocationPermission = async () => {
 
 export const requestNotificationPermission = async () => {
   try {
-    const permission =
-      Platform.OS === 'ios'
-        ? PERMISSIONS.IOS.NOTIFICATIONS
-        : PERMISSIONS.ANDROID.POST_NOTIFICATIONS;
-    const result = await request(permission);
-    return isGranted(result);
+    if (Platform.OS === 'ios') {
+      const result = await request(PERMISSIONS.IOS.NOTIFICATIONS);
+      return isGranted(result);
+    }
+
+    if (Platform.OS === 'android') {
+      const apiLevel =
+        typeof Platform.Version === 'number'
+          ? Platform.Version
+          : parseInt(String(Platform.Version), 10);
+      if (apiLevel < 33) {
+        return true;
+      }
+      const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+      return isGranted(result);
+    }
+
+    return false;
   } catch (error) {
     console.error('Notification permission error:', error);
     return false;
