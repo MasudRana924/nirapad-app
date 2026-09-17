@@ -2,11 +2,10 @@ import React, {useState} from 'react';
 import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
+import ErrorModal from '../components/common/ErrorModal';
 import AuthLayout, {
   AuthField,
   AuthPrimaryButton,
-  AuthOutlineButton,
-  AuthOrDivider,
   AuthFooterLink,
 } from '../components/auth/AuthLayout';
 import {loginUser, extractAuthPayload} from '../services/api';
@@ -87,7 +86,7 @@ const LoginScreen = ({navigation}) => {
         setError(message);
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err?.message || 'Something went wrong. Please try again.');
       console.error('❌ Login error:', err);
     } finally {
       setLoading(false);
@@ -97,6 +96,11 @@ const LoginScreen = ({navigation}) => {
   return (
     <>
       <Loader visible={loading} />
+      <ErrorModal
+        visible={!!error}
+        message={error}
+        onOk={() => setError('')}
+      />
       <AuthLayout
         title="Welcome Back"
         subtitle="Sign in to continue caring for your loved ones">
@@ -104,11 +108,7 @@ const LoginScreen = ({navigation}) => {
           icon={isPhoneLogin ? 'call-outline' : 'mail-outline'}
           value={identifier}
           onChangeText={setIdentifier}
-          placeholder={
-            isPhoneLogin
-              ? 'Enter your phone number'
-              : 'Enter your email address'
-          }
+          placeholder={isPhoneLogin ? 'Phone number' : 'Email address'}
           keyboardType={isPhoneLogin ? 'phone-pad' : 'email-address'}
           autoCapitalize="none"
         />
@@ -117,7 +117,7 @@ const LoginScreen = ({navigation}) => {
           icon="lock-closed-outline"
           value={password}
           onChangeText={setPassword}
-          placeholder="Enter your password"
+          placeholder="Password"
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           right={
@@ -151,8 +151,6 @@ const LoginScreen = ({navigation}) => {
           actionLabel="Register"
           onPress={() => navigation?.navigate('VerifyPhone')}
         />
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </AuthLayout>
     </>
   );
@@ -170,11 +168,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#008178',
-  },
-  errorText: {
-    fontSize: 13,
-    color: '#DC2626',
-    textAlign: 'center',
-    marginTop: 12,
   },
 });

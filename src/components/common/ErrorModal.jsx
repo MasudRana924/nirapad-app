@@ -17,9 +17,10 @@ const ErrorModal = ({visible, message, onOk}) => {
       onRequestClose={onOk}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.title}>Error</Text>
-          <View style={styles.dottedLine} />
           <Text style={styles.message}>{message}</Text>
+          <View style={styles.dottedWrap}>
+            <View style={styles.dottedLine} />
+          </View>
           <TouchableOpacity style={styles.okButton} onPress={onOk}>
             <Text style={styles.okButtonText}>Okay</Text>
           </TouchableOpacity>
@@ -39,39 +40,40 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 22,
+    paddingBottom: 12,
     width: Dimensions.get('window').width * 0.8,
     maxWidth: 320,
     alignItems: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111820',
+  message: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#DC2626',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 14,
+  },
+  dottedWrap: {
+    width: '100%',
+    height: 1,
+    overflow: 'hidden',
     marginBottom: 8,
   },
   dottedLine: {
     width: '100%',
-    height: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
     borderStyle: 'dotted',
-    marginBottom: 12,
-  },
-  message: {
-    fontSize: 10,
-    color: '#DC2626',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 14,
   },
   okButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
   },
   okButtonText: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#111820',
   },
 });

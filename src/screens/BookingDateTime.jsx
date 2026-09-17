@@ -45,16 +45,17 @@ const MONTH_SHORT = [
   'Dec',
 ];
 
-const TIMES = [
-  '09:00 AM',
-  '10:00 AM',
-  '11:00 AM',
-  '12:00 PM',
-  '02:00 PM',
-  '03:00 PM',
-  '04:00 PM',
-  '05:00 PM',
-].map((time, index) => ({id: index + 1, time}));
+const formatHourLabel = hour24 => {
+  const meridiem = hour24 < 12 ? 'AM' : 'PM';
+  const hour12 = hour24 % 12 || 12;
+  return `${String(hour12).padStart(2, '0')}:00 ${meridiem}`;
+};
+
+const TIMES = Array.from({length: 24}, (_, hour) => ({
+  id: hour + 1,
+  hour,
+  time: formatHourLabel(hour),
+}));
 
 const DURATIONS = [2, 3, 4, 5, 6, 8];
 
@@ -231,6 +232,7 @@ const BookingDateTime = ({navigation, route}) => {
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
   const [durationHours, setDurationHours] = useState(4);
   const [notes, setNotes] = useState('');
 
@@ -266,7 +268,9 @@ const BookingDateTime = ({navigation, route}) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled">
         <Text style={styles.pageHint}>
           Choose when you need the caregiver
         </Text>
@@ -279,27 +283,72 @@ const BookingDateTime = ({navigation, route}) => {
           />
 
           <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
-            Time
+            Start time
           </Text>
-          <View style={styles.timeGrid}>
-            {TIMES.map(time => {
-              const selected = selectedTime?.id === time.id;
-              return (
-                <TouchableOpacity
-                  key={time.id}
-                  activeOpacity={0.85}
-                  style={[styles.timeChip, selected && styles.chipSelected]}
-                  onPress={() => setSelectedTime(time)}>
-                  <Text
-                    style={[
-                      styles.chipText,
-                      selected && styles.chipTextSelected,
-                    ]}>
-                    {time.time}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+          <View
+            style={[
+              styles.timeDropdownWrap,
+              timeDropdownOpen && styles.timeDropdownWrapOpen,
+            ]}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[
+                styles.timeDropdownButton,
+                timeDropdownOpen && styles.timeDropdownButtonOpen,
+              ]}
+              onPress={() => setTimeDropdownOpen(open => !open)}>
+              <Icon name="time-outline" size={18} color="#008178" />
+              <Text
+                style={[
+                  styles.timeDropdownValue,
+                  !selectedTime && styles.timeDropdownPlaceholder,
+                ]}>
+                {selectedTime?.time || 'Select start time'}
+              </Text>
+              <Icon
+                name={timeDropdownOpen ? 'chevron-up' : 'chevron-down'}
+                size={18}
+                color="#8190A7"
+              />
+            </TouchableOpacity>
+            {timeDropdownOpen && (
+              <View style={styles.timeDropdownPanel}>
+                <ScrollView
+                  nestedScrollEnabled
+                  keyboardShouldPersistTaps="handled"
+                  style={styles.timeDropdownList}
+                  showsVerticalScrollIndicator={false}>
+                  {TIMES.map((time, index) => {
+                    const selected = selectedTime?.id === time.id;
+                    return (
+                      <TouchableOpacity
+                        key={time.id}
+                        activeOpacity={0.75}
+                        style={[
+                          styles.timeDropdownItem,
+                          index === TIMES.length - 1 &&
+                            styles.timeDropdownItemLast,
+                        ]}
+                        onPress={() => {
+                          setSelectedTime(time);
+                          setTimeDropdownOpen(false);
+                        }}>
+                        <Text
+                          style={[
+                            styles.timeDropdownItemText,
+                            selected && styles.timeDropdownItemTextSelected,
+                          ]}>
+                          {time.time}
+                        </Text>
+                        {selected && (
+                          <Icon name="checkmark" size={18} color="#008178" />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
           </View>
 
           <Text style={styles.sectionTitle}>Duration</Text>
@@ -479,23 +528,74 @@ const styles = StyleSheet.create({
   dayNumberSelected: {
     color: '#FFFFFF',
   },
-  timeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+  timeDropdownWrap: {
     marginBottom: 20,
     paddingHorizontal: 8,
+    zIndex: 1,
   },
-  timeChip: {
-    width: '47%',
-    flexGrow: 1,
-    height: 42,
-    borderRadius: 12,
+  timeDropdownWrapOpen: {
+    zIndex: 20,
+  },
+  timeDropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 52,
+    paddingHorizontal: 14,
+    gap: 10,
     backgroundColor: '#F6F6F6',
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#E3E8F0',
+  },
+  timeDropdownButtonOpen: {
+    borderColor: '#008178',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  timeDropdownValue: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111820',
+  },
+  timeDropdownPlaceholder: {
+    fontWeight: '500',
+    color: '#8190A7',
+  },
+  timeDropdownPanel: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: '#008178',
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
+    maxHeight: 240,
+    overflow: 'hidden',
+  },
+  timeDropdownList: {
+    maxHeight: 240,
+  },
+  timeDropdownItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F2F5',
+  },
+  timeDropdownItemLast: {
+    borderBottomWidth: 0,
+  },
+  timeDropdownItemText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#111820',
+    paddingRight: 8,
+  },
+  timeDropdownItemTextSelected: {
+    color: '#008178',
+    fontWeight: '600',
   },
   durationRow: {
     flexDirection: 'row',

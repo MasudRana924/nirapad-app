@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,15 +10,15 @@ import {
   ScrollView,
   StatusBar,
   TextInput,
-  useWindowDimensions,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const TEAL = '#008178';
-const INK = '#1B3330';
+const INK = '#163532';
 const MUTED = '#7E9390';
-const PAGE = '#E8F4EE';
+const PAGE = '#EAF6F1';
+const BORDER = '#C9DDD7';
 
 const AuthLayout = ({
   children,
@@ -27,15 +27,17 @@ const AuthLayout = ({
   extra,
   showBack = false,
   onBack,
-  compactHero = false,
 }) => {
   const insets = useSafeAreaInsets();
-  const {width, height} = useWindowDimensions();
-  const heroHeight = Math.min(width * 0.7, height * 0.36);
 
   return (
     <View style={styles.page}>
       <StatusBar barStyle="dark-content" backgroundColor={PAGE} />
+      <View pointerEvents="none" style={styles.blobTop} />
+      <View pointerEvents="none" style={styles.blobTopSoft} />
+      <View pointerEvents="none" style={styles.blobBottomLeft} />
+      <View pointerEvents="none" style={styles.blobBottomRight} />
+
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -45,90 +47,70 @@ const AuthLayout = ({
           bounces={false}
           contentContainerStyle={[
             styles.scroll,
-            {paddingBottom: Math.max(28, insets.bottom + 18)},
+            {
+              paddingTop: Math.max(20, insets.top + 8),
+              paddingBottom: Math.max(36, insets.bottom + 24),
+            },
           ]}>
-          <View style={[styles.hero, {height: heroHeight}]}>
+          {showBack ? (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.backButton}
+              onPress={onBack}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              <Icon name="arrow-back" size={22} color={INK} />
+            </TouchableOpacity>
+          ) : null}
+
+          <View style={styles.brand}>
             <Image
-              source={require('../../assets/auth-hero.png')}
-              style={styles.heroImage}
-              resizeMode="cover"
-            />
-            <Image
-              source={require('../../assets/logo.png')}
-              style={[styles.logo, {top: Math.max(8, insets.top)}]}
+              source={require('../../assets/auth.png')}
+              style={styles.brandLogo}
               resizeMode="contain"
             />
-
-            <View style={[styles.heroOverlay, {paddingTop: insets.top}]}>
-              <View style={styles.heroTopRow}>
-                {showBack ? (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.backButton}
-                    onPress={onBack}
-                    hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-                    <Icon name="arrow-back" size={20} color={INK} />
-                  </TouchableOpacity>
-                ) : (
-                  <View style={styles.backPlaceholder} />
-                )}
-                <View style={styles.taglineBlock}>
-                  <Text style={styles.tagline}>Better Care</Text>
-                  <View style={styles.taglineRow}>
-                    <Text style={styles.tagline}>Happier Days</Text>
-                    <Icon name="heart" size={11} color={TEAL} />
-                  </View>
-                </View>
-              </View>
-
-              {compactHero ? null : (
-                <View style={styles.heroCopy}>
-                  <Text style={styles.heroTitle}>
-                    Trusted Care for{'\n'}your Loved Ones
-                  </Text>
-                  <Text style={styles.heroSubtitle}>
-                    Book verified caregivers and nurses for your family's better
-                    tomorrow.
-                  </Text>
-                </View>
-              )}
-            </View>
+            {/* <Text style={styles.brandName}>Nirapod</Text> */}
+            <Text style={styles.brandTagline}>Care for a better tomorrow</Text>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.title}>{title}</Text>
-            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-            {extra}
-            <View style={styles.accent} />
-            {children}
-          </View>
+          <Text style={styles.title}>{title}</Text>
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          {extra}
+          <View style={styles.accent} />
+          {children}
         </ScrollView>
       </KeyboardAvoidingView>
-
-      <View pointerEvents="none" style={styles.leafLeft}>
-        <Icon name="leaf" size={86} color="rgba(0,129,120,0.14)" />
-      </View>
-      <View pointerEvents="none" style={styles.leafRight}>
-        <Icon name="leaf" size={72} color="rgba(0,129,120,0.12)" />
-      </View>
-      <View pointerEvents="none" style={styles.heartDecor}>
-        <Icon name="heart-outline" size={18} color="rgba(0,129,120,0.28)" />
-      </View>
     </View>
   );
 };
 
-export const AuthField = ({icon, right, style, ...inputProps}) => (
-  <View style={[styles.inputRow, style]}>
-    <Icon name={icon} size={18} color={MUTED} />
-    <TextInput
-      style={styles.input}
-      placeholderTextColor={MUTED}
-      {...inputProps}
-    />
-    {right}
-  </View>
-);
+export const AuthField = ({icon, right, style, ...inputProps}) => {
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <View
+      style={[
+        styles.inputRow,
+        focused && styles.inputRowFocused,
+        style,
+      ]}>
+      <Icon name={icon} size={18} color={MUTED} />
+      <TextInput
+        style={styles.input}
+        placeholderTextColor={MUTED}
+        {...inputProps}
+        onFocus={event => {
+          setFocused(true);
+          inputProps.onFocus?.(event);
+        }}
+        onBlur={event => {
+          setFocused(false);
+          inputProps.onBlur?.(event);
+        }}
+      />
+      {right}
+    </View>
+  );
+};
 
 export const AuthPrimaryButton = ({title, onPress, disabled}) => (
   <TouchableOpacity
@@ -174,128 +156,119 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
     backgroundColor: PAGE,
+    overflow: 'hidden',
   },
   flex: {
     flex: 1,
   },
-  hero: {
-    width: '100%',
-    overflow: 'hidden',
-    backgroundColor: PAGE,
-  },
-  heroImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  logo: {
-    position: 'absolute',
-    left: -30,
-    top: 8,
-    width: 150,
-    height: 150,
-    zIndex: 2,
-  },
-  heroOverlay: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  heroTopRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-  },
-  backPlaceholder: {
-    width: 38,
-  },
-  taglineBlock: {
-    alignItems: 'flex-end',
-    marginTop: 4,
-  },
-  taglineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  tagline: {
-    fontSize: 13,
-    fontStyle: 'italic',
-    fontWeight: '600',
-    color: TEAL,
-    lineHeight: 18,
-  },
-  heroCopy: {
-    marginTop: 16,
-    maxWidth: 168,
-  },
-  heroTitle: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '800',
-    color: INK,
-    letterSpacing: -0.4,
-  },
-  heroSubtitle: {
-    marginTop: 8,
-    fontSize: 12,
-    lineHeight: 17,
-    color: '#5F746F',
-  },
   scroll: {
     flexGrow: 1,
+    paddingHorizontal: 28,
   },
-  card: {
-    marginTop: -42,
-    marginHorizontal: 18,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 28,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 22,
-    shadowColor: '#0B3D38',
-    shadowOffset: {width: 0, height: 12},
-    shadowOpacity: 0.1,
-    shadowRadius: 24,
-    elevation: 10,
+  blobTop: {
+    position: 'absolute',
+    top: -110,
+    right: -70,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: 'rgba(168, 214, 198, 0.55)',
   },
-  title: {
+  blobTopSoft: {
+    position: 'absolute',
+    top: -40,
+    right: -120,
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: 'rgba(0, 129, 120, 0.08)',
+  },
+  blobBottomLeft: {
+    position: 'absolute',
+    bottom: -90,
+    left: -80,
+    width: 280,
+    height: 220,
+    borderRadius: 140,
+    backgroundColor: 'rgba(168, 214, 198, 0.45)',
+  },
+  blobBottomRight: {
+    position: 'absolute',
+    bottom: -120,
+    right: -40,
+    width: 260,
+    height: 240,
+    borderRadius: 130,
+    backgroundColor: 'rgba(0, 129, 120, 0.08)',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    marginLeft: -8,
+  },
+  brand: {
+    alignItems: 'flex-start',
+    marginBottom: 28,
+    marginTop: 8,
+  },
+  brandLogo: {
+    width: 56,
+    height: 56,
+    marginBottom: 6,
+  },
+  brandName: {
     fontSize: 28,
     fontWeight: '800',
-    color: INK,
-    letterSpacing: -0.5,
+    color: TEAL,
+    letterSpacing: -0.4,
+    marginTop: -2,
   },
-  subtitle: {
-    marginTop: 6,
-    fontSize: 14,
-    lineHeight: 20,
+  brandTagline: {
+    marginTop: 2,
+    fontSize: 12,
+    fontStyle: 'italic',
     color: MUTED,
   },
-  accent: {
-    width: 42,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: TEAL,
-    marginTop: 12,
-    marginBottom: 22,
+  title: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: INK,
+    letterSpacing: -0.6,
   },
+  subtitle: {
+    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 22,
+    color: MUTED,
+    maxWidth: 280,
+    marginBottom:25
+  },
+  // accent: {
+  //   width: 42,
+  //   height: 4,
+  //   borderRadius: 2,
+  //   backgroundColor: TEAL,
+  //   marginTop: 16,
+  //   marginBottom: 26,
+  // },
   inputRow: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#F3F6F5',
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: BORDER,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     gap: 10,
     marginBottom: 14,
+  },
+  inputRowFocused: {
+    borderColor: TEAL,
   },
   input: {
     flex: 1,
@@ -305,8 +278,8 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   primaryButton: {
-    height: 52,
-    borderRadius: 26,
+    height: 54,
+    borderRadius: 16,
     backgroundColor: TEAL,
     alignItems: 'center',
     justifyContent: 'center',
@@ -322,8 +295,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   outlineButton: {
-    height: 52,
-    borderRadius: 26,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
     borderColor: TEAL,
@@ -346,7 +319,7 @@ const styles = StyleSheet.create({
   orLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E4EEEC',
+    backgroundColor: '#D7E6E2',
   },
   orText: {
     fontSize: 12,
@@ -358,7 +331,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 18,
     flexWrap: 'wrap',
   },
   footerText: {
@@ -369,22 +342,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: TEAL,
-  },
-  leafLeft: {
-    position: 'absolute',
-    bottom: 6,
-    left: -12,
-    transform: [{rotate: '-24deg'}],
-  },
-  leafRight: {
-    position: 'absolute',
-    bottom: 2,
-    right: -8,
-    transform: [{rotate: '125deg'}],
-  },
-  heartDecor: {
-    position: 'absolute',
-    bottom: 18,
-    right: 78,
   },
 });

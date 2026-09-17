@@ -5,7 +5,6 @@ import Loader from '../components/common/Loader';
 import AuthLayout, {
   AuthField,
   AuthPrimaryButton,
-  AuthOrDivider,
   AuthFooterLink,
 } from '../components/auth/AuthLayout';
 import {registerUser} from '../services/api';
@@ -70,7 +69,7 @@ const CreateAccountScreen = ({navigation}) => {
         subtitle="Register to start caring for your family">
         <AuthField
           icon="person-outline"
-          placeholder="Enter your full name"
+          placeholder="Full name"
           value={form.name}
           onChangeText={text => updateField('name', text)}
           autoCapitalize="words"
@@ -78,7 +77,7 @@ const CreateAccountScreen = ({navigation}) => {
 
         <AuthField
           icon="mail-outline"
-          placeholder="Enter your email address"
+          placeholder="Email address"
           keyboardType="email-address"
           autoCapitalize="none"
           value={form.email}
@@ -87,7 +86,7 @@ const CreateAccountScreen = ({navigation}) => {
 
         <AuthField
           icon="lock-closed-outline"
-          placeholder="Create a password"
+          placeholder="Password"
           secureTextEntry={!showPassword}
           value={form.password}
           onChangeText={text => updateField('password', text)}

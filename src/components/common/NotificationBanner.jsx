@@ -89,7 +89,12 @@ const NotificationBanner = ({visible, title, body, onPress, onHide}) => {
             style={styles.logo}
           />
           <View style={styles.textCol}>
-            <Text style={styles.appName}>Nirapod</Text>
+            <View style={styles.topRow}>
+              <Text style={styles.appName} numberOfLines={1}>
+                Nirapod
+              </Text>
+              <Text style={styles.time}>now</Text>
+            </View>
             <Text style={styles.title} numberOfLines={1}>
               {title || 'Notification'}
             </Text>
@@ -108,52 +113,68 @@ const NotificationBanner = ({visible, title, body, onPress, onHide}) => {
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    left: 16,
-    right: 16,
+    left: 12,
+    right: 12,
     zIndex: 9999,
     elevation: 20,
   },
   card: {
-    minHeight: 80,
-    borderRadius: 20,
-    backgroundColor: '#1F1F1F',
+    minHeight: 64,
+    borderRadius: 24,
+    backgroundColor: '#2C2C2E',
     justifyContent: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 16,
   },
   left: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
   },
   logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    marginRight: 10,
   },
   textCol: {
     flex: 1,
     minWidth: 0,
     justifyContent: 'center',
   },
-  appName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: 'white',
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
   },
-  title: {
-    marginTop: 4,
+  appName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  time: {
     fontSize: 12,
     fontWeight: '400',
-    color: 'white',
+    color: '#8E8E93',
+  },
+  title: {
+    marginTop: 1,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#E5E5EA',
   },
   body: {
-    marginTop: 2,
+    marginTop: 1,
     fontSize: 12,
     lineHeight: 16,
-    color: 'white',
+    color: '#C7C7CC',
   },
 });
 

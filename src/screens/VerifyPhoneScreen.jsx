@@ -148,7 +148,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
       <AuthLayout
         showBack
         onBack={() => navigation?.goBack()}
-        title="Verify email"
+        title="Verify OTP"
         subtitle="We sent a 4-digit code to your email"
         extra={email ? <Text style={styles.emailText}>{email}</Text> : null}>
         <View style={styles.otpContainer}>
@@ -221,9 +221,9 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 16,
-    backgroundColor: '#F4F8F6',
-    borderWidth: 1.5,
-    borderColor: '#E4EEEA',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#C9DDD7',
     textAlign: 'center',
     fontSize: 22,
     fontWeight: '700',
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   otpInputFilled: {
     borderColor: '#008178',
-    backgroundColor: '#E6F4F3',
+    backgroundColor: '#FFFFFF',
   },
   resendRow: {
     flexDirection: 'row',
