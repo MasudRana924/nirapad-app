@@ -22,6 +22,7 @@ const BkashCheckout = ({route, navigation}) => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [webViewHtml, setWebViewHtml] = useState('');
+  const [webViewLoading, setWebViewLoading] = useState(true);
   const webViewRef = useRef(null);
   const paymentIDRef = useRef(prePaymentID || null);
   const bookingIdRef = useRef(bookingId);
@@ -220,11 +221,19 @@ const BkashCheckout = ({route, navigation}) => {
             <Text style={styles.executingText}>Verifying payment...</Text>
           </View>
         )}
+        {webViewLoading && !isExecuting && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#E2136E" />
+            <Text style={styles.loadingText}>Loading bKash...</Text>
+          </View>
+        )}
         <WebView
           ref={webViewRef}
           source={{html: webViewHtml}}
           style={styles.webView}
           onMessage={handleWebViewMessage}
+          onLoadStart={() => setWebViewLoading(true)}
+          onLoadEnd={() => setWebViewLoading(false)}
           javaScriptEnabled={true}
           domStorageEnabled={true}
           mixedContentMode="always"
@@ -315,6 +324,23 @@ const styles = StyleSheet.create({
   },
   executingText: {
     marginTop: 12,
+    fontSize: 14,
+    color: '#5B6B7C',
+    fontWeight: '500',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FFFFFF',
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 14,
     fontSize: 14,
     color: '#5B6B7C',
     fontWeight: '500',

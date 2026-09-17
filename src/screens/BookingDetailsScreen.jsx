@@ -18,6 +18,7 @@ import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 import Loader from '../components/common/Loader';
 import ErrorModal from '../components/common/ErrorModal';
 import StarReviewModal from '../components/common/StarReviewModal';
+import SuccessModal from '../components/common/SuccessModal';
 
 const COMPLETED_STATUSES = ['SERVICE_COMPLETED', 'COMPLETED'];
 const CLOSED_STATUSES = ['CANCELLED', ...COMPLETED_STATUSES];
@@ -69,6 +70,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [starModalVisible, setStarModalVisible] = useState(false);
   const [reviewDismissed, setReviewDismissed] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   console.log('BookingDetails payment_status:', booking?.payment_status, 'status:', booking?.status);
 
   useEffect(() => {
@@ -109,7 +111,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
     try {
       await submitReview.mutateAsync({id: bookingId, rating});
       closeStarModal();
-      Alert.alert('Thank you', 'Your rating has been submitted.');
+      setSuccessModalVisible(true);
     } catch (error) {
       setErrorMessage(error?.message || 'Failed to submit review. Please try again.');
       setErrorModalVisible(true);
@@ -281,9 +283,16 @@ const BookingDetailsScreen = ({navigation, route}) => {
       <StarReviewModal
         visible={starModalVisible}
         bookingNumber={booking.booking_number}
+        caregiverName={caregiverName}
         submitting={submitReview.isPending}
         onSubmit={handleSubmitReview}
         onClose={closeStarModal}
+      />
+      <SuccessModal
+        visible={successModalVisible}
+        title="Thank You!"
+        message="Your rating has been submitted successfully. We appreciate your feedback!"
+        onClose={() => setSuccessModalVisible(false)}
       />
       <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
 
