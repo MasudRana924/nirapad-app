@@ -56,6 +56,12 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
+    notificationService.requestPermission().catch((error: any) => {
+      console.log('Notification permission request failed:', error);
+    });
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = notificationService.setForegroundBannerHandler(
       payload => {
         queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});

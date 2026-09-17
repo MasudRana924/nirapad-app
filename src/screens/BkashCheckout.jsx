@@ -1,19 +1,53 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
+  Animated,
+  Easing,
   Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
-import { paymentService } from '../api/services';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../api/queryKeys';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {WebView} from 'react-native-webview';
+import {paymentService} from '../api/services';
+import {useQueryClient} from '@tanstack/react-query';
+import {queryKeys} from '../api/queryKeys';
 
 const getPaymentData = payload => payload?.data || payload || {};
+
+const CustomLoader = () => {
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [rotateAnim]);
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  return (
+    <Animated.View
+      style={[
+        styles.spinner,
+        {
+          transform: [{rotate}],
+        },
+      ]}
+    />
+  );
+};
 
 const BkashCheckout = ({ route, navigation }) => {
   const { bookingId, paymentID: prePaymentID, amount: preAmount } =
@@ -216,23 +250,13 @@ const BkashCheckout = ({ route, navigation }) => {
     return (
       <SafeAreaView style={styles.safeArea}>
         {isExecuting && (
-          <View style={styles.executingOverlay}>
-            <ActivityIndicator
-              size="large"
-              color="#E2136E"
-              style={{ transform: [{ scale: 1.8 }] }}
-            />
-
+          <View style={styles.loadingOverlay}>
+            <CustomLoader />
           </View>
         )}
         {webViewLoading && !isExecuting && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator
-              size="large"
-              color="#E2136E"
-              style={{ transform: [{ scale: 1.8 }] }}
-            />
-
+            <CustomLoader />
           </View>
         )}
         <WebView
@@ -264,9 +288,7 @@ const BkashCheckout = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <View style={styles.container}>
-        {!statusMessage && (
-          <ActivityIndicator size="large" color="#E2136E" />
-        )}
+        {!statusMessage && <CustomLoader />}
 
         {statusMessage ? (
           <Text style={styles.statusMessage}>{statusMessage}</Text>
@@ -319,23 +341,6 @@ const styles = StyleSheet.create({
   webView: {
     flex: 1,
   },
-  executingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    zIndex: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  executingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: '#5B6B7C',
-    fontWeight: '500',
-  },
   loadingOverlay: {
     position: 'absolute',
     top: 0,
@@ -347,11 +352,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  spinner: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: '#008178',
+    borderTopColor: 'transparent',
+    borderRightColor: 'transparent',
+  },
   loadingText: {
-    marginTop: 14,
-    fontSize: 14,
-    color: '#5B6B7C',
+    marginTop: 18,
+    fontSize: 15,
     fontWeight: '500',
+    color: '#333333',
   },
 });
 

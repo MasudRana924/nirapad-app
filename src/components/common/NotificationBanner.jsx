@@ -98,11 +98,11 @@ const NotificationBanner = ({visible, title, body, onPress, onHide}) => {
             <Text style={styles.title} numberOfLines={1}>
               {title || 'Notification'}
             </Text>
-            {!!body && (
+            {/* {!!body && (
               <Text style={styles.body} numberOfLines={2}>
                 {body}
               </Text>
-            )}
+            )} */}
           </View>
         </View>
       </Pressable>

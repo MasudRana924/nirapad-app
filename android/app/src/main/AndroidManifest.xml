@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -24,13 +25,23 @@
       android:supportsRtl="true">
       <meta-data
         android:name="com.google.firebase.messaging.default_notification_channel_id"
-        android:value="nirapod_default" />
+        android:value="nirapod_default"
+        tools:replace="android:value" />
       <meta-data
         android:name="com.google.firebase.messaging.default_notification_icon"
         android:resource="@drawable/ic_stat_notification" />
       <meta-data
         android:name="com.google.firebase.messaging.default_notification_color"
-        android:resource="@color/notification_color" />
+        android:resource="@color/notification_color"
+        tools:replace="android:resource" />
+      <receiver
+        android:name=".NirapodMessagingReceiver"
+        android:exported="true"
+        android:permission="com.google.android.c2dm.permission.SEND">
+        <intent-filter android:priority="999">
+          <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        </intent-filter>
+      </receiver>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
