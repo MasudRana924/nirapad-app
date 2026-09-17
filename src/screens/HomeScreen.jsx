@@ -1,28 +1,48 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, ScrollView} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {StyleSheet, ScrollView, RefreshControl} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useFocusEffect} from '@react-navigation/native';
 
 import HomeHeader from '../components/home/HomeHeader';
 import ActiveBookingCard from '../components/home/ActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
-import QuickServices from '../components/home/QuickServices';
-import TopCaregivers from '../components/home/TopCaregivers';
-// import AvailableNurses from '../components/home/AvailableNurses';
 import HomeSkeleton from '../components/home/HomeSkeleton';
-
+import {useUserProfile, useBookings} from '../api/queries';
 
 const HomeScreen = ({navigation}) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    isLoading: profileLoading,
+    refetch: refetchProfile,
+  } = useUserProfile();
+  const {
+    isLoading: bookingsLoading,
+    refetch: refetchBookings,
+  } = useBookings({page: 1, limit: 20});
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+  const reloadHome = useCallback(async () => {
+    await Promise.all([refetchProfile(), refetchBookings()]);
+  }, [refetchBookings, refetchProfile]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      reloadHome();
+    }, [reloadHome]),
+  );
 
-  if (isLoading) {
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await reloadHome();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [reloadHome]);
+
+  const isInitialLoading =
+    (profileLoading || bookingsLoading) && !refreshing;
+
+  if (isInitialLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <HomeSkeleton />
@@ -34,13 +54,18 @@ const HomeScreen = ({navigation}) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#008178']}
+            tintColor="#008178"
+          />
+        }>
         <HomeHeader navigation={navigation} />
         <ActiveBookingCard navigation={navigation} />
         <BookingButtons navigation={navigation} />
-        {/* <QuickServices navigation={navigation} />
-        <TopCaregivers navigation={navigation} /> */}
-        {/* <AvailableNurses navigation={navigation} /> */}
       </ScrollView>
     </SafeAreaView>
   );

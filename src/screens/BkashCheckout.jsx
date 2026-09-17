@@ -4,8 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
-  Easing,
   Linking,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -13,41 +11,9 @@ import {WebView} from 'react-native-webview';
 import {paymentService} from '../api/services';
 import {useQueryClient} from '@tanstack/react-query';
 import {queryKeys} from '../api/queryKeys';
+import CustomLoader from '../components/common/CustomLoader';
 
 const getPaymentData = payload => payload?.data || payload || {};
-
-const CustomLoader = () => {
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 900,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    );
-    animation.start();
-    return () => animation.stop();
-  }, [rotateAnim]);
-
-  const rotate = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  return (
-    <Animated.View
-      style={[
-        styles.spinner,
-        {
-          transform: [{rotate}],
-        },
-      ]}
-    />
-  );
-};
 
 const BkashCheckout = ({ route, navigation }) => {
   const { bookingId, paymentID: prePaymentID, amount: preAmount } =
@@ -351,21 +317,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  spinner: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: '#008178',
-    borderTopColor: 'transparent',
-    borderRightColor: 'transparent',
-  },
-  loadingText: {
-    marginTop: 18,
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#333333',
   },
 });
 

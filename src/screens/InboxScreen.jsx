@@ -1,12 +1,14 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNotifications} from '../api/queries';
 import Header from '../components/common/Header';
@@ -20,13 +22,29 @@ import {
 } from '../utils/notificationHandler';
 
 const InboxScreen = ({navigation}) => {
-  const {data: notificationsData, isLoading} = useNotifications({
+  const {data: notificationsData, isLoading, refetch} = useNotifications({
     page: 1,
     limit: 20,
   });
   const notifications = Array.isArray(notificationsData?.data)
     ? notificationsData.data
     : [];
+  const [refreshing, setRefreshing] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
 
   const formatTime = dateString => {
     if (!dateString) return '';
@@ -114,7 +132,15 @@ const InboxScreen = ({navigation}) => {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#008178']}
+            tintColor="#008178"
+          />
+        }>
         {isLoading ? (
           <NotificationSkeleton />
         ) : notifications.length === 0 ? (

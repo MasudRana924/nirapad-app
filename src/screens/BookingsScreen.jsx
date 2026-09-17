@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  RefreshControl,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookings} from '../api/queries';
 import BookingSkeleton from '../components/home/BookingSkeleton';
@@ -130,8 +132,27 @@ const getServiceLabel = booking => {
 
 const BookingsScreen = ({navigation}) => {
   const [filter, setFilter] = useState('all');
-  const {data: bookingsData, isLoading} = useBookings({page: 1, limit: 20});
+  const {data: bookingsData, isLoading, refetch} = useBookings({
+    page: 1,
+    limit: 20,
+  });
   const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
+  const [refreshing, setRefreshing] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
 
   const counts = {
     all: bookings.length,
@@ -204,7 +225,15 @@ const BookingsScreen = ({navigation}) => {
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#008178']}
+              tintColor="#008178"
+            />
+          }>
           {isLoading ? (
             <BookingSkeleton />
           ) : visibleBookings.length === 0 ? (

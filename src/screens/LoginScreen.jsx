@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Loader from '../components/common/Loader';
+import CustomLoader from '../components/common/CustomLoader';
 import ErrorModal from '../components/common/ErrorModal';
 import AuthLayout, {
   AuthField,
@@ -95,7 +95,7 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <>
-      <Loader visible={loading} />
+      <CustomLoader overlay visible={loading} />
       <ErrorModal
         visible={!!error}
         message={error}

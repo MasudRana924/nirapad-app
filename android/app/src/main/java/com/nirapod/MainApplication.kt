@@ -21,6 +21,7 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    AppLifecycleTracker.register(this)
     NotificationHelper.createChannel(this)
     loadReactNative(this)
   }
