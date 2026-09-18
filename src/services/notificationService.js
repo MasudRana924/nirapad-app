@@ -163,17 +163,13 @@ class NotificationService {
         false,
       );
 
-      if (response.success) {
-        console.log('✅ Token registered successfully with server');
-        await AsyncStorage.setItem('tokenRegistered', 'true');
-        if (response.data?.id) {
-          await AsyncStorage.setItem('fcmTokenId', response.data.id);
-        }
-        return true;
-      } else {
-        console.log('❌ Token registration failed:', response.message);
-        return false;
+      const tokenId = response?.data?.id;
+      await AsyncStorage.setItem('tokenRegistered', 'true');
+      if (tokenId) {
+        await AsyncStorage.setItem('fcmTokenId', tokenId);
       }
+      console.log('✅ Token registered successfully with server');
+      return true;
     } catch (error) {
       console.error('❌ Token registration error:', error);
       return false;
@@ -329,6 +325,11 @@ class NotificationService {
     const openBooking =
       type === 'SERVICE_STARTED' ||
       type === 'SERVICE_COMPLETED' ||
+      type === 'BOOKING_ACCEPTED' ||
+      type === 'BOOKING_REASSIGNED' ||
+      type === 'BOOKING_REJECTED' ||
+      type === 'BOOKING_CANCELLED' ||
+      type === 'DISPUTE_UPDATED' ||
       type === 'OPEN_BOOKING' ||
       data.action === 'OPEN_BOOKING' ||
       data.screen === 'booking_details' ||
@@ -370,10 +371,12 @@ class NotificationService {
     switch (type) {
       case 'BOOKING_CREATED':
       case 'BOOKING_ACCEPTED':
+      case 'BOOKING_REASSIGNED':
       case 'BOOKING_CANCELLED':
       case 'BOOKING_REJECTED':
       case 'SERVICE_STARTED':
       case 'SERVICE_COMPLETED':
+      case 'DISPUTE_UPDATED':
       case 'PATIENT_PICKED_UP':
         if (bookingId) {
           navigation.navigate('BookingDetails', {

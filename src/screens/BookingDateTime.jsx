@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,12 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
+import {useCaregiverAvailability} from '../api/queries';
+import {
+  unwrapAvailability,
+  slotsForDay,
+  isHourInSlots,
+} from '../utils/availability';
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MONTH_NAMES = [
@@ -230,11 +236,36 @@ const BookingDateTime = ({navigation, route}) => {
     serviceType,
   } = route.params || {};
 
+  const caregiverId =
+    selectedCaregiver?.id || selectedCaregiver?.uuid || null;
+  const {data: availabilityData} = useCaregiverAvailability(caregiverId);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
   const [durationHours, setDurationHours] = useState(4);
   const [notes, setNotes] = useState('');
+
+  const availability = unwrapAvailability(availabilityData);
+  const hasWeeklySlots = availability.length > 0;
+  const selectedDayOfWeek = selectedDate
+    ? new Date(`${selectedDate.fullDate}T00:00:00`).getDay()
+    : null;
+  const availableTimes = useMemo(() => {
+    if (!hasWeeklySlots || selectedDayOfWeek == null) {
+      return TIMES;
+    }
+    const daySlots = slotsForDay(availability, selectedDayOfWeek);
+    return TIMES.filter(time => isHourInSlots(time.hour, daySlots));
+  }, [availability, hasWeeklySlots, selectedDayOfWeek]);
+
+  useEffect(() => {
+    if (!selectedTime || !hasWeeklySlots) {
+      return;
+    }
+    if (!availableTimes.some(time => time.id === selectedTime.id)) {
+      setSelectedTime(null);
+    }
+  }, [availableTimes, hasWeeklySlots, selectedTime]);
 
   const canContinue = !!selectedDate && !!selectedTime;
 
@@ -279,7 +310,10 @@ const BookingDateTime = ({navigation, route}) => {
           <Text style={styles.sectionTitle}>Date</Text>
           <MonthCalendar
             selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
+            onSelectDate={dateObj => {
+              setSelectedDate(dateObj);
+              setSelectedTime(null);
+            }}
           />
 
           <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
@@ -296,7 +330,13 @@ const BookingDateTime = ({navigation, route}) => {
                 styles.timeDropdownButton,
                 timeDropdownOpen && styles.timeDropdownButtonOpen,
               ]}
-              onPress={() => setTimeDropdownOpen(open => !open)}>
+              onPress={() => {
+                if (hasWeeklySlots && !selectedDate) {
+                  Alert.alert('Schedule', 'Please select a date first');
+                  return;
+                }
+                setTimeDropdownOpen(open => !open);
+              }}>
               <Icon name="time-outline" size={18} color="#008178" />
               <Text
                 style={[
@@ -318,7 +358,12 @@ const BookingDateTime = ({navigation, route}) => {
                   keyboardShouldPersistTaps="handled"
                   style={styles.timeDropdownList}
                   showsVerticalScrollIndicator={false}>
-                  {TIMES.map((time, index) => {
+                  {availableTimes.length === 0 ? (
+                    <Text style={styles.noSlotsText}>
+                      No weekly slots on this day. Choose another date.
+                    </Text>
+                  ) : (
+                    availableTimes.map((time, index) => {
                     const selected = selectedTime?.id === time.id;
                     return (
                       <TouchableOpacity
@@ -326,7 +371,7 @@ const BookingDateTime = ({navigation, route}) => {
                         activeOpacity={0.75}
                         style={[
                           styles.timeDropdownItem,
-                          index === TIMES.length - 1 &&
+                          index === availableTimes.length - 1 &&
                             styles.timeDropdownItemLast,
                         ]}
                         onPress={() => {
@@ -345,7 +390,8 @@ const BookingDateTime = ({navigation, route}) => {
                         )}
                       </TouchableOpacity>
                     );
-                  })}
+                  })
+                  )}
                 </ScrollView>
               </View>
             )}
@@ -596,6 +642,13 @@ const styles = StyleSheet.create({
   timeDropdownItemTextSelected: {
     color: '#008178',
     fontWeight: '600',
+  },
+  noSlotsText: {
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+    fontSize: 13,
+    color: '#8190A7',
+    lineHeight: 18,
   },
   durationRow: {
     flexDirection: 'row',

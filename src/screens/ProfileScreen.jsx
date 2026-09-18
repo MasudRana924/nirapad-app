@@ -114,9 +114,10 @@ const ProfileScreen = ({navigation}) => {
     },
     {
       id: 'settings',
-      name: 'Settings',
-      subtitle: 'Preferences',
-      icon: 'settings-outline',
+      name: 'Notifications',
+      subtitle: 'Mute alerts',
+      icon: 'notifications-outline',
+      onPress: () => navigation?.navigate('NotificationSettings'),
     },
   ];
 

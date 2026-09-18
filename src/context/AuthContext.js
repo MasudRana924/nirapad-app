@@ -1,6 +1,7 @@
-import React, {createContext, useState, useEffect, useContext} from 'react';
+import React, {createContext, useState, useEffect, useContext, useCallback} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import notificationService from '../services/notificationService';
+import {setAuthFailureHandler} from '../api/client';
 
 const AuthContext = createContext();
 
@@ -10,7 +11,25 @@ export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for stored token on app launch
+  const logout = useCallback(async () => {
+    try {
+      console.log('🚪 Handling logout...');
+      await notificationService.handleLogout(userToken);
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('refreshToken');
+      await AsyncStorage.removeItem('user');
+      setUserToken(null);
+      setRefreshToken(null);
+      setUser(null);
+      console.log('✅ Logout completed successfully');
+    } catch (error) {
+      console.error('Failed to remove token:', error);
+      setUserToken(null);
+      setRefreshToken(null);
+      setUser(null);
+    }
+  }, [userToken]);
+
   useEffect(() => {
     const loadToken = async () => {
       try {
@@ -35,6 +54,13 @@ export const AuthProvider = ({children}) => {
     loadToken();
   }, []);
 
+  useEffect(() => {
+    setAuthFailureHandler(() => {
+      logout();
+    });
+    return () => setAuthFailureHandler(null);
+  }, [logout]);
+
   const login = async (token, refresh, userData) => {
     try {
       await AsyncStorage.setItem('userToken', token);
@@ -49,27 +75,6 @@ export const AuthProvider = ({children}) => {
       setUser(userData);
     } catch (error) {
       console.error('Failed to save token:', error);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      console.log('🚪 Handling logout...');
-
-      // Deactivate notification tokens
-      await notificationService.handleLogout(userToken);
-
-      // Clear local storage
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('refreshToken');
-      await AsyncStorage.removeItem('user');
-      setUserToken(null);
-      setRefreshToken(null);
-      setUser(null);
-
-      console.log('✅ Logout completed successfully');
-    } catch (error) {
-      console.error('Failed to remove token:', error);
     }
   };
 

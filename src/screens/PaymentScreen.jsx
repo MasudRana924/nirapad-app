@@ -10,57 +10,30 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {apiRequest} from '../services/api';
+import {getApiErrorMessage} from '../api/client';
 
 const PaymentScreen = ({route, navigation}) => {
   const {bookingId, amount, bookingNumber} = route.params || {};
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
 
-  const processPayment = async paymentMethod => {
+  const handleBkashPayment = () => {
     if (!bookingId) {
       Alert.alert('Error', 'Missing booking information');
       return;
     }
-
-    if (paymentMethod === 'bkash') {
-      navigation.navigate('BkashCheckout', {bookingId});
-      return;
-    }
-
+    setSelectedMethod('bkash');
     setLoading(true);
     try {
-      const response = await apiRequest('/payments/wallet', 'POST', {
-        amount,
-        booking_id: bookingId,
-      });
-
-      if (response.success) {
-        Alert.alert('Success', 'Payment processed successfully', [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('BookingDetails', {bookingId}),
-          },
-        ]);
-      } else {
-        Alert.alert('Error', response.message || 'Payment failed');
-      }
+      navigation.navigate('BkashCheckout', {bookingId, amount});
     } catch (error) {
-      console.error('Payment error:', error);
-      Alert.alert('Error', 'Payment initialization failed');
+      Alert.alert(
+        'Error',
+        getApiErrorMessage(error, 'Payment initialization failed'),
+      );
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleBkashPayment = () => {
-    setSelectedMethod('bkash');
-    processPayment('bkash');
-  };
-
-  const handleWalletPayment = () => {
-    setSelectedMethod('wallet');
-    processPayment('wallet');
   };
 
   return (
@@ -105,25 +78,6 @@ const PaymentScreen = ({route, navigation}) => {
             <Text style={styles.methodName}>bKash</Text>
             <Text style={styles.methodDescription}>
               Pay with your bKash account
-            </Text>
-          </View>
-          <Icon name="chevron-forward" size={20} color="#8190A7" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.paymentMethod,
-            selectedMethod === 'wallet' && styles.selectedMethod,
-          ]}
-          onPress={handleWalletPayment}
-          disabled={loading}>
-          <View style={styles.methodIcon}>
-            <Icon name="wallet" size={24} color="#008178" />
-          </View>
-          <View style={styles.methodInfo}>
-            <Text style={styles.methodName}>Wallet</Text>
-            <Text style={styles.methodDescription}>
-              Pay with your Nirapod wallet
             </Text>
           </View>
           <Icon name="chevron-forward" size={20} color="#8190A7" />

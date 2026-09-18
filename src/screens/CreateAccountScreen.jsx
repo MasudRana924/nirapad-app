@@ -8,6 +8,7 @@ import AuthLayout, {
   AuthFooterLink,
 } from '../components/auth/AuthLayout';
 import {registerUser} from '../services/api';
+import {getApiErrorMessage} from '../api/client';
 
 const CreateAccountScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,14 +46,13 @@ const CreateAccountScreen = ({navigation}) => {
 
     setLoading(true);
     try {
-      const response = await registerUser(name.trim(), email.trim(), password);
-      if (response.success) {
-        navigation?.navigate('VerifyPhone', {email: email.trim()});
-      } else {
-        Alert.alert('Error', response.message || 'Registration failed');
-      }
+      await registerUser(name.trim(), email.trim(), password);
+      navigation?.navigate('VerifyPhone', {email: email.trim()});
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert(
+        'Error',
+        getApiErrorMessage(error, 'Something went wrong. Please try again.'),
+      );
       console.error('Register error:', error);
     } finally {
       setLoading(false);

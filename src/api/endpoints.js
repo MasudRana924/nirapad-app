@@ -39,6 +39,7 @@ export const ENDPOINTS = {
     SEARCH: '/caregiver/search',
     LIST: '/caregiver/search',
     DETAIL: id => `/caregiver/${id}`,
+    AVAILABILITY: id => `/caregiver/${id}/availability`,
   },
 
   // Bookings endpoints
@@ -49,6 +50,8 @@ export const ENDPOINTS = {
     UPDATE: id => `/bookings/${id}`,
     CANCEL: id => `/bookings/${id}/cancel`,
     REVIEW: id => `/bookings/${id}/review`,
+    DISPUTE: id => `/bookings/${id}/dispute`,
+    DISPUTES: id => `/bookings/${id}/disputes`,
   },
 
   // Hospitals endpoints
@@ -70,6 +73,7 @@ export const ENDPOINTS = {
   PAYMENTS: {
     BKASH_CREATE: '/payments/bkash/create',
     BKASH_EXECUTE: '/payments/bkash/execute',
+    BKASH_QUERY: '/payments/bkash/query',
   },
 
   // FCM token endpoints
@@ -77,6 +81,11 @@ export const ENDPOINTS = {
     LIST: '/notifications/tokens',
     CREATE: '/notifications/tokens',
     DELETE: id => `/notifications/tokens/${id}`,
+  },
+
+  NOTIFICATION_PREFERENCES: {
+    GET: '/notifications/preferences',
+    UPDATE: '/notifications/preferences',
   },
 };
 

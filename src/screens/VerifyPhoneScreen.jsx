@@ -11,6 +11,7 @@ import {
 import Loader from '../components/common/Loader';
 import AuthLayout, {AuthPrimaryButton} from '../components/auth/AuthLayout';
 import {verifyOtp, resendOtp, extractAuthPayload} from '../services/api';
+import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
 import notificationService from '../services/notificationService';
 
@@ -73,15 +74,14 @@ const VerifyPhoneScreen = ({navigation, route}) => {
     }
     setResending(true);
     try {
-      const response = await resendOtp(email);
-      if (response.success) {
-        setSeconds(42);
-        Alert.alert('Success', 'OTP has been resent to your email');
-      } else {
-        Alert.alert('Error', response.message || 'Failed to resend OTP');
-      }
+      await resendOtp(email);
+      setSeconds(42);
+      Alert.alert('Success', 'OTP has been resent to your email');
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert(
+        'Error',
+        getApiErrorMessage(error, 'Something went wrong. Please try again.'),
+      );
       console.error('Resend OTP error:', error);
     } finally {
       setResending(false);
@@ -96,44 +96,22 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
     setLoading(true);
     try {
-      console.log('🔍 Verifying OTP...');
       const response = await verifyOtp(email, enteredOtp);
-
       const {token, refreshToken, user} = extractAuthPayload(response);
-      if (response.success && token) {
-        console.log('✅ OTP verification response received');
-
-        // Step 1: Store authentication tokens (data.token, data.refreshToken, data.user)
-        await login(token, refreshToken, user);
-        console.log('✅ Auth tokens stored locally');
-
-        // Step 2: Initialize notification service
-        console.log('🔔 Initializing notification service...');
-        const notificationInitialized = await notificationService.initialize(
-          token,
-        );
-
-        if (notificationInitialized) {
-          console.log('✅ Notification service initialized');
-        } else {
-          console.log('⚠️ Notification service initialization failed');
-        }
-
-        // Step 3: Register FCM token with server
-        console.log('📱 Registering FCM token with server...');
-        const tokenRegistered =
-          await notificationService.registerTokenWithServer(token);
-
-        if (tokenRegistered) {
-          console.log('✅ FCM token registered successfully');
-        } else {
-          console.log('⚠️ FCM token registration failed');
-        }
-      } else {
-        Alert.alert('Error', response.message || 'OTP verification failed');
+      if (!token) {
+        Alert.alert('Error', 'OTP verification failed');
+        return;
       }
+
+      await login(token, refreshToken, user);
+      await notificationService.initialize(token);
+      await notificationService.registerTokenWithServer(token);
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      const fallback =
+        error?.code === API_CODES.OTP_INVALID
+          ? 'Invalid OTP. Please try again.'
+          : 'Something went wrong. Please try again.';
+      Alert.alert('Error', getApiErrorMessage(error, fallback));
       console.error('❌ Verify OTP error:', error);
     } finally {
       setLoading(false);

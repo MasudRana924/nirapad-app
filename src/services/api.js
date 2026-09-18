@@ -1,110 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {apiRequest, extractAuthPayload, createUuid} from '../api/client';
 
-// const BASE_URL = 'http://192.168.10.78:8000/api/v1';
-const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
-
-const AUTH_SKIP_REFRESH = [
-  '/auth/login',
-  '/auth/register',
-  '/auth/verify-otp',
-  '/auth/resend-otp',
-  '/auth/send-otp',
-  '/auth/refresh-token',
-];
-
-const persistAuthTokens = async data => {
-  if (data?.token) {
-    await AsyncStorage.setItem('userToken', data.token);
-  }
-  if (data?.refreshToken) {
-    await AsyncStorage.setItem('refreshToken', data.refreshToken);
-  }
-};
-
-const refreshAccessToken = async () => {
-  const refreshToken = await AsyncStorage.getItem('refreshToken');
-  if (!refreshToken) {
-    return null;
-  }
-
-  try {
-    const response = await fetch(`${BASE_URL}/auth/refresh-token`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({refreshToken}),
-    });
-    const payload = await response.json();
-    const data = payload?.data;
-    if (payload?.success && data?.token) {
-      await persistAuthTokens(data);
-      return data.token;
-    }
-  } catch (error) {
-    console.error('Refresh token error:', error);
-  }
-  return null;
-};
-
-export const extractAuthPayload = response => {
-  const data = response?.data || {};
-  return {
-    token: data.token,
-    refreshToken: data.refreshToken,
-    user: data.user,
-  };
-};
-
-export const apiRequest = async (
-  endpoint,
-  method = 'GET',
-  body = null,
-  isFormData = false,
-  {retry = true} = {},
-) => {
-  const token = await AsyncStorage.getItem('userToken');
-
-  const config = {
-    method,
-    headers: {},
-  };
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  if (!isFormData) {
-    config.headers['Content-Type'] = 'application/json';
-  }
-
-  if (body) {
-    config.body = isFormData ? body : JSON.stringify(body);
-  }
-
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
-  let data = null;
-  try {
-    data = await response.json();
-  } catch (error) {
-    data = {
-      success: false,
-      message: `HTTP error! status: ${response.status}`,
-    };
-  }
-
-  if (
-    response.status === 401 &&
-    retry &&
-    token &&
-    !AUTH_SKIP_REFRESH.some(path => endpoint.startsWith(path))
-  ) {
-    const newToken = await refreshAccessToken();
-    if (newToken) {
-      return apiRequest(endpoint, method, body, isFormData, {retry: false});
-    }
-  }
-
-  return data;
-};
+export {
+  apiRequest,
+  ApiError,
+  extractAuthPayload,
+  createUuid,
+  getApiErrorMessage,
+} from '../api/client';
 
 export const registerUser = async (name, email, password) => {
   return apiRequest('/auth/register', 'POST', {
@@ -187,7 +90,13 @@ export const markAllInboxAsRead = async () => {
 };
 
 export const createBkashPayment = async bookingId => {
-  return apiRequest('/payments/bkash/create', 'POST', {booking_id: bookingId});
+  return apiRequest(
+    '/payments/bkash/create',
+    'POST',
+    {booking_id: bookingId},
+    false,
+    {idempotencyKey: createUuid()},
+  );
 };
 
 export const executeBkashPayment = async (paymentID, bookingId) => {
@@ -197,7 +106,23 @@ export const executeBkashPayment = async (paymentID, bookingId) => {
   });
 };
 
+export const queryBkashPayment = async paymentID => {
+  return apiRequest('/payments/bkash/query', 'POST', {paymentID});
+};
+
 /** @deprecated Use markInboxAsRead */
 export const markNotificationAsRead = async notificationId => {
   return markInboxAsRead(notificationId);
+};
+
+export const persistLocalAuth = async ({token, refreshToken, user}) => {
+  if (token) {
+    await AsyncStorage.setItem('userToken', token);
+  }
+  if (refreshToken) {
+    await AsyncStorage.setItem('refreshToken', refreshToken);
+  }
+  if (user) {
+    await AsyncStorage.setItem('user', JSON.stringify(user));
+  }
 };

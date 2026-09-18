@@ -8,6 +8,7 @@ import ActiveBookingCard from '../components/home/ActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
 import HomeSkeleton from '../components/home/HomeSkeleton';
 import {useUserProfile, useBookings} from '../api/queries';
+import {isActiveStatus, isSearchingStatus} from '../utils/bookingStatus';
 
 const HomeScreen = ({navigation}) => {
   const {
@@ -16,8 +17,11 @@ const HomeScreen = ({navigation}) => {
   } = useUserProfile();
   const {
     isLoading: bookingsLoading,
+    data: bookingsData,
     refetch: refetchBookings,
   } = useBookings({page: 1, limit: 20});
+  const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
+  const activeBooking = bookings.find(item => isActiveStatus(item?.status));
   const [refreshing, setRefreshing] = useState(false);
 
   const reloadHome = useCallback(async () => {
@@ -64,7 +68,13 @@ const HomeScreen = ({navigation}) => {
           />
         }>
         <HomeHeader navigation={navigation} />
-        <ActiveBookingCard navigation={navigation} />
+        {activeBooking ? (
+          <ActiveBookingCard
+            navigation={navigation}
+            booking={activeBooking}
+            searching={isSearchingStatus(activeBooking.status)}
+          />
+        ) : null}
         <BookingButtons navigation={navigation} />
       </ScrollView>
     </SafeAreaView>

@@ -9,11 +9,19 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {WebView} from 'react-native-webview';
 import {paymentService} from '../api/services';
+import {API_CODES, createUuid, getApiErrorMessage} from '../api/client';
 import {useQueryClient} from '@tanstack/react-query';
 import {queryKeys} from '../api/queryKeys';
 import CustomLoader from '../components/common/CustomLoader';
 
-const getPaymentData = payload => payload?.data || payload || {};
+const getPaymentData = payload => payload?.data || {};
+
+const isPaymentComplete = data =>
+  Boolean(
+    data?.already_paid ||
+      data?.paymentID ||
+      data?.paymentId,
+  );
 
 const BkashCheckout = ({ route, navigation }) => {
   const { bookingId, paymentID: prePaymentID, amount: preAmount } =
@@ -28,6 +36,7 @@ const BkashCheckout = ({ route, navigation }) => {
   const bookingIdRef = useRef(bookingId);
   const executingRef = useRef(false);
   const startedRef = useRef(false);
+  const idempotencyKeyRef = useRef(createUuid());
 
   useEffect(() => {
     bookingIdRef.current = bookingId;
@@ -56,6 +65,7 @@ const BkashCheckout = ({ route, navigation }) => {
     try {
       const createPaymentResponse = await paymentService.createBkashPayment(
         bookingId,
+        {idempotencyKey: idempotencyKeyRef.current},
       );
       const data = getPaymentData(createPaymentResponse);
       const createdPaymentID = data.paymentID || data.paymentId;
@@ -74,13 +84,17 @@ const BkashCheckout = ({ route, navigation }) => {
         }
       } else {
         setStatusMessage(
-          createPaymentResponse?.message ||
-          'Payment creation failed. Please try again.',
+          getApiErrorMessage(
+            {message: createPaymentResponse?.message},
+            'Payment creation failed. Please try again.',
+          ),
         );
       }
     } catch (error) {
       console.error('Payment error:', error);
-      setStatusMessage(error?.message || 'Payment failed. Please try again.');
+      setStatusMessage(
+        getApiErrorMessage(error, 'Payment failed. Please try again.'),
+      );
     }
   };
 
@@ -185,25 +199,55 @@ const BkashCheckout = ({ route, navigation }) => {
       );
       const data = getPaymentData(response);
 
-      if (data?.paymentID || data?.paymentId || response?.success) {
+      if (isPaymentComplete(data) || data?.already_paid) {
         queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
         queryClient.invalidateQueries({
           queryKey: queryKeys.bookings.detail(activeBookingId),
         });
         navigation.replace('PaymentSuccess');
-      } else {
-        setWebViewHtml('');
-        setStatusMessage(
-          response?.message ||
-          'Payment verification failed. Please contact support.',
-        );
+        return;
       }
-    } catch (error) {
-      console.error('Execute payment error:', error);
+
+      const queried = await paymentService.queryBkashPayment(activePaymentID);
+      const queryData = getPaymentData(queried);
+      if (isPaymentComplete(queryData)) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.bookings.detail(activeBookingId),
+        });
+        navigation.replace('PaymentSuccess');
+        return;
+      }
+
       setWebViewHtml('');
       setStatusMessage(
-        error?.message ||
+        response?.message ||
         'Payment verification failed. Please contact support.',
+      );
+    } catch (error) {
+      console.error('Execute payment error:', error);
+      try {
+        const queried = await paymentService.queryBkashPayment(activePaymentID);
+        const queryData = getPaymentData(queried);
+        if (isPaymentComplete(queryData)) {
+          queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.bookings.detail(activeBookingId),
+          });
+          navigation.replace('PaymentSuccess');
+          return;
+        }
+      } catch (queryError) {
+        console.error('Payment query fallback error:', queryError);
+      }
+      setWebViewHtml('');
+      setStatusMessage(
+        error?.code === API_CODES.PAYMENT_FAILED
+          ? getApiErrorMessage(error, 'Payment failed. Please try again.')
+          : getApiErrorMessage(
+              error,
+              'Payment verification failed. Please contact support.',
+            ),
       );
     } finally {
       executingRef.current = false;

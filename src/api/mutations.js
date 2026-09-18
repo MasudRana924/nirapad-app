@@ -4,7 +4,7 @@
  */
 
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {familyService, bookingService, authService, inboxService, paymentService} from './services';
+import {familyService, bookingService, authService, inboxService, paymentService, notificationPreferenceService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -98,7 +98,8 @@ export const useSubmitBookingReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({id, rating}) => bookingService.submitReview(id, rating),
+    mutationFn: ({id, rating, comment}) =>
+      bookingService.submitReview(id, {rating, comment}),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
       if (variables?.id) {
@@ -130,9 +131,55 @@ export const useCancelBooking = () => {
   });
 };
 
+export const useCreateDispute = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({id, reason, details}) =>
+      bookingService.createDispute(id, {reason, details}),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
+      if (variables?.id) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.bookings.detail(variables.id),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.bookings.disputes(variables.id),
+        });
+      }
+    },
+  });
+};
+
 export const useCreateBkashPayment = () => {
   return useMutation({
-    mutationFn: bookingId => paymentService.createBkashPayment(bookingId),
+    mutationFn: variables => {
+      const bookingId =
+        typeof variables === 'object' ? variables.bookingId : variables;
+      const idempotencyKey =
+        typeof variables === 'object' ? variables.idempotencyKey : undefined;
+      return paymentService.createBkashPayment(bookingId, {idempotencyKey});
+    },
+  });
+};
+
+export const useQueryBkashPayment = () => {
+  return useMutation({
+    mutationFn: paymentID => paymentService.queryBkashPayment(paymentID),
+  });
+};
+
+export const useUpdateNotificationPreferences = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: payload =>
+      notificationPreferenceService.updatePreferences(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notificationPreferences.all,
+      });
+    },
   });
 };
 
@@ -216,8 +263,11 @@ export default {
   useUpdateBooking,
   useCancelBooking,
   useSubmitBookingReview,
+  useCreateDispute,
   useCreateBkashPayment,
+  useQueryBkashPayment,
   useExecuteBkashPayment,
+  useUpdateNotificationPreferences,
   useMarkInboxRead,
 
   // Auth

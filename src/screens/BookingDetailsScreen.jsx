@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -9,40 +9,35 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useBookingDetails} from '../api/queries';
-import {useCancelBooking, useSubmitBookingReview} from '../api/mutations';
+import {useBookingDetails, useBookingDisputes} from '../api/queries';
+import {
+  useCancelBooking,
+  useSubmitBookingReview,
+  useCreateDispute,
+} from '../api/mutations';
 import {paymentService} from '../api/services';
+import {API_CODES, createUuid, getApiErrorMessage} from '../api/client';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
 import Loader from '../components/common/Loader';
 import StarReviewModal from '../components/common/StarReviewModal';
+import CancelBookingSheet from '../components/common/CancelBookingSheet';
+import DisputeSheet from '../components/common/DisputeSheet';
 import {useAppModal} from '../contexts/ModalContext';
+import {
+  getStatusMeta,
+  isSearchingStatus,
+  normalizeBooking,
+  formatRefund,
+} from '../utils/bookingStatus';
 
-const COMPLETED_STATUSES = ['SERVICE_COMPLETED', 'COMPLETED'];
-const CLOSED_STATUSES = ['CANCELLED', ...COMPLETED_STATUSES];
+const isTrue = value => value === true || value === 'true';
 
 const shouldShowStarModal = booking => {
   if (!booking) {
     return false;
   }
-  const canReview =
-    booking.can_review === true || booking.can_review === 'true';
-  return (
-    booking.status === 'SERVICE_COMPLETED' &&
-    canReview &&
-    booking.review == null
-  );
-};
-
-const STATUS_STYLES = {
-  PENDING_PAYMENT: {bg: '#FFF4E5', text: '#D97706'},
-  PROVIDER_ASSIGNED: {bg: '#E6F4F3', text: '#008178'},
-  CONFIRMED: {bg: '#E6F4F3', text: '#008178'},
-  IN_PROGRESS: {bg: '#E6F4F3', text: '#008178'},
-  SERVICE_IN_PROGRESS: {bg: '#E6F4F3', text: '#008178'},
-  COMPLETED: {bg: '#E6F4F3', text: '#008178'},
-  SERVICE_COMPLETED: {bg: '#E6F4F3', text: '#008178'},
-  CANCELLED: {bg: '#FEECEC', text: '#DC2626'},
+  return isTrue(booking.can_review) && booking.review == null;
 };
 
 const BookingDetailsScreen = ({navigation, route}) => {
@@ -50,24 +45,22 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const {data: bookingData, isLoading, refetch} = useBookingDetails(bookingId, {
     refetchOnMount: 'always',
   });
+  const {data: disputesData, refetch: refetchDisputes} = useBookingDisputes(
+    bookingId,
+    {enabled: !!bookingId, retry: false},
+  );
   const cancelBooking = useCancelBooking();
   const submitReview = useSubmitBookingReview();
-  const rawData = bookingData?.data;
-  const bookingBase = rawData?.booking || rawData;
-  const booking = bookingBase
-    ? {
-        ...bookingBase,
-        can_review: rawData?.can_review ?? bookingBase.can_review,
-        review:
-          rawData?.review !== undefined ? rawData.review : bookingBase.review,
-        status: rawData?.status ?? bookingBase.status,
-      }
-    : bookingBase;
+  const createDispute = useCreateDispute();
+  const booking = normalizeBooking(bookingData);
+  const disputes = Array.isArray(disputesData?.data) ? disputesData.data : [];
   const [payLoading, setPayLoading] = useState(false);
   const {showModal} = useAppModal();
   const [starModalVisible, setStarModalVisible] = useState(false);
   const [reviewDismissed, setReviewDismissed] = useState(false);
-  console.log('BookingDetails payment_status:', booking?.payment_status, 'status:', booking?.status);
+  const [cancelVisible, setCancelVisible] = useState(false);
+  const [disputeVisible, setDisputeVisible] = useState(false);
+  const paymentKeyRef = useRef(createUuid());
 
   useEffect(() => {
     setReviewDismissed(false);
@@ -100,16 +93,16 @@ const BookingDetailsScreen = ({navigation, route}) => {
     setReviewDismissed(true);
   };
 
-  const handleSubmitReview = async rating => {
+  const handleSubmitReview = async (rating, comment) => {
     if (!bookingId || rating < 1 || rating > 5) {
       return;
     }
     try {
-      await submitReview.mutateAsync({id: bookingId, rating});
+      await submitReview.mutateAsync({id: bookingId, rating, comment});
       closeStarModal();
       showModal({type: 'success', title: 'Thank You!', message: 'Your rating has been submitted successfully. We appreciate your feedback!'});
     } catch (error) {
-      showModal({type: 'error', title: 'Error', message: error?.message || 'Failed to submit review. Please try again.'});
+      showModal({type: 'error', title: 'Error', message: getApiErrorMessage(error, 'Failed to submit review. Please try again.')});
     }
   };
 
@@ -117,10 +110,12 @@ const BookingDetailsScreen = ({navigation, route}) => {
     if (!bookingId || payLoading) return;
     setPayLoading(true);
     try {
-      const response = await paymentService.createBkashPayment(bookingId);
-      const data = response?.data || response || {};
+      const response = await paymentService.createBkashPayment(bookingId, {
+        idempotencyKey: paymentKeyRef.current,
+      });
+      const data = response?.data || {};
       const createdPaymentID = data.paymentID || data.paymentId;
-      const amount = String(data.amount ?? '');
+      const amount = String(data.amount ?? booking?.pay_amount ?? '');
       if (createdPaymentID) {
         navigation.navigate('BkashCheckout', {
           bookingId,
@@ -131,7 +126,11 @@ const BookingDetailsScreen = ({navigation, route}) => {
         showModal({type: 'error', title: 'Error', message: response?.message || 'Payment creation failed. Please try again.'});
       }
     } catch (error) {
-      showModal({type: 'error', title: 'Error', message: error?.message || 'Payment failed. Please try again.'});
+      const message =
+        error?.code === API_CODES.PAYMENT_FAILED
+          ? getApiErrorMessage(error, 'Payment failed. Please try again.')
+          : getApiErrorMessage(error, 'Payment failed. Please try again.');
+      showModal({type: 'error', title: 'Error', message});
     } finally {
       setPayLoading(false);
     }
@@ -166,16 +165,22 @@ const BookingDetailsScreen = ({navigation, route}) => {
     }
   };
 
-  const statusStyle =
-    STATUS_STYLES[booking?.status] || {bg: '#F0F2F5', text: '#8190A7'};
-  const statusLabel = (booking?.status || '').replace(/_/g, ' ');
-  const showPayButton = booking?.payment_status === 'PENDING';
-  const isPaid = booking?.payment_status === 'PAID';
+  const statusMeta = getStatusMeta(booking?.status);
+  const showPayButton =
+    isTrue(booking?.can_pay) ||
+    (booking?.can_pay == null && booking?.payment_status === 'PENDING');
   const canCancel =
-    booking?.status &&
-    !CLOSED_STATUSES.includes(booking.status) &&
-    !isPaid;
+    isTrue(booking?.can_cancel) ||
+    (booking?.can_cancel == null &&
+      booking?.status &&
+      booking.status !== 'SERVICE_COMPLETED' &&
+      booking.status !== 'SERVICE_IN_PROGRESS' &&
+      booking.status !== 'CANCELLED_BY_USER' &&
+      booking.status !== 'CANCELLED_BY_ADMIN' &&
+      booking.status !== 'CANCELLED');
   const canLeaveReview = shouldShowStarModal(booking);
+  const canDispute = isTrue(booking?.can_dispute);
+  const searching = isSearchingStatus(booking?.status);
 
   const familyName =
     booking?.family_member_name || booking?.family_member?.name;
@@ -197,26 +202,47 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const hospitalName =
     booking?.hospital_name || booking?.hospital?.name;
 
-  const handleCancel = () => {
-    showModal({
-      type: 'confirm',
-      title: 'Cancel Booking',
-      message: 'Do you want to cancel this booking?',
-      cancelText: 'Keep',
-      confirmText: 'Cancel Booking',
-      confirmDestructive: true,
-      onConfirm: async () => {
-        try {
-          await cancelBooking.mutateAsync({
-            id: bookingId,
-            reason: 'Plans changed',
-          });
-          showModal({type: 'success', title: 'Cancelled', message: 'Booking cancelled successfully'});
-        } catch (error) {
-          showModal({type: 'error', title: 'Error', message: error?.message || 'Failed to cancel booking'});
-        }
-      },
-    });
+  const handleCancel = async () => {
+    try {
+      const response = await cancelBooking.mutateAsync({
+        id: bookingId,
+        reason: 'Plans changed',
+      });
+      setCancelVisible(false);
+      const refundText = formatRefund(response?.data?.refund);
+      showModal({
+        type: 'success',
+        title: 'Cancelled',
+        message: refundText
+          ? `Booking cancelled. Refund: ${refundText}`
+          : 'Booking cancelled successfully',
+      });
+    } catch (error) {
+      showModal({
+        type: 'error',
+        title: 'Error',
+        message: getApiErrorMessage(error, 'Failed to cancel booking'),
+      });
+    }
+  };
+
+  const handleDispute = async ({reason, details}) => {
+    try {
+      await createDispute.mutateAsync({id: bookingId, reason, details});
+      setDisputeVisible(false);
+      refetchDisputes();
+      showModal({
+        type: 'success',
+        title: 'Dispute submitted',
+        message: 'We received your dispute and will update you soon.',
+      });
+    } catch (error) {
+      showModal({
+        type: 'error',
+        title: 'Error',
+        message: getApiErrorMessage(error, 'Failed to submit dispute'),
+      });
+    }
   };
 
   if (isLoading) {
@@ -265,7 +291,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Loader visible={cancelBooking.isPending || payLoading} />
+      <Loader visible={cancelBooking.isPending || payLoading || createDispute.isPending} />
       <StarReviewModal
         visible={starModalVisible}
         bookingNumber={booking.booking_number}
@@ -274,18 +300,44 @@ const BookingDetailsScreen = ({navigation, route}) => {
         onSubmit={handleSubmitReview}
         onClose={closeStarModal}
       />
+      <CancelBookingSheet
+        visible={cancelVisible}
+        policy={booking.cancellation_policy}
+        submitting={cancelBooking.isPending}
+        onConfirm={handleCancel}
+        onClose={() => setCancelVisible(false)}
+      />
+      <DisputeSheet
+        visible={disputeVisible}
+        submitting={createDispute.isPending}
+        onSubmit={handleDispute}
+        onClose={() => setDisputeVisible(false)}
+      />
       <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
+        {searching && (
+          <View style={styles.searchingBanner}>
+            <Icon name="search-outline" size={18} color="#D97706" />
+            <Text style={styles.searchingText}>Finding another caregiver</Text>
+          </View>
+        )}
         {/* ── Card 1: Amount & Booking Details ── */}
         <View style={styles.heroCard}>
           <View style={styles.heroTop}>
             <View style={styles.heroLeft}>
               <Text style={styles.heroLabel}>Total amount</Text>
-              <Text style={styles.heroAmount}>৳{booking.total_amount}</Text>
+              <Text style={styles.heroAmount}>
+                ৳{booking.pay_amount ?? booking.total_amount}
+              </Text>
+            </View>
+            <View style={[styles.statusBadge, {backgroundColor: statusMeta.bg}]}>
+              <Text style={[styles.statusText, {color: statusMeta.color}]}>
+                {statusMeta.label}
+              </Text>
             </View>
           </View>
 
@@ -414,7 +466,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
             {!!booking.patient_requirements && (
               <>
                 {(!!familyName || !!caregiverName || !!hospitalName) && <View style={styles.sectionDivider} />}
-                <Text style={styles.sectionTitle}>Patient details</Text>
+                <Text style={styles.sectionTitle}>Service details</Text>
                 <Text style={styles.bodyText}>{booking.patient_requirements}</Text>
               </>
             )}
@@ -441,24 +493,27 @@ const BookingDetailsScreen = ({navigation, route}) => {
             ))}
           </View>
         )}
+
+        {disputes.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Disputes</Text>
+            {disputes.map((item, index) => (
+              <Text key={item.id || index} style={styles.bodyText}>
+                {(item.status || item.reason || 'Dispute').replace(/_/g, ' ')}
+                {item.details ? ` · ${item.details}` : ''}
+              </Text>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
-      {isPaid && booking?.status && !CLOSED_STATUSES.includes(booking.status) && (
-        <View style={styles.supportNote}>
-          <Icon name="information-circle-outline" size={18} color="#008178" />
-          <Text style={styles.supportNoteText}>
-            If you want to cancel this booking, please contact our support team.
-          </Text>
-        </View>
-      )}
-
-      {(showPayButton || canCancel || canLeaveReview) && (
+      {(showPayButton || canCancel || canLeaveReview || canDispute) && (
         <View style={styles.bottomContainer}>
           {canCancel && (
             <TouchableOpacity
               activeOpacity={0.85}
               style={[styles.actionButton, styles.cancelButton]}
-              onPress={handleCancel}>
+              onPress={() => setCancelVisible(true)}>
               <Text style={[styles.payButtonText, styles.cancelButtonText]}>
                 Cancel
               </Text>
@@ -481,6 +536,14 @@ const BookingDetailsScreen = ({navigation, route}) => {
                 setStarModalVisible(true);
               }}>
               <Text style={styles.payButtonText}>Rate service</Text>
+            </TouchableOpacity>
+          )}
+          {canDispute && (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[styles.actionButton, styles.disputeButton]}
+              onPress={() => setDisputeVisible(true)}>
+              <Text style={styles.payButtonText}>Dispute</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -698,6 +761,26 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#DC2626',
+  },
+  disputeButton: {
+    backgroundColor: '#111820',
+  },
+  searchingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 8,
+    marginBottom: 12,
+  },
+  searchingText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#92400E',
+    fontWeight: '600',
   },
   supportNote: {
     flexDirection: 'row',

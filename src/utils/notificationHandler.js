@@ -33,6 +33,11 @@ const shouldOpenBookingDetails = data => {
   return (
     type === 'SERVICE_STARTED' ||
     type === 'SERVICE_COMPLETED' ||
+    type === 'BOOKING_ACCEPTED' ||
+    type === 'BOOKING_REASSIGNED' ||
+    type === 'BOOKING_REJECTED' ||
+    type === 'BOOKING_CANCELLED' ||
+    type === 'DISPUTE_UPDATED' ||
     type === 'OPEN_BOOKING' ||
     data?.action === 'OPEN_BOOKING' ||
     screen === 'booking_details' ||
@@ -74,10 +79,12 @@ export const handleNotificationClick = (data, navigation) => {
   switch (type) {
     case 'BOOKING_CREATED':
     case 'BOOKING_ACCEPTED':
+    case 'BOOKING_REASSIGNED':
     case 'BOOKING_REJECTED':
     case 'BOOKING_CANCELLED':
     case 'SERVICE_STARTED':
     case 'SERVICE_COMPLETED':
+    case 'DISPUTE_UPDATED':
       openBookingDetails(bookingId, navigation, {inboxId});
       break;
 

@@ -23,7 +23,7 @@ const BookingConfirmedScreen = ({navigation, route}) => {
     });
   };
 
-  const statusLabel = (status || 'PENDING_PAYMENT').replace(/_/g, ' ');
+  const statusLabel = (status || 'SEARCHING_PROVIDER').replace(/_/g, ' ');
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
@@ -57,7 +57,7 @@ const BookingConfirmedScreen = ({navigation, route}) => {
         <View style={styles.noteBox}>
           <Icon name="notifications-outline" size={20} color="#008178" />
           <Text style={styles.noteText}>
-            You will get a notification when your caregiver is accepted.
+            You will get a notification when a caregiver is assigned or accepted.
           </Text>
         </View>
 

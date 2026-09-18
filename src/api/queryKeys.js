@@ -33,6 +33,7 @@ export const queryKeys = {
     search: (params) => ['caregivers', 'search', params],
     details: () => ['caregivers', 'detail'],
     detail: (id) => ['caregivers', 'detail', id],
+    availability: id => ['caregivers', 'availability', id],
   },
 
   // Bookings keys
@@ -42,6 +43,7 @@ export const queryKeys = {
     list: (filters) => ['bookings', 'list', filters],
     details: () => ['bookings', 'detail'],
     detail: (id) => ['bookings', 'detail', id],
+    disputes: id => ['bookings', 'disputes', id],
   },
 
   // Inbox keys
@@ -52,6 +54,11 @@ export const queryKeys = {
     details: () => ['inbox', 'detail'],
     detail: id => ['inbox', 'detail', id],
     unreadCount: () => ['inbox', 'unread-count'],
+  },
+
+  notificationPreferences: {
+    all: ['notificationPreferences'],
+    current: () => ['notificationPreferences', 'current'],
   },
 
   // Notifications keys (alias of inbox for existing hooks)

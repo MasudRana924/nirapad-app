@@ -13,6 +13,7 @@ import Loader from '../components/common/Loader';
 import Header from '../components/common/Header';
 import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
+import {API_CODES, getApiErrorMessage} from '../api/client';
 
 const toStartTime = timeValue => {
   if (!timeValue) {
@@ -127,11 +128,21 @@ const BookingPreviewScreen = ({navigation, route}) => {
       await storage.clearBookingData();
       navigation?.navigate('BookingConfirmed', {
         message: response.message || 'Booking created successfully',
-        status: response.data?.status || 'PENDING_PAYMENT',
+        status: response.data?.status || 'SEARCHING_PROVIDER',
         bookingNumber: response.data?.booking_number,
       });
     } catch (error) {
-      Alert.alert('Error', error?.message || 'Failed to create booking. Please try again.');
+      const message =
+        error?.code === API_CODES.CONFLICT
+          ? getApiErrorMessage(
+              error,
+              'This time overlaps another booking or the slot is unavailable.',
+            )
+          : getApiErrorMessage(
+              error,
+              'Failed to create booking. Please try again.',
+            );
+      Alert.alert('Error', message);
     } finally {
       setIsSubmitting(false);
     }

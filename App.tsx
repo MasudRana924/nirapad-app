@@ -21,11 +21,17 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
-      retry: 1,
+      retry: (failureCount, error) => {
+        const code = error?.code;
+        if (code === 'UNAUTHORIZED' || code === 'TOKEN_EXPIRED') {
+          return false;
+        }
+        return failureCount < 1;
+      },
       refetchOnWindowFocus: false,
     },
     mutations: {
-      retry: 1,
+      retry: 0,
     },
   },
 });

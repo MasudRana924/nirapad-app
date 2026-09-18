@@ -1,22 +1,57 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {getStatusMeta, isSearchingStatus} from '../../utils/bookingStatus';
 
-const ActiveBookingCard = ({navigation}) => {
+const getServiceLabel = booking => {
+  const type = String(booking?.service_type || '').toUpperCase();
+  if (type.includes('HOSPITAL')) {
+    return 'Hospital Assistance';
+  }
+  if (type.includes('NURSE')) {
+    return 'Nurse Care';
+  }
+  if (type.includes('ELDER')) {
+    return 'Elderly Support';
+  }
+  if (type) {
+    return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return 'Caregiver Service';
+};
+
+const ActiveBookingCard = ({navigation, booking, searching}) => {
+  if (!booking) {
+    return null;
+  }
+
+  const finding = searching || isSearchingStatus(booking.status);
+  const status = getStatusMeta(booking.status);
+  const caregiverName =
+    booking.caregiver_name || booking.caregiver?.name || 'Caregiver';
+  const hospitalName =
+    booking.hospital_name || booking.hospital?.name || booking.booking_number;
+
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
         <View style={styles.iconTile}>
-          <Icon name="medkit-outline" size={20} color="#008178" />
+          <Icon
+            name={finding ? 'search-outline' : 'medkit-outline'}
+            size={20}
+            color="#008178"
+          />
         </View>
 
         <View style={styles.headerText}>
           <Text style={styles.title} numberOfLines={1}>
-            Hospital Assistance
+            {getServiceLabel(booking)}
           </Text>
           <View style={styles.statusRow}>
             <View style={styles.statusDot} />
-            <Text style={styles.statusText}>On the way</Text>
+            <Text style={styles.statusText}>
+              {finding ? 'Finding another caregiver' : status.label}
+            </Text>
           </View>
         </View>
       </View>
@@ -26,22 +61,26 @@ const ActiveBookingCard = ({navigation}) => {
       <View style={styles.infoRow}>
         <Icon name="person-outline" size={15} color="#303944" />
         <Text style={styles.infoText} numberOfLines={1}>
-          Rahim Ahmed
+          {finding ? 'Assigning a caregiver' : caregiverName}
         </Text>
       </View>
 
       <View style={styles.infoRow}>
         <Icon name="location-outline" size={15} color="#303944" />
         <Text style={styles.infoText} numberOfLines={1}>
-          Square Hospital
+          {hospitalName || '—'}
         </Text>
       </View>
 
       <TouchableOpacity
         activeOpacity={0.85}
         style={styles.trackBtn}
-        onPress={() => navigation?.navigate('Bookings')}>
-        <Text style={styles.trackBtnText}>Track live</Text>
+        onPress={() =>
+          navigation?.navigate('BookingDetails', {bookingId: booking.id})
+        }>
+        <Text style={styles.trackBtnText}>
+          {finding ? 'View status' : 'Track live'}
+        </Text>
         <Icon name="chevron-forward" size={16} color="#008178" />
       </TouchableOpacity>
     </View>
@@ -101,9 +140,8 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#008178',
+    color: '#E6F4F3',
   },
-
 
   infoRow: {
     flexDirection: 'row',

@@ -13,6 +13,12 @@ import {useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookings} from '../api/queries';
 import BookingSkeleton from '../components/home/BookingSkeleton';
+import {
+  isCompletedStatus,
+  isCancelledStatus,
+  isSearchingStatus,
+  getStatusMeta,
+} from '../utils/bookingStatus';
 
 const INK = '#163532';
 const MUTED = '#7B9390';
@@ -37,68 +43,18 @@ const formatDate = dateString => {
   });
 };
 
-const isCompleted = booking =>
-  booking?.status === 'COMPLETED' || booking?.status === 'SERVICE_COMPLETED';
+const isCompleted = booking => isCompletedStatus(booking?.status);
 const isPending = booking =>
-  booking?.status !== 'COMPLETED' &&
-  booking?.status !== 'SERVICE_COMPLETED' &&
-  booking?.status !== 'CANCELLED';
+  !isCompletedStatus(booking?.status) && !isCancelledStatus(booking?.status);
 
-const getStatusMeta = booking => {
-  switch (booking?.status) {
-    case 'COMPLETED':
-    case 'SERVICE_COMPLETED':
-      return {
-        label: 'Completed',
-        icon: 'checkmark-circle',
-        color: '#0F8A7A',
-        bg: '#E7F6F1',
-      };
-    case 'CANCELLED':
-      return {
-        label: 'Cancelled',
-        icon: 'close-circle',
-        color: '#DC2626',
-        bg: '#FEECEC',
-      };
-    case 'PROVIDER_ACCEPTED':
-      return {
-        label: 'Accepted',
-        icon: 'checkmark-done',
-        color: '#008178',
-        bg: '#E6F4F3',
-      };
-    case 'CONFIRMED':
-      return {
-        label: 'Confirmed',
-        icon: 'shield-checkmark',
-        color: '#008178',
-        bg: '#E6F4F3',
-      };
-    case 'IN_PROGRESS':
-    case 'SERVICE_IN_PROGRESS':
-      return {
-        label: 'In Progress',
-        icon: 'play-circle',
-        color: '#2563EB',
-        bg: '#E8F1FB',
-      };
-    case 'PROVIDER_ASSIGNED':
-      return {
-        label: 'Assigned',
-        icon: 'person-circle',
-        color: '#7C3AED',
-        bg: '#EEE8FB',
-      };
-    case 'PENDING_PAYMENT':
-    default:
-      return {
-        label: 'Pending',
-        icon: 'time',
-        color: '#D97706',
-        bg: '#FEF3C7',
-      };
+const getStatusMetaForCard = booking => {
+  if (isSearchingStatus(booking?.status)) {
+    return {
+      ...getStatusMeta(booking?.status),
+      label: 'Finding caregiver',
+    };
   }
+  return getStatusMeta(booking?.status);
 };
 
 const getServiceLabel = booking => {
@@ -247,7 +203,7 @@ const BookingsScreen = ({navigation}) => {
           ) : (
             visibleBookings.map((booking, index) => {
               const theme = CARD_THEMES[index % CARD_THEMES.length];
-              const status = getStatusMeta(booking);
+              const status = getStatusMetaForCard(booking);
               const serviceLabel = getServiceLabel(booking);
 
               return (

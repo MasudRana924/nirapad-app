@@ -9,6 +9,7 @@ import AuthLayout, {
   AuthFooterLink,
 } from '../components/auth/AuthLayout';
 import {loginUser, extractAuthPayload} from '../services/api';
+import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
 import notificationService from '../services/notificationService';
 
@@ -38,55 +39,34 @@ const LoginScreen = ({navigation}) => {
 
     setLoading(true);
     try {
-      console.log('🔐 Starting login process...');
       const response = await loginUser(identifier.trim(), password);
-
       const {token, refreshToken, user} = extractAuthPayload(response);
-      if (response.success && token) {
-        console.log('✅ Login API response received');
+      if (!token) {
+        setError('Login failed');
+        return;
+      }
 
-        await login(token, refreshToken, user);
-        console.log('✅ Auth tokens stored locally');
-
-        console.log('🔔 Initializing notification service...');
-        const notificationInitialized = await notificationService.initialize(
-          token,
-        );
-
-        if (notificationInitialized) {
-          console.log('✅ Notification service initialized');
-        } else {
-          console.log(
-            '⚠️ Notification service initialization failed, but continuing...',
-          );
-        }
-
-        console.log('📱 Registering FCM token with server...');
-        const tokenRegistered =
-          await notificationService.registerTokenWithServer(token);
-
-        if (tokenRegistered) {
-          console.log('✅ FCM token registered successfully');
-        } else {
-          console.log(
-            '⚠️ FCM token registration failed, but login successful',
-          );
-        }
+      await login(token, refreshToken, user);
+      await notificationService.initialize(token);
+      await notificationService.registerTokenWithServer(token);
+    } catch (err) {
+      const message = getApiErrorMessage(err, 'Something went wrong. Please try again.');
+      const needsVerify =
+        err?.errors?.some?.(e =>
+          String(e?.message || e)
+            .toLowerCase()
+            .includes('verify'),
+        ) || message.toLowerCase().includes('verify');
+      if (needsVerify && !isPhoneLogin) {
+        navigation?.navigate('VerifyPhone', {email: identifier.trim()});
+      }
+      if (err?.code === API_CODES.OTP_INVALID) {
+        setError(message);
+      } else if (err?.code === API_CODES.TOO_MANY_REQUESTS) {
+        setError(message || 'Too many attempts. Please wait and try again.');
       } else {
-        const message = response.message || 'Login failed';
-        const needsVerify =
-          response.errors?.some?.(e =>
-            String(e?.message || e)
-              .toLowerCase()
-              .includes('verify'),
-          ) || message.toLowerCase().includes('verify');
-        if (needsVerify && !isPhoneLogin) {
-          navigation?.navigate('VerifyPhone', {email: identifier.trim()});
-        }
         setError(message);
       }
-    } catch (err) {
-      setError(err?.message || 'Something went wrong. Please try again.');
       console.error('❌ Login error:', err);
     } finally {
       setLoading(false);

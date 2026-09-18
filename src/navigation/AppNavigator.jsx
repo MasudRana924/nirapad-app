@@ -42,6 +42,7 @@ import ReviewScreen from '../screens/ReviewScreen';
 import PaymentHistory from '../screens/PaymentHistory';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import PaymentCancelledScreen from '../screens/PaymentCancelledScreen';
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -197,6 +198,7 @@ function AppNavigator() {
           <Stack.Screen name="PaymentHistory" component={PaymentHistory} />
           <Stack.Screen name="PaymentSuccess" component={PaymentSuccessScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="PaymentCancelled" component={PaymentCancelledScreen} options={{gestureEnabled: false}} />
+          <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
         </>
       ) : (
         // Not authenticated — show auth screens

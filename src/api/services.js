@@ -3,134 +3,9 @@
  * HTTP client and service functions for API calls
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getFullUrl} from './endpoints';
+import {apiRequest, createUuid} from './client';
 
-const AUTH_SKIP_REFRESH = [
-  '/auth/login',
-  '/auth/register',
-  '/auth/verify-otp',
-  '/auth/resend-otp',
-  '/auth/send-otp',
-  '/auth/refresh-token',
-];
-
-const persistAuthTokens = async data => {
-  if (data?.token) {
-    await AsyncStorage.setItem('userToken', data.token);
-  }
-  if (data?.refreshToken) {
-    await AsyncStorage.setItem('refreshToken', data.refreshToken);
-  }
-};
-
-const refreshAccessToken = async () => {
-  const refreshToken = await AsyncStorage.getItem('refreshToken');
-  if (!refreshToken) {
-    return null;
-  }
-
-  try {
-    const response = await fetch(getFullUrl('/auth/refresh-token'), {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({refreshToken}),
-    });
-    const payload = await response.json();
-    const data = payload?.data;
-    if (payload?.success && data?.token) {
-      await persistAuthTokens(data);
-      return data.token;
-    }
-  } catch (error) {
-    console.error('Refresh token error:', error);
-  }
-  return null;
-};
-
-const parseResponseBody = async response => {
-  try {
-    return await response.json();
-  } catch (error) {
-    return null;
-  }
-};
-
-const getErrorMessage = (payload, status) => {
-  if (payload?.message) {
-    return payload.message;
-  }
-  if (Array.isArray(payload?.errors) && payload.errors.length > 0) {
-    const first = payload.errors[0];
-    return typeof first === 'string' ? first : first?.message || `HTTP error! status: ${status}`;
-  }
-  return `HTTP error! status: ${status}`;
-};
-
-/**
- * Get auth token from storage
- */
-const getAuthToken = async () => {
-  return await AsyncStorage.getItem('userToken');
-};
-
-/**
- * Generic API request handler
- */
-export const apiRequest = async (
-  endpoint,
-  method = 'GET',
-  body = null,
-  isFormData = false,
-  {retry = true} = {},
-) => {
-  const token = await getAuthToken();
-
-  const headers = {};
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  if (!isFormData) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  const config = {
-    method,
-    headers,
-  };
-
-  if (body) {
-    config.body = isFormData ? body : JSON.stringify(body);
-  }
-
-  try {
-    const response = await fetch(getFullUrl(endpoint), config);
-    const data = await parseResponseBody(response);
-
-    if (
-      response.status === 401 &&
-      retry &&
-      token &&
-      !AUTH_SKIP_REFRESH.some(path => endpoint.startsWith(path))
-    ) {
-      const newToken = await refreshAccessToken();
-      if (newToken) {
-        return apiRequest(endpoint, method, body, isFormData, {retry: false});
-      }
-    }
-
-    if (!response.ok) {
-      throw new Error(getErrorMessage(data, response.status));
-    }
-
-    return data;
-  } catch (error) {
-    console.error('API Request Error:', error);
-    throw error;
-  }
-};
+export {apiRequest, ApiError, extractAuthPayload, createUuid} from './client';
 
 /**
  * Auth Services
@@ -186,6 +61,8 @@ export const caregiverService = {
   getCaregivers: (params = {}) => caregiverService.searchCaregivers(params),
 
   getCaregiverDetails: id => apiRequest(`/caregiver/${id}`, 'GET'),
+
+  getAvailability: id => apiRequest(`/caregiver/${id}/availability`, 'GET'),
 
   searchCaregivers: (params = {}) => {
     const {
@@ -259,6 +136,13 @@ export const inboxService = {
   markAllAsRead: () => apiRequest('/inbox/read-all', 'PUT'),
 };
 
+export const notificationPreferenceService = {
+  getPreferences: () => apiRequest('/notifications/preferences', 'GET'),
+
+  updatePreferences: payload =>
+    apiRequest('/notifications/preferences', 'PUT', payload),
+};
+
 /** @deprecated Use inboxService — kept so existing imports keep working */
 export const notificationService = {
   getNotifications: params => inboxService.getInbox(params),
@@ -285,8 +169,23 @@ export const bookingService = {
 
   getBookingDetails: id => apiRequest(`/bookings/${id}`, 'GET'),
 
-  submitReview: (id, rating) =>
-    apiRequest(`/bookings/${id}/review`, 'POST', {rating}),
+  submitReview: (id, {rating, comment} = {}) => {
+    const body = {rating};
+    if (comment != null && String(comment).trim()) {
+      body.comment = String(comment).trim();
+    }
+    return apiRequest(`/bookings/${id}/review`, 'POST', body);
+  },
+
+  createDispute: (id, {reason, details} = {}) => {
+    const body = {reason};
+    if (details != null && String(details).trim()) {
+      body.details = String(details).trim();
+    }
+    return apiRequest(`/bookings/${id}/dispute`, 'POST', body);
+  },
+
+  getDisputes: id => apiRequest(`/bookings/${id}/disputes`, 'GET'),
 
   createBooking: bookingData =>
     apiRequest('/bookings', 'POST', bookingData, false),
@@ -304,14 +203,23 @@ export const bookingService = {
  * Payments Services
  */
 export const paymentService = {
-  createBkashPayment: bookingId =>
-    apiRequest('/payments/bkash/create', 'POST', {booking_id: bookingId}),
+  createBkashPayment: (bookingId, {idempotencyKey} = {}) =>
+    apiRequest(
+      '/payments/bkash/create',
+      'POST',
+      {booking_id: bookingId},
+      false,
+      {idempotencyKey: idempotencyKey || createUuid()},
+    ),
 
   executeBkashPayment: (paymentID, bookingId) =>
     apiRequest('/payments/bkash/execute', 'POST', {
       paymentID,
       booking_id: bookingId,
     }),
+
+  queryBkashPayment: paymentID =>
+    apiRequest('/payments/bkash/query', 'POST', {paymentID}),
 };
 
 /**
@@ -345,4 +253,5 @@ export default {
   hospitalService,
   inboxService,
   notificationService,
+  notificationPreferenceService,
 };

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,30 +14,19 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const StarReviewModal = ({
-  visible,
-  caregiverName,
-  submitting = false,
-  onSubmit,
-  onClose,
-}) => {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
+const DisputeSheet = ({visible, submitting = false, onSubmit, onClose}) => {
   const insets = useSafeAreaInsets();
+  const [reason, setReason] = useState('');
+  const [details, setDetails] = useState('');
 
   useEffect(() => {
     if (visible) {
-      setRating(0);
-      setComment('');
+      setReason('');
+      setDetails('');
     }
   }, [visible]);
 
-  const handleSubmit = () => {
-    if (rating < 1 || rating > 5 || submitting) {
-      return;
-    }
-    onSubmit(rating, comment.trim());
-  };
+  const canSubmit = reason.trim().length > 0 && !submitting;
 
   return (
     <Modal
@@ -58,7 +47,6 @@ const StarReviewModal = ({
                 <View style={styles.handleRow}>
                   <View style={styles.handle} />
                 </View>
-
                 <TouchableOpacity
                   style={styles.closeBtn}
                   onPress={onClose}
@@ -66,53 +54,43 @@ const StarReviewModal = ({
                   <Icon name="close" size={22} color="#8190A7" />
                 </TouchableOpacity>
 
-                <Text style={styles.title}>Rate Your Experience</Text>
+                <Text style={styles.title}>Open a dispute</Text>
                 <Text style={styles.subtitle}>
-                  {caregiverName
-                    ? `How was the service of ${caregiverName}?`
-                    : 'How was your experience with this service?'}
+                  Tell us what went wrong after payment. Our team will review it.
                 </Text>
 
-                <View style={styles.starsContainer}>
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <TouchableOpacity
-                      key={star}
-                      onPress={() => setRating(star)}
-                      disabled={submitting}
-                      activeOpacity={0.7}
-                      style={styles.starBtn}>
-                      <Icon
-                        name={star <= rating ? 'star' : 'star-outline'}
-                        size={40}
-                        color={star <= rating ? '#F6A900' : '#D1D5DB'}
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
+                <Text style={styles.label}>Reason</Text>
                 <TextInput
-                  style={styles.commentInput}
-                  value={comment}
-                  onChangeText={setComment}
-                  placeholder="Add a comment (optional)"
+                  style={styles.input}
+                  value={reason}
+                  onChangeText={setReason}
+                  placeholder="Short reason"
+                  placeholderTextColor="#8190A7"
+                />
+
+                <Text style={styles.label}>Details (optional)</Text>
+                <TextInput
+                  style={[styles.input, styles.detailsInput]}
+                  value={details}
+                  onChangeText={setDetails}
+                  placeholder="Add more context"
                   placeholderTextColor="#8190A7"
                   multiline
                   textAlignVertical="top"
-                  editable={!submitting}
                 />
 
                 <TouchableOpacity
                   style={[
                     styles.submitBtn,
-                    (rating < 1 || submitting) && styles.submitBtnDisabled,
+                    !canSubmit && styles.submitBtnDisabled,
                   ]}
-                  onPress={handleSubmit}
-                  disabled={rating < 1 || submitting}
+                  onPress={() => onSubmit?.({reason: reason.trim(), details})}
+                  disabled={!canSubmit}
                   activeOpacity={0.85}>
                   {submitting ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.submitText}>Submit Rating</Text>
+                    <Text style={styles.submitText}>Submit dispute</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -135,7 +113,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
-    alignItems: 'center',
   },
   handleRow: {
     width: '100%',
@@ -172,33 +149,28 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#8190A7',
     textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 12,
+    marginBottom: 20,
   },
-  starsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#111820',
     marginBottom: 8,
   },
-  starBtn: {
-    padding: 4,
-  },
-  commentInput: {
-    width: '100%',
-    minHeight: 88,
+  input: {
+    height: 48,
     borderRadius: 12,
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E3E8F0',
     paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 12,
-    fontSize: 14,
+    fontSize: 15,
     color: '#111820',
-    marginBottom: 16,
-    marginTop: 8,
+    marginBottom: 14,
+  },
+  detailsInput: {
+    height: 96,
+    paddingTop: 12,
   },
   submitBtn: {
     width: '100%',
@@ -219,4 +191,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StarReviewModal;
+export default DisputeSheet;

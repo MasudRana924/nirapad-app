@@ -67,10 +67,12 @@ const InboxScreen = ({navigation}) => {
       case 'BOOKING':
       case 'BOOKING_CREATED':
       case 'BOOKING_ACCEPTED':
+      case 'BOOKING_REASSIGNED':
       case 'BOOKING_REJECTED':
       case 'BOOKING_CANCELLED':
       case 'SERVICE_STARTED':
       case 'SERVICE_COMPLETED':
+      case 'DISPUTE_UPDATED':
         return 'calendar-outline';
       case 'PAYMENT':
         return 'card-outline';

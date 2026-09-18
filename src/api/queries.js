@@ -4,7 +4,7 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -66,6 +66,15 @@ export const useCaregiver = (id, options = {}) => {
   });
 };
 
+export const useCaregiverAvailability = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.caregivers.availability(id),
+    queryFn: () => caregiverService.getAvailability(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
 /**
  * Bookings Queries
  */
@@ -81,6 +90,15 @@ export const useBookingDetails = (id, options = {}) => {
   return useQuery({
     queryKey: queryKeys.bookings.detail(id),
     queryFn: () => bookingService.getBookingDetails(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export const useBookingDisputes = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.bookings.disputes(id),
+    queryFn: () => bookingService.getDisputes(id),
     enabled: !!id,
     ...options,
   });
@@ -106,10 +124,29 @@ export const useInboxItem = (id, options = {}) => {
   });
 };
 
+const unreadFromPayload = payload => {
+  if (typeof payload?.meta?.unread === 'number') {
+    return payload.meta.unread;
+  }
+  if (typeof payload?.data === 'number') {
+    return payload.data;
+  }
+  return payload?.data?.unread ?? payload?.data?.count ?? 0;
+};
+
 export const useInboxUnreadCount = (options = {}) => {
   return useQuery({
     queryKey: queryKeys.inbox.unreadCount(),
     queryFn: () => inboxService.getUnreadCount(),
+    select: unreadFromPayload,
+    ...options,
+  });
+};
+
+export const useNotificationPreferences = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.notificationPreferences.current(),
+    queryFn: () => notificationPreferenceService.getPreferences(),
     ...options,
   });
 };
@@ -160,10 +197,12 @@ export default {
   // Caregivers
   useCaregivers,
   useCaregiver,
+  useCaregiverAvailability,
 
   // Bookings
   useBookings,
   useBookingDetails,
+  useBookingDisputes,
 
   // Hospitals
   useHospitals,

@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {apiRequest} from '../services/api';
+import {bookingService} from '../api/services';
+import {getApiErrorMessage} from '../api/client';
 
 const ReviewScreen = ({route, navigation}) => {
   const {bookingId} = route.params || {};
@@ -29,32 +30,24 @@ const ReviewScreen = ({route, navigation}) => {
       return;
     }
 
-    if (!review.trim()) {
-      Alert.alert('Error', 'Please write a review');
-      return;
-    }
-
     setLoading(true);
     try {
-      const response = await apiRequest('/reviews', 'POST', {
-        booking_id: bookingId,
-        rating: rating,
-        review: review.trim(),
+      await bookingService.submitReview(bookingId, {
+        rating,
+        comment: review.trim(),
       });
-
-      if (response.success) {
-        Alert.alert('Success', 'Thank you for your review!', [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('BookingDetails', {bookingId}),
-          },
-        ]);
-      } else {
-        Alert.alert('Error', response.message || 'Failed to submit review');
-      }
+      Alert.alert('Success', 'Thank you for your review!', [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('BookingDetails', {bookingId}),
+        },
+      ]);
     } catch (error) {
       console.error('Review submission error:', error);
-      Alert.alert('Error', 'Failed to submit review');
+      Alert.alert(
+        'Error',
+        getApiErrorMessage(error, 'Failed to submit review'),
+      );
     } finally {
       setLoading(false);
     }
