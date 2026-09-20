@@ -27,6 +27,13 @@ export const isCancelledStatus = status => CANCELLED.includes(status);
 export const isSearchingStatus = status =>
   status === BOOKING_STATUS.SEARCHING_PROVIDER;
 
+export const isWaitingForAcceptStatus = status =>
+  status === BOOKING_STATUS.PROVIDER_ASSIGNED;
+
+/** Poll while offer is pending or backend is finding another caregiver. */
+export const shouldPollBookingStatus = status =>
+  isSearchingStatus(status) || isWaitingForAcceptStatus(status);
+
 export const isClosedStatus = status =>
   isCompletedStatus(status) || isCancelledStatus(status);
 
@@ -66,15 +73,15 @@ export const getStatusMeta = status => {
   switch (status) {
     case BOOKING_STATUS.SEARCHING_PROVIDER:
       return {
-        label: 'Finding caregiver',
+        label: 'Finding another caregiver…',
         icon: 'search',
         color: '#D97706',
         bg: '#FEF3C7',
       };
     case BOOKING_STATUS.PROVIDER_ASSIGNED:
       return {
-        label: 'Assigned',
-        icon: 'person-circle',
+        label: 'Waiting for caregiver',
+        icon: 'time',
         color: '#7C3AED',
         bg: '#EEE8FB',
       };

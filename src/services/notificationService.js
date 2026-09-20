@@ -327,6 +327,7 @@ class NotificationService {
       type === 'SERVICE_COMPLETED' ||
       type === 'BOOKING_ACCEPTED' ||
       type === 'BOOKING_REASSIGNED' ||
+      type === 'BOOKING_SEARCHING' ||
       type === 'BOOKING_REJECTED' ||
       type === 'BOOKING_CANCELLED' ||
       type === 'DISPUTE_UPDATED' ||
@@ -372,6 +373,7 @@ class NotificationService {
       case 'BOOKING_CREATED':
       case 'BOOKING_ACCEPTED':
       case 'BOOKING_REASSIGNED':
+      case 'BOOKING_SEARCHING':
       case 'BOOKING_CANCELLED':
       case 'BOOKING_REJECTED':
       case 'SERVICE_STARTED':

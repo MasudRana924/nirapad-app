@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {getStatusMeta} from '../utils/bookingStatus';
 
 const BookingConfirmedScreen = ({navigation, route}) => {
   const {message, status, bookingNumber} = route.params || {};
@@ -23,7 +24,8 @@ const BookingConfirmedScreen = ({navigation, route}) => {
     });
   };
 
-  const statusLabel = (status || 'SEARCHING_PROVIDER').replace(/_/g, ' ');
+  const statusMeta = getStatusMeta(status || 'PROVIDER_ASSIGNED');
+  const statusLabel = statusMeta.label;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
@@ -57,7 +59,8 @@ const BookingConfirmedScreen = ({navigation, route}) => {
         <View style={styles.noteBox}>
           <Icon name="notifications-outline" size={20} color="#008178" />
           <Text style={styles.noteText}>
-            You will get a notification when a caregiver is assigned or accepted.
+            Your selected caregiver has been notified. You will get an update
+            when they accept, or if we need to find another caregiver.
           </Text>
         </View>
 

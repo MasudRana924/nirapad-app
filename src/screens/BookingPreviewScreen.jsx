@@ -11,6 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
 import Header from '../components/common/Header';
+import Toast from '../components/common/Toast';
 import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
 import {API_CODES, getApiErrorMessage} from '../api/client';
@@ -68,7 +69,16 @@ const BookingPreviewScreen = ({navigation, route}) => {
   } = route.params || {};
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'error',
+  });
   const createBooking = useCreateBooking();
+
+  const showToast = (message, type = 'error') => {
+    setToast({visible: true, message, type});
+  };
 
   const hourlyRate =
     selectedCaregiver?.hourly_rate ||
@@ -128,7 +138,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
       await storage.clearBookingData();
       navigation?.navigate('BookingConfirmed', {
         message: response.message || 'Booking created successfully',
-        status: response.data?.status || 'SEARCHING_PROVIDER',
+        status: response.data?.status || 'PROVIDER_ASSIGNED',
         bookingNumber: response.data?.booking_number,
       });
     } catch (error) {
@@ -142,7 +152,11 @@ const BookingPreviewScreen = ({navigation, route}) => {
               error,
               'Failed to create booking. Please try again.',
             );
-      Alert.alert('Error', message);
+      if (error?.code === API_CODES.CONFLICT) {
+        showToast(message, 'error');
+      } else {
+        Alert.alert('Error', message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -151,6 +165,12 @@ const BookingPreviewScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={isSubmitting} />
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() => setToast(prev => ({...prev, visible: false}))}
+      />
       <Header title="Booking Preview" onBack={() => navigation?.goBack()} />
 
       <ScrollView

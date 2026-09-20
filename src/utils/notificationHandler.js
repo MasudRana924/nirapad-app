@@ -35,6 +35,7 @@ const shouldOpenBookingDetails = data => {
     type === 'SERVICE_COMPLETED' ||
     type === 'BOOKING_ACCEPTED' ||
     type === 'BOOKING_REASSIGNED' ||
+    type === 'BOOKING_SEARCHING' ||
     type === 'BOOKING_REJECTED' ||
     type === 'BOOKING_CANCELLED' ||
     type === 'DISPUTE_UPDATED' ||
@@ -80,6 +81,7 @@ export const handleNotificationClick = (data, navigation) => {
     case 'BOOKING_CREATED':
     case 'BOOKING_ACCEPTED':
     case 'BOOKING_REASSIGNED':
+    case 'BOOKING_SEARCHING':
     case 'BOOKING_REJECTED':
     case 'BOOKING_CANCELLED':
     case 'SERVICE_STARTED':

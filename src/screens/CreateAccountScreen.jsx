@@ -9,6 +9,11 @@ import AuthLayout, {
 } from '../components/auth/AuthLayout';
 import {registerUser} from '../services/api';
 import {getApiErrorMessage} from '../api/client';
+import {
+  EMAIL_NOT_SENT_MESSAGE,
+  getDevOtpHint,
+  isEmailSent,
+} from '../utils/otpHelpers';
 
 const CreateAccountScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,8 +51,17 @@ const CreateAccountScreen = ({navigation}) => {
 
     setLoading(true);
     try {
-      await registerUser(name.trim(), email.trim(), password);
-      navigation?.navigate('VerifyPhone', {email: email.trim()});
+      const response = await registerUser(name.trim(), email.trim(), password);
+      if (!isEmailSent(response)) {
+        Alert.alert('Email not sent', EMAIL_NOT_SENT_MESSAGE);
+        return;
+      }
+      const params = {email: email.trim()};
+      const devOtp = getDevOtpHint(response);
+      if (devOtp) {
+        params.devOtpHint = devOtp;
+      }
+      navigation?.navigate('VerifyPhone', params);
     } catch (error) {
       Alert.alert(
         'Error',

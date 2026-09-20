@@ -51,7 +51,7 @@ const getStatusMetaForCard = booking => {
   if (isSearchingStatus(booking?.status)) {
     return {
       ...getStatusMeta(booking?.status),
-      label: 'Finding caregiver',
+      label: 'Finding another caregiver…',
     };
   }
   return getStatusMeta(booking?.status);

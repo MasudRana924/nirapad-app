@@ -27,9 +27,12 @@ import {useAppModal} from '../contexts/ModalContext';
 import {
   getStatusMeta,
   isSearchingStatus,
+  isWaitingForAcceptStatus,
+  shouldPollBookingStatus,
   normalizeBooking,
   formatRefund,
 } from '../utils/bookingStatus';
+import {formatOfferCountdown} from '../utils/offerCountdown';
 
 const isTrue = value => value === true || value === 'true';
 
@@ -42,18 +45,10 @@ const shouldShowStarModal = booking => {
 
 const BookingDetailsScreen = ({navigation, route}) => {
   const {bookingId, notificationOpenedAt} = route.params || {};
-  const {data: bookingData, isLoading, refetch} = useBookingDetails(bookingId, {
-    refetchOnMount: 'always',
-  });
-  const {data: disputesData, refetch: refetchDisputes} = useBookingDisputes(
-    bookingId,
-    {enabled: !!bookingId, retry: false},
-  );
+  const [countdownTick, setCountdownTick] = useState(0);
   const cancelBooking = useCancelBooking();
   const submitReview = useSubmitBookingReview();
   const createDispute = useCreateDispute();
-  const booking = normalizeBooking(bookingData);
-  const disputes = Array.isArray(disputesData?.data) ? disputesData.data : [];
   const [payLoading, setPayLoading] = useState(false);
   const {showModal} = useAppModal();
   const [starModalVisible, setStarModalVisible] = useState(false);
@@ -61,6 +56,21 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const [cancelVisible, setCancelVisible] = useState(false);
   const [disputeVisible, setDisputeVisible] = useState(false);
   const paymentKeyRef = useRef(createUuid());
+  const statusForPollRef = useRef(null);
+
+  const {data: bookingData, isLoading, refetch} = useBookingDetails(bookingId, {
+    refetchOnMount: 'always',
+    refetchInterval: () =>
+      shouldPollBookingStatus(statusForPollRef.current) ? 15000 : false,
+  });
+  const booking = normalizeBooking(bookingData);
+  statusForPollRef.current = booking?.status;
+
+  const {data: disputesData, refetch: refetchDisputes} = useBookingDisputes(
+    bookingId,
+    {enabled: !!bookingId, retry: false},
+  );
+  const disputes = Array.isArray(disputesData?.data) ? disputesData.data : [];
 
   useEffect(() => {
     setReviewDismissed(false);
@@ -69,6 +79,16 @@ const BookingDetailsScreen = ({navigation, route}) => {
       refetch();
     }
   }, [bookingId, notificationOpenedAt, refetch]);
+
+  useEffect(() => {
+    if (!isWaitingForAcceptStatus(booking?.status) || !booking?.offer_expires_at) {
+      return undefined;
+    }
+    const timer = setInterval(() => {
+      setCountdownTick(tick => tick + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [booking?.status, booking?.offer_expires_at]);
 
   useEffect(() => {
     if (reviewDismissed || isLoading || !booking) {
@@ -181,6 +201,12 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const canLeaveReview = shouldShowStarModal(booking);
   const canDispute = isTrue(booking?.can_dispute);
   const searching = isSearchingStatus(booking?.status);
+  const waitingForAccept = isWaitingForAcceptStatus(booking?.status);
+  // countdownTick forces a re-render every second so the label stays live
+  const offerCountdownLabel =
+    waitingForAccept && booking?.offer_expires_at && countdownTick >= 0
+      ? formatOfferCountdown(booking.offer_expires_at)
+      : null;
 
   const familyName =
     booking?.family_member_name || booking?.family_member?.name;
@@ -322,7 +348,29 @@ const BookingDetailsScreen = ({navigation, route}) => {
         {searching && (
           <View style={styles.searchingBanner}>
             <Icon name="search-outline" size={18} color="#D97706" />
-            <Text style={styles.searchingText}>Finding another caregiver</Text>
+            <Text style={styles.searchingText}>
+              Finding another caregiver…
+            </Text>
+          </View>
+        )}
+        {waitingForAccept && (
+          <View style={styles.waitingBanner}>
+            <Icon name="time-outline" size={18} color="#7C3AED" />
+            <View style={styles.waitingCopy}>
+              <Text style={styles.waitingText}>
+                Waiting for caregiver to accept
+              </Text>
+              {offerCountdownLabel ? (
+                <Text style={styles.waitingSubtext}>
+                  Offer expires in {offerCountdownLabel}
+                </Text>
+              ) : booking?.accept_timeout_minutes ? (
+                <Text style={styles.waitingSubtext}>
+                  Caregiver usually responds within{' '}
+                  {booking.accept_timeout_minutes} minutes
+                </Text>
+              ) : null}
+            </View>
           </View>
         )}
         {/* ── Card 1: Amount & Booking Details ── */}
@@ -781,6 +829,32 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#92400E',
     fontWeight: '600',
+  },
+  waitingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEE8FB',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 8,
+    marginBottom: 12,
+  },
+  waitingCopy: {
+    flex: 1,
+  },
+  waitingText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#5B21B6',
+    fontWeight: '600',
+  },
+  waitingSubtext: {
+    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#7C3AED',
+    fontWeight: '500',
   },
   supportNote: {
     flexDirection: 'row',

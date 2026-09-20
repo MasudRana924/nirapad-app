@@ -50,7 +50,7 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
           <View style={styles.statusRow}>
             <View style={styles.statusDot} />
             <Text style={styles.statusText}>
-              {finding ? 'Finding another caregiver' : status.label}
+              {finding ? 'Finding another caregiver…' : status.label}
             </Text>
           </View>
         </View>

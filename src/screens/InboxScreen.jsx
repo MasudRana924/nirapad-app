@@ -68,6 +68,7 @@ const InboxScreen = ({navigation}) => {
       case 'BOOKING_CREATED':
       case 'BOOKING_ACCEPTED':
       case 'BOOKING_REASSIGNED':
+      case 'BOOKING_SEARCHING':
       case 'BOOKING_REJECTED':
       case 'BOOKING_CANCELLED':
       case 'SERVICE_STARTED':

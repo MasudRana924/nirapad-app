@@ -14,6 +14,11 @@ import {verifyOtp, resendOtp, extractAuthPayload} from '../services/api';
 import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
 import notificationService from '../services/notificationService';
+import {
+  EMAIL_NOT_SENT_MESSAGE,
+  getDevOtpHint,
+  isEmailSent,
+} from '../utils/otpHelpers';
 
 const OTP_LENGTH = 4;
 
@@ -22,6 +27,11 @@ const VerifyPhoneScreen = ({navigation, route}) => {
   const [seconds, setSeconds] = useState(42);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [devHint, setDevHint] = useState(
+    typeof __DEV__ !== 'undefined' && __DEV__
+      ? route?.params?.devOtpHint || null
+      : null,
+  );
   const inputs = useRef([]);
   const {login} = useAuth();
   const email = route?.params?.email || '';
@@ -74,8 +84,13 @@ const VerifyPhoneScreen = ({navigation, route}) => {
     }
     setResending(true);
     try {
-      await resendOtp(email);
+      const response = await resendOtp(email);
+      if (!isEmailSent(response)) {
+        Alert.alert('Email not sent', EMAIL_NOT_SENT_MESSAGE);
+        return;
+      }
       setSeconds(42);
+      setDevHint(getDevOtpHint(response));
       Alert.alert('Success', 'OTP has been resent to your email');
     } catch (error) {
       Alert.alert(
@@ -127,7 +142,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         showBack
         onBack={() => navigation?.goBack()}
         title="Verify OTP"
-        subtitle="We sent a 4-digit code to your email"
+        subtitle="Enter the 4-digit code sent to your email"
         extra={email ? <Text style={styles.emailText}>{email}</Text> : null}>
         <View style={styles.otpContainer}>
           {otp.map((value, index) => (
@@ -147,6 +162,10 @@ const VerifyPhoneScreen = ({navigation, route}) => {
             />
           ))}
         </View>
+
+        {!!devHint && (
+          <Text style={styles.devHint}>Dev only — API otp: {devHint}</Text>
+        )}
 
         <View style={styles.resendRow}>
           <Text style={styles.resendText}>Didn't get the code? </Text>
@@ -211,6 +230,13 @@ const styles = StyleSheet.create({
   otpInputFilled: {
     borderColor: '#008178',
     backgroundColor: '#FFFFFF',
+  },
+  devHint: {
+    marginTop: 8,
+    marginBottom: 4,
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#7B9390',
   },
   resendRow: {
     flexDirection: 'row',
