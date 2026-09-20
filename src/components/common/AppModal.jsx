@@ -93,10 +93,9 @@ const AppModal = ({
 
     return (
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#008178' }]}
+        style={[styles.button, {backgroundColor: '#008178'}]}
         onPress={onClose}
-        activeOpacity={0.7}
-      >
+        activeOpacity={0.7}>
         <Text style={styles.buttonText}>
           {type === 'success' ? 'Done' : 'Okay'}
         </Text>

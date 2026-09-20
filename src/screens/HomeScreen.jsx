@@ -5,6 +5,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import HomeHeader from '../components/home/HomeHeader';
 import ActiveBookingCard from '../components/home/ActiveBookingCard';
+import EmptyActiveBookingCard from '../components/home/EmptyActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
 import HomeSkeleton from '../components/home/HomeSkeleton';
 import {useUserProfile, useBookings} from '../api/queries';
@@ -74,7 +75,10 @@ const HomeScreen = ({navigation}) => {
             booking={activeBooking}
             searching={isSearchingStatus(activeBooking.status)}
           />
-        ) : null}
+        ) : (
+          <EmptyActiveBookingCard navigation={navigation} />
+        )}
+
         <BookingButtons navigation={navigation} />
       </ScrollView>
     </SafeAreaView>

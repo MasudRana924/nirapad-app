@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -19,11 +18,14 @@ import {useUpdateProfile} from '../api/mutations';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
+import PrimaryButton from '../components/common/PrimaryButton';
 import {requestGalleryPermission} from '../utils/permissions';
+import {useAppModal} from '../contexts/ModalContext';
 
 const EditProfile = ({navigation}) => {
   const {data: profileData} = useUserProfile();
   const updateMutation = useUpdateProfile();
+  const {showError} = useAppModal();
 
   const [toast, setToast] = useState({
     visible: false,
@@ -69,9 +71,9 @@ const EditProfile = ({navigation}) => {
     try {
       const granted = await requestGalleryPermission();
       if (!granted) {
-        Alert.alert(
-          'Permission Required',
+        showError(
           'Please allow photo library access to update your profile picture.',
+          'Permission Required',
         );
         return;
       }
@@ -84,10 +86,7 @@ const EditProfile = ({navigation}) => {
 
       if (result.didCancel) return;
       if (result.errorCode) {
-        Alert.alert(
-          'Error',
-          result.errorMessage || 'Failed to open image picker',
-        );
+        showError(result.errorMessage || 'Failed to open image picker');
         return;
       }
       if (result.assets?.[0]?.uri) {
@@ -95,7 +94,7 @@ const EditProfile = ({navigation}) => {
       }
     } catch (error) {
       console.error('Image picker error:', error);
-      Alert.alert('Error', 'Failed to open image picker');
+      showError('Failed to open image picker');
     }
   };
 
@@ -107,11 +106,11 @@ const EditProfile = ({navigation}) => {
     const {name, email, phone, address, date_of_birth} = formData;
 
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter name');
+      showError('Please enter name');
       return;
     }
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter email');
+      showError('Please enter email');
       return;
     }
 
@@ -222,13 +221,12 @@ const EditProfile = ({navigation}) => {
         </ScrollView>
 
         <View style={styles.bottomContainer}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.submitButton}
+          <PrimaryButton
+            title="Save changes"
             onPress={handleSaveProfile}
-            disabled={updateMutation.isPending}>
-            <Text style={styles.submitButtonText}>Save changes</Text>
-          </TouchableOpacity>
+            disabled={updateMutation.isPending}
+            loading={updateMutation.isPending}
+          />
         </View>
       </KeyboardAvoidingView>
 

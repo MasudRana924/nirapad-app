@@ -12,6 +12,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {CARE_SERVICES} from '../data/careServices';
 import {storage} from '../utils/storage';
+import PrimaryButton from '../components/common/PrimaryButton';
 
 const PAGE = '#FFFFFF';
 const TEAL = '#008178';
@@ -129,13 +130,11 @@ const SelectServiceScreen = ({navigation, route}) => {
             styles.bottomContainer,
             {paddingBottom: Math.max(16, insets.bottom + 8)},
           ]}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={[styles.nextButton, !selectedService && styles.disabledButton]}
+          <PrimaryButton
+            title="Next"
             onPress={handleNext}
-            disabled={!selectedService}>
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+            disabled={!selectedService}
+          />
         </View>
       </SafeAreaView>
     </View>
@@ -296,20 +295,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingTop: 10,
     backgroundColor: PAGE,
-  },
-  nextButton: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: TEAL,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#A9C5C2',
-  },
-  nextButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
   },
 });

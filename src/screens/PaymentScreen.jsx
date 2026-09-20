@@ -5,21 +5,22 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {getApiErrorMessage} from '../api/client';
+import {useAppModal} from '../contexts/ModalContext';
 
 const PaymentScreen = ({route, navigation}) => {
   const {bookingId, amount, bookingNumber} = route.params || {};
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
+  const {showError} = useAppModal();
 
   const handleBkashPayment = () => {
     if (!bookingId) {
-      Alert.alert('Error', 'Missing booking information');
+      showError('Missing booking information');
       return;
     }
     setSelectedMethod('bkash');
@@ -27,10 +28,7 @@ const PaymentScreen = ({route, navigation}) => {
     try {
       navigation.navigate('BkashCheckout', {bookingId, amount});
     } catch (error) {
-      Alert.alert(
-        'Error',
-        getApiErrorMessage(error, 'Payment initialization failed'),
-      );
+      showError(getApiErrorMessage(error, 'Payment initialization failed'));
     } finally {
       setLoading(false);
     }

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import PrimaryButton from '../common/PrimaryButton';
 
 const TEAL = '#008178';
 const INK = '#163532';
@@ -112,15 +113,13 @@ export const AuthField = ({icon, right, style, ...inputProps}) => {
   );
 };
 
-export const AuthPrimaryButton = ({title, onPress, disabled}) => (
-  <TouchableOpacity
-    activeOpacity={0.85}
-    disabled={disabled}
+export const AuthPrimaryButton = ({title, onPress, disabled, loading}) => (
+  <PrimaryButton
+    title={title}
     onPress={onPress}
-    style={[styles.primaryButton, disabled && styles.primaryButtonDisabled]}>
-    <Text style={styles.primaryButtonText}>{title}</Text>
-    {/* <Icon name="arrow-forward" size={18} color="#FFFFFF" /> */}
-  </TouchableOpacity>
+    disabled={disabled}
+    loading={loading}
+  />
 );
 
 export const AuthOutlineButton = ({title, icon, onPress}) => (

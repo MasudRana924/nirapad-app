@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   TextInput,
   Keyboard,
-  Alert,
 } from 'react-native';
 import Loader from '../components/common/Loader';
 import AuthLayout, {AuthPrimaryButton} from '../components/auth/AuthLayout';
 import {verifyOtp, resendOtp, extractAuthPayload} from '../services/api';
 import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
+import {useAppModal} from '../contexts/ModalContext';
 import notificationService from '../services/notificationService';
 import {
   EMAIL_NOT_SENT_MESSAGE,
@@ -34,6 +34,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
   );
   const inputs = useRef([]);
   const {login} = useAuth();
+  const {showError, showSuccess} = useAppModal();
   const email = route?.params?.email || '';
 
   useEffect(() => {
@@ -86,15 +87,14 @@ const VerifyPhoneScreen = ({navigation, route}) => {
     try {
       const response = await resendOtp(email);
       if (!isEmailSent(response)) {
-        Alert.alert('Email not sent', EMAIL_NOT_SENT_MESSAGE);
+        showError(EMAIL_NOT_SENT_MESSAGE, 'Email not sent');
         return;
       }
       setSeconds(42);
       setDevHint(getDevOtpHint(response));
-      Alert.alert('Success', 'OTP has been resent to your email');
+      showSuccess('OTP has been resent to your email');
     } catch (error) {
-      Alert.alert(
-        'Error',
+      showError(
         getApiErrorMessage(error, 'Something went wrong. Please try again.'),
       );
       console.error('Resend OTP error:', error);
@@ -114,7 +114,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
       const response = await verifyOtp(email, enteredOtp);
       const {token, refreshToken, user} = extractAuthPayload(response);
       if (!token) {
-        Alert.alert('Error', 'OTP verification failed');
+        showError('OTP verification failed');
         return;
       }
 
@@ -126,7 +126,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         error?.code === API_CODES.OTP_INVALID
           ? 'Invalid OTP. Please try again.'
           : 'Something went wrong. Please try again.';
-      Alert.alert('Error', getApiErrorMessage(error, fallback));
+      showError(getApiErrorMessage(error, fallback));
       console.error('❌ Verify OTP error:', error);
     } finally {
       setLoading(false);

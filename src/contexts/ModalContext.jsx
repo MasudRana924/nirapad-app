@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, {createContext, useContext, useState, useCallback} from 'react';
 import AppModal from '../components/common/AppModal';
 
 const ModalContext = createContext();
 
-export const ModalProvider = ({ children }) => {
+export const ModalProvider = ({children}) => {
   const [modalState, setModalState] = useState({
     visible: false,
     type: 'error',
@@ -16,7 +16,7 @@ export const ModalProvider = ({ children }) => {
     onClose: undefined,
   });
 
-  const showModal = useCallback((options) => {
+  const showModal = useCallback(options => {
     setModalState({
       visible: true,
       type: options.type || 'error',
@@ -31,11 +31,34 @@ export const ModalProvider = ({ children }) => {
   }, []);
 
   const hideModal = useCallback(() => {
-    setModalState((prev) => ({
+    setModalState(prev => ({
       ...prev,
       visible: false,
     }));
   }, []);
+
+  /** Common error modal for Login → all screens */
+  const showError = useCallback(
+    (message, title = 'Error') => {
+      showModal({
+        type: 'error',
+        title,
+        message: message || 'Something went wrong. Please try again.',
+      });
+    },
+    [showModal],
+  );
+
+  const showSuccess = useCallback(
+    (message, title = 'Success') => {
+      showModal({
+        type: 'success',
+        title,
+        message: message || '',
+      });
+    },
+    [showModal],
+  );
 
   const handleClose = () => {
     if (modalState.onClose) {
@@ -52,7 +75,8 @@ export const ModalProvider = ({ children }) => {
   };
 
   return (
-    <ModalContext.Provider value={{ showModal, hideModal }}>
+    <ModalContext.Provider
+      value={{showModal, hideModal, showError, showSuccess}}>
       {children}
       <AppModal
         visible={modalState.visible}

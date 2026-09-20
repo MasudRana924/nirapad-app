@@ -6,13 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
+import PrimaryButton from '../components/common/PrimaryButton';
+import {useAppModal} from '../contexts/ModalContext';
 
 const PAYMENT_OPTIONS = [
   {
@@ -37,6 +38,7 @@ const CheckoutScreen = ({navigation, route}) => {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
+  const {showError} = useAppModal();
 
   const cartItems = Object.entries(cart)
     .map(([id, quantity]) => {
@@ -57,11 +59,11 @@ const CheckoutScreen = ({navigation, route}) => {
 
   const handlePlaceOrder = () => {
     if (!address.trim()) {
-      Alert.alert('Missing address', 'Please enter your delivery address');
+      showError('Please enter your delivery address', 'Missing address');
       return;
     }
     if (!phone.trim()) {
-      Alert.alert('Missing phone', 'Please enter your phone number');
+      showError('Please enter your phone number', 'Missing phone');
       return;
     }
 
@@ -200,12 +202,11 @@ const CheckoutScreen = ({navigation, route}) => {
             <Text style={styles.bottomLabel}>Payable</Text>
             <Text style={styles.bottomPrice}>৳{total}</Text>
           </View>
-          <TouchableOpacity
-            activeOpacity={0.85}
+          <PrimaryButton
+            title="Place order"
+            onPress={handlePlaceOrder}
             style={styles.placeBtn}
-            onPress={handlePlaceOrder}>
-            <Text style={styles.placeBtnText}>Place order</Text>
-          </TouchableOpacity>
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -408,15 +409,9 @@ const styles = StyleSheet.create({
   },
   placeBtn: {
     height: 48,
+    width: undefined,
+    minWidth: 140,
     paddingHorizontal: 22,
     borderRadius: 14,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeBtnText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
 });

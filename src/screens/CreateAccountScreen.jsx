@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomLoader from '../components/common/CustomLoader';
 import AuthLayout, {
@@ -9,6 +9,7 @@ import AuthLayout, {
 } from '../components/auth/AuthLayout';
 import {registerUser} from '../services/api';
 import {getApiErrorMessage} from '../api/client';
+import {useAppModal} from '../contexts/ModalContext';
 import {
   EMAIL_NOT_SENT_MESSAGE,
   getDevOtpHint,
@@ -19,6 +20,7 @@ const CreateAccountScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const {showError} = useAppModal();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -33,19 +35,19 @@ const CreateAccountScreen = ({navigation}) => {
     const {name, email, password} = form;
 
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter your name');
+      showError('Please enter your name');
       return;
     }
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email');
+      showError('Please enter your email');
       return;
     }
     if (!password.trim()) {
-      Alert.alert('Error', 'Please enter a password');
+      showError('Please enter a password');
       return;
     }
     if (!agreed) {
-      Alert.alert('Error', 'Please agree to the Terms of Service');
+      showError('Please agree to the Terms of Service');
       return;
     }
 
@@ -53,7 +55,7 @@ const CreateAccountScreen = ({navigation}) => {
     try {
       const response = await registerUser(name.trim(), email.trim(), password);
       if (!isEmailSent(response)) {
-        Alert.alert('Email not sent', EMAIL_NOT_SENT_MESSAGE);
+        showError(EMAIL_NOT_SENT_MESSAGE, 'Email not sent');
         return;
       }
       const params = {email: email.trim()};
@@ -63,8 +65,7 @@ const CreateAccountScreen = ({navigation}) => {
       }
       navigation?.navigate('VerifyPhone', params);
     } catch (error) {
-      Alert.alert(
-        'Error',
+      showError(
         getApiErrorMessage(error, 'Something went wrong. Please try again.'),
       );
       console.error('Register error:', error);

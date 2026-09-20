@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import PrimaryButton from '../components/common/PrimaryButton';
 import {getStatusMeta} from '../utils/bookingStatus';
 
 const BookingConfirmedScreen = ({navigation, route}) => {
@@ -66,19 +66,14 @@ const BookingConfirmedScreen = ({navigation, route}) => {
 
         <View style={styles.spacer} />
 
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.primaryButton}
-          onPress={handleTrackBooking}>
-          <Text style={styles.primaryButtonText}>View bookings</Text>
-        </TouchableOpacity>
+        <PrimaryButton title="View bookings" onPress={handleTrackBooking} />
 
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.secondaryButton}
-          onPress={handleBackHome}>
-          <Text style={styles.secondaryButtonText}>Back to home</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          title="Back to home"
+          variant="secondary"
+          onPress={handleBackHome}
+          style={styles.secondarySpacing}
+        />
       </View>
     </SafeAreaView>
   );
@@ -173,32 +168,8 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1,
   },
-  primaryButton: {
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  secondaryButton: {
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
+  secondarySpacing: {
     marginTop: 12,
     marginBottom: 8,
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#008178',
   },
 });

@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchHospitals} from '../api/queries';
 import HospitalSkeleton from '../components/home/HospitalSkeleton';
 import SearchableDropdown from '../components/common/SearchableDropdown';
+import PrimaryButton from '../components/common/PrimaryButton';
 import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
 import {storage} from '../utils/storage';
 
@@ -247,16 +248,11 @@ const HospitalSelection = ({navigation, route}) => {
             styles.bottomContainer,
             {paddingBottom: Math.max(16, insets.bottom + 8)},
           ]}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={[
-              styles.nextButton,
-              !selectedHospital && styles.disabledButton,
-            ]}
+          <PrimaryButton
+            title="Next"
             onPress={handleNext}
-            disabled={!selectedHospital}>
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+            disabled={!selectedHospital}
+          />
         </View>
       </SafeAreaView>
     </View>

@@ -11,6 +11,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useFamilyMembers} from '../api/queries';
 import Header from '../components/common/Header';
+import PrimaryButton from '../components/common/PrimaryButton';
 import FamilySkeleton from '../components/home/FamilySkeleton';
 import {storage} from '../utils/storage';
 
@@ -143,16 +144,11 @@ const SelectFamilyMember = ({navigation, route}) => {
 
       {/* ================= NEXT BUTTON ================= */}
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={[
-            styles.nextButton,
-            !selectedMember && styles.disabledButton,
-          ]}
+        <PrimaryButton
+          title="Next"
           onPress={handleNext}
-          disabled={!selectedMember}>
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
+          disabled={!selectedMember}
+        />
       </View>
     </SafeAreaView>
   );

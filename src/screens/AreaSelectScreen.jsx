@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
@@ -15,6 +14,8 @@ import {
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SearchableDropdown from '../components/common/SearchableDropdown';
+import PrimaryButton from '../components/common/PrimaryButton';
+import {useAppModal} from '../contexts/ModalContext';
 import {bangladeshDistricts} from '../data/bangladeshLocations';
 import {getThanasByDistrict} from '../data/bangladeshThanas';
 import {storage} from '../utils/storage';
@@ -35,6 +36,7 @@ const FieldLabel = ({icon, title}) => (
 
 const AreaSelectScreen = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
+  const {showError} = useAppModal();
   const {
     selectedMember,
     selectedService,
@@ -55,11 +57,11 @@ const AreaSelectScreen = ({navigation, route}) => {
 
   const handleNext = async () => {
     if (!district || !thana) {
-      Alert.alert('Select area', 'Please select both district and thana');
+      showError('Please select both district and thana', 'Select area');
       return;
     }
     if (!fullAddress.trim()) {
-      Alert.alert('Full address', 'Please enter your full address');
+      showError('Please enter your full address', 'Full address');
       return;
     }
 
@@ -176,13 +178,11 @@ const AreaSelectScreen = ({navigation, route}) => {
               styles.bottomContainer,
               {paddingBottom: Math.max(16, insets.bottom + 8)},
             ]}>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={[styles.nextButton, !canContinue && styles.disabledButton]}
+            <PrimaryButton
+              title="Next"
               onPress={handleNext}
-              disabled={!canContinue}>
-              <Text style={styles.nextButtonText}>Next</Text>
-            </TouchableOpacity>
+              disabled={!canContinue}
+            />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -322,20 +322,5 @@ const styles = StyleSheet.create({
   bottomContainer: {
     paddingHorizontal: 20,
     paddingTop: 12,
-  },
-  nextButton: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: TEAL,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#C5CDD6',
-  },
-  nextButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
   },
 });

@@ -6,19 +6,20 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  Alert,
-  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {bookingService} from '../api/services';
 import {getApiErrorMessage} from '../api/client';
+import PrimaryButton from '../components/common/PrimaryButton';
+import {useAppModal} from '../contexts/ModalContext';
 
 const ReviewScreen = ({route, navigation}) => {
   const {bookingId} = route.params || {};
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [loading, setLoading] = useState(false);
+  const {showError, showSuccess} = useAppModal();
 
   const handleRating = value => {
     setRating(value);
@@ -26,7 +27,7 @@ const ReviewScreen = ({route, navigation}) => {
 
   const submitReview = async () => {
     if (rating === 0) {
-      Alert.alert('Error', 'Please select a rating');
+      showError('Please select a rating');
       return;
     }
 
@@ -36,18 +37,11 @@ const ReviewScreen = ({route, navigation}) => {
         rating,
         comment: review.trim(),
       });
-      Alert.alert('Success', 'Thank you for your review!', [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('BookingDetails', {bookingId}),
-        },
-      ]);
+      showSuccess('Thank you for your review!');
+      navigation.navigate('BookingDetails', {bookingId});
     } catch (error) {
       console.error('Review submission error:', error);
-      Alert.alert(
-        'Error',
-        getApiErrorMessage(error, 'Failed to submit review'),
-      );
+      showError(getApiErrorMessage(error, 'Failed to submit review'));
     } finally {
       setLoading(false);
     }
@@ -100,16 +94,12 @@ const ReviewScreen = ({route, navigation}) => {
           />
         </View>
 
-        <TouchableOpacity
-          style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+        <PrimaryButton
+          title="Submit Review"
           onPress={submitReview}
-          disabled={loading}>
-          {loading ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.submitButtonText}>Submit Review</Text>
-          )}
-        </TouchableOpacity>
+          disabled={loading}
+          loading={loading}
+        />
       </ScrollView>
     </SafeAreaView>
   );

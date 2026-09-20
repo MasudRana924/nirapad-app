@@ -13,6 +13,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import LinearGradient from 'react-native-linear-gradient';
 import {requestAppPermissions} from '../utils/permissions';
+import PrimaryButton from '../components/common/PrimaryButton';
 
 const WelcomeScreen = ({navigation}) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -132,34 +133,18 @@ const WelcomeScreen = ({navigation}) => {
           {/* Buttons */}
           <View style={styles.buttonSection}>
             {currentStep === 2 ? (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.primaryButton}
-                onPress={handleGetStarted}>
-                <Text style={styles.primaryButtonText}>
-                  Get Started
-                </Text>
-              </TouchableOpacity>
+              <PrimaryButton title="Get Started" onPress={handleGetStarted} />
             ) : (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.primaryButton}
-                onPress={handleNext}>
-                <Text style={styles.primaryButtonText}>
-                  Next
-                </Text>
-              </TouchableOpacity>
+              <PrimaryButton title="Next" onPress={handleNext} />
             )}
 
             {currentStep === 2 && (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.secondaryButton}
-                onPress={() => navigation?.navigate('Login')}>
-                <Text style={styles.secondaryButtonText}>
-                  I already have an account
-                </Text>
-              </TouchableOpacity>
+              <PrimaryButton
+                title="I already have an account"
+                variant="secondary"
+                onPress={() => navigation?.navigate('Login')}
+                style={styles.secondarySpacing}
+              />
             )}
           </View>
 
@@ -329,36 +314,8 @@ const styles = StyleSheet.create({
     gap: 14,
   },
 
-  primaryButton: {
-    height: 52,
-    width: '100%',
-    borderRadius: 17,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  primaryButtonText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-
-  secondaryButton: {
-    height: 52,
-    width: '100%',
-    borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderWidth: 1.5,
-    borderColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  secondaryButtonText: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#000000',
+  secondarySpacing: {
+    marginTop: 0,
   },
 
   termsContainer: {

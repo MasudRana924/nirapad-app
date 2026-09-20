@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomLoader from '../components/common/CustomLoader';
-import ErrorModal from '../components/common/ErrorModal';
 import AuthLayout, {
   AuthField,
   AuthPrimaryButton,
@@ -11,6 +10,7 @@ import AuthLayout, {
 import {loginUser, extractAuthPayload} from '../services/api';
 import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
+import {useAppModal} from '../contexts/ModalContext';
 import notificationService from '../services/notificationService';
 
 const LoginScreen = ({navigation}) => {
@@ -19,13 +19,12 @@ const LoginScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isPhoneLogin, setIsPhoneLogin] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const {login} = useAuth();
+  const {showError} = useAppModal();
 
   const handleLogin = async () => {
-    setError('');
     if (!identifier.trim()) {
-      setError(
+      showError(
         isPhoneLogin
           ? 'Please enter your phone number'
           : 'Please enter your email',
@@ -33,7 +32,7 @@ const LoginScreen = ({navigation}) => {
       return;
     }
     if (!password.trim()) {
-      setError('Please enter your password');
+      showError('Please enter your password');
       return;
     }
 
@@ -42,7 +41,7 @@ const LoginScreen = ({navigation}) => {
       const response = await loginUser(identifier.trim(), password);
       const {token, refreshToken, user} = extractAuthPayload(response);
       if (!token) {
-        setError('Login failed');
+        showError('Login failed');
         return;
       }
 
@@ -50,7 +49,10 @@ const LoginScreen = ({navigation}) => {
       await notificationService.initialize(token);
       await notificationService.registerTokenWithServer(token);
     } catch (err) {
-      const message = getApiErrorMessage(err, 'Something went wrong. Please try again.');
+      const message = getApiErrorMessage(
+        err,
+        'Something went wrong. Please try again.',
+      );
       const needsVerify =
         err?.errors?.some?.(e =>
           String(e?.message || e)
@@ -61,11 +63,11 @@ const LoginScreen = ({navigation}) => {
         navigation?.navigate('VerifyPhone', {email: identifier.trim()});
       }
       if (err?.code === API_CODES.OTP_INVALID) {
-        setError(message);
+        showError(message);
       } else if (err?.code === API_CODES.TOO_MANY_REQUESTS) {
-        setError(message || 'Too many attempts. Please wait and try again.');
+        showError(message || 'Too many attempts. Please wait and try again.');
       } else {
-        setError(message);
+        showError(message);
       }
       console.error('❌ Login error:', err);
     } finally {
@@ -76,11 +78,6 @@ const LoginScreen = ({navigation}) => {
   return (
     <>
       <CustomLoader overlay visible={loading} />
-      <ErrorModal
-        visible={!!error}
-        message={error}
-        onOk={() => setError('')}
-      />
       <AuthLayout
         title="Welcome Back"
         subtitle="Sign in to continue caring for your loved ones">

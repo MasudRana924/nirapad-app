@@ -5,16 +5,16 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
 import Header from '../components/common/Header';
-import Toast from '../components/common/Toast';
+import PrimaryButton from '../components/common/PrimaryButton';
 import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
 import {API_CODES, getApiErrorMessage} from '../api/client';
+import {useAppModal} from '../contexts/ModalContext';
 
 const toStartTime = timeValue => {
   if (!timeValue) {
@@ -69,16 +69,8 @@ const BookingPreviewScreen = ({navigation, route}) => {
   } = route.params || {};
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'error',
-  });
   const createBooking = useCreateBooking();
-
-  const showToast = (message, type = 'error') => {
-    setToast({visible: true, message, type});
-  };
+  const {showError} = useAppModal();
 
   const hourlyRate =
     selectedCaregiver?.hourly_rate ||
@@ -102,18 +94,18 @@ const BookingPreviewScreen = ({navigation, route}) => {
 
   const handleConfirm = async () => {
     if (!selectedMember || !selectedCaregiver) {
-      Alert.alert('Error', 'Missing booking details. Please go back and try again.');
+      showError('Missing booking details. Please go back and try again.');
       return;
     }
 
     const token = await storage.getAuthToken();
     if (!token) {
-      Alert.alert('Error', 'Please login to book an appointment');
+      showError('Please login to book an appointment');
       return;
     }
 
     if (!selectedHospital?.id) {
-      Alert.alert('Error', 'Please select a hospital to continue');
+      showError('Please select a hospital to continue');
       return;
     }
 
@@ -152,11 +144,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
               error,
               'Failed to create booking. Please try again.',
             );
-      if (error?.code === API_CODES.CONFLICT) {
-        showToast(message, 'error');
-      } else {
-        Alert.alert('Error', message);
-      }
+      showError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -165,12 +153,6 @@ const BookingPreviewScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={isSubmitting} />
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onHide={() => setToast(prev => ({...prev, visible: false}))}
-      />
       <Header title="Booking Preview" onBack={() => navigation?.goBack()} />
 
       <ScrollView
@@ -266,13 +248,12 @@ const BookingPreviewScreen = ({navigation, route}) => {
       </ScrollView>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.confirmButton}
+        <PrimaryButton
+          title="Confirm booking"
           onPress={handleConfirm}
-          disabled={isSubmitting}>
-          <Text style={styles.confirmButtonText}>Confirm booking</Text>
-        </TouchableOpacity>
+          disabled={isSubmitting}
+          loading={isSubmitting}
+        />
       </View>
     </SafeAreaView>
   );

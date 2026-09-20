@@ -13,6 +13,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchCaregivers} from '../api/queries';
 import CaregiverSkeleton from '../components/home/CaregiverSkeleton';
+import PrimaryButton from '../components/common/PrimaryButton';
 import {storage} from '../utils/storage';
 
 const TEAL = '#008178';
@@ -370,16 +371,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
             styles.bottomContainer,
             {paddingBottom: Math.max(16, insets.bottom + 8)},
           ]}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={[
-              styles.nextButton,
-              !selectedCaregiver && styles.disabledButton,
-            ]}
+          <PrimaryButton
+            title="Next"
             onPress={handleNext}
-            disabled={!selectedCaregiver}>
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+            disabled={!selectedCaregiver}
+          />
         </View>
       </SafeAreaView>
     </View>

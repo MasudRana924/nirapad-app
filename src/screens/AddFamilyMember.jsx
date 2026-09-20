@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -20,8 +19,10 @@ import {useAddFamilyMember, useUpdateFamilyMember} from '../api/mutations';
 import {useFamilyMember} from '../api/queries';
 import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
+import PrimaryButton from '../components/common/PrimaryButton';
 import {requestGalleryPermission} from '../utils/permissions';
 import FamilyDetailsSkeleton from '../components/home/FamilyDetailsSkeleton';
+import {useAppModal} from '../contexts/ModalContext';
 
 const RELATIONSHIPS = [
   'Father',
@@ -46,6 +47,7 @@ const AddFamilyMember = ({navigation, route}) => {
 
   const addMutation = useAddFamilyMember();
   const updateMutation = useUpdateFamilyMember();
+  const {showError} = useAppModal();
   const {data: memberData, isLoading: memberLoading} = useFamilyMember(
     isEditMode ? memberId : null,
   );
@@ -80,9 +82,9 @@ const AddFamilyMember = ({navigation, route}) => {
     try {
       const granted = await requestGalleryPermission();
       if (!granted) {
-        Alert.alert(
-          'Permission Required',
+        showError(
           'Please allow photo library access to add a photo.',
+          'Permission Required',
         );
         return;
       }
@@ -95,10 +97,7 @@ const AddFamilyMember = ({navigation, route}) => {
 
       if (result.didCancel) return;
       if (result.errorCode) {
-        Alert.alert(
-          'Error',
-          result.errorMessage || 'Failed to open image picker',
-        );
+        showError(result.errorMessage || 'Failed to open image picker');
         return;
       }
       if (result.assets?.[0]?.uri) {
@@ -106,7 +105,7 @@ const AddFamilyMember = ({navigation, route}) => {
       }
     } catch (error) {
       console.error('Image picker error:', error);
-      Alert.alert('Error', 'Failed to open image picker');
+      showError('Failed to open image picker');
     }
   };
 
@@ -118,15 +117,15 @@ const AddFamilyMember = ({navigation, route}) => {
     const {name, relationship, gender} = formData;
 
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter name');
+      showError('Please enter name');
       return;
     }
     if (!relationship.trim()) {
-      Alert.alert('Error', 'Please select relationship');
+      showError('Please select relationship');
       return;
     }
     if (!gender.trim()) {
-      Alert.alert('Error', 'Please select gender');
+      showError('Please select gender');
       return;
     }
 
@@ -240,15 +239,12 @@ const AddFamilyMember = ({navigation, route}) => {
         </ScrollView>
 
         <View style={styles.bottomContainer}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.submitButton}
+          <PrimaryButton
+            title={isEditMode ? 'Update member' : 'Add member'}
             onPress={handleSubmit}
-            disabled={isPending}>
-            <Text style={styles.submitButtonText}>
-              {isEditMode ? 'Update member' : 'Add member'}
-            </Text>
-          </TouchableOpacity>
+            disabled={isPending}
+            loading={isPending}
+          />
         </View>
       </KeyboardAvoidingView>
 

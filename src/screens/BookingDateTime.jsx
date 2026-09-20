@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   TextInput,
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +12,8 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
+import PrimaryButton from '../components/common/PrimaryButton';
+import {useAppModal} from '../contexts/ModalContext';
 import {useCaregiverAvailability} from '../api/queries';
 import {
   unwrapAvailability,
@@ -227,6 +228,7 @@ const MonthCalendar = ({selectedDate, onSelectDate}) => {
 };
 
 const BookingDateTime = ({navigation, route}) => {
+  const {showError} = useAppModal();
   const {
     selectedMember,
     selectedCaregiver,
@@ -271,7 +273,7 @@ const BookingDateTime = ({navigation, route}) => {
 
   const handleNext = () => {
     if (!selectedDate || !selectedTime) {
-      Alert.alert('Schedule', 'Please select date and time');
+      showError('Please select date and time', 'Schedule');
       return;
     }
 
@@ -332,7 +334,7 @@ const BookingDateTime = ({navigation, route}) => {
               ]}
               onPress={() => {
                 if (hasWeeklySlots && !selectedDate) {
-                  Alert.alert('Schedule', 'Please select a date first');
+                  showError('Please select a date first', 'Schedule');
                   return;
                 }
                 setTimeDropdownOpen(open => !open);
@@ -436,13 +438,11 @@ const BookingDateTime = ({navigation, route}) => {
       </ScrollView>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={[styles.nextButton, !canContinue && styles.disabledButton]}
+        <PrimaryButton
+          title="Preview booking"
           onPress={handleNext}
-          disabled={!canContinue}>
-          <Text style={styles.nextButtonText}>Preview booking</Text>
-        </TouchableOpacity>
+          disabled={!canContinue}
+        />
       </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
