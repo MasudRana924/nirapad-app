@@ -2,34 +2,62 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+const TEAL = '#008178';
+const INK = '#0B3F3C';
+const MINT = '#E8F5F2';
+
+const ACTIONS = [
+  {
+    key: 'caregiver',
+    label: 'Book Caregiver',
+    icon: 'person',
+    onPress: navigation =>
+      navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'}),
+  },
+  {
+    key: 'nurse',
+    label: 'Book Nurse',
+    icon: 'medical',
+    onPress: navigation => navigation?.navigate('SelectNurse'),
+  },
+];
+
 const BookingButtons = ({navigation}) => {
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={styles.button}
-        onPress={() =>
-          navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'})
-        }>
-        <View style={styles.iconWrap}>
-          <Icon name="person-add" size={18} color="#008178" />
-        </View>
-        <Text style={styles.buttonText} numberOfLines={1}>
-          Book Caregiver
-        </Text>
-      </TouchableOpacity>
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Quick actions</Text>
+        <Icon name="arrow-forward" size={18} color={INK} />
+      </View>
 
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={styles.button}
-        onPress={() => navigation?.navigate('SelectNurse')}>
-        <View style={styles.iconWrap}>
-          <Icon name="medical" size={18} color="#008178" />
-        </View>
-        <Text style={styles.buttonText} numberOfLines={1}>
-          Book Nurse
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.row}>
+        {ACTIONS.map(action => (
+          <TouchableOpacity
+            key={action.key}
+            activeOpacity={0.85}
+            style={[
+              styles.card,
+              action.key === 'caregiver' ? styles.caregiverCard : styles.nurseCard,
+            ]}
+            onPress={() => action.onPress(navigation)}>
+            <Icon
+              name={action.icon}
+              size={17}
+              color={TEAL}
+              style={styles.fixedIcon}
+            />
+            <Text style={styles.cardLabel} numberOfLines={1}>
+              {action.label}
+            </Text>
+            <Icon
+              name="chevron-forward"
+              size={15}
+              color={TEAL}
+              style={styles.fixedIcon}
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
@@ -37,36 +65,48 @@ const BookingButtons = ({navigation}) => {
 export default BookingButtons;
 
 const styles = StyleSheet.create({
-  container: {
+  section: {
+    marginTop: 28,
+  },
+  sectionHeader: {
     flexDirection: 'row',
-    marginTop: 16,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: INK,
+  },
+  row: {
+    flexDirection: 'row',
     gap: 12,
   },
-
-  button: {
-    flex: 1,
-    backgroundColor: '#F6F6F6',
-    borderRadius: 16,
+  card: {
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    backgroundColor: MINT,
+    borderRadius: 16,
+    paddingVertical: 14,
     paddingHorizontal: 10,
+    gap: 6,
   },
-
-  iconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: '#E6F4F3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
+  caregiverCard: {
+    flex: 1.25,
   },
-
-  buttonText: {
-    flexShrink: 1,
-    color: '#111820',
-    fontSize: 13,
+  nurseCard: {
+    flex: 1,
+  },
+  fixedIcon: {
+    flexShrink: 0,
+  },
+  cardLabel: {
+    flex: 1,
+    minWidth: 0,
+    fontSize: 12.5,
     fontWeight: '600',
+    color: INK,
   },
 });

@@ -7,8 +7,13 @@ import HomeHeader from '../components/home/HomeHeader';
 import ActiveBookingCard from '../components/home/ActiveBookingCard';
 import EmptyActiveBookingCard from '../components/home/EmptyActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
+import HomeFamilySection from '../components/home/HomeFamilySection';
 import HomeSkeleton from '../components/home/HomeSkeleton';
-import {useUserProfile, useBookings} from '../api/queries';
+import {
+  useUserProfile,
+  useBookings,
+  useFamilyMembers,
+} from '../api/queries';
 import {isActiveStatus, isSearchingStatus} from '../utils/bookingStatus';
 
 const HomeScreen = ({navigation}) => {
@@ -21,13 +26,24 @@ const HomeScreen = ({navigation}) => {
     data: bookingsData,
     refetch: refetchBookings,
   } = useBookings({page: 1, limit: 20});
+  const {
+    isLoading: familyLoading,
+    data: familyData,
+    refetch: refetchFamily,
+  } = useFamilyMembers();
+
   const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
   const activeBooking = bookings.find(item => isActiveStatus(item?.status));
+  const familyMembers = Array.isArray(familyData?.data) ? familyData.data : [];
   const [refreshing, setRefreshing] = useState(false);
 
   const reloadHome = useCallback(async () => {
-    await Promise.all([refetchProfile(), refetchBookings()]);
-  }, [refetchBookings, refetchProfile]);
+    await Promise.all([
+      refetchProfile(),
+      refetchBookings(),
+      refetchFamily(),
+    ]);
+  }, [refetchBookings, refetchFamily, refetchProfile]);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,7 +61,7 @@ const HomeScreen = ({navigation}) => {
   }, [reloadHome]);
 
   const isInitialLoading =
-    (profileLoading || bookingsLoading) && !refreshing;
+    (profileLoading || bookingsLoading || familyLoading) && !refreshing;
 
   if (isInitialLoading) {
     return (
@@ -69,6 +85,7 @@ const HomeScreen = ({navigation}) => {
           />
         }>
         <HomeHeader navigation={navigation} />
+
         {activeBooking ? (
           <ActiveBookingCard
             navigation={navigation}
@@ -76,10 +93,15 @@ const HomeScreen = ({navigation}) => {
             searching={isSearchingStatus(activeBooking.status)}
           />
         ) : (
-          <EmptyActiveBookingCard navigation={navigation} />
+          <EmptyActiveBookingCard />
         )}
 
         <BookingButtons navigation={navigation} />
+
+        <HomeFamilySection
+          navigation={navigation}
+          members={familyMembers}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -92,9 +114,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 28,
+    paddingHorizontal: 20,
+    paddingBottom: 36,
   },
 });

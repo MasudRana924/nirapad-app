@@ -4,6 +4,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
 import {useInbox, useInboxUnreadCount} from '../../api/queries';
 
+const INK = '#0B3F3C';
+const MUTED = '#8A9A97';
+
 const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
@@ -15,8 +18,7 @@ const HomeHeader = ({navigation}) => {
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
-  const unread =
-    inboxData?.meta?.unread ?? unreadCount ?? 0;
+  const unread = inboxData?.meta?.unread ?? unreadCount ?? 0;
   const greeting = getGreeting();
   const displayName =
     user?.name || user?.full_name || user?.first_name || 'there';
@@ -33,7 +35,7 @@ const HomeHeader = ({navigation}) => {
             <Image source={{uri: photo}} style={styles.profileImage} />
           ) : (
             <View style={styles.placeholderAvatar}>
-              <Icon name="person" size={22} color="#8190A7" />
+              <Icon name="person" size={24} color="#9AA8A5" />
             </View>
           )}
         </TouchableOpacity>
@@ -50,7 +52,7 @@ const HomeHeader = ({navigation}) => {
         activeOpacity={0.8}
         style={styles.notificationButton}
         onPress={() => navigation?.navigate('Inbox')}>
-        <Icon name="notifications-outline" size={20} color="#172333" />
+        <Icon name="notifications-outline" size={22} color={INK} />
         {Number(unread) > 0 ? <View style={styles.notificationDot} /> : null}
       </TouchableOpacity>
     </View>
@@ -66,67 +68,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 4,
+    marginBottom: 4,
   },
-
   headerLeft: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 12,
   },
-
   profileButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#E6F4F3',
+    backgroundColor: '#EEF2F1',
     marginRight: 12,
   },
-
   profileImage: {
     width: '100%',
     height: '100%',
   },
-
   placeholderAvatar: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#EEF2F1',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   greetingBlock: {
     flex: 1,
     justifyContent: 'center',
   },
-
   goodMorning: {
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 18,
-    color: '#8190A7',
-    fontWeight: '500',
+    color: MUTED,
+    fontWeight: '400',
   },
-
   userName: {
-    fontSize: 18,
-    lineHeight: 24,
-    color: '#111820',
+    fontSize: 22,
+    lineHeight: 28,
+    color: INK,
     fontWeight: '700',
     marginTop: 1,
   },
-
   notificationButton: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 14,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#F0F3F2',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   notificationDot: {
     position: 'absolute',
     width: 8,
@@ -134,8 +127,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#E34242',
     borderWidth: 1.5,
-    borderColor: '#F6F6F6',
-    right: 10,
-    top: 10,
+    borderColor: '#F0F3F2',
+    right: 11,
+    top: 11,
   },
 });

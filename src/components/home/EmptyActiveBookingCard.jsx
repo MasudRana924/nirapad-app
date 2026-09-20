@@ -1,34 +1,35 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import PrimaryButton from '../common/PrimaryButton';
+
+const TEAL = '#008178';
+const INK = '#0B3F3C';
+const MUTED = '#6F8480';
+const MINT = '#E8F5F2';
 
 /**
- * Shown on Home when the user has no active booking.
+ * Empty active-booking state — matches home mock exactly.
  */
-const EmptyActiveBookingCard = ({navigation}) => {
+const EmptyActiveBookingCard = () => {
   return (
     <View style={styles.card}>
-      <View style={styles.headerRow}>
-        <View style={styles.iconTile}>
-          <Icon name="calendar-outline" size={20} color="#008178" />
-        </View>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>No active booking</Text>
-          <Text style={styles.subtitle}>
-            Book a trusted caregiver for your family when you need care.
-          </Text>
+      <View style={styles.iconCircle}>
+        <Icon name="calendar-outline" size={26} color={TEAL} />
+        <View style={styles.plusBadge}>
+          <Icon name="add" size={10} color="#FFFFFF" />
         </View>
       </View>
 
-      <PrimaryButton
-        title="Book a caregiver"
-        onPress={() =>
-          navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'})
-        }
-        style={styles.cta}
-        textStyle={styles.ctaText}
-      />
+      <View style={styles.copy}>
+        <View style={styles.statusPill}>
+          <View style={styles.statusDot} />
+          <Text style={styles.statusText}>No active booking</Text>
+        </View>
+        <Text style={styles.title}>You don't have an active booking</Text>
+        <Text style={styles.subtitle}>
+          Your upcoming care bookings will appear here.
+        </Text>
+      </View>
     </View>
   );
 };
@@ -37,47 +38,73 @@ export default EmptyActiveBookingCard;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#E6F4F3',
-    borderRadius: 18,
-    padding: 16,
-    marginTop: 16,
-    borderWidth: 1,
-    borderColor: '#C9E4E0',
-  },
-  headerRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 14,
+    alignItems: 'center',
+    backgroundColor: MINT,
+    borderRadius: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    marginTop: 18,
   },
-  iconTile: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+  iconCircle: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#C9E8E2',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
-  headerText: {
+  plusBadge: {
+    position: 'absolute',
+    right: 6,
+    bottom: 8,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: TEAL,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  copy: {
     flex: 1,
     minWidth: 0,
   },
+  statusPill: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 8,
+    gap: 6,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: TEAL,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: TEAL,
+  },
   title: {
     fontSize: 16,
+    lineHeight: 22,
     fontWeight: '700',
-    color: '#163532',
+    color: INK,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#5F7A76',
-  },
-  cta: {
-    height: 44,
-    borderRadius: 12,
-  },
-  ctaText: {
-    fontSize: 14,
+    color: MUTED,
+    fontWeight: '400',
   },
 });
