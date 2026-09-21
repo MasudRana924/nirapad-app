@@ -59,6 +59,12 @@ export const getApiErrorMessage = (error, fallback = 'Request failed') => {
   if (!error) {
     return fallback;
   }
+  if (error.statusCode === 503) {
+    return (
+      error.message ||
+      'Server is temporarily unavailable. Please try again in a moment.'
+    );
+  }
   if (Array.isArray(error.errors) && error.errors.length > 0) {
     const first = error.errors[0];
     const fieldMessage =
@@ -186,12 +192,13 @@ const unwrapSuccess = json => {
 
 export const parseEnvelope = (json, httpStatus) => {
   if (!json || typeof json !== 'object') {
-    throw new ApiError(
-      undefined,
-      `HTTP error! status: ${httpStatus}`,
-      [],
-      httpStatus,
-    );
+    const friendly =
+      httpStatus === 503
+        ? 'Server is temporarily unavailable. Please try again in a moment.'
+        : httpStatus === 502 || httpStatus === 504
+          ? 'Server gateway error. Please try again.'
+          : `HTTP error! status: ${httpStatus}`;
+    throw new ApiError(undefined, friendly, [], httpStatus);
   }
 
   if (!json.success) {

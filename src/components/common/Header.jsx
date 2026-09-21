@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
     paddingTop:20
   },
   
@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
   },
   
   title: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
     color: '#172333',
     textAlign: 'center',
     flex: 1,

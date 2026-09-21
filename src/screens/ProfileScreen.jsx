@@ -181,13 +181,6 @@ const ProfileScreen = ({navigation}) => {
               {isLoading ? 'Loading...' : user.name || 'Your profile'}
             </Text>
           </View>
-
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.editIcon}
-            onPress={handleUpdateDetails}>
-            <Icon name="pencil-outline" size={18} color="#008178" />
-          </TouchableOpacity>
         </View>
 
         <Text style={styles.sectionTitle}>Account</Text>
@@ -256,8 +249,8 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '500',
     color: '#111820',
     letterSpacing: -0.3,
   },

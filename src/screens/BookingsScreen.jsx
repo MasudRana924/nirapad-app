@@ -294,8 +294,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '500',
     color: INK,
   },
   headerSubtitle: {

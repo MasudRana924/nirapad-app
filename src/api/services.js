@@ -31,6 +31,7 @@ export const authService = {
 
   getUserProfile: () => apiRequest('/user/profile', 'GET'),
 
+  /** PUT /user/profile — always multipart/form-data (text fields + optional profile_photo) */
   updateUserProfile: formData =>
     apiRequest('/user/profile', 'PUT', formData, true),
 

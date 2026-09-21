@@ -11,16 +11,20 @@ import {
   Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
 import {useUserProfile} from '../api/queries';
 import {useUpdateProfile} from '../api/mutations';
+import {getApiErrorMessage} from '../api/client';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import {requestGalleryPermission} from '../utils/permissions';
 import {useAppModal} from '../contexts/ModalContext';
+
+const LANG_KEY = 'app_language';
 
 const EditProfile = ({navigation}) => {
   const {data: profileData} = useUserProfile();
@@ -33,10 +37,13 @@ const EditProfile = ({navigation}) => {
     type: 'success',
   });
   const [imageUri, setImageUri] = useState(null);
+  const [pickedPhoto, setPickedPhoto] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    language_preference: 'en',
+    emergency_contact: '',
     address: '',
     date_of_birth: '',
   });
@@ -44,28 +51,69 @@ const EditProfile = ({navigation}) => {
   const user = profileData?.data || {};
 
   React.useEffect(() => {
-    if (user.name) {
+    if (!user.name && !user.email) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const hydrate = async () => {
+      let language =
+        user.language_preference === 'bn' || user.language_preference === 'en'
+          ? user.language_preference
+          : null;
+
+      if (!language) {
+        try {
+          const saved = await AsyncStorage.getItem(LANG_KEY);
+          if (saved === 'en' || saved === 'bn') {
+            language = saved;
+          }
+        } catch (_) {
+          // ignore storage read errors
+        }
+      }
+
+      if (cancelled) {
+        return;
+      }
+
       setFormData({
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
+        language_preference: language || 'en',
+        emergency_contact: user.emergency_contact || '',
         address: user.address || '',
         date_of_birth: user.date_of_birth
           ? String(user.date_of_birth).split('T')[0]
           : '',
       });
+
       if (user.profile_photo) {
         setImageUri(user.profile_photo);
       }
-    }
+    };
+
+    hydrate();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     user.name,
     user.email,
     user.phone,
+    user.language_preference,
+    user.emergency_contact,
     user.address,
     user.date_of_birth,
     user.profile_photo,
   ]);
+
+  const updateField = (key, value) => {
+    setFormData(prev => ({...prev, [key]: value}));
+  };
 
   const handleImagePick = async () => {
     try {
@@ -89,8 +137,11 @@ const EditProfile = ({navigation}) => {
         showError(result.errorMessage || 'Failed to open image picker');
         return;
       }
-      if (result.assets?.[0]?.uri) {
-        setImageUri(result.assets[0].uri);
+
+      const asset = result.assets?.[0];
+      if (asset?.uri) {
+        setImageUri(asset.uri);
+        setPickedPhoto(asset);
       }
     } catch (error) {
       console.error('Image picker error:', error);
@@ -103,7 +154,15 @@ const EditProfile = ({navigation}) => {
   };
 
   const handleSaveProfile = async () => {
-    const {name, email, phone, address, date_of_birth} = formData;
+    const {
+      name,
+      email,
+      phone,
+      language_preference,
+      emergency_contact,
+      address,
+      date_of_birth,
+    } = formData;
 
     if (!name.trim()) {
       showError('Please enter name');
@@ -115,27 +174,43 @@ const EditProfile = ({navigation}) => {
     }
 
     try {
+      // PUT /api/v1/user/profile — multipart/form-data (any updated fields)
       const data = new FormData();
-      data.append('name', name);
-      data.append('email', email);
-      if (phone) data.append('phone', phone);
-      if (address) data.append('address', address);
-      if (date_of_birth) data.append('date_of_birth', date_of_birth);
+      data.append('name', name.trim());
+      data.append('email', email.trim());
+      data.append('phone', phone.trim());
+      data.append('language_preference', language_preference || 'en');
+      data.append('emergency_contact', emergency_contact.trim());
+      data.append('address', address.trim());
+      data.append('date_of_birth', date_of_birth.trim());
 
-      if (imageUri && !String(imageUri).startsWith('http')) {
+      if (pickedPhoto?.uri) {
         data.append('profile_photo', {
-          uri: imageUri,
-          type: 'image/jpeg',
-          name: 'profile_photo.jpg',
+          uri: pickedPhoto.uri,
+          type: pickedPhoto.type || 'image/jpeg',
+          name: pickedPhoto.fileName || 'profile_photo.jpg',
         });
       }
 
       await updateMutation.mutateAsync(data);
+
+      try {
+        await AsyncStorage.setItem(
+          LANG_KEY,
+          language_preference === 'bn' ? 'bn' : 'en',
+        );
+      } catch (_) {
+        // ignore storage write errors
+      }
+
       showToast('Profile updated successfully');
       navigation?.goBack();
     } catch (error) {
       console.error('Failed to update profile:', error);
-      showToast(error?.message || 'Failed to update profile', 'error');
+      showToast(
+        getApiErrorMessage(error, 'Failed to update profile'),
+        'error',
+      );
     }
   };
 
@@ -173,7 +248,7 @@ const EditProfile = ({navigation}) => {
           <TextInput
             style={styles.input}
             value={formData.name}
-            onChangeText={text => setFormData({...formData, name: text})}
+            onChangeText={text => updateField('name', text)}
             placeholder="Enter name"
             placeholderTextColor="#8190A7"
           />
@@ -182,7 +257,7 @@ const EditProfile = ({navigation}) => {
           <TextInput
             style={styles.input}
             value={formData.email}
-            onChangeText={text => setFormData({...formData, email: text})}
+            onChangeText={text => updateField('email', text)}
             placeholder="Enter email"
             placeholderTextColor="#8190A7"
             keyboardType="email-address"
@@ -193,17 +268,27 @@ const EditProfile = ({navigation}) => {
           <TextInput
             style={styles.input}
             value={formData.phone}
-            onChangeText={text => setFormData({...formData, phone: text})}
+            onChangeText={text => updateField('phone', text)}
             placeholder="Enter phone number"
             placeholderTextColor="#8190A7"
             keyboardType="phone-pad"
           />
+{/* 
+          <Text style={styles.label}>Emergency contact</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.emergency_contact}
+            onChangeText={text => updateField('emergency_contact', text)}
+            placeholder="Enter emergency contact"
+            placeholderTextColor="#8190A7"
+            keyboardType="phone-pad"
+          /> */}
 
           <Text style={styles.label}>Address</Text>
           <TextInput
             style={styles.input}
             value={formData.address}
-            onChangeText={text => setFormData({...formData, address: text})}
+            onChangeText={text => updateField('address', text)}
             placeholder="Enter address"
             placeholderTextColor="#8190A7"
           />
@@ -212,9 +297,7 @@ const EditProfile = ({navigation}) => {
           <TextInput
             style={styles.input}
             value={formData.date_of_birth}
-            onChangeText={text =>
-              setFormData({...formData, date_of_birth: text})
-            }
+            onChangeText={text => updateField('date_of_birth', text)}
             placeholder="YYYY-MM-DD"
             placeholderTextColor="#8190A7"
           />
@@ -310,27 +393,37 @@ const styles = StyleSheet.create({
     borderColor: '#E3E8F0',
     marginBottom: 16,
   },
+  langSwitch: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    backgroundColor: '#F0F2F5',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+  },
+  langOption: {
+    minWidth: 56,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  langOptionActive: {
+    backgroundColor: '#008178',
+  },
+  langText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8190A7',
+  },
+  langTextActive: {
+    color: '#FFFFFF',
+  },
   bottomContainer: {
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
     backgroundColor: '#FFFFFF',
-  },
-  submitButton: {
-    height: 52,
-    backgroundColor: '#008178',
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#B5C0D0',
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
 });
