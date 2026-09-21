@@ -5,6 +5,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const TEAL = '#008178';
 const INK = '#0B3F3C';
 const MINT = '#E8F5F2';
+const DISABLED = '#C5CDD6';
+const DISABLED_BG = '#F5F5F5';
 
 const ACTIONS = [
   {
@@ -19,6 +21,19 @@ const ACTIONS = [
     label: 'Book Nurse',
     icon: 'medical',
     onPress: navigation => navigation?.navigate('SelectNurse'),
+  },
+];
+
+const DISABLED_SERVICES = [
+  {
+    key: 'physio',
+    label: 'Physiotherapy',
+    icon: 'fitness',
+  },
+  {
+    key: 'medicine',
+    label: 'Medicine',
+    icon: 'medkit',
   },
 ];
 
@@ -58,6 +73,21 @@ const BookingButtons = ({navigation}) => {
           </TouchableOpacity>
         ))}
       </View>
+
+      <View style={styles.disabledRow}>
+        {DISABLED_SERVICES.map(service => (
+          <View key={service.key} style={styles.disabledCard}>
+            <Icon
+              name={service.icon}
+              size={24}
+              color={DISABLED}
+            />
+            <Text style={styles.disabledLabel} numberOfLines={1}>
+              {service.label}
+            </Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 };
@@ -82,6 +112,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+  },
+  disabledRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
   },
   card: {
     minWidth: 0,
@@ -108,5 +143,18 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     fontWeight: '600',
     color: INK,
+  },
+  disabledCard: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingVertical: 8,
+    gap: 4,
+  },
+  disabledLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: DISABLED,
+    textAlign: 'center',
   },
 });
