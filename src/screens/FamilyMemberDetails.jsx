@@ -13,18 +13,6 @@ import Header from '../components/common/Header';
 import {useFamilyMember} from '../api/queries';
 import FamilyDetailsSkeleton from '../components/home/FamilyDetailsSkeleton';
 
-const DetailRow = ({label, value, icon}) => (
-  <View style={styles.detailRow}>
-    <View style={styles.detailRowLeft}>
-      <View style={styles.detailIcon}>
-        <Icon name={icon} size={18} color="#008178" />
-      </View>
-      <Text style={styles.detailLabel}>{label}</Text>
-    </View>
-    <Text style={styles.detailValue}>{value || '—'}</Text>
-  </View>
-);
-
 const FamilyMemberDetails = ({navigation, route}) => {
   const {memberId} = route.params || {};
   const {data: memberData, isLoading} = useFamilyMember(memberId);
@@ -87,20 +75,12 @@ const FamilyMemberDetails = ({navigation, route}) => {
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{member.name}</Text>
             <Text style={styles.profileRelation}>{member.relationship}</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
-          <DetailRow
-            label="Gender"
-            value={
-              member.gender
+            <Text style={styles.profileGender}>
+              {member.gender
                 ? member.gender.charAt(0).toUpperCase() + member.gender.slice(1)
-                : '—'
-            }
-            icon="male-female-outline"
-          />
+                : '—'}
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -139,8 +119,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F2F5',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
   },
   profilePhoto: {
     width: 72,
@@ -160,58 +142,18 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#111820',
     marginBottom: 4,
   },
   profileRelation: {
     fontSize: 15,
     color: '#8190A7',
+    marginBottom: 2,
   },
-  section: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111820',
-    marginBottom: 16,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F2F5',
-  },
-  detailRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  detailIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#E6F4F3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  detailLabel: {
+  profileGender: {
     fontSize: 14,
     color: '#8190A7',
-    flex: 1,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111820',
-    textAlign: 'right',
-    flex: 1,
   },
 });

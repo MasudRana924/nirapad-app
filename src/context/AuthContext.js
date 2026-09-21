@@ -78,6 +78,17 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const updateUser = async (userData) => {
+    try {
+      if (userData) {
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Failed to update user:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -87,6 +98,7 @@ export const AuthProvider = ({children}) => {
         isLoading,
         login,
         logout,
+        updateUser,
       }}>
       {children}
     </AuthContext.Provider>

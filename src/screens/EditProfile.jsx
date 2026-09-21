@@ -23,6 +23,7 @@ import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import {requestGalleryPermission} from '../utils/permissions';
 import {useAppModal} from '../contexts/ModalContext';
+import {useAuth} from '../context/AuthContext';
 
 const LANG_KEY = 'app_language';
 
@@ -30,6 +31,7 @@ const EditProfile = ({navigation}) => {
   const {data: profileData} = useUserProfile();
   const updateMutation = useUpdateProfile();
   const {showError} = useAppModal();
+  const {updateUser} = useAuth();
 
   const [toast, setToast] = useState({
     visible: false,
@@ -192,7 +194,7 @@ const EditProfile = ({navigation}) => {
         });
       }
 
-      await updateMutation.mutateAsync(data);
+      const response = await updateMutation.mutateAsync(data);
 
       try {
         await AsyncStorage.setItem(
@@ -201,6 +203,11 @@ const EditProfile = ({navigation}) => {
         );
       } catch (_) {
         // ignore storage write errors
+      }
+
+      // Update user state with the new profile data
+      if (response?.data) {
+        updateUser(response.data);
       }
 
       showToast('Profile updated successfully');
