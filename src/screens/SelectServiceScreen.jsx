@@ -99,9 +99,9 @@ const SelectServiceScreen = ({navigation, route}) => {
                     )}
                   </View>
 
-                  <Text style={styles.description} numberOfLines={3}>
+                  {/* <Text style={styles.description} numberOfLines={3}>
                     {service.description}
-                  </Text>
+                  </Text> */}
 
                   <View style={styles.metaRow}>
                     {service.badge ? (

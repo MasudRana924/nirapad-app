@@ -197,32 +197,7 @@ const HospitalSelection = ({navigation, route}) => {
                     )}
 
                     <View style={styles.cardFooter}>
-                      <View style={styles.statBlock}>
-                        <View style={styles.statIcon}>
-                          <Icon name="star-outline" size={15} color={TEAL} />
-                        </View>
-                        <View>
-                          <Text style={styles.statLabel}>Rating</Text>
-                          <Text style={styles.statValue}>
-                            {formatRating(hospital.rating)}
-                            <Text style={styles.statSuffix}> / 5.0</Text>
-                          </Text>
-                        </View>
-                      </View>
-
-                      <View style={styles.statBlock}>
-                        <View style={styles.statIcon}>
-                          <Icon name="cash-outline" size={15} color={TEAL} />
-                        </View>
-                        <View>
-                          <Text style={styles.statLabel}>Consultation Fee</Text>
-                          <Text style={styles.statValue}>
-                            ৳{formatMoney(consultationFee)}
-                            <Text style={styles.statSuffix}> (est.)</Text>
-                          </Text>
-                        </View>
-                      </View>
-
+                     
                       <View
                         style={[
                           styles.selectPill,
@@ -390,9 +365,9 @@ const styles = StyleSheet.create({
     color: TEAL,
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 21,
-    fontWeight: '800',
+    fontWeight: '500',
     color: INK,
     marginBottom: 4,
   },

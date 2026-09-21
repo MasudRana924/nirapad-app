@@ -13,7 +13,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Loader from '../components/common/Loader';
+import CustomLoader from '../components/common/CustomLoader';
 import {useUserProfile} from '../api/queries';
 import {useUpdateProfile} from '../api/mutations';
 import {getApiErrorMessage} from '../api/client';
@@ -216,9 +216,10 @@ const EditProfile = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Loader visible={updateMutation.isPending} />
+      <CustomLoader overlay visible={updateMutation.isPending} />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         style={styles.flex}>
         <Header title="Edit profile" onBack={() => navigation?.goBack()} />
 
