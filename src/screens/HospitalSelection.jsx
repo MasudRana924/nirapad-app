@@ -56,18 +56,17 @@ const HospitalSelection = ({navigation, route}) => {
     ? hospitalsData.data
     : [];
 
-  const handleNext = () => {
-    if (selectedHospital) {
-      storage.saveSelectedHospital(selectedHospital);
-      navigation?.navigate('BookingDateTime', {
-        selectedMember,
-        selectedCaregiver,
-        selectedService,
-        selectedHospital,
-        selectedArea,
-        serviceType,
-      });
-    }
+  const handleSelectHospital = (hospital) => {
+    setSelectedHospital(hospital);
+    storage.saveSelectedHospital(hospital);
+    navigation?.navigate('BookingDateTime', {
+      selectedMember,
+      selectedCaregiver,
+      selectedService,
+      selectedHospital: hospital,
+      selectedArea,
+      serviceType,
+    });
   };
 
   return (
@@ -145,71 +144,56 @@ const HospitalSelection = ({navigation, route}) => {
                       styles.hospitalCard,
                       isSelected && styles.selectedCard,
                     ]}
-                    onPress={() => setSelectedHospital(hospital)}>
-                    <View style={styles.cardHeader}>
-                      {photo ? (
-                        <Image source={{uri: photo}} style={styles.hospitalImage} />
-                      ) : (
-                        <View style={styles.placeholderAvatar}>
-                          <Icon name="business" size={28} color={TEAL} />
-                        </View>
-                      )}
-
-                      <View style={styles.userInfo}>
-                        {isVerified ? (
-                          <View style={styles.verifiedBadge}>
-                            <Icon name="checkmark-circle" size={13} color={TEAL} />
-                            <Text style={styles.verifiedText}>Verified</Text>
+                    onPress={() => handleSelectHospital(hospital)}>
+                    <View style={styles.cardContent}>
+                      <View style={styles.cardHeader}>
+                        {photo ? (
+                          <Image source={{uri: photo}} style={styles.hospitalImage} />
+                        ) : (
+                          <View style={styles.placeholderAvatar}>
+                            <Icon name="business" size={28} color={TEAL} />
                           </View>
-                        ) : null}
+                        )}
 
                         <Text style={styles.name} numberOfLines={2}>
                           {hospital.name}
                         </Text>
-
-                        <View style={styles.infoRow}>
-                          <Icon name="star" size={13} color="#F6A900" />
-                          <Text style={styles.infoText}>
-                            {formatRating(hospital.rating)}
-                            {hospital.completed_bookings != null
-                              ? ` (${hospital.completed_bookings})`
-                              : ' (0)'}
-                            {hospital.type ? `  ·  ${hospital.type}` : ''}
-                          </Text>
-                        </View>
-
-                        <View style={styles.infoRow}>
-                          <Icon name="location-outline" size={13} color={MUTED} />
-                          <Text style={styles.infoText} numberOfLines={1}>
-                            {locationLine || hospital.address || 'No location'}
-                          </Text>
-                        </View>
                       </View>
+
+                      <View style={styles.infoRow}>
+                        <Icon name="star" size={13} color="#F6A900" />
+                        <Text style={styles.infoText}>
+                          {formatRating(hospital.rating)}
+                          {hospital.completed_bookings != null
+                            ? ` (${hospital.completed_bookings})`
+                            : ' (0)'}
+                          {hospital.type ? `  ·  ${hospital.type}` : ''}
+                        </Text>
+                      </View>
+
+                      <View style={styles.infoRow}>
+                        <Icon name="location-outline" size={13} color={MUTED} />
+                        <Text style={styles.infoText} numberOfLines={1}>
+                          {locationLine || hospital.address || 'No location'}
+                        </Text>
+                      </View>
+
+                      {!!hospital.address && (
+                        <View style={styles.addressRow}>
+                          <Icon name="notifications-outline" size={15} color={MUTED} />
+                          <Text style={styles.addressText} numberOfLines={2}>
+                            {hospital.address}
+                          </Text>
+                        </View>
+                      )}
                     </View>
 
-                    {!!hospital.address && (
-                      <View style={styles.addressRow}>
-                        <Icon name="notifications-outline" size={15} color={MUTED} />
-                        <Text style={styles.addressText} numberOfLines={2}>
-                          {hospital.address}
-                        </Text>
-                      </View>
-                    )}
-
-                    <View style={styles.cardFooter}>
-                     
-                      <View
-                        style={[
-                          styles.selectPill,
-                          isSelected && styles.selectPillActive,
-                        ]}>
-                        <Text style={styles.selectPillText}>
-                          {isSelected ? 'Selected' : 'Select'}
-                        </Text>
-                        {!isSelected ? (
-                          <Icon name="arrow-forward" size={14} color="#FFFFFF" />
-                        ) : null}
-                      </View>
+                    <View style={styles.radioButton}>
+                      <Icon 
+                        name={isSelected ? 'radio-button-on' : 'radio-button-off'} 
+                        size={24} 
+                        color={isSelected ? TEAL : '#C5CDD6'} 
+                      />
                     </View>
                   </TouchableOpacity>
                 );
@@ -217,18 +201,6 @@ const HospitalSelection = ({navigation, route}) => {
             </View>
           )}
         </ScrollView>
-
-        <View
-          style={[
-            styles.bottomContainer,
-            {paddingBottom: Math.max(16, insets.bottom + 8)},
-          ]}>
-          <PrimaryButton
-            title="Next"
-            onPress={handleNext}
-            disabled={!selectedHospital}
-          />
-        </View>
       </SafeAreaView>
     </View>
   );
@@ -319,57 +291,43 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E8EEEC',
     marginBottom: 12,
-  
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   selectedCard: {
     borderColor: TEAL,
   },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   cardHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   hospitalImage: {
-    width: 78,
-    height: 78,
+    width: 40,
+    height: 40,
     borderRadius: 16,
     backgroundColor: '#E8EEEC',
     marginRight: 12,
   },
   placeholderAvatar: {
-    width: 78,
-    height: 78,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#E8F6F2',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
-  userInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 4,
-    backgroundColor: '#E8F6F2',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-    marginBottom: 6,
-  },
-  verifiedText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: TEAL,
-  },
   name: {
+    flex: 1,
     fontSize: 15,
     lineHeight: 21,
     fontWeight: '500',
     color: INK,
-    marginBottom: 4,
   },
   infoRow: {
     minHeight: 18,
@@ -397,6 +355,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: MUTED,
+  },
+  radioButton: {
+    marginLeft: 12,
   },
   cardFooter: {
     marginTop: 12,
