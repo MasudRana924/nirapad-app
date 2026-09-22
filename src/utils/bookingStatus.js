@@ -61,12 +61,30 @@ export const normalizeBooking = payload => {
     can_review: raw.can_review ?? base.can_review,
     can_cancel: raw.can_cancel ?? base.can_cancel,
     can_dispute: raw.can_dispute ?? base.can_dispute,
+    can_live_track: raw.can_live_track ?? base.can_live_track,
+    live_tracking_active:
+      raw.live_tracking_active ?? base.live_tracking_active,
     cancellation_policy:
       raw.cancellation_policy ?? base.cancellation_policy ?? null,
     review: raw.review !== undefined ? raw.review : base.review,
     status: raw.status ?? base.status,
     refund: raw.refund ?? base.refund,
   };
+};
+
+const isTrueFlag = value => value === true || value === 'true' || value === 1;
+
+/** Show Live Tracking when service is in progress or API flags allow it. */
+export const canShowLiveTracking = booking => {
+  if (!booking) {
+    return false;
+  }
+  return (
+    isTrueFlag(booking.can_live_track) ||
+    isTrueFlag(booking.live_tracking_active) ||
+    booking.status === BOOKING_STATUS.SERVICE_IN_PROGRESS ||
+    booking.status === 'IN_PROGRESS'
+  );
 };
 
 export const getStatusMeta = status => {

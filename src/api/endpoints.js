@@ -6,6 +6,16 @@
 // const BASE_URL = 'http://192.168.10.78:8000/api/v1';
  const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
 
+/** Socket.IO host (no /api/v1 suffix). */
+export const getSocketBaseUrl = () => {
+  try {
+    const url = new URL(BASE_URL);
+    return `${url.protocol}//${url.host}`;
+  } catch (error) {
+    return BASE_URL.replace(/\/api\/v1\/?$/, '');
+  }
+};
+
 export const ENDPOINTS = {
   // Auth endpoints
   AUTH: {
@@ -52,6 +62,7 @@ export const ENDPOINTS = {
     REVIEW: id => `/bookings/${id}/review`,
     DISPUTE: id => `/bookings/${id}/dispute`,
     DISPUTES: id => `/bookings/${id}/disputes`,
+    LIVE_LOCATION: id => `/bookings/${id}/live-location`,
   },
 
   // Hospitals endpoints

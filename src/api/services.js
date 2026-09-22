@@ -170,6 +170,8 @@ export const bookingService = {
 
   getBookingDetails: id => apiRequest(`/bookings/${id}`, 'GET'),
 
+  getLiveLocation: id => apiRequest(`/bookings/${id}/live-location`, 'GET'),
+
   submitReview: (id, {rating, comment} = {}) => {
     const body = {rating};
     if (comment != null && String(comment).trim()) {

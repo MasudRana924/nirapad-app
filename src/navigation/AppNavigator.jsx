@@ -32,6 +32,7 @@ import BookingConfirmedScreen from '../screens/BookingConfirmedScreen';
 import AllCaregiversScreen from '../screens/AllCaregiversScreen';
 import BookingsScreen from '../screens/BookingsScreen';
 import BookingDetailsScreen from '../screens/BookingDetailsScreen';
+import LiveTrackingScreen from '../screens/LiveTrackingScreen';
 import InboxScreen from '../screens/InboxScreen';
 import AreaSelectScreen from '../screens/AreaSelectScreen';
 import SelectServiceScreen from '../screens/SelectServiceScreen';
@@ -192,6 +193,7 @@ function AppNavigator() {
           <Stack.Screen name="BookingPreview" component={BookingPreviewScreen} />
           <Stack.Screen name="AllCaregivers" component={AllCaregiversScreen} />
           <Stack.Screen name="BookingDetails" component={BookingDetailsScreen} />
+          <Stack.Screen name="LiveTracking" component={LiveTrackingScreen} />
           <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
           <Stack.Screen name="BkashCheckout" component={BkashCheckout} />
           <Stack.Screen name="ReviewScreen" component={ReviewScreen} />

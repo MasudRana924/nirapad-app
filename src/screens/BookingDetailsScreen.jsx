@@ -31,6 +31,7 @@ import {
   shouldPollBookingStatus,
   normalizeBooking,
   formatRefund,
+  canShowLiveTracking,
 } from '../utils/bookingStatus';
 import {formatOfferCountdown} from '../utils/offerCountdown';
 
@@ -200,6 +201,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
       booking.status !== 'CANCELLED');
   const canLeaveReview = shouldShowStarModal(booking);
   const canDispute = isTrue(booking?.can_dispute);
+  const showLiveTracking = canShowLiveTracking(booking);
   const searching = isSearchingStatus(booking?.status);
   const waitingForAccept = isWaitingForAcceptStatus(booking?.status);
   // countdownTick forces a re-render every second so the label stays live
@@ -555,8 +557,23 @@ const BookingDetailsScreen = ({navigation, route}) => {
         )}
       </ScrollView>
 
-      {(showPayButton || canCancel || canLeaveReview || canDispute) && (
+      {(showPayButton ||
+        canCancel ||
+        canLeaveReview ||
+        canDispute ||
+        showLiveTracking) && (
         <View style={styles.bottomContainer}>
+          {showLiveTracking && (
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={[styles.actionButton, styles.liveTrackButton]}
+              onPress={() =>
+                navigation.navigate('LiveTracking', {bookingId})
+              }>
+              <Icon name="navigate" size={16} color="#FFFFFF" />
+              <Text style={styles.payButtonText}>Live Tracking</Text>
+            </TouchableOpacity>
+          )}
           {canCancel && (
             <TouchableOpacity
               activeOpacity={0.85}
@@ -793,9 +810,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 6,
   },
   payButton: {
     backgroundColor: '#008178',
+  },
+  liveTrackButton: {
+    backgroundColor: '#2563EB',
   },
   payButtonText: {
     fontSize: 14,

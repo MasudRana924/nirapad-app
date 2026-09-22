@@ -44,6 +44,7 @@ export const queryKeys = {
     details: () => ['bookings', 'detail'],
     detail: (id) => ['bookings', 'detail', id],
     disputes: id => ['bookings', 'disputes', id],
+    liveLocation: id => ['bookings', 'live-location', id],
   },
 
   // Inbox keys

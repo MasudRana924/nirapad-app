@@ -27,6 +27,37 @@ export const openBookingDetails = (bookingId, navigation, extra = {}) => {
   navigation.navigate('Inbox', extra.inboxId ? {inboxId: extra.inboxId} : undefined);
 };
 
+export const openLiveTracking = (bookingId, navigation) => {
+  if (!navigation || !bookingId) {
+    return;
+  }
+  navigation.navigate('LiveTracking', {bookingId});
+};
+
+const getLiveTrackingFlag = data => {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+  if (isTrue(data.live_tracking)) {
+    return true;
+  }
+  const extra =
+    typeof data.extraData === 'string'
+      ? parseNotificationData(data.extraData)
+      : data.extraData;
+  return isTrue(extra?.live_tracking);
+};
+
+const shouldOpenLiveTracking = data => {
+  const type = getType(data);
+  return (
+    data?.action === 'OPEN_LIVE_TRACKING' ||
+    type === 'OPEN_LIVE_TRACKING' ||
+    data?.screen === 'live_tracking' ||
+    (type === 'SERVICE_STARTED' && getLiveTrackingFlag(data))
+  );
+};
+
 const shouldOpenBookingDetails = data => {
   const type = getType(data);
   const screen = data?.screen;
@@ -57,6 +88,11 @@ export const handleNotificationClick = (data, navigation) => {
   const bookingId = getBookingId(data);
   const inboxId = getInboxId(data);
   const type = getType(data);
+
+  if (shouldOpenLiveTracking(data)) {
+    openLiveTracking(bookingId, navigation);
+    return;
+  }
 
   if (shouldOpenBookingDetails(data)) {
     openBookingDetails(bookingId, navigation, {inboxId});
