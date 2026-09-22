@@ -1,7 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {getStatusMeta, isSearchingStatus} from '../../utils/bookingStatus';
+import {
+  canShowLiveTracking,
+  getStatusMeta,
+  isSearchingStatus,
+} from '../../utils/bookingStatus';
 
 const getServiceLabel = booking => {
   const type = String(booking?.service_type || '').toUpperCase();
@@ -26,18 +30,36 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
   }
 
   const finding = searching || isSearchingStatus(booking.status);
+  const liveTracking = !finding && canShowLiveTracking(booking);
   const status = getStatusMeta(booking.status);
   const caregiverName =
     booking.caregiver_name || booking.caregiver?.name || 'Caregiver';
   const hospitalName =
     booking.hospital_name || booking.hospital?.name || booking.booking_number;
 
+  const handlePress = () => {
+    if (!booking.id) {
+      return;
+    }
+    if (liveTracking) {
+      navigation?.navigate('LiveTracking', {bookingId: booking.id});
+      return;
+    }
+    navigation?.navigate('BookingDetails', {bookingId: booking.id});
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
         <View style={styles.iconTile}>
           <Icon
-            name={finding ? 'search-outline' : 'medkit-outline'}
+            name={
+              finding
+                ? 'search-outline'
+                : liveTracking
+                  ? 'navigate-outline'
+                  : 'medkit-outline'
+            }
             size={20}
             color="#008178"
           />
@@ -75,11 +97,9 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
       <TouchableOpacity
         activeOpacity={0.85}
         style={styles.trackBtn}
-        onPress={() =>
-          navigation?.navigate('BookingDetails', {bookingId: booking.id})
-        }>
+        onPress={handlePress}>
         <Text style={styles.trackBtnText}>
-          {finding ? 'View status' : 'Track live'}
+          {finding ? 'View status' : liveTracking ? 'Track live' : 'View details'}
         </Text>
         <Icon name="chevron-forward" size={16} color="#008178" />
       </TouchableOpacity>
