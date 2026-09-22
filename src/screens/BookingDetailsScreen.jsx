@@ -19,7 +19,7 @@ import {paymentService} from '../api/services';
 import {API_CODES, createUuid, getApiErrorMessage} from '../api/client';
 import Header from '../components/common/Header';
 import BookingDetailsSkeleton from '../components/home/BookingDetailsSkeleton';
-import Loader from '../components/common/Loader';
+import CustomLoader from '../components/common/CustomLoader';
 import StarReviewModal from '../components/common/StarReviewModal';
 import CancelBookingSheet from '../components/common/CancelBookingSheet';
 import DisputeSheet from '../components/common/DisputeSheet';
@@ -320,7 +320,10 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Loader visible={cancelBooking.isPending || payLoading || createDispute.isPending} />
+      <CustomLoader
+        overlay
+        visible={cancelBooking.isPending || payLoading || createDispute.isPending}
+      />
       <StarReviewModal
         visible={starModalVisible}
         bookingNumber={booking.booking_number}

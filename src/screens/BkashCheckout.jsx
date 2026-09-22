@@ -16,12 +16,40 @@ import CustomLoader from '../components/common/CustomLoader';
 
 const getPaymentData = payload => payload?.data || {};
 
-const isPaymentComplete = data =>
-  Boolean(
-    data?.already_paid ||
-      data?.paymentID ||
-      data?.paymentId,
+const isPaymentComplete = data => {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  const status = String(
+    data.transactionStatus ||
+      data.transaction_status ||
+      data.status ||
+      data.payment_status ||
+      '',
+  ).toUpperCase();
+
+  return Boolean(
+    data.already_paid ||
+      data.paymentID ||
+      data.paymentId ||
+      data.trxID ||
+      data.trxId ||
+      status.includes('COMPLETE') ||
+      status === 'PAID' ||
+      status === 'PAYMENT_PAID' ||
+      status === 'SUCCESS',
   );
+};
+
+const isSuccessMessage = message => {
+  const text = String(message || '').toLowerCase();
+  return (
+    text.includes('success') ||
+    text.includes('completed') ||
+    text.includes('paid')
+  );
+};
 
 const BkashCheckout = ({ route, navigation }) => {
   const { bookingId, paymentID: prePaymentID, amount: preAmount } =
@@ -177,6 +205,16 @@ const BkashCheckout = ({ route, navigation }) => {
     }
   };
 
+  const goToPaymentSuccess = activeBookingId => {
+    queryClient.invalidateQueries({queryKey: queryKeys.bookings.lists()});
+    if (activeBookingId) {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.bookings.detail(activeBookingId),
+      });
+    }
+    navigation.replace('PaymentSuccess');
+  };
+
   const executePayment = async () => {
     if (executingRef.current) {
       return;
@@ -199,42 +237,44 @@ const BkashCheckout = ({ route, navigation }) => {
       );
       const data = getPaymentData(response);
 
-      if (isPaymentComplete(data) || data?.already_paid) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.bookings.detail(activeBookingId),
-        });
-        navigation.replace('PaymentSuccess');
+      // apiRequest only resolves when envelope.success === true
+      if (
+        response?.success ||
+        isPaymentComplete(data) ||
+        data?.already_paid ||
+        isSuccessMessage(response?.message)
+      ) {
+        goToPaymentSuccess(activeBookingId);
         return;
       }
 
       const queried = await paymentService.queryBkashPayment(activePaymentID);
       const queryData = getPaymentData(queried);
-      if (isPaymentComplete(queryData)) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.bookings.detail(activeBookingId),
-        });
-        navigation.replace('PaymentSuccess');
+      if (
+        queried?.success ||
+        isPaymentComplete(queryData) ||
+        isSuccessMessage(queried?.message)
+      ) {
+        goToPaymentSuccess(activeBookingId);
         return;
       }
 
       setWebViewHtml('');
       setStatusMessage(
         response?.message ||
-        'Payment verification failed. Please contact support.',
+          'Payment verification failed. Please contact support.',
       );
     } catch (error) {
       console.error('Execute payment error:', error);
       try {
         const queried = await paymentService.queryBkashPayment(activePaymentID);
         const queryData = getPaymentData(queried);
-        if (isPaymentComplete(queryData)) {
-          queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.bookings.detail(activeBookingId),
-          });
-          navigation.replace('PaymentSuccess');
+        if (
+          queried?.success ||
+          isPaymentComplete(queryData) ||
+          isSuccessMessage(queried?.message)
+        ) {
+          goToPaymentSuccess(activeBookingId);
           return;
         }
       } catch (queryError) {

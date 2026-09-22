@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 22,
     color: '#8190A7',
     textAlign: 'center',
