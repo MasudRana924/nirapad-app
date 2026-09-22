@@ -8,8 +8,10 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
@@ -168,7 +170,6 @@ const MonthCalendar = ({selectedDate, onSelectDate}) => {
           <Text style={styles.monthTitle}>
             {MONTH_NAMES[viewMonth]} {viewYear}
           </Text>
-       
         </View>
 
         <TouchableOpacity
@@ -228,6 +229,7 @@ const MonthCalendar = ({selectedDate, onSelectDate}) => {
 };
 
 const BookingDateTime = ({navigation, route}) => {
+  const insets = useSafeAreaInsets();
   const {showError} = useAppModal();
   const {
     selectedMember,
@@ -243,7 +245,7 @@ const BookingDateTime = ({navigation, route}) => {
   const {data: availabilityData} = useCaregiverAvailability(caregiverId);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
-  const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
+  const [timeModalOpen, setTimeModalOpen] = useState(false);
   const [durationHours, setDurationHours] = useState(4);
   const [notes, setNotes] = useState('');
 
@@ -296,154 +298,187 @@ const BookingDateTime = ({navigation, route}) => {
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Header title="Book appointment" onBack={() => navigation?.goBack()} />
+        <Header title="Book appointment" onBack={() => navigation?.goBack()} />
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-        keyboardShouldPersistTaps="handled">
-        <Text style={styles.pageHint}>
-          Choose when you need the caregiver
-        </Text>
-
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Date</Text>
-          <MonthCalendar
-            selectedDate={selectedDate}
-            onSelectDate={dateObj => {
-              setSelectedDate(dateObj);
-              setSelectedTime(null);
-            }}
-          />
-
-          <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
-            Start time
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+          keyboardShouldPersistTaps="handled">
+          <Text style={styles.pageHint}>
+            Choose when you need the caregiver
           </Text>
-          <View
-            style={[
-              styles.timeDropdownWrap,
-              timeDropdownOpen && styles.timeDropdownWrapOpen,
-            ]}>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={[
-                styles.timeDropdownButton,
-                timeDropdownOpen && styles.timeDropdownButtonOpen,
-              ]}
-              onPress={() => {
-                if (hasWeeklySlots && !selectedDate) {
-                  showError('Please select a date first', 'Schedule');
-                  return;
-                }
-                setTimeDropdownOpen(open => !open);
-              }}>
-              <Icon name="time-outline" size={18} color="#008178" />
-              <Text
+
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Date</Text>
+            <MonthCalendar
+              selectedDate={selectedDate}
+              onSelectDate={dateObj => {
+                setSelectedDate(dateObj);
+                setSelectedTime(null);
+              }}
+            />
+
+            <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
+              Start time
+            </Text>
+            <View style={styles.timeDropdownWrap}>
+              <TouchableOpacity
+                activeOpacity={0.85}
                 style={[
-                  styles.timeDropdownValue,
-                  !selectedTime && styles.timeDropdownPlaceholder,
-                ]}>
-                {selectedTime?.time || 'Select start time'}
-              </Text>
-              <Icon
-                name={timeDropdownOpen ? 'chevron-up' : 'chevron-down'}
-                size={18}
-                color="#8190A7"
-              />
-            </TouchableOpacity>
-            {timeDropdownOpen && (
-              <View style={styles.timeDropdownPanel}>
-                <ScrollView
-                  nestedScrollEnabled
-                  keyboardShouldPersistTaps="handled"
-                  style={styles.timeDropdownList}
-                  showsVerticalScrollIndicator={false}>
-                  {availableTimes.length === 0 ? (
-                    <Text style={styles.noSlotsText}>
-                      No weekly slots on this day. Choose another date.
+                  styles.timeDropdownButton,
+                  timeModalOpen && styles.timeDropdownButtonOpen,
+                ]}
+                onPress={() => {
+                  if (hasWeeklySlots && !selectedDate) {
+                    showError('Please select a date first', 'Schedule');
+                    return;
+                  }
+                  setTimeModalOpen(true);
+                }}>
+                <Icon name="time-outline" size={18} color="#008178" />
+                <Text
+                  style={[
+                    styles.timeDropdownValue,
+                    !selectedTime && styles.timeDropdownPlaceholder,
+                  ]}>
+                  {selectedTime?.time || 'Select start time'}
+                </Text>
+                <Icon name="chevron-down" size={18} color="#8190A7" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.sectionTitle}>Duration</Text>
+            <View style={styles.durationRow}>
+              {DURATIONS.map(hours => {
+                const selected = durationHours === hours;
+                return (
+                  <TouchableOpacity
+                    key={hours}
+                    activeOpacity={0.85}
+                    style={[
+                      styles.durationChip,
+                      selected && styles.chipSelected,
+                    ]}
+                    onPress={() => setDurationHours(hours)}>
+                    <Text
+                      style={[
+                        styles.chipText,
+                        selected && styles.chipTextSelected,
+                      ]}>
+                      {hours}h
                     </Text>
-                  ) : (
-                    availableTimes.map((time, index) => {
-                    const selected = selectedTime?.id === time.id;
-                    return (
-                      <TouchableOpacity
-                        key={time.id}
-                        activeOpacity={0.75}
-                        style={[
-                          styles.timeDropdownItem,
-                          index === availableTimes.length - 1 &&
-                            styles.timeDropdownItemLast,
-                        ]}
-                        onPress={() => {
-                          setSelectedTime(time);
-                          setTimeDropdownOpen(false);
-                        }}>
-                        <Text
-                          style={[
-                            styles.timeDropdownItemText,
-                            selected && styles.timeDropdownItemTextSelected,
-                          ]}>
-                          {time.time}
-                        </Text>
-                        {selected && (
-                          <Icon name="checkmark" size={18} color="#008178" />
-                        )}
-                      </TouchableOpacity>
-                    );
-                  })
-                  )}
-                </ScrollView>
-              </View>
-            )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
 
-          <Text style={styles.sectionTitle}>Duration</Text>
-          <View style={styles.durationRow}>
-            {DURATIONS.map(hours => {
-              const selected = durationHours === hours;
-              return (
-                <TouchableOpacity
-                  key={hours}
-                  activeOpacity={0.85}
-                  style={[
-                    styles.durationChip,
-                    selected && styles.chipSelected,
-                  ]}
-                  onPress={() => setDurationHours(hours)}>
-                  <Text
-                    style={[
-                      styles.chipText,
-                      selected && styles.chipTextSelected,
-                    ]}>
-                    {hours}h
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <Text style={[styles.sectionTitle, styles.notesTitle]}>Notes</Text>
+          <TextInput
+            style={styles.notesInput}
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="Write any extra details for the caregiver..."
+            placeholderTextColor="#8190A7"
+            multiline
+            textAlignVertical="top"
+          />
+        </ScrollView>
+
+        <View style={styles.bottomContainer}>
+          <PrimaryButton
+            title="Preview booking"
+            onPress={handleNext}
+            disabled={!canContinue}
+          />
         </View>
 
-        <Text style={[styles.sectionTitle, styles.notesTitle]}>Notes</Text>
-        <TextInput
-          style={styles.notesInput}
-          value={notes}
-          onChangeText={setNotes}
-          placeholder="Write any extra details for the caregiver..."
-          placeholderTextColor="#8190A7"
-          multiline
-          textAlignVertical="top"
-        />
-      </ScrollView>
+        <Modal
+          visible={timeModalOpen}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setTimeModalOpen(false)}>
+          <TouchableWithoutFeedback onPress={() => setTimeModalOpen(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View
+                  style={[
+                    styles.modalSheet,
+                    {paddingBottom: Math.max(insets.bottom + 12, 20)},
+                  ]}>
+                  <View style={styles.handleRow}>
+                    <View style={styles.handle} />
+                  </View>
 
-      <View style={styles.bottomContainer}>
-        <PrimaryButton
-          title="Preview booking"
-          onPress={handleNext}
-          disabled={!canContinue}
-        />
-      </View>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>Select Start Time</Text>
+                    <TouchableOpacity
+                      onPress={() => setTimeModalOpen(false)}
+                      style={styles.closeBtn}
+                      hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+                      <Icon name="close" size={20} color="#8190A7" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <ScrollView
+                    style={styles.modalList}
+                    contentContainerStyle={styles.modalListContent}
+                    showsVerticalScrollIndicator={false}>
+                    {availableTimes.length === 0 ? (
+                      <View style={styles.noSlotsContainer}>
+                        <Icon
+                          name="time-outline"
+                          size={36}
+                          color="#C5CDD6"
+                          style={styles.noSlotsIcon}
+                        />
+                        <Text style={styles.noSlotsText}>
+                          No weekly slots on this day. Choose another date.
+                        </Text>
+                      </View>
+                    ) : (
+                      availableTimes.map((time, index) => {
+                        const selected = selectedTime?.id === time.id;
+                        return (
+                          <TouchableOpacity
+                            key={time.id}
+                            activeOpacity={0.7}
+                            style={[
+                              styles.modalItem,
+                              index === availableTimes.length - 1 &&
+                                styles.modalItemLast,
+                              selected && styles.modalItemSelected,
+                            ]}
+                            onPress={() => {
+                              setSelectedTime(time);
+                              setTimeModalOpen(false);
+                            }}>
+                            <Text
+                              style={[
+                                styles.modalItemText,
+                                selected && styles.modalItemTextSelected,
+                              ]}>
+                              {time.time}
+                            </Text>
+                            {selected && (
+                              <Icon
+                                name="checkmark-circle"
+                                size={20}
+                                color="#008178"
+                              />
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })
+                    )}
+                  </ScrollView>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -476,7 +511,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     paddingVertical: 12,
-
   },
   sectionTitle: {
     fontSize: 15,
@@ -554,14 +588,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
   },
   dayCircleSelected: {
     backgroundColor: '#008178',
+    borderRadius: 9999,
   },
   dayNumber: {
     fontSize: 15,
@@ -577,10 +612,6 @@ const styles = StyleSheet.create({
   timeDropdownWrap: {
     marginBottom: 20,
     paddingHorizontal: 8,
-    zIndex: 1,
-  },
-  timeDropdownWrapOpen: {
-    zIndex: 20,
   },
   timeDropdownButton: {
     flexDirection: 'row',
@@ -595,8 +626,6 @@ const styles = StyleSheet.create({
   },
   timeDropdownButtonOpen: {
     borderColor: '#008178',
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
   },
   timeDropdownValue: {
     flex: 1,
@@ -608,48 +637,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#8190A7',
   },
-  timeDropdownPanel: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: '#008178',
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
-    maxHeight: 240,
-    overflow: 'hidden',
-  },
-  timeDropdownList: {
-    maxHeight: 240,
-  },
-  timeDropdownItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F2F5',
-  },
-  timeDropdownItemLast: {
-    borderBottomWidth: 0,
-  },
-  timeDropdownItemText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#111820',
-    paddingRight: 8,
-  },
-  timeDropdownItemTextSelected: {
-    color: '#008178',
-    fontWeight: '600',
-  },
-  noSlotsText: {
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-    fontSize: 13,
-    color: '#8190A7',
-    lineHeight: 18,
-  },
   durationRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -660,7 +647,7 @@ const styles = StyleSheet.create({
     minWidth: 48,
     height: 40,
     paddingHorizontal: 12,
-    borderRadius: 12,
+    borderRadius: 9999,
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E3E8F0',
@@ -670,7 +657,7 @@ const styles = StyleSheet.create({
   chipSelected: {
     backgroundColor: '#008178',
     borderColor: '#008178',
-    borderRadius: 12,
+    borderRadius: 9999,
   },
   chipText: {
     fontSize: 13,
@@ -703,19 +690,100 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 16,
   },
-  nextButton: {
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#008178',
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: 480,
+    paddingHorizontal: 20,
+  },
+  handleRow: {
+    width: '100%',
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingBottom: 6,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#D1D5DB',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F4F3',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#163532',
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  disabledButton: {
-    backgroundColor: '#B5C0D0',
+  modalList: {
+    maxHeight: 360,
   },
-  nextButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+  modalListContent: {
+    paddingBottom: 12,
+  },
+  modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F4F3',
+  },
+  modalItemLast: {
+    borderBottomWidth: 0,
+  },
+  modalItemSelected: {
+    backgroundColor: '#F3FAF7',
+    borderRadius: 10,
+    marginHorizontal: -4,
+    paddingHorizontal: 14,
+  },
+  modalItemText: {
+    fontSize: 15,
+    color: '#111820',
+    fontWeight: '500',
+    flex: 1,
+  },
+  modalItemTextSelected: {
+    color: '#008178',
+    fontWeight: '700',
+  },
+  noSlotsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 36,
+    paddingHorizontal: 16,
+  },
+  noSlotsIcon: {
+    marginBottom: 8,
+  },
+  noSlotsText: {
+    fontSize: 14,
+    color: '#8190A7',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
+
