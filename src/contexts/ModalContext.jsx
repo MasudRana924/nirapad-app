@@ -60,6 +60,30 @@ export const ModalProvider = ({children}) => {
     [showModal],
   );
 
+  const showConfirm = useCallback(
+    ({
+      title = 'Confirm',
+      message = '',
+      confirmText = 'Confirm',
+      cancelText = 'Cancel',
+      confirmDestructive = false,
+      onConfirm,
+      onClose,
+    } = {}) => {
+      showModal({
+        type: 'confirm',
+        title,
+        message,
+        confirmText,
+        cancelText,
+        confirmDestructive,
+        onConfirm,
+        onClose,
+      });
+    },
+    [showModal],
+  );
+
   const handleClose = () => {
     if (modalState.onClose) {
       modalState.onClose();
@@ -76,7 +100,7 @@ export const ModalProvider = ({children}) => {
 
   return (
     <ModalContext.Provider
-      value={{showModal, hideModal, showError, showSuccess}}>
+      value={{showModal, hideModal, showError, showSuccess, showConfirm}}>
       {children}
       <AppModal
         visible={modalState.visible}

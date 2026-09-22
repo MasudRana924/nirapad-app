@@ -31,7 +31,11 @@ export const openLiveTracking = (bookingId, navigation) => {
   if (!navigation || !bookingId) {
     return;
   }
-  navigation.navigate('LiveTracking', {bookingId});
+  // Map lives on Booking Details — open details directly
+  navigation.navigate('BookingDetails', {
+    bookingId,
+    notificationOpenedAt: Date.now(),
+  });
 };
 
 const getLiveTrackingFlag = data => {

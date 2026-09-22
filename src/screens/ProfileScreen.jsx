@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,7 +20,7 @@ const LANG_KEY = 'app_language';
 
 const ProfileScreen = ({navigation}) => {
   const {logout} = useAuth();
-  const {showModal} = useAppModal();
+  const {showConfirm} = useAppModal();
   const {data: profileData, isLoading} = useUserProfile();
   const [language, setLanguage] = useState('en');
   const [toast, setToast] = useState({
@@ -59,17 +58,17 @@ const ProfileScreen = ({navigation}) => {
   };
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      {text: 'Cancel', style: 'cancel'},
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          await storage.clearBookingData();
-          logout();
-        },
+    showConfirm({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      confirmDestructive: true,
+      onConfirm: async () => {
+        await storage.clearBookingData();
+        logout();
       },
-    ]);
+    });
   };
 
   const getInitials = name => {

@@ -41,10 +41,6 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
     if (!booking.id) {
       return;
     }
-    if (liveTracking) {
-      navigation?.navigate('LiveTracking', {bookingId: booking.id});
-      return;
-    }
     navigation?.navigate('BookingDetails', {bookingId: booking.id});
   };
 

@@ -23,6 +23,7 @@ import Loader from '../components/common/Loader';
 import StarReviewModal from '../components/common/StarReviewModal';
 import CancelBookingSheet from '../components/common/CancelBookingSheet';
 import DisputeSheet from '../components/common/DisputeSheet';
+import LiveTrackingMapSection from '../components/booking/LiveTrackingMapSection';
 import {useAppModal} from '../contexts/ModalContext';
 import {
   getStatusMeta,
@@ -347,6 +348,12 @@ const BookingDetailsScreen = ({navigation, route}) => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
+        {showLiveTracking && (
+          <LiveTrackingMapSection
+            bookingId={bookingId}
+            enabled={showLiveTracking}
+          />
+        )}
         {searching && (
           <View style={styles.searchingBanner}>
             <Icon name="search-outline" size={18} color="#D97706" />
@@ -557,23 +564,8 @@ const BookingDetailsScreen = ({navigation, route}) => {
         )}
       </ScrollView>
 
-      {(showPayButton ||
-        canCancel ||
-        canLeaveReview ||
-        canDispute ||
-        showLiveTracking) && (
+      {(showPayButton || canCancel || canLeaveReview || canDispute) && (
         <View style={styles.bottomContainer}>
-          {showLiveTracking && (
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={[styles.actionButton, styles.liveTrackButton]}
-              onPress={() =>
-                navigation.navigate('LiveTracking', {bookingId})
-              }>
-              <Icon name="navigate" size={16} color="#FFFFFF" />
-              <Text style={styles.payButtonText}>Live Tracking</Text>
-            </TouchableOpacity>
-          )}
           {canCancel && (
             <TouchableOpacity
               activeOpacity={0.85}
@@ -815,9 +807,6 @@ const styles = StyleSheet.create({
   },
   payButton: {
     backgroundColor: '#008178',
-  },
-  liveTrackButton: {
-    backgroundColor: '#2563EB',
   },
   payButtonText: {
     fontSize: 14,
