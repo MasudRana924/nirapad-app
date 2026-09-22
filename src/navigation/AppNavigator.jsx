@@ -44,6 +44,7 @@ import PaymentHistory from '../screens/PaymentHistory';
 import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import PaymentCancelledScreen from '../screens/PaymentCancelledScreen';
 import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
+import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -208,6 +209,7 @@ function AppNavigator() {
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={CreateAccountScreen} />
+          <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
           <Stack.Screen
             name="VerifyPhone"
             component={VerifyPhoneScreen}

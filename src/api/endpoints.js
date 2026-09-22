@@ -3,8 +3,8 @@
  * Centralized endpoint definitions for all API routes
  */
 
-// const BASE_URL = 'http://192.168.10.78:8000/api/v1';
- const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
+const BASE_URL = 'http://192.168.10.78:8000/api/v1';
+//  const BASE_URL = 'https://carevita-service.onrender.com/api/v1';
 
 /** Socket.IO host (no /api/v1 suffix). */
 export const getSocketBaseUrl = () => {
@@ -97,6 +97,11 @@ export const ENDPOINTS = {
   NOTIFICATION_PREFERENCES: {
     GET: '/notifications/preferences',
     UPDATE: '/notifications/preferences',
+  },
+
+  // Public privacy policy (no auth)
+  PRIVACY_POLICIES: {
+    BY_AUDIENCE: audience => `/privacy-policies/${audience}`,
   },
 };
 

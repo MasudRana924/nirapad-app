@@ -218,9 +218,14 @@ export const apiRequest = async (
   method = 'GET',
   body = null,
   isFormData = false,
-  {retry = true, headers: extraHeaders = {}, idempotencyKey} = {},
+  {
+    retry = true,
+    headers: extraHeaders = {},
+    idempotencyKey,
+    skipAuth = false,
+  } = {},
 ) => {
-  const token = await AsyncStorage.getItem('userToken');
+  const token = skipAuth ? null : await AsyncStorage.getItem('userToken');
   const headers = {...extraHeaders};
 
   if (token) {
@@ -250,13 +255,20 @@ export const apiRequest = async (
     endpoint.startsWith(path),
   );
 
-  if (isAuthFailure(json, response.status) && retry && token && !skipRefresh) {
+  if (
+    isAuthFailure(json, response.status) &&
+    retry &&
+    token &&
+    !skipAuth &&
+    !skipRefresh
+  ) {
     const newToken = await refreshAccessToken();
     if (newToken) {
       return apiRequest(endpoint, method, body, isFormData, {
         retry: false,
         headers: extraHeaders,
         idempotencyKey,
+        skipAuth,
       });
     }
     await notifyAuthFailure();

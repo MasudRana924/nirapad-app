@@ -4,7 +4,7 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -185,6 +185,17 @@ export const useHospital = (id, options = {}) => {
     queryKey: queryKeys.hospitals.detail(id),
     queryFn: () => hospitalService.getHospitalDetails(id),
     enabled: !!id,
+    ...options,
+  });
+};
+
+/**
+ * Privacy Policy (public)
+ */
+export const usePrivacyPolicy = (audience = 'USER', options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.privacyPolicies.byAudience(audience),
+    queryFn: () => privacyPolicyService.getByAudience(audience),
     ...options,
   });
 };

@@ -144,6 +144,16 @@ export const notificationPreferenceService = {
     apiRequest('/notifications/preferences', 'PUT', payload),
 };
 
+/**
+ * Privacy Policies (public — no token)
+ */
+export const privacyPolicyService = {
+  getByAudience: (audience = 'USER') =>
+    apiRequest(`/privacy-policies/${audience}`, 'GET', null, false, {
+      skipAuth: true,
+    }),
+};
+
 /** @deprecated Use inboxService — kept so existing imports keep working */
 export const notificationService = {
   getNotifications: params => inboxService.getInbox(params),
@@ -257,4 +267,5 @@ export default {
   inboxService,
   notificationService,
   notificationPreferenceService,
+  privacyPolicyService,
 };

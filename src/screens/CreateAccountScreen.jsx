@@ -47,7 +47,7 @@ const CreateAccountScreen = ({navigation}) => {
       return;
     }
     if (!agreed) {
-      showError('Please agree to the Terms of Service');
+      showError('Please accept the Privacy and Policy');
       return;
     }
 
@@ -127,8 +127,12 @@ const CreateAccountScreen = ({navigation}) => {
             {agreed ? <Icon name="checkmark" size={14} color="#FFFFFF" /> : null}
           </TouchableOpacity>
           <Text style={styles.termsText}>
-            I agree to Nirapod's <Text style={styles.link}>Terms</Text> and{' '}
-            <Text style={styles.link}>Privacy Policy</Text>
+            I accept all{' '}
+            <Text
+              style={styles.link}
+              onPress={() => navigation?.navigate('PrivacyPolicy')}>
+              Privacy and Policy
+            </Text>
           </Text>
         </View>
 
