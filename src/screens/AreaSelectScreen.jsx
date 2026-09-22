@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   addressBox: {
     minHeight: 110,
     borderRadius: 16,
-    backgroundColor: '#F7FBFA',
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#DCEEE9',
     flexDirection: 'row',

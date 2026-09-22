@@ -121,7 +121,7 @@ const SelectFamilyMember = ({navigation, route}) => {
                       <Text style={styles.relation}>{member.relationship}</Text>
                     </View>
                   </View>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     activeOpacity={0.7}
                     style={styles.rightArrow}
                     onPress={(e) => {
@@ -129,7 +129,7 @@ const SelectFamilyMember = ({navigation, route}) => {
                       handleViewDetails(member);
                     }}>
                     <Icon name="chevron-forward" size={24} color="#8190A7" />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
                 {/* {selectedMember?.id === member.id && (
                   <View style={styles.selectedBadge}>

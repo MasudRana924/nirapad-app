@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Modal,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const SearchableDropdown = ({
   data = [],
@@ -18,62 +23,56 @@ const SearchableDropdown = ({
   icon = 'location-outline',
   containerStyle,
   variant = 'default',
+  disabled = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState(data);
-  const containerRef = useRef(null);
+  const insets = useSafeAreaInsets();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalSearchText, setModalSearchText] = useState('');
 
-  useEffect(() => {
-    setSearchText(value || '');
-  }, [value]);
-
-  useEffect(() => {
-    setFilteredData(data || []);
-  }, [data]);
-
-  const handleSearch = text => {
-    setSearchText(text);
-    if (!isOpen) {
-      setIsOpen(true);
+  const filteredData = useMemo(() => {
+    if (!modalSearchText) {
+      return data || [];
     }
-    const filtered = (data || []).filter(item =>
-      item.toLowerCase().includes(text.toLowerCase()),
+    return (data || []).filter(item =>
+      item.toLowerCase().includes(modalSearchText.toLowerCase()),
     );
-    setFilteredData(filtered);
+  }, [data, modalSearchText]);
+
+  const handleOpen = () => {
+    if (disabled) {
+      return;
+    }
+    setModalSearchText('');
+    setModalVisible(true);
+  };
+
+  const handleClose = () => {
+    setModalVisible(false);
+    setModalSearchText('');
   };
 
   const handleSelect = item => {
     onSelect(item);
-    setSearchText(item);
-    setIsOpen(false);
+    handleClose();
   };
 
   const handleClear = () => {
-    setSearchText('');
     onSelect('');
-    setFilteredData(data || []);
-    setIsOpen(true);
-  };
-
-  const handleToggle = () => {
-    setIsOpen(prev => !prev);
-    if (!isOpen) {
-      setFilteredData(data || []);
-    }
   };
 
   const isPill = variant === 'pill';
   const isLight = variant === 'light';
 
+  const titleText = label
+    ? `Select ${label}`
+    : placeholder || 'Select Option';
+
   return (
     <View
-      ref={containerRef}
       style={[
         styles.container,
         isPill && styles.pillContainer,
         isLight && styles.lightContainer,
-        isOpen && styles.containerOpen,
         containerStyle,
       ]}>
       {!!label && !isPill && <Text style={styles.label}>{label}</Text>}
@@ -83,28 +82,25 @@ const SearchableDropdown = ({
           styles.dropdownButton,
           isPill && styles.pillButton,
           isLight && styles.lightButton,
-          isOpen && styles.dropdownButtonOpen,
-          isPill && isOpen && styles.pillButtonOpen,
+          modalVisible && styles.dropdownButtonActive,
         ]}
         activeOpacity={0.85}
-        onPress={handleToggle}>
+        onPress={handleOpen}>
         <View style={styles.buttonContent}>
           <Icon name={icon} size={18} color={isPill ? '#008178' : '#8190A7'} />
           <View style={styles.inputWrap}>
             {!!label && isPill && <Text style={styles.pillLabel}>{label}</Text>}
-            <TextInput
-              style={[styles.input, isPill && styles.pillInput]}
-              placeholder={placeholder}
-              placeholderTextColor="#8190A7"
-              value={searchText}
-              onChangeText={handleSearch}
-              onFocus={() => {
-                setIsOpen(true);
-                setFilteredData(data || []);
-              }}
-            />
+            <Text
+              style={[
+                styles.valueText,
+                isPill && styles.pillValueText,
+                !value && styles.placeholderText,
+              ]}
+              numberOfLines={1}>
+              {value || placeholder}
+            </Text>
           </View>
-          {searchText ? (
+          {value ? (
             <TouchableOpacity
               onPress={handleClear}
               style={styles.clearButton}
@@ -112,56 +108,125 @@ const SearchableDropdown = ({
               <Icon name="close-circle" size={18} color="#8190A7" />
             </TouchableOpacity>
           ) : (
-            <Icon
-              name={isOpen ? 'chevron-up' : 'chevron-down'}
-              size={18}
-              color="#8190A7"
-            />
+            <Icon name="chevron-down" size={18} color="#8190A7" />
           )}
         </View>
       </TouchableOpacity>
 
-      {isOpen && (
-        <View style={styles.dropdownPanel}>
-          {filteredData.length > 0 ? (
-            <ScrollView
-              nestedScrollEnabled
-              keyboardShouldPersistTaps="handled"
-              style={styles.dropdownList}
-              showsVerticalScrollIndicator={false}>
-              {filteredData.map((item, index) => {
-                const selected = searchText === item || value === item;
-                return (
-                  <TouchableOpacity
-                    key={`${item}-${index}`}
-                    style={[
-                      styles.dropdownItem,
-                      index === filteredData.length - 1 && styles.dropdownItemLast,
-                    ]}
-                    onPress={() => handleSelect(item)}
-                    activeOpacity={0.75}>
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        selected && styles.dropdownItemTextSelected,
-                      ]}
-                      numberOfLines={1}>
-                      {item}
-                    </Text>
-                    {selected && (
-                      <Icon name="checkmark" size={18} color="#008178" />
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={handleClose}>
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={styles.keyboardAvoid}>
+                <View
+                  style={[
+                    styles.modalSheet,
+                    {paddingBottom: Math.max(insets.bottom + 12, 20)},
+                  ]}>
+                  <View style={styles.handleRow}>
+                    <View style={styles.handle} />
+                  </View>
+
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>{titleText}</Text>
+                    <TouchableOpacity
+                      onPress={handleClose}
+                      style={styles.closeBtn}
+                      hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+                      <Icon name="close" size={20} color="#8190A7" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.searchBarContainer}>
+                    <Icon
+                      name="search-outline"
+                      size={18}
+                      color="#8190A7"
+                      style={styles.searchIcon}
+                    />
+                    <TextInput
+                      style={styles.modalSearchInput}
+                      placeholder={`Search ${
+                        label ? label.toLowerCase() : 'here'
+                      }...`}
+                      placeholderTextColor="#8190A7"
+                      value={modalSearchText}
+                      onChangeText={setModalSearchText}
+                      autoCapitalize="none"
+                    />
+                    {!!modalSearchText && (
+                      <TouchableOpacity
+                        onPress={() => setModalSearchText('')}
+                        style={styles.clearSearchBtn}
+                        hitSlop={{top: 6, bottom: 6, left: 6, right: 6}}>
+                        <Icon name="close-circle" size={18} color="#8190A7" />
+                      </TouchableOpacity>
                     )}
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          ) : (
-            <View style={styles.noResults}>
-              <Text style={styles.noResultsText}>No results found</Text>
-            </View>
-          )}
-        </View>
-      )}
+                  </View>
+
+                  <ScrollView
+                    style={styles.modalList}
+                    contentContainerStyle={styles.modalListContent}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}>
+                    {filteredData.length > 0 ? (
+                      filteredData.map((item, index) => {
+                        const selected = value === item;
+                        return (
+                          <TouchableOpacity
+                            key={`${item}-${index}`}
+                            style={[
+                              styles.modalItem,
+                              index === filteredData.length - 1 &&
+                                styles.modalItemLast,
+                              selected && styles.modalItemSelected,
+                            ]}
+                            onPress={() => handleSelect(item)}
+                            activeOpacity={0.7}>
+                            <Text
+                              style={[
+                                styles.modalItemText,
+                                selected && styles.modalItemTextSelected,
+                              ]}
+                              numberOfLines={1}>
+                              {item}
+                            </Text>
+                            {selected && (
+                              <Icon
+                                name="checkmark-circle"
+                                size={20}
+                                color="#008178"
+                              />
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })
+                    ) : (
+                      <View style={styles.noResults}>
+                        <Icon
+                          name="search-outline"
+                          size={36}
+                          color="#C5CDD6"
+                          style={styles.noResultsIcon}
+                        />
+                        <Text style={styles.noResultsText}>
+                          No options found
+                        </Text>
+                      </View>
+                    )}
+                  </ScrollView>
+                </View>
+              </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -171,10 +236,6 @@ export default SearchableDropdown;
 const styles = StyleSheet.create({
   container: {
     marginBottom: 14,
-    zIndex: 1,
-  },
-  containerOpen: {
-    zIndex: 20,
   },
   pillContainer: {
     marginBottom: 0,
@@ -189,7 +250,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   dropdownButton: {
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#fff',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#E3E8F0',
@@ -201,17 +262,12 @@ const styles = StyleSheet.create({
     borderColor: '#D7EBE6',
   },
   lightButton: {
-    backgroundColor: '#F7FBFA',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#DCEEE9',
   },
-  dropdownButtonOpen: {
-    borderColor: '#008178',
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
-  pillButtonOpen: {
+  dropdownButtonActive: {
     borderColor: '#008178',
   },
   buttonContent: {
@@ -223,72 +279,146 @@ const styles = StyleSheet.create({
   },
   inputWrap: {
     flex: 1,
-    minWidth: 0,
+    justifyContent: 'center',
   },
   pillLabel: {
     fontSize: 11,
     color: '#7B9390',
     marginBottom: 1,
   },
-  input: {
-    flex: 1,
-    height: '100%',
+  valueText: {
     fontSize: 15,
     color: '#111820',
-    paddingVertical: 0,
+    fontWeight: '500',
   },
-  pillInput: {
-    flex: 0,
-    height: 20,
+  pillValueText: {
     fontSize: 14,
     fontWeight: '700',
     color: '#163532',
   },
+  placeholderText: {
+    color: '#8190A7',
+    fontWeight: '400',
+  },
   clearButton: {
     padding: 2,
   },
-  dropdownPanel: {
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'flex-end',
+  },
+  keyboardAvoid: {
+    width: '100%',
+  },
+  modalSheet: {
     backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: '#008178',
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
-    maxHeight: 220,
-    overflow: 'hidden',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: 520,
+    paddingHorizontal: 20,
   },
-  dropdownList: {
-    maxHeight: 220,
+  handleRow: {
+    width: '100%',
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingBottom: 6,
   },
-  dropdownItem: {
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#D1D5DB',
+  },
+  modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F2F5',
+    paddingVertical: 12,
   },
-  dropdownItemLast: {
-    borderBottomWidth: 0,
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#163532',
   },
-  dropdownItemText: {
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+    paddingHorizontal: 12,
+    height: 44,
+    marginVertical: 12,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  modalSearchInput: {
     flex: 1,
+    height: '100%',
     fontSize: 14,
     color: '#111820',
-    paddingRight: 8,
+    padding: 0,
   },
-  dropdownItemTextSelected: {
+  clearSearchBtn: {
+    padding: 2,
+    marginLeft: 6,
+  },
+  modalList: {
+    maxHeight: 340,
+  },
+  modalListContent: {
+    paddingBottom: 8,
+  },
+  modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F4F3',
+  },
+  modalItemLast: {
+    borderBottomWidth: 0,
+  },
+  modalItemSelected: {
+    backgroundColor: '#F3FAF7',
+    borderRadius: 10,
+    marginHorizontal: -4,
+    paddingHorizontal: 12,
+  },
+  modalItemText: {
+    fontSize: 15,
+    color: '#111820',
+    fontWeight: '400',
+    flex: 1,
+  },
+  modalItemTextSelected: {
     color: '#008178',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   noResults: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingVertical: 36,
+  },
+  noResultsIcon: {
+    marginBottom: 8,
   },
   noResultsText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#8190A7',
   },
 });
+
