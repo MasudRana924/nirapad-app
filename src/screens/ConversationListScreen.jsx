@@ -207,9 +207,7 @@ const ConversationListScreen = ({navigation}) => {
             name="send"
             size={20}
             color={newMessage.trim() ? '#FFFFFF' : '#A8B3C4'}
-            style={{marginRight: 8}}
-          />
-          <Text style={styles.sendButtonText}>Send</Text>
+		  />
         </TouchableOpacity>
       </View>
       </KeyboardAvoidingView>
@@ -238,41 +236,32 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   newChatContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
     paddingBottom: Platform.OS === 'ios' ? 28 : 12,
   },
   newChatInput: {
-    width: '100%',
+    flex: 1,
     backgroundColor: '#F5F7FA',
     borderRadius: 24,
     paddingHorizontal: 20,
-    paddingVertical: 14,
-    marginBottom: 12,
+    paddingVertical: 12,
+    marginRight: 12,
     fontSize: 15,
     color: '#111820',
-    maxHeight: 120,
+    maxHeight: 100,
     borderWidth: 0,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   sendButton: {
-    width: '100%',
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    shadowColor: '#008178',
-    shadowOffset: {width: 0, height: 3},
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 5,
   },
   sendButtonDisabled: {
     backgroundColor: '#E3E8F0',

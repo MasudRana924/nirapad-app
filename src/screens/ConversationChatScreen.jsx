@@ -19,10 +19,10 @@ import {useSendMessage, useMarkMessagesAsRead} from '../api/mutations';
 import {
   initializeSocket,
   disconnectSocket,
-  joinConversation,
-  leaveConversation,
+  subscribeToConversation,
+  unsubscribeFromConversation,
   onNewMessage,
-  onMessagesRead,
+  onConversationStatus,
   sendSocketMessage,
   isSocketConnected,
 } from '../services/websocket';
@@ -38,7 +38,7 @@ const ConversationChatScreen = ({route, navigation}) => {
   const [isSending, setIsSending] = useState(false);
   const hasMarkedAsRead = useRef(false);
 
-  const {data: conversation, isLoading: conversationLoading} =
+  const {data: conversation, isLoading: conversationLoading, refetch: refetchConversation} =
     useConversationDetails(conversationId);
   const {
     data: messagesData,
@@ -61,23 +61,24 @@ const ConversationChatScreen = ({route, navigation}) => {
     }
 
     return () => {
-      leaveConversation(conversationId);
+      unsubscribeFromConversation(conversationId);
     };
   }, [user?.token, conversationId]);
 
-  // Join conversation room when socket is ready
+  // Subscribe to conversation when socket is ready
   useEffect(() => {
     if (isSocketConnected() && conversationId) {
-      joinConversation(conversationId).catch(err => {
-        console.error('Failed to join conversation:', err);
+      subscribeToConversation(conversationId).catch(err => {
+        console.error('Failed to subscribe to conversation:', err);
       });
     }
   }, [conversationId]);
 
   // Listen for new messages
   useEffect(() => {
-    const handleNewMessage = message => {
-      if (message.conversation_id === conversationId) {
+    const handleNewMessage = data => {
+      const message = data.message;
+      if (data.conversation_id === conversationId && message) {
         setLocalMessages(prev => [...prev, message]);
         // Scroll to bottom when new message arrives
         setTimeout(() => {
@@ -87,6 +88,23 @@ const ConversationChatScreen = ({route, navigation}) => {
     };
 
     onNewMessage(handleNewMessage);
+
+    return () => {
+      // Cleanup would happen in disconnectSocket
+    };
+  }, [conversationId]);
+
+  // Listen for conversation status changes
+  useEffect(() => {
+    const handleStatusChange = data => {
+      if (data.conversation_id === conversationId) {
+        console.log('Conversation status changed:', data.status);
+        // Optionally refetch conversation details to update UI
+        refetchConversation();
+      }
+    };
+
+    onConversationStatus(handleStatusChange);
 
     return () => {
       // Cleanup would happen in disconnectSocket
@@ -105,6 +123,12 @@ const ConversationChatScreen = ({route, navigation}) => {
           hasMarkedAsRead.current = true;
         } catch (error) {
           console.error('Failed to mark messages as read:', error);
+          console.error('Error details:', {
+            message: error?.message,
+            status: error?.status,
+            response: error?.response,
+            conversationId,
+          });
         }
       };
 
@@ -443,28 +467,25 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
     paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E3E8F0',
   },
   input: {
     flex: 1,
     backgroundColor: '#F5F7FA',
     borderRadius: 24,
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingVertical: 12,
     marginRight: 12,
     fontSize: 15,
     color: '#111820',
-    maxHeight: 120,
+    maxHeight: 100,
     borderWidth: 0,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   sendButton: {
     width: 48,
@@ -473,11 +494,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#008178',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
   },
   sendButtonDisabled: {
     backgroundColor: '#E3E8F0',

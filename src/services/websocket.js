@@ -80,40 +80,40 @@ export const disconnectSocket = () => {
 };
 
 /**
- * Join a conversation room
- * @param {string} conversationId - Conversation ID to join
+ * Subscribe to a conversation
+ * @param {string} conversationId - Conversation ID to subscribe
  */
-export const joinConversation = (conversationId) => {
+export const subscribeToConversation = (conversationId) => {
   if (!socket || !isConnected) {
-    console.warn('Socket not connected, cannot join conversation');
+    console.warn('Socket not connected, cannot subscribe to conversation');
     return Promise.reject(new Error('Socket not connected'));
   }
 
   return new Promise((resolve, reject) => {
-    socket.emit('conversation:join', {conversation_id: conversationId}, (response) => {
+    socket.emit('conversation:subscribe', {conversation_id: conversationId}, (response) => {
       if (response?.ok) {
-        console.log('Joined conversation room:', conversationId);
+        console.log('Subscribed to conversation:', conversationId);
         resolve(response);
       } else {
-        console.error('Failed to join conversation:', response);
-        reject(new Error('Failed to join conversation'));
+        console.error('Failed to subscribe to conversation:', response);
+        reject(new Error('Failed to subscribe to conversation'));
       }
     });
   });
 };
 
 /**
- * Leave a conversation room
- * @param {string} conversationId - Conversation ID to leave
+ * Unsubscribe from a conversation
+ * @param {string} conversationId - Conversation ID to unsubscribe
  */
-export const leaveConversation = (conversationId) => {
+export const unsubscribeFromConversation = (conversationId) => {
   if (!socket || !isConnected) {
     return;
   }
 
-  socket.emit('conversation:leave', {conversation_id: conversationId}, (response) => {
+  socket.emit('conversation:unsubscribe', {conversation_id: conversationId}, (response) => {
     if (response?.ok) {
-      console.log('Left conversation room:', conversationId);
+      console.log('Unsubscribed from conversation:', conversationId);
     }
   });
 };
@@ -179,38 +179,38 @@ export const onNewMessage = (callback) => {
     return;
   }
 
-  socket.on('message:new', (message) => {
-    console.log('New message received:', message);
-    callback(message);
+  socket.on('conversation:message', (data) => {
+    console.log('New message received:', data.message);
+    callback(data);
   });
 
   // Store listener for cleanup
-  if (!eventListeners.has('message:new')) {
-    eventListeners.set('message:new', []);
+  if (!eventListeners.has('conversation:message')) {
+    eventListeners.set('conversation:message', []);
   }
-  eventListeners.get('message:new').push(callback);
+  eventListeners.get('conversation:message').push(callback);
 };
 
 /**
- * Listen for read status updates
- * @param {function} callback - Callback function to handle read status
+ * Listen for conversation status updates
+ * @param {function} callback - Callback function to handle status changes
  */
-export const onMessagesRead = (callback) => {
+export const onConversationStatus = (callback) => {
   if (!socket) {
     console.warn('Socket not initialized');
     return;
   }
 
-  socket.on('conversation:messages_read', (data) => {
-    console.log('Conversation messages marked as read:', data);
+  socket.on('conversation:status', (data) => {
+    console.log('Conversation status changed:', data.status);
     callback(data);
   });
 
   // Store listener for cleanup
-  if (!eventListeners.has('conversation:messages_read')) {
-    eventListeners.set('conversation:messages_read', []);
+  if (!eventListeners.has('conversation:status')) {
+    eventListeners.set('conversation:status', []);
   }
-  eventListeners.get('conversation:messages_read').push(callback);
+  eventListeners.get('conversation:status').push(callback);
 };
 
 /**
@@ -258,12 +258,12 @@ export default {
   getSocket,
   isSocketConnected,
   disconnectSocket,
-  joinConversation,
-  leaveConversation,
+  subscribeToConversation,
+  unsubscribeFromConversation,
   sendSocketMessage,
   markMessagesRead,
   onNewMessage,
-  onMessagesRead,
+  onConversationStatus,
   removeEventListener,
   removeAllEventListeners,
 };
