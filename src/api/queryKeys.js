@@ -91,7 +91,6 @@ export const queryKeys = {
     list: filters => ['conversations', 'list', filters],
     details: () => ['conversations', 'detail'],
     detail: id => ['conversations', 'detail', id],
-    unreadCount: () => ['conversations', 'unread-count'],
   },
 
   // Messages keys

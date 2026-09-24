@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
-import {useInbox, useInboxUnreadCount, useConversationUnreadCount} from '../../api/queries';
+import {useInbox, useInboxUnreadCount, useConversations} from '../../api/queries';
 
 const INK = '#0B3F3C';
 const MUTED = '#8A9A97';
@@ -18,9 +18,13 @@ const HomeHeader = ({navigation}) => {
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
-  const {data: conversationUnreadCount} = useConversationUnreadCount();
+  const {data: conversationsData} = useConversations();
   const unread = inboxData?.meta?.unread ?? unreadCount ?? 0;
-  const conversationUnread = conversationUnreadCount ?? 0;
+  
+  // Calculate conversation unread count from conversations list
+  const conversations = Array.isArray(conversationsData?.data) ? conversationsData.data : [];
+  const conversationUnread = conversations.reduce((sum, conv) => sum + (conv.user_unread_count || 0), 0);
+  
   const greeting = getGreeting();
   const displayName =
     user?.name || user?.full_name || user?.first_name || 'there';

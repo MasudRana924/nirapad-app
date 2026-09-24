@@ -106,17 +106,11 @@ export const ENDPOINTS = {
 
   // Conversations endpoints
   CONVERSATIONS: {
-    LIST: '/conversations/my',
+    LIST: '/conversations',
     CREATE: '/conversations',
     DETAIL: id => `/conversations/${id}`,
-    UNREAD_COUNT: '/conversations/unread',
-  },
-
-  // Messages endpoints
-  MESSAGES: {
-    SEND: '/messages',
-    LIST: conversationId => `/messages/conversation/${conversationId}`,
-    MARK_READ: conversationId => `/messages/conversation/${conversationId}/read`,
+    MESSAGES: id => `/conversations/${id}/messages`,
+    MARK_READ: id => `/conversations/${id}/read`,
   },
 };
 

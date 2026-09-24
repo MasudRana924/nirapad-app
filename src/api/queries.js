@@ -203,10 +203,10 @@ export const usePrivacyPolicy = (audience = 'USER', options = {}) => {
 /**
  * Conversations Queries
  */
-export const useConversations = (options = {}) => {
+export const useConversations = (params = {}, options = {}) => {
   return useQuery({
-    queryKey: queryKeys.conversations.lists(),
-    queryFn: () => conversationService.getMyConversations(),
+    queryKey: queryKeys.conversations.lists(params),
+    queryFn: () => conversationService.getMyConversations(params),
     ...options,
   });
 };
@@ -220,14 +220,6 @@ export const useConversationDetails = (id, options = {}) => {
   });
 };
 
-export const useConversationUnreadCount = (options = {}) => {
-  return useQuery({
-    queryKey: queryKeys.conversations.unreadCount(),
-    queryFn: () => conversationService.getUnreadCount(),
-    select: data => data?.unreadCount ?? data?.unread ?? data?.count ?? 0,
-    ...options,
-  });
-};
 
 /**
  * Messages Queries
@@ -263,7 +255,6 @@ export default {
   // Conversations
   useConversations,
   useConversationDetails,
-  useConversationUnreadCount,
 
   // Messages
   useMessages,

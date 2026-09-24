@@ -8,6 +8,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useFocusEffect} from '@react-navigation/native';
@@ -185,21 +186,44 @@ const ConversationChatScreen = ({route, navigation}) => {
       <Header
         title={conversation?.subject || 'Conversation'}
         showBack={true}
-        subtitle={conversation?.unread_count > 0 ? `${conversation.unread_count} unread` : undefined}
+        rightComponent={
+          <View style={styles.headerRight}>
+            <View style={styles.onlineIndicator} />
+          </View>
+        }
       />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
         <ScrollView
           ref={scrollViewRef}
           style={styles.messagesContainer}
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}>
           {messagesLoading && localMessages.length === 0 ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Loading messages...</Text>
+            <View style={styles.skeletonContainer}>
+              {[1, 2, 3, 4].map(index => {
+                const isLeft = index % 2 === 1; // Left (admin) for odd indices
+                return (
+                  <View 
+                    key={index} 
+                    style={[
+                      styles.skeletonMessageRow,
+                      isLeft ? styles.skeletonRowLeft : styles.skeletonRowRight
+                    ]}>
+                    {isLeft && <View style={styles.skeletonAvatar} />}
+                    <View 
+                      style={[
+                        styles.skeletonBubble,
+                        isLeft ? styles.skeletonBubbleLeft : styles.skeletonBubbleRight
+                      ]} 
+                    />
+                    {!isLeft && <View style={styles.skeletonAvatar} />}
+                  </View>
+                );
+              })}
             </View>
           ) : messages.length === 0 ? (
             <View style={styles.emptyState}>
@@ -307,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FC',
   },
   messagesContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 12,
     paddingBottom: 20,
   },
@@ -341,7 +365,7 @@ const styles = StyleSheet.create({
   },
   messageRow: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 12,
     alignItems: 'flex-end',
   },
   messageRowOwn: {
@@ -351,35 +375,42 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 10,
   },
   avatarSpacer: {
-    width: 32,
+    width: 36,
   },
   avatarText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     color: '#FFFFFF',
   },
   messageBubble: {
     maxWidth: '70%',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   messageBubbleOwn: {
     backgroundColor: '#008178',
     borderBottomRightRadius: 4,
+    marginRight: 4,
   },
   messageBubbleOther: {
     backgroundColor: '#FFFFFF',
     borderBottomLeftRadius: 4,
+    marginLeft: 4,
   },
   messageText: {
     fontSize: 14,
@@ -408,29 +439,93 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E3E8F0',
+    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
   },
   input: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginRight: 8,
-    fontSize: 14,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    marginRight: 12,
+    fontSize: 15,
     color: '#111820',
-    maxHeight: 100,
+    maxHeight: 120,
+    borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#008178',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   sendButtonDisabled: {
     backgroundColor: '#E3E8F0',
+    shadowColor: 'transparent',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  headerRight: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  onlineIndicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#4CAF50',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  skeletonContainer: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  skeletonMessageRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    alignItems: 'flex-end',
+  },
+  skeletonRowLeft: {
+    justifyContent: 'flex-start',
+  },
+  skeletonRowRight: {
+    justifyContent: 'flex-end',
+  },
+  skeletonAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#E3E8F0',
+    marginRight: 10,
+  },
+  skeletonBubble: {
+    width: 160,
+    height: 50,
+    backgroundColor: '#E3E8F0',
+    borderRadius: 20,
+    borderBottomLeftRadius: 4,
+  },
+  skeletonBubbleRight: {
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 4,
+  },
+  skeletonBubbleLeft: {
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 20,
   },
 });

@@ -1,8 +1,19 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, StatusBar, Platform} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 const Header = ({title, onBack, showBack = true, rightComponent}) => {
+  const navigation = useNavigation();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigation.goBack();
+    }
+  };
+
   return (
     <>
       <StatusBar
@@ -15,15 +26,15 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.backButton}
-              onPress={onBack}>
+              onPress={handleBack}>
               <Icon name="arrow-back" size={24} color="#172333" />
             </TouchableOpacity>
           ) : (
             <View style={styles.placeholder} />
           )}
-          
+
           <Text style={styles.title}>{title}</Text>
-          
+
           {rightComponent || <View style={styles.placeholder} />}
         </View>
       </View>

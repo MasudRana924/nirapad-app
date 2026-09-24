@@ -54,15 +54,15 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   const insets = useSafeAreaInsets();
   // Manual bottom inset so tab bar sits above system nav (not under it)
-  const bottomInset = insets.bottom > 0 ? insets.bottom : 12;
+  // Increased default padding for Windows device action panel
+  const bottomInset = insets.bottom > 0 ? insets.bottom : 20;
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-        // Disable auto inset — we apply it ourselves to avoid underlap/double-gap
-        safeAreaInsets: {bottom: 0},
+        // Enable auto inset for proper device action panel handling
         tabBarStyle: {
           height: 56 + bottomInset,
           paddingBottom: bottomInset,
@@ -101,19 +101,6 @@ function MainTabs() {
           tabBarIcon: ({focused, color}) => (
             <Icon
               name={focused ? 'people' : 'people-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="ConversationList"
-        component={ConversationListScreen}
-        options={{
-          tabBarIcon: ({focused, color}) => (
-            <Icon
-              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
               size={24}
               color={color}
             />
@@ -205,7 +192,7 @@ function AppNavigator() {
           <Stack.Screen name="PaymentCancelled" component={PaymentCancelledScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
           <Stack.Screen name="ConversationList" component={ConversationListScreen} />
-          <Stack.Screen name="ConversationChat" component={ConversationChatScreen} />
+          <Stack.Screen name="ConversationChat" component={ConversationChatScreen} options={{headerShown: false}} />
         </>
       ) : (
         // Not authenticated — show auth screens

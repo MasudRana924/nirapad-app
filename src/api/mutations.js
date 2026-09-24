@@ -256,8 +256,8 @@ export const useCreateConversation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({subject, message}) =>
-      conversationService.createConversation({subject, message}),
+    mutationFn: ({subject, first_message}) =>
+      conversationService.createConversation({subject, first_message}),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});
     },
@@ -296,10 +296,6 @@ export const useMarkMessagesAsRead = () => {
       });
       // Invalidate conversations list to update unread status
       queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});
-      // Invalidate unread count
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.conversations.unreadCount(),
-      });
     },
   });
 };

@@ -7,26 +7,26 @@ import {
   TouchableOpacity,
   RefreshControl,
   TextInput,
+  Platform,
+  KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useConversations, useConversationUnreadCount} from '../api/queries';
+import {useConversations} from '../api/queries';
 import {useCreateConversation} from '../api/mutations';
 import Header from '../components/common/Header';
 
 const ConversationListScreen = ({navigation}) => {
   const {data: conversationsData, isLoading, refetch} = useConversations();
-  const {data: unreadCount} = useConversationUnreadCount();
   const createConversationMutation = useCreateConversation();
   const [refreshing, setRefreshing] = useState(false);
-  const [showNewChat, setShowNewChat] = useState(false);
   const [newMessage, setNewMessage] = useState('');
 
-  const conversations = Array.isArray(conversationsData?.conversations)
-    ? conversationsData.conversations
+  const conversations = Array.isArray(conversationsData?.data)
+    ? conversationsData.data
     : [];
-  const unread = conversationsData?.unreadCount ?? unreadCount ?? 0;
 
   useFocusEffect(
     useCallback(() => {
@@ -50,12 +50,12 @@ const ConversationListScreen = ({navigation}) => {
 
     try {
       const result = await createConversationMutation.mutateAsync({
-        message: newMessage,
+        subject: 'Support Request',
+        first_message: newMessage,
       });
 
       if (result?.data?.id) {
         setNewMessage('');
-        setShowNewChat(false);
         navigation.navigate('ConversationChat', {conversationId: result.data.id});
       }
     } catch (error) {
@@ -94,57 +94,35 @@ const ConversationListScreen = ({navigation}) => {
       <Header
         title="Messages"
         showBack={true}
-        rightComponent={
-          <TouchableOpacity
-            onPress={() => setShowNewChat(!showNewChat)}
-            style={styles.newChatButton}>
-            <Icon name="add-circle-outline" size={24} color="#008178" />
-          </TouchableOpacity>
-        }
       />
 
-      {showNewChat && (
-        <View style={styles.newChatContainer}>
-          <TextInput
-            style={styles.newChatInput}
-            placeholder="Type a message to start a new conversation..."
-            placeholderTextColor="#8190A7"
-            value={newMessage}
-            onChangeText={setNewMessage}
-            multiline
-            maxLength={500}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              !newMessage.trim() && styles.sendButtonDisabled,
-            ]}
-            onPress={handleCreateConversation}
-            disabled={!newMessage.trim() || createConversationMutation.isPending}>
-            <Icon
-              name="send"
-              size={20}
-              color={newMessage.trim() ? '#FFFFFF' : '#A8B3C4'}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#008178']}
+              tintColor="#008178"
             />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#008178']}
-            tintColor="#008178"
-          />
-        }>
+          }>
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading conversations...</Text>
+          <View style={styles.skeletonContainer}>
+            {[1, 2, 3].map(index => (
+              <View key={index} style={styles.skeletonCard}>
+                <View style={styles.skeletonAvatar} />
+                <View style={styles.skeletonContent}>
+                  <View style={styles.skeletonTitle} />
+                  <View style={styles.skeletonSubtitle} />
+                </View>
+              </View>
+            ))}
           </View>
         ) : conversations.length === 0 ? (
           <View style={styles.emptyState}>
@@ -159,10 +137,10 @@ const ConversationListScreen = ({navigation}) => {
         ) : (
           conversations.map(conversation => {
             const lastMessage =
-              conversation.last_message?.message ||
+              conversation.last_message_preview ||
               conversation.subject ||
               'No messages yet';
-            const isUnread = conversation.unread_count > 0;
+            const isUnread = conversation.user_unread_count > 0;
 
             return (
               <TouchableOpacity
@@ -198,7 +176,7 @@ const ConversationListScreen = ({navigation}) => {
                 {isUnread && (
                   <View style={styles.unreadBadge}>
                     <Text style={styles.unreadBadgeText}>
-                      {conversation.unread_count}
+                      {conversation.user_unread_count}
                     </Text>
                   </View>
                 )}
@@ -207,6 +185,32 @@ const ConversationListScreen = ({navigation}) => {
           })
         )}
       </ScrollView>
+
+      <View style={styles.newChatContainer}>
+        <TextInput
+          style={styles.newChatInput}
+          placeholder="Type a message to start a new conversation..."
+          placeholderTextColor="#8190A7"
+          value={newMessage}
+          onChangeText={setNewMessage}
+          multiline
+          maxLength={500}
+        />
+        <TouchableOpacity
+          style={[
+            styles.sendButton,
+            !newMessage.trim() && styles.sendButtonDisabled,
+          ]}
+          onPress={handleCreateConversation}
+          disabled={!newMessage.trim() || createConversationMutation.isPending}>
+          <Icon
+            name="send"
+            size={20}
+            color={newMessage.trim() ? '#FFFFFF' : '#A8B3C4'}
+          />
+        </TouchableOpacity>
+      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -217,6 +221,9 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -230,33 +237,84 @@ const styles = StyleSheet.create({
   },
   newChatContainer: {
     flexDirection: 'row',
+    alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F6F6F6',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E3E8F0',
+    backgroundColor: '#FFFFFF',
+    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
   },
   newChatInput: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginRight: 8,
-    fontSize: 14,
+    backgroundColor: '#F5F7FA',
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    marginRight: 12,
+    fontSize: 15,
     color: '#111820',
-    maxHeight: 80,
+    maxHeight: 120,
+    borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#008178',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 5,
   },
   sendButtonDisabled: {
     backgroundColor: '#E3E8F0',
+    shadowColor: 'transparent',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  skeletonContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  skeletonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
+  },
+  skeletonAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#E3E8F0',
+    marginRight: 14,
+  },
+  skeletonContent: {
+    flex: 1,
+  },
+  skeletonTitle: {
+    height: 16,
+    width: '60%',
+    backgroundColor: '#E3E8F0',
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  skeletonSubtitle: {
+    height: 12,
+    width: '80%',
+    backgroundColor: '#E3E8F0',
+    borderRadius: 4,
   },
   loadingContainer: {
     alignItems: 'center',
@@ -297,25 +355,28 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F6F6F6',
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E3E8F0',
   },
   cardUnread: {
     backgroundColor: '#E6F4F3',
+    borderColor: '#008178',
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   avatarText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
   },

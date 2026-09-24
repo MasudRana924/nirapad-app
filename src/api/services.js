@@ -260,14 +260,22 @@ export const hospitalService = {
  * Conversations Services
  */
 export const conversationService = {
-  getMyConversations: () => apiRequest('/conversations/my', 'GET'),
+  getMyConversations: (params = {}) => {
+    const {status, page = 1, limit = 10} = params;
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (status) {
+      queryParams.append('status', status);
+    }
+    return apiRequest(`/conversations?${queryParams.toString()}`, 'GET');
+  },
 
   getConversationDetails: id => apiRequest(`/conversations/${id}`, 'GET'),
 
-  createConversation: ({subject, message}) =>
-    apiRequest('/conversations', 'POST', {subject, message}),
-
-  getUnreadCount: () => apiRequest('/conversations/unread', 'GET'),
+  createConversation: ({subject, first_message}) =>
+    apiRequest('/conversations', 'POST', {subject, first_message}),
 };
 
 /**
@@ -275,7 +283,7 @@ export const conversationService = {
  */
 export const messageService = {
   sendMessage: ({conversation_id, message, message_type = 'text'}) =>
-    apiRequest('/messages', 'POST', {conversation_id, message, message_type}),
+    apiRequest(`/conversations/${conversation_id}/messages`, 'POST', {message_type, message}),
 
   getMessages: (conversationId, params = {}) => {
     const {page = 1, limit = 20} = params;
@@ -283,11 +291,11 @@ export const messageService = {
       page: page.toString(),
       limit: limit.toString(),
     });
-    return apiRequest(`/messages/conversation/${conversationId}?${queryParams.toString()}`, 'GET');
+    return apiRequest(`/conversations/${conversationId}/messages?${queryParams.toString()}`, 'GET');
   },
 
   markAsRead: conversationId =>
-    apiRequest(`/messages/conversation/${conversationId}/read`, 'PUT'),
+    apiRequest(`/conversations/${conversationId}/read`, 'PUT'),
 };
 
 export default {
