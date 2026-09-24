@@ -79,8 +79,13 @@ export const requestNotificationPermission = async () => {
       if (apiLevel < 33) {
         return true;
       }
-      const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
-      return isGranted(result);
+      // Check if POST_NOTIFICATIONS permission is available
+      if (PERMISSIONS.ANDROID.POST_NOTIFICATIONS) {
+        const result = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+        return isGranted(result);
+      }
+      // If permission constant not available, assume granted for older implementations
+      return true;
     }
 
     return false;

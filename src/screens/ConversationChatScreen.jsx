@@ -36,6 +36,7 @@ const ConversationChatScreen = ({route, navigation}) => {
   const [messageText, setMessageText] = useState('');
   const [localMessages, setLocalMessages] = useState([]);
   const [isSending, setIsSending] = useState(false);
+  const hasMarkedAsRead = useRef(false);
 
   const {data: conversation, isLoading: conversationLoading} =
     useConversationDetails(conversationId);
@@ -96,14 +97,22 @@ const ConversationChatScreen = ({route, navigation}) => {
   useFocusEffect(
     useCallback(() => {
       const markAsRead = async () => {
+        if (hasMarkedAsRead.current) {
+          return;
+        }
         try {
           await markAsReadMutation.mutateAsync(conversationId);
+          hasMarkedAsRead.current = true;
         } catch (error) {
           console.error('Failed to mark messages as read:', error);
         }
       };
 
       markAsRead();
+
+      return () => {
+        hasMarkedAsRead.current = false;
+      };
     }, [conversationId, markAsReadMutation]),
   );
 
@@ -236,7 +245,6 @@ const ConversationChatScreen = ({route, navigation}) => {
           ) : (
             messages.map((message, index) => {
               const isOwn = isCurrentUser(message);
-              const showAvatar = !isOwn || (index > 0 && !isCurrentUser(messages[index - 1]));
 
               return (
                 <View
@@ -245,27 +253,27 @@ const ConversationChatScreen = ({route, navigation}) => {
                     styles.messageRow,
                     isOwn ? styles.messageRowOwn : styles.messageRowOther,
                   ]}>
-                  {!isOwn && showAvatar && (
+                  {!isOwn && (
                     <View style={styles.avatar}>
                       <Text style={styles.avatarText}>
                         {getInitials(message.sender_name || 'Admin')}
                       </Text>
                     </View>
                   )}
-                  {!isOwn && !showAvatar && <View style={styles.avatarSpacer} />}
-
-                  <View
-                    style={[
-                      styles.messageBubble,
-                      isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther,
-                    ]}>
-                    <Text
+                  <View style={styles.messageContentWrapper}>
+                    <View
                       style={[
-                        styles.messageText,
-                        isOwn ? styles.messageTextOwn : styles.messageTextOther,
+                        styles.messageBubble,
+                        isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther,
                       ]}>
-                      {message.message}
-                    </Text>
+                      <Text
+                        style={[
+                          styles.messageText,
+                          isOwn ? styles.messageTextOwn : styles.messageTextOther,
+                        ]}>
+                        {message.message}
+                      </Text>
+                    </View>
                     <Text
                       style={[
                         styles.messageTime,
@@ -274,8 +282,6 @@ const ConversationChatScreen = ({route, navigation}) => {
                       {formatTime(message.created_at)}
                     </Text>
                   </View>
-
-                  {isOwn && <View style={styles.avatarSpacer} />}
                 </View>
               );
             })
@@ -328,7 +334,7 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#FFFFFF',
   },
   messagesContent: {
     paddingHorizontal: 12,
@@ -386,13 +392,15 @@ const styles = StyleSheet.create({
   avatarSpacer: {
     width: 36,
   },
+  messageContentWrapper: {
+    maxWidth: '70%',
+  },
   avatarText: {
     fontSize: 13,
     fontWeight: '600',
     color: '#FFFFFF',
   },
   messageBubble: {
-    maxWidth: '70%',
     paddingHorizontal: 18,
     paddingVertical: 14,
     borderRadius: 20,
@@ -425,10 +433,10 @@ const styles = StyleSheet.create({
   messageTime: {
     fontSize: 11,
     marginTop: 4,
-    alignSelf: 'flex-end',
+    color: '#8190A7',
   },
   messageTimeOwn: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#8190A7',
   },
   messageTimeOther: {
     color: '#8190A7',

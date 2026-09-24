@@ -321,7 +321,15 @@ class NotificationService {
 
     const bookingId = data.booking_id || data.bookingId;
     const inboxId = data.inbox_id || data.inboxId;
+    const conversationId = data.conversation_id || data.conversationId;
     const type = data.type || data.action;
+    
+    // Handle conversation message notifications
+    if (type === 'conversation_message' && conversationId) {
+      navigation.navigate('ConversationChat', {conversationId});
+      return;
+    }
+    
     const openBooking =
       type === 'SERVICE_STARTED' ||
       type === 'SERVICE_COMPLETED' ||

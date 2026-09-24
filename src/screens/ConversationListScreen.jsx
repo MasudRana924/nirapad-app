@@ -207,7 +207,9 @@ const ConversationListScreen = ({navigation}) => {
             name="send"
             size={20}
             color={newMessage.trim() ? '#FFFFFF' : '#A8B3C4'}
+            style={{marginRight: 8}}
           />
+          <Text style={styles.sendButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
       </KeyboardAvoidingView>
@@ -236,20 +238,18 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   newChatContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
     paddingBottom: Platform.OS === 'ios' ? 28 : 12,
   },
   newChatInput: {
-    flex: 1,
+    width: '100%',
     backgroundColor: '#F5F7FA',
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 14,
-    marginRight: 12,
+    marginBottom: 12,
     fontSize: 15,
     color: '#111820',
     maxHeight: 120,
@@ -261,12 +261,13 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   sendButton: {
-    width: 52,
+    width: '100%',
     height: 52,
     borderRadius: 26,
     backgroundColor: '#008178',
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
     shadowColor: '#008178',
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.25,
@@ -279,6 +280,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0,
     elevation: 0,
   },
+  sendButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   skeletonContainer: {
     paddingHorizontal: 16,
     paddingVertical: 16,
@@ -286,12 +292,12 @@ const styles = StyleSheet.create({
   skeletonCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F6F6',
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F6F6F6',
   },
   skeletonAvatar: {
     width: 56,
@@ -306,14 +312,14 @@ const styles = StyleSheet.create({
   skeletonTitle: {
     height: 16,
     width: '60%',
-    backgroundColor: '#E3E8F0',
+    backgroundColor: '#D9D9D9',
     borderRadius: 4,
     marginBottom: 8,
   },
   skeletonSubtitle: {
     height: 12,
     width: '80%',
-    backgroundColor: '#E3E8F0',
+    backgroundColor: '#D9D9D9',
     borderRadius: 4,
   },
   loadingContainer: {
@@ -355,12 +361,12 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F6F6F6',
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#F6F6F6',
   },
   cardUnread: {
     backgroundColor: '#E6F4F3',
