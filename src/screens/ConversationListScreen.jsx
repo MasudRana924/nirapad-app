@@ -1,0 +1,367 @@
+import React, {useCallback, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  TextInput,
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useFocusEffect} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {useConversations, useConversationUnreadCount} from '../api/queries';
+import {useCreateConversation} from '../api/mutations';
+import Header from '../components/common/Header';
+
+const ConversationListScreen = ({navigation}) => {
+  const {data: conversationsData, isLoading, refetch} = useConversations();
+  const {data: unreadCount} = useConversationUnreadCount();
+  const createConversationMutation = useCreateConversation();
+  const [refreshing, setRefreshing] = useState(false);
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+
+  const conversations = Array.isArray(conversationsData?.conversations)
+    ? conversationsData.conversations
+    : [];
+  const unread = conversationsData?.unreadCount ?? unreadCount ?? 0;
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
+
+  const handleCreateConversation = async () => {
+    if (!newMessage.trim()) {
+      return;
+    }
+
+    try {
+      const result = await createConversationMutation.mutateAsync({
+        message: newMessage,
+      });
+
+      if (result?.data?.id) {
+        setNewMessage('');
+        setShowNewChat(false);
+        navigation.navigate('ConversationChat', {conversationId: result.data.id});
+      }
+    } catch (error) {
+      console.error('Failed to create conversation:', error);
+    }
+  };
+
+  const formatTime = dateString => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now - date;
+    const diffInMins = Math.floor(diffInMs / 60000);
+    const diffInHours = Math.floor(diffInMs / 3600000);
+    const diffInDays = Math.floor(diffInMs / 86400000);
+
+    if (diffInMins < 1) return 'Just now';
+    if (diffInMins < 60) return `${diffInMins}m ago`;
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+  };
+
+  const getInitials = name => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header
+        title="Messages"
+        showBack={true}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => setShowNewChat(!showNewChat)}
+            style={styles.newChatButton}>
+            <Icon name="add-circle-outline" size={24} color="#008178" />
+          </TouchableOpacity>
+        }
+      />
+
+      {showNewChat && (
+        <View style={styles.newChatContainer}>
+          <TextInput
+            style={styles.newChatInput}
+            placeholder="Type a message to start a new conversation..."
+            placeholderTextColor="#8190A7"
+            value={newMessage}
+            onChangeText={setNewMessage}
+            multiline
+            maxLength={500}
+          />
+          <TouchableOpacity
+            style={[
+              styles.sendButton,
+              !newMessage.trim() && styles.sendButtonDisabled,
+            ]}
+            onPress={handleCreateConversation}
+            disabled={!newMessage.trim() || createConversationMutation.isPending}>
+            <Icon
+              name="send"
+              size={20}
+              color={newMessage.trim() ? '#FFFFFF' : '#A8B3C4'}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#008178']}
+            tintColor="#008178"
+          />
+        }>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading conversations...</Text>
+          </View>
+        ) : conversations.length === 0 ? (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIcon}>
+              <Icon name="chatbubbles-outline" size={32} color="#008178" />
+            </View>
+            <Text style={styles.emptyTitle}>No conversations yet</Text>
+            <Text style={styles.emptyText}>
+              Start a conversation to get help and support
+            </Text>
+          </View>
+        ) : (
+          conversations.map(conversation => {
+            const lastMessage =
+              conversation.last_message?.message ||
+              conversation.subject ||
+              'No messages yet';
+            const isUnread = conversation.unread_count > 0;
+
+            return (
+              <TouchableOpacity
+                key={conversation.id}
+                style={[styles.card, isUnread && styles.cardUnread]}
+                onPress={() =>
+                  navigation.navigate('ConversationChat', {
+                    conversationId: conversation.id,
+                  })
+                }>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>
+                    {getInitials(conversation.subject || 'Support')}
+                  </Text>
+                </View>
+
+                <View style={styles.content}>
+                  <View style={styles.topRow}>
+                    <Text
+                      style={[styles.subject, isUnread && styles.subjectUnread]}
+                      numberOfLines={1}>
+                      {conversation.subject || 'Support Conversation'}
+                    </Text>
+                    <Text style={styles.time}>
+                      {formatTime(conversation.updated_at || conversation.created_at)}
+                    </Text>
+                  </View>
+                  <Text style={styles.lastMessage} numberOfLines={2}>
+                    {lastMessage}
+                  </Text>
+                </View>
+
+                {isUnread && (
+                  <View style={styles.unreadBadge}>
+                    <Text style={styles.unreadBadgeText}>
+                      {conversation.unread_count}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+export default ConversationListScreen;
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  newChatButton: {
+    padding: 8,
+  },
+  newChatContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#F6F6F6',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E3E8F0',
+  },
+  newChatInput: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginRight: 8,
+    fontSize: 14,
+    color: '#111820',
+    maxHeight: 80,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#008178',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: '#E3E8F0',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#8190A7',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 24,
+  },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#E6F4F3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111820',
+  },
+  emptyText: {
+    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#8190A7',
+    textAlign: 'center',
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+  },
+  cardUnread: {
+    backgroundColor: '#E6F4F3',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#008178',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  avatarText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  content: {
+    flex: 1,
+    minWidth: 0,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  subject: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#303944',
+    marginRight: 8,
+  },
+  subjectUnread: {
+    color: '#111820',
+    fontWeight: '700',
+  },
+  time: {
+    fontSize: 12,
+    color: '#8190A7',
+  },
+  lastMessage: {
+    fontSize: 13,
+    color: '#7D8BA5',
+    lineHeight: 18,
+  },
+  unreadBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#E34242',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    marginLeft: 8,
+  },
+  unreadBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+});

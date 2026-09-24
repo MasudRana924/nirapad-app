@@ -34,6 +34,8 @@ import BookingsScreen from '../screens/BookingsScreen';
 import BookingDetailsScreen from '../screens/BookingDetailsScreen';
 import LiveTrackingScreen from '../screens/LiveTrackingScreen';
 import InboxScreen from '../screens/InboxScreen';
+import ConversationListScreen from '../screens/ConversationListScreen';
+import ConversationChatScreen from '../screens/ConversationChatScreen';
 import AreaSelectScreen from '../screens/AreaSelectScreen';
 import SelectServiceScreen from '../screens/SelectServiceScreen';
 import BookingPreviewScreen from '../screens/BookingPreviewScreen';
@@ -106,12 +108,12 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="Inbox"
-        component={InboxScreen}
+        name="ConversationList"
+        component={ConversationListScreen}
         options={{
           tabBarIcon: ({focused, color}) => (
             <Icon
-              name={focused ? 'mail' : 'mail-outline'}
+              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
               size={24}
               color={color}
             />
@@ -202,6 +204,8 @@ function AppNavigator() {
           <Stack.Screen name="PaymentSuccess" component={PaymentSuccessScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="PaymentCancelled" component={PaymentCancelledScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+          <Stack.Screen name="ConversationList" component={ConversationListScreen} />
+          <Stack.Screen name="ConversationChat" component={ConversationChatScreen} />
         </>
       ) : (
         // Not authenticated — show auth screens
