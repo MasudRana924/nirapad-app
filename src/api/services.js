@@ -256,6 +256,40 @@ export const hospitalService = {
   },
 };
 
+/**
+ * Conversations Services
+ */
+export const conversationService = {
+  getMyConversations: () => apiRequest('/conversations/my', 'GET'),
+
+  getConversationDetails: id => apiRequest(`/conversations/${id}`, 'GET'),
+
+  createConversation: ({subject, message}) =>
+    apiRequest('/conversations', 'POST', {subject, message}),
+
+  getUnreadCount: () => apiRequest('/conversations/unread', 'GET'),
+};
+
+/**
+ * Messages Services
+ */
+export const messageService = {
+  sendMessage: ({conversation_id, message, message_type = 'text'}) =>
+    apiRequest('/messages', 'POST', {conversation_id, message, message_type}),
+
+  getMessages: (conversationId, params = {}) => {
+    const {page = 1, limit = 20} = params;
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    return apiRequest(`/messages/conversation/${conversationId}?${queryParams.toString()}`, 'GET');
+  },
+
+  markAsRead: conversationId =>
+    apiRequest(`/messages/conversation/${conversationId}/read`, 'PUT'),
+};
+
 export default {
   apiRequest,
   authService,
@@ -268,4 +302,6 @@ export default {
   notificationService,
   notificationPreferenceService,
   privacyPolicyService,
+  conversationService,
+  messageService,
 };

@@ -103,6 +103,21 @@ export const ENDPOINTS = {
   PRIVACY_POLICIES: {
     BY_AUDIENCE: audience => `/privacy-policies/${audience}`,
   },
+
+  // Conversations endpoints
+  CONVERSATIONS: {
+    LIST: '/conversations/my',
+    CREATE: '/conversations',
+    DETAIL: id => `/conversations/${id}`,
+    UNREAD_COUNT: '/conversations/unread',
+  },
+
+  // Messages endpoints
+  MESSAGES: {
+    SEND: '/messages',
+    LIST: conversationId => `/messages/conversation/${conversationId}`,
+    MARK_READ: conversationId => `/messages/conversation/${conversationId}/read`,
+  },
 };
 
 export const getFullUrl = endpoint => `${BASE_URL}${endpoint}`;

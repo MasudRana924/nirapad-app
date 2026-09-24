@@ -4,7 +4,7 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService, conversationService, messageService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -200,6 +200,47 @@ export const usePrivacyPolicy = (audience = 'USER', options = {}) => {
   });
 };
 
+/**
+ * Conversations Queries
+ */
+export const useConversations = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.conversations.lists(),
+    queryFn: () => conversationService.getMyConversations(),
+    ...options,
+  });
+};
+
+export const useConversationDetails = (id, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.conversations.detail(id),
+    queryFn: () => conversationService.getConversationDetails(id),
+    enabled: !!id,
+    ...options,
+  });
+};
+
+export const useConversationUnreadCount = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.conversations.unreadCount(),
+    queryFn: () => conversationService.getUnreadCount(),
+    select: data => data?.unreadCount ?? data?.unread ?? data?.count ?? 0,
+    ...options,
+  });
+};
+
+/**
+ * Messages Queries
+ */
+export const useMessages = (conversationId, params = {}, options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.messages.list(conversationId, params),
+    queryFn: () => messageService.getMessages(conversationId, params),
+    enabled: !!conversationId,
+    ...options,
+  });
+};
+
 export default {
   // Family members
   useFamilyMembers,
@@ -218,4 +259,12 @@ export default {
   // Hospitals
   useHospitals,
   useHospital,
+
+  // Conversations
+  useConversations,
+  useConversationDetails,
+  useConversationUnreadCount,
+
+  // Messages
+  useMessages,
 };

@@ -4,7 +4,7 @@
  */
 
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {familyService, bookingService, authService, inboxService, paymentService, notificationPreferenceService} from './services';
+import {familyService, bookingService, authService, inboxService, paymentService, notificationPreferenceService, conversationService, messageService} from './services';
 import {queryKeys} from './queryKeys';
 
 /**
@@ -249,6 +249,61 @@ export const useUpdateProfile = () => {
   });
 };
 
+/**
+ * Conversations Mutations
+ */
+export const useCreateConversation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({subject, message}) =>
+      conversationService.createConversation({subject, message}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});
+    },
+  });
+};
+
+/**
+ * Messages Mutations
+ */
+export const useSendMessage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({conversation_id, message, message_type = 'text'}) =>
+      messageService.sendMessage({conversation_id, message, message_type}),
+    onSuccess: (data, variables) => {
+      // Invalidate messages list for this conversation
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.messages.list(variables.conversation_id),
+      });
+      // Invalidate conversations list to update last message
+      queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});
+    },
+  });
+};
+
+export const useMarkMessagesAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: conversationId => messageService.markAsRead(conversationId),
+    onSuccess: (data, variables) => {
+      // Invalidate messages list for this conversation
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.messages.list(variables),
+      });
+      // Invalidate conversations list to update unread status
+      queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});
+      // Invalidate unread count
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.conversations.unreadCount(),
+      });
+    },
+  });
+};
+
 export default {
   // Family members
   useAddFamilyMember,
@@ -274,4 +329,11 @@ export default {
   useLogin,
   useRegister,
   useUpdateProfile,
+
+  // Conversations
+  useCreateConversation,
+
+  // Messages
+  useSendMessage,
+  useMarkMessagesAsRead,
 };

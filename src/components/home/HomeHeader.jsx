@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
-import {useInbox, useInboxUnreadCount} from '../../api/queries';
+import {useInbox, useInboxUnreadCount, useConversationUnreadCount} from '../../api/queries';
 
 const INK = '#0B3F3C';
 const MUTED = '#8A9A97';
@@ -18,7 +18,9 @@ const HomeHeader = ({navigation}) => {
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
+  const {data: conversationUnreadCount} = useConversationUnreadCount();
   const unread = inboxData?.meta?.unread ?? unreadCount ?? 0;
+  const conversationUnread = conversationUnreadCount ?? 0;
   const greeting = getGreeting();
   const displayName =
     user?.name || user?.full_name || user?.first_name || 'there';
@@ -48,13 +50,25 @@ const HomeHeader = ({navigation}) => {
         </View>
       </View>
 
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={styles.notificationButton}
-        onPress={() => navigation?.navigate('Inbox')}>
-        <Icon name="notifications-outline" size={22} color={INK} />
-        {Number(unread) > 0 ? <View style={styles.notificationDot} /> : null}
-      </TouchableOpacity>
+      <View style={styles.headerRight}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.iconButton}
+          onPress={() => navigation?.navigate('ConversationList')}>
+          <Icon name="chatbubbles-outline" size={22} color={INK} />
+          {Number(conversationUnread) > 0 ? (
+            <View style={styles.notificationDot} />
+          ) : null}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.iconButton}
+          onPress={() => navigation?.navigate('Inbox')}>
+          <Icon name="notifications-outline" size={22} color={INK} />
+          {Number(unread) > 0 ? <View style={styles.notificationDot} /> : null}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -112,13 +126,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 1,
   },
-  notificationButton: {
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: '#F0F3F2',
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 8,
   },
   notificationDot: {
     position: 'absolute',
