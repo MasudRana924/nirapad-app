@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 const nurses = [
   {
@@ -59,16 +60,16 @@ const nurses = [
   },
 ];
 
-const filters = [
-  'Available',
-  'Top Rated',
-  'Female',
-  'Nearby',
-  'Budget',
-];
-
 const SelectNurseScreen = ({navigation}) => {
-  const [selectedFilter, setSelectedFilter] = useState('Available');
+  const {t} = useTranslation();
+  const filters = [
+    t('available', 'Available'),
+    t('topRated', 'Top Rated'),
+    t('female', 'Female'),
+    t('nearby', 'Nearby'),
+    t('budget', 'Budget'),
+  ];
+  const [selectedFilter, setSelectedFilter] = useState(t('available', 'Available'));
   const [search, setSearch] = useState('');
 
   const filteredNurses = nurses.filter(item =>
@@ -89,7 +90,7 @@ const SelectNurseScreen = ({navigation}) => {
           <Icon name="arrow-back" size={27} color="#182331" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Select Nurse</Text>
+        <Text style={styles.headerTitle}>{t('selectNurse')}</Text>
       </View>
 
       <ScrollView
@@ -105,7 +106,7 @@ const SelectNurseScreen = ({navigation}) => {
             <TextInput
               value={search}
               onChangeText={setSearch}
-              placeholder="Search nurses..."
+              placeholder={t('searchNurses', 'Search nurses...')}
               placeholderTextColor="#7D8BA5"
               style={styles.searchInput}
             />
@@ -142,12 +143,12 @@ const SelectNurseScreen = ({navigation}) => {
         {/* ================= RESULT HEADER ================= */}
 
         <View style={styles.resultHeader}>
-          <Text style={styles.availableText}>18 nurses available</Text>
+          <Text style={styles.availableText}>18 {t('available', 'nurses available')}</Text>
 
           <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
             <Icon name="swap-vertical" size={19} color="#1473DC" />
 
-            <Text style={styles.sortText}>Sort</Text>
+            <Text style={styles.sortText}>{t('sort', 'Sort')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -207,7 +208,7 @@ const SelectNurseScreen = ({navigation}) => {
                   </View>
 
                   <View style={styles.availableBadge}>
-                    <Text style={styles.availableBadgeText}>Available</Text>
+                    <Text style={styles.availableBadgeText}>{t('available', 'Available')}</Text>
                   </View>
                 </View>
 
@@ -227,7 +228,7 @@ const SelectNurseScreen = ({navigation}) => {
               <View style={styles.priceContainer}>
                 <Text style={styles.price}>{nurse.price}</Text>
 
-                <Text style={styles.visit}>/visit</Text>
+                <Text style={styles.visit}>{t('perDay', '/visit')}</Text>
               </View>
             </TouchableOpacity>
           ))}

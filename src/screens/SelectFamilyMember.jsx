@@ -14,8 +14,10 @@ import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import FamilySkeleton from '../components/home/FamilySkeleton';
 import {storage} from '../utils/storage';
+import {useTranslation} from 'react-i18next';
 
 const SelectFamilyMember = ({navigation, route}) => {
+  const {t} = useTranslation();
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
   const {selectedCaregiver} = route.params || {};
   const {data: familyMembersData, isLoading} = useFamilyMembers();
@@ -67,7 +69,7 @@ const SelectFamilyMember = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Select Family Member" onBack={() => navigation?.goBack()} />
+      <Header title={t('selectFamilyMember', 'Select Family Member')} onBack={() => navigation?.goBack()} />
 
       {/* ================= FAMILY LIST ================= */}
       <ScrollView
@@ -75,23 +77,23 @@ const SelectFamilyMember = ({navigation, route}) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
           <View>
-            <Text style={styles.sectionTitle}>Who needs assistance?</Text>
+            <Text style={styles.sectionTitle}>{t('selectFamilyMemberDesc', 'Who needs assistance?')}</Text>
           </View>
         {isLoading ? (
           <FamilySkeleton />
         ) : familyMembers.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon name="people-outline" size={64} color="#E3E8F0" />
-            <Text style={styles.emptyTitle}>No Family Members</Text>
+            <Text style={styles.emptyTitle}>{t('noFamilyMembers', 'No Family Members')}</Text>
             <Text style={styles.emptyText}>
-              Add your family members to get started
+              {t('addFamilyMembersDesc', 'Add your family members to get started')}
             </Text>
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.addButton}
               onPress={handleAddMember}>
               <Icon name="add" size={20} color="#FFFFFF" />
-              <Text style={styles.addButtonText}>Add Family Member</Text>
+              <Text style={styles.addButtonText}>{t('addFamilyMember', 'Add Family Member')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -145,7 +147,7 @@ const SelectFamilyMember = ({navigation, route}) => {
       {/* ================= NEXT BUTTON ================= */}
       <View style={styles.bottomContainer}>
         <PrimaryButton
-          title="Next"
+          title={t('next', 'Next')}
           onPress={handleNext}
           disabled={!selectedMember}
         />

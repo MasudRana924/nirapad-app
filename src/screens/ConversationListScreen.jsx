@@ -1,4 +1,5 @@
 import React, {useCallback, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -42,6 +43,8 @@ const ConversationListScreen = ({navigation}) => {
       setRefreshing(false);
     }
   }, [refetch]);
+
+  const {t} = useTranslation();
 
   const handleCreateConversation = async () => {
     if (!newMessage.trim()) {
@@ -92,7 +95,7 @@ const ConversationListScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header
-        title="Messages"
+        title={t('conversations')}
         showBack={true}
       />
 
@@ -129,7 +132,7 @@ const ConversationListScreen = ({navigation}) => {
             <View style={styles.emptyIcon}>
               <Icon name="chatbubbles-outline" size={32} color="#008178" />
             </View>
-            <Text style={styles.emptyTitle}>No conversations yet</Text>
+            <Text style={styles.emptyTitle}>{t('noConversations')}</Text>
             <Text style={styles.emptyText}>
               Start a conversation to get help and support
             </Text>

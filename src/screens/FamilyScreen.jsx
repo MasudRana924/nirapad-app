@@ -1,4 +1,5 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ import FamilySkeleton from '../components/home/FamilySkeleton';
 import Header from '../components/common/Header';
 
 const FamilyScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const [toast, setToast] = React.useState({visible: false, message: '', type: 'success'});
 
   // React Query hooks
@@ -50,7 +52,7 @@ const FamilyScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header
-        title="Family"
+        title={t('family')}
         onBack={() => navigation?.goBack()}
         rightComponent={
           <TouchableOpacity
@@ -58,7 +60,7 @@ const FamilyScreen = ({navigation}) => {
             style={styles.addButton}
             onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}>
             <Icon name="add" size={20} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Add</Text>
+            <Text style={styles.addButtonText}>{t('add')}</Text>
           </TouchableOpacity>
         }
       />
@@ -73,9 +75,9 @@ const FamilyScreen = ({navigation}) => {
         ) : familyMembers.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon name="people-outline" size={64} color="#E3E8F0" />
-            <Text style={styles.emptyTitle}>No Family Members</Text>
+            <Text style={styles.emptyTitle}>{t('noFamilyMembers')}</Text>
             <Text style={styles.emptyText}>
-              Add your family members to get started
+              {t('addFamilyToGetStarted')}
             </Text>
           </View>
         ) : (

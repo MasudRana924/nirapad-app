@@ -8,6 +8,7 @@ import {useNotificationPreferences} from '../api/queries';
 import {useUpdateNotificationPreferences} from '../api/mutations';
 import {useAppModal} from '../contexts/ModalContext';
 import {getApiErrorMessage} from '../api/client';
+import {useTranslation} from 'react-i18next';
 
 const isMutedPrefs = prefs =>
   prefs?.muted === true ||
@@ -31,6 +32,7 @@ const withMute = (prefs, muted) => {
 };
 
 const NotificationSettingsScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const {showModal} = useAppModal();
   const {data, isLoading, refetch} = useNotificationPreferences();
   const updatePrefs = useUpdateNotificationPreferences();
@@ -50,7 +52,7 @@ const NotificationSettingsScreen = ({navigation}) => {
       showModal({
         type: 'error',
         title: 'Error',
-        message: getApiErrorMessage(error, 'Failed to update notifications'),
+        message: getApiErrorMessage(error, t('failedToUpdateNotifications')),
       });
     } finally {
       setSaving(false);
@@ -60,16 +62,16 @@ const NotificationSettingsScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={isLoading || saving} />
-      <Header title="Notifications" onBack={() => navigation?.goBack()} />
+      <Header title={t('notificationSettings')} onBack={() => navigation?.goBack()} />
 
       <View style={styles.card}>
         <View style={styles.iconWrap}>
           <Icon name="notifications-off-outline" size={20} color="#008178" />
         </View>
         <View style={styles.textBlock}>
-          <Text style={styles.title}>Mute notifications</Text>
+          <Text style={styles.title}>{t('muteNotifications')}</Text>
           <Text style={styles.subtitle}>
-            Pause booking and service alerts on this account
+            {t('muteNotificationsDesc')}
           </Text>
         </View>
         <Switch
@@ -84,7 +86,7 @@ const NotificationSettingsScreen = ({navigation}) => {
         activeOpacity={0.8}
         style={styles.refresh}
         onPress={() => refetch()}>
-        <Text style={styles.refreshText}>Refresh preferences</Text>
+        <Text style={styles.refreshText}>{t('refreshPreferences')}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

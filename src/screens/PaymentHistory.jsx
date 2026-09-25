@@ -9,8 +9,10 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
+import {useTranslation} from 'react-i18next';
 
 const PaymentHistory = ({navigation}) => {
+  const {t} = useTranslation();
   // Sample payment history data - replace with actual API call
   const payments = [
     {
@@ -78,7 +80,7 @@ const PaymentHistory = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Payment History" showBack={true} />
+      <Header title={t('paymentHistory')} showBack={true} />
 
       <ScrollView
         style={styles.scrollView}
@@ -89,9 +91,9 @@ const PaymentHistory = ({navigation}) => {
             <View style={styles.emptyIcon}>
               <Icon name="card-outline" size={32} color="#008178" />
             </View>
-            <Text style={styles.emptyTitle}>No payment history</Text>
+            <Text style={styles.emptyTitle}>{t('noPayments')}</Text>
             <Text style={styles.emptyText}>
-              Your payment history will show up here
+              {t('noPaymentsDesc', 'Your payment history will show up here')}
             </Text>
           </View>
         ) : (
@@ -121,8 +123,7 @@ const PaymentHistory = ({navigation}) => {
                       styles.statusText,
                       {color: getStatusColor(payment.status)},
                     ]}>
-                    {payment.status.charAt(0).toUpperCase() +
-                      payment.status.slice(1)}
+                    {payment.status === 'completed' ? t('paid') : t('unpaid')}
                   </Text>
                 </View>
               </View>
@@ -136,8 +137,7 @@ const PaymentHistory = ({navigation}) => {
                       color="#008178"
                     />
                     <Text style={styles.methodText}>
-                      {payment.method.charAt(0).toUpperCase() +
-                        payment.method.slice(1)}
+                      {payment.method}
                     </Text>
                   </View>
                   <Text style={styles.amount}>{formatAmount(payment.amount)}</Text>

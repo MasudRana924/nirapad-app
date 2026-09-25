@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -56,6 +57,8 @@ const HospitalSelection = ({navigation, route}) => {
     ? hospitalsData.data
     : [];
 
+  const {t} = useTranslation();
+
   const handleSelectHospital = (hospital) => {
     setSelectedHospital(hospital);
     storage.saveSelectedHospital(hospital);
@@ -80,7 +83,7 @@ const HospitalSelection = ({navigation, route}) => {
             onPress={() => navigation?.goBack()}>
             <Icon name="arrow-back" size={22} color={INK} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Select Hospital</Text>
+          <Text style={styles.headerTitle}>{t('selectHospital')}</Text>
           <View style={styles.headerSpacer} />
         </View>
         <Text style={styles.headerSubtitle}>
@@ -120,7 +123,7 @@ const HospitalSelection = ({navigation, route}) => {
           ) : hospitals.length === 0 ? (
             <View style={styles.emptyState}>
               <Icon name="medkit-outline" size={64} color="#E3E8F0" />
-              <Text style={styles.emptyTitle}>No Hospitals Found</Text>
+              <Text style={styles.emptyTitle}>{t('noHospitalsFound')}</Text>
               <Text style={styles.emptyText}>Try adjusting your filters</Text>
             </View>
           ) : (

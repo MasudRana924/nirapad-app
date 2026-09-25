@@ -8,8 +8,10 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 const PaymentCancelledScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const {bookingId} = route.params || {};
 
   const handleGoBack = () => {
@@ -32,10 +34,9 @@ const PaymentCancelledScreen = ({navigation, route}) => {
             </View>
           </View>
 
-          <Text style={styles.title}>Payment Cancelled</Text>
+          <Text style={styles.title}>{t('paymentCancelled')}</Text>
           <Text style={styles.subtitle}>
-            Your payment was not completed. You can try again from the booking
-            details page.
+            {t('paymentCancelledDesc')}
           </Text>
         </View>
 
@@ -45,7 +46,7 @@ const PaymentCancelledScreen = ({navigation, route}) => {
             style={styles.goBackButton}
             onPress={handleGoBack}>
             {/* <Icon name="arrow-back-outline" size={20} color="#FFFFFF" /> */}
-            <Text style={styles.goBackText}>Go Back</Text>
+            <Text style={styles.goBackText}>{t('goHome')}</Text>
           </TouchableOpacity>
         </View>
       </View>

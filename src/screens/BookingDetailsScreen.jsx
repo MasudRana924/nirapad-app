@@ -25,6 +25,7 @@ import CancelBookingSheet from '../components/common/CancelBookingSheet';
 import DisputeSheet from '../components/common/DisputeSheet';
 import LiveTrackingMapSection from '../components/booking/LiveTrackingMapSection';
 import {useAppModal} from '../contexts/ModalContext';
+import {useTranslation} from 'react-i18next';
 import {
   getStatusMeta,
   isSearchingStatus,
@@ -46,6 +47,7 @@ const shouldShowStarModal = booking => {
 };
 
 const BookingDetailsScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const {bookingId, notificationOpenedAt} = route.params || {};
   const [countdownTick, setCountdownTick] = useState(0);
   const cancelBooking = useCancelBooking();
@@ -277,7 +279,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
+        <Header title={t('bookingDetails', 'Booking details')} onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
         <BookingDetailsSkeleton />
       </SafeAreaView>
     );
@@ -286,14 +288,14 @@ const BookingDetailsScreen = ({navigation, route}) => {
   if (!booking) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Booking details" onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
+        <Header title={t('bookingDetails', 'Booking details')} onBack={() => navigation.navigate('Main', {screen: 'Bookings'})} />
         <View style={styles.errorContainer}>
           <View style={styles.errorIcon}>
             <Icon name="alert-circle-outline" size={32} color="#008178" />
           </View>
-          <Text style={styles.errorTitle}>Booking not found</Text>
+          <Text style={styles.errorTitle}>{t('bookingNotFound', 'Booking not found')}</Text>
           <Text style={styles.errorText}>
-            This booking may have been removed or is unavailable
+            {t('bookingNotFoundDesc', 'This booking may have been removed or is unavailable')}
           </Text>
         </View>
       </SafeAreaView>
@@ -301,19 +303,19 @@ const BookingDetailsScreen = ({navigation, route}) => {
   }
 
   const infoRows = [
-    {label: 'Booking number', value: booking.booking_number},
-    {label: 'Date', value: formatDate(booking.booking_date)},
+    {label: t('bookingNumber', 'Booking number'), value: booking.booking_number},
+    {label: t('date', 'Date'), value: formatDate(booking.booking_date)},
     {
-      label: 'Time',
+      label: t('time', 'Time'),
       value: `${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`,
     },
-    {label: 'Duration', value: `${booking.duration_hours} hours`},
+    {label: t('duration', 'Duration'), value: `${booking.duration_hours} ${t('hours', 'hours')}`},
     {
-      label: 'Service',
+      label: t('service', 'Service'),
       value: (booking.service_type || '').replace(/_/g, ' '),
     },
     {
-      label: 'Payment',
+      label: t('payment', 'Payment'),
       value: (booking.payment_status || '').replace(/_/g, ' '),
     },
   ];
@@ -361,7 +363,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
           <View style={styles.searchingBanner}>
             <Icon name="search-outline" size={18} color="#D97706" />
             <Text style={styles.searchingText}>
-              Finding another caregiver…
+              {t('findingCaregiver', 'Finding another caregiver…')}
             </Text>
           </View>
         )}
@@ -370,16 +372,16 @@ const BookingDetailsScreen = ({navigation, route}) => {
             <Icon name="time-outline" size={18} color="#7C3AED" />
             <View style={styles.waitingCopy}>
               <Text style={styles.waitingText}>
-                Waiting for caregiver to accept
+                {t('waitingForAccept', 'Waiting for caregiver to accept')}
               </Text>
               {offerCountdownLabel ? (
                 <Text style={styles.waitingSubtext}>
-                  Offer expires in {offerCountdownLabel}
+                  {t('offerExpiresIn', 'Offer expires in')} {offerCountdownLabel}
                 </Text>
               ) : booking?.accept_timeout_minutes ? (
                 <Text style={styles.waitingSubtext}>
-                  Caregiver usually responds within{' '}
-                  {booking.accept_timeout_minutes} minutes
+                  {t('caregiverRespondsWithin', 'Caregiver usually responds within')}{' '}
+                  {booking.accept_timeout_minutes} {t('minutes', 'minutes')}
                 </Text>
               ) : null}
             </View>
@@ -389,7 +391,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
         <View style={styles.heroCard}>
           <View style={styles.heroTop}>
             <View style={styles.heroLeft}>
-              <Text style={styles.heroLabel}>Total amount</Text>
+              <Text style={styles.heroLabel}>{t('totalAmount', 'Total amount')}</Text>
               <Text style={styles.heroAmount}>
                 ৳{booking.pay_amount ?? booking.total_amount}
               </Text>
@@ -423,7 +425,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
           <View style={styles.card}>
             {!!familyName && (
               <>
-                <Text style={styles.sectionTitle}>Patient</Text>
+                <Text style={styles.sectionTitle}>{t('patient', 'Patient')}</Text>
                 <View style={styles.personRow}>
                   {booking.family_member?.photo ? (
                     <Image
@@ -451,7 +453,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
             {!!caregiverName && (
               <>
                 {!!familyName && <View style={styles.sectionDivider} />}
-                <Text style={styles.sectionTitle}>Caregiver</Text>
+                <Text style={styles.sectionTitle}>{t('caregiverDetails', 'Caregiver')}</Text>
                 <View style={styles.personRow}>
                   {booking.caregiver?.profile_photo ? (
                     <Image
@@ -476,7 +478,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
                       )}
                       {!!booking.caregiver?.experience_years && (
                         <Text style={styles.personMeta}>
-                          {booking.caregiver.experience_years} yrs exp
+                          {booking.caregiver.experience_years} {t('yrsExp', 'yrs exp')}
                         </Text>
                       )}
                     </View>
@@ -496,7 +498,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
             {!!hospitalName && (
               <>
                 {(!!familyName || !!caregiverName) && <View style={styles.sectionDivider} />}
-                <Text style={styles.sectionTitle}>Hospital</Text>
+                <Text style={styles.sectionTitle}>{t('hospital', 'Hospital')}</Text>
                 <View style={styles.personRow}>
                   {booking.hospital?.photo ? (
                     <Image
@@ -526,7 +528,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
             {!!booking.patient_requirements && (
               <>
                 {(!!familyName || !!caregiverName || !!hospitalName) && <View style={styles.sectionDivider} />}
-                <Text style={styles.sectionTitle}>Service details</Text>
+                <Text style={styles.sectionTitle}>{t('serviceDetails', 'Service details')}</Text>
                 <Text style={styles.bodyText}>{booking.patient_requirements}</Text>
               </>
             )}
@@ -534,7 +536,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
             {!!booking.notes && (
               <>
                 {(!!familyName || !!caregiverName || !!hospitalName || !!booking.patient_requirements) && <View style={styles.sectionDivider} />}
-                <Text style={styles.sectionTitle}>Notes</Text>
+                <Text style={styles.sectionTitle}>{t('notes', 'Notes')}</Text>
                 <Text style={styles.bodyText}>{booking.notes}</Text>
               </>
             )}
@@ -543,7 +545,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
         {Array.isArray(booking.history) && booking.history.length > 0 && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>History</Text>
+            <Text style={styles.sectionTitle}>{t('history', 'History')}</Text>
             {booking.history.map((item, index) => (
               <Text key={`${item.new_status}-${index}`} style={styles.bodyText}>
                 {(item.old_status || '—').replace(/_/g, ' ')} →{' '}
@@ -556,7 +558,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
 
         {disputes.length > 0 && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Disputes</Text>
+            <Text style={styles.sectionTitle}>{t('disputes', 'Disputes')}</Text>
             {disputes.map((item, index) => (
               <Text key={item.id || index} style={styles.bodyText}>
                 {(item.status || item.reason || 'Dispute').replace(/_/g, ' ')}
@@ -575,7 +577,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
               style={[styles.actionButton, styles.cancelButton]}
               onPress={() => setCancelVisible(true)}>
               <Text style={[styles.payButtonText, styles.cancelButtonText]}>
-                Cancel
+                {t('cancelBooking', 'Cancel')}
               </Text>
             </TouchableOpacity>
           )}
@@ -584,7 +586,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
               activeOpacity={0.85}
               style={[styles.actionButton, styles.payButton]}
               onPress={handlePayNow}>
-              <Text style={styles.payButtonText}>Pay now</Text>
+              <Text style={styles.payButtonText}>{t('payNow', 'Pay now')}</Text>
             </TouchableOpacity>
           )}
           {canLeaveReview && (
@@ -595,7 +597,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
                 setReviewDismissed(false);
                 setStarModalVisible(true);
               }}>
-              <Text style={styles.payButtonText}>Rate service</Text>
+              <Text style={styles.payButtonText}>{t('leaveReview', 'Rate service')}</Text>
             </TouchableOpacity>
           )}
           {canDispute && (
@@ -603,7 +605,7 @@ const BookingDetailsScreen = ({navigation, route}) => {
               activeOpacity={0.85}
               style={[styles.actionButton, styles.disputeButton]}
               onPress={() => setDisputeVisible(true)}>
-              <Text style={styles.payButtonText}>Dispute</Text>
+              <Text style={styles.payButtonText}>{t('dispute', 'Dispute')}</Text>
             </TouchableOpacity>
           )}
         </View>

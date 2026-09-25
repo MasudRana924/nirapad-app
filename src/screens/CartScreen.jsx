@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -25,6 +26,7 @@ const MedicineThumb = ({image}) => {
 
 const CartScreen = ({navigation, route}) => {
   const {cart = {}, medicines = []} = route?.params || {};
+  const {t} = useTranslation();
   const [localCart, setLocalCart] = useState(cart);
 
   const updateQuantity = (medicineId, delta) => {
@@ -67,7 +69,7 @@ const CartScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="My cart" onBack={() => navigation?.goBack()} />
+      <Header title={t('cart')} onBack={() => navigation?.goBack()} />
 
       <ScrollView
         style={styles.scroll}
@@ -78,7 +80,7 @@ const CartScreen = ({navigation, route}) => {
             <View style={styles.emptyIcon}>
               <Icon name="cart-outline" size={32} color="#008178" />
             </View>
-            <Text style={styles.emptyTitle}>Your cart is empty</Text>
+            <Text style={styles.emptyTitle}>{t('emptyCart')}</Text>
             <Text style={styles.emptyText}>
               Add medicines to continue shopping
             </Text>
@@ -164,7 +166,7 @@ const CartScreen = ({navigation, route}) => {
       {cartItems.length > 0 && (
         <View style={styles.bottomBar}>
           <View>
-            <Text style={styles.bottomLabel}>Total</Text>
+            <Text style={styles.bottomLabel}>{t('totalCost')}</Text>
             <Text style={styles.bottomPrice}>৳{totalPrice + 50}</Text>
           </View>
           <TouchableOpacity
@@ -176,7 +178,7 @@ const CartScreen = ({navigation, route}) => {
                 medicines,
               })
             }>
-            <Text style={styles.checkoutBtnText}>Checkout</Text>
+            <Text style={styles.checkoutBtnText}>{t('checkout')}</Text>
             <Icon name="arrow-forward" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>

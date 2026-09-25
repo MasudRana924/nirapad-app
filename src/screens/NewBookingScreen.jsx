@@ -9,26 +9,27 @@ import {
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
-const services = [
+const getServices = (t) => [
   {
     id: 'hospital',
-    title: 'Hospital Visit Assistance',
-    description: 'Accompany patient to hospital, registration & billing',
+    title: t('hospitalVisitAssistance', 'Hospital Visit Assistance'),
+    description: t('hospitalVisitDesc', 'Accompany patient to hospital, registration & billing'),
     price: '৳800',
     icon: 'business',
   },
   {
     id: 'nursing',
-    title: 'Home Nursing',
-    description: 'Professional nurse visits at home',
+    title: t('homeNursing', 'Home Nursing'),
+    description: t('homeNursingDesc', 'Professional nurse visits at home'),
     price: '৳1,500',
     icon: 'fitness',
   },
   {
     id: 'elderly',
-    title: 'Elderly Companion',
-    description: 'Daily companionship and personal assistance',
+    title: t('elderlyCompanion', 'Elderly Companion'),
+    description: t('elderlyCompanionDesc', 'Daily companionship and personal assistance'),
     price: '৳700',
     icon: 'heart-outline',
   },
@@ -52,6 +53,8 @@ const patients = [
 ];
 
 const NewBookingScreen = ({navigation}) => {
+  const {t} = useTranslation();
+  const services = getServices(t);
   const insets = useSafeAreaInsets();
   const [selectedService, setSelectedService] = useState('hospital');
   const [selectedPatient, setSelectedPatient] = useState('abul');
@@ -72,7 +75,7 @@ const NewBookingScreen = ({navigation}) => {
           <Icon name="arrow-back" size={25} color="#182331" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>New Booking</Text>
+        <Text style={styles.headerTitle}>{t('newBooking', 'New Booking')}</Text>
       </View>
 
       {/* =====================================================
@@ -95,13 +98,13 @@ const NewBookingScreen = ({navigation}) => {
           ))}
         </View>
 
-        <Text style={styles.stepText}>Step 1 of 5 — Service & Patient</Text>
+        <Text style={styles.stepText}>{t('stepText', 'Step 1 of 5 — Service & Patient')}</Text>
 
         {/* =================================================
             SELECT SERVICE
         ================================================= */}
 
-        <Text style={styles.sectionTitle}>Select Service</Text>
+        <Text style={styles.sectionTitle}>{t('selectService', 'Select Service')}</Text>
 
         <View style={styles.servicesContainer}>
           {services.map(service => {
@@ -130,7 +133,7 @@ const NewBookingScreen = ({navigation}) => {
 
                   <Text style={styles.serviceDescription}>{service.description}</Text>
 
-                  <Text style={styles.servicePrice}>From {service.price}</Text>
+                  <Text style={styles.servicePrice}>{t('from', 'From')} {service.price}</Text>
                 </View>
 
                 {/* Selected */}
@@ -153,7 +156,7 @@ const NewBookingScreen = ({navigation}) => {
             SELECT PATIENT
         ================================================= */}
 
-        <Text style={[styles.sectionTitle, styles.patientTitle]}>Select Patient</Text>
+        <Text style={[styles.sectionTitle, styles.patientTitle]}>{t('selectPatient', 'Select Patient')}</Text>
 
         <View style={styles.patientContainer}>
           {patients.map(patient => {
@@ -177,7 +180,7 @@ const NewBookingScreen = ({navigation}) => {
                   <Text style={styles.patientName}>{patient.name}</Text>
 
                   <Text style={styles.patientDetails}>
-                    {patient.relation} · {patient.age} yrs
+                    {patient.relation} · {patient.age} {t('yrs', 'yrs')}
                   </Text>
                 </View>
 
@@ -204,7 +207,7 @@ const NewBookingScreen = ({navigation}) => {
               <Icon name="add" size={25} color="#7D8BA5" />
             </View>
 
-            <Text style={styles.addPatientText}>Add another family member</Text>
+            <Text style={styles.addPatientText}>{t('addAnotherFamilyMember', 'Add another family member')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -226,7 +229,7 @@ const NewBookingScreen = ({navigation}) => {
               patient: selectedPatient,
             });
           }}>
-          <Text style={styles.continueText}>Continue</Text>
+          <Text style={styles.continueText}>{t('next', 'Continue')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

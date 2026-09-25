@@ -1,4 +1,5 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -54,13 +55,14 @@ const NotificationsScreen = () => {
     },
   ];
 
+  const {t} = useTranslation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={styles.headerTitle}>{t('notificationsTitle')}</Text>
         <TouchableOpacity activeOpacity={0.7}>
           <Text style={styles.markAllRead}>Mark all read</Text>
         </TouchableOpacity>

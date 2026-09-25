@@ -11,8 +11,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {getApiErrorMessage} from '../api/client';
 import {useAppModal} from '../contexts/ModalContext';
+import {useTranslation} from 'react-i18next';
 
 const PaymentScreen = ({route, navigation}) => {
+  const {t} = useTranslation();
   const {bookingId, amount, bookingNumber} = route.params || {};
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
@@ -20,7 +22,7 @@ const PaymentScreen = ({route, navigation}) => {
 
   const handleBkashPayment = () => {
     if (!bookingId) {
-      showError('Missing booking information');
+      showError(t('missingBookingInfo', 'Missing booking information'));
       return;
     }
     setSelectedMethod('bkash');
@@ -28,7 +30,7 @@ const PaymentScreen = ({route, navigation}) => {
     try {
       navigation.navigate('BkashCheckout', {bookingId, amount});
     } catch (error) {
-      showError(getApiErrorMessage(error, 'Payment initialization failed'));
+      showError(getApiErrorMessage(error, t('paymentInitFailed', 'Payment initialization failed')));
     } finally {
       setLoading(false);
     }
@@ -42,7 +44,7 @@ const PaymentScreen = ({route, navigation}) => {
           onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="#111820" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Payment</Text>
+        <Text style={styles.headerTitle}>{t('payment')}</Text>
       </View>
 
       <ScrollView
@@ -51,16 +53,16 @@ const PaymentScreen = ({route, navigation}) => {
         showsVerticalScrollIndicator={false}>
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Booking Number</Text>
+            <Text style={styles.summaryLabel}>{t('bookingNumber', 'Booking Number')}</Text>
             <Text style={styles.summaryValue}>{bookingNumber || 'N/A'}</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Amount</Text>
+            <Text style={styles.summaryLabel}>{t('amount')}</Text>
             <Text style={styles.summaryValue}>{amount || 0} BDT</Text>
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Select Payment Method</Text>
+        <Text style={styles.sectionTitle}>{t('paymentMethod')}</Text>
 
         <TouchableOpacity
           style={[
@@ -75,7 +77,7 @@ const PaymentScreen = ({route, navigation}) => {
           <View style={styles.methodInfo}>
             <Text style={styles.methodName}>bKash</Text>
             <Text style={styles.methodDescription}>
-              Pay with your bKash account
+              {t('payWithBkash', 'Pay with your bKash account')}
             </Text>
           </View>
           <Icon name="chevron-forward" size={20} color="#8190A7" />
@@ -84,7 +86,7 @@ const PaymentScreen = ({route, navigation}) => {
         {loading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#008178" />
-            <Text style={styles.loadingText}>Processing payment...</Text>
+            <Text style={styles.loadingText}>{t('processingPayment', 'Processing payment...')}</Text>
           </View>
         )}
       </ScrollView>

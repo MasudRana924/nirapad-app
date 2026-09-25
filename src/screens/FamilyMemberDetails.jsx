@@ -12,8 +12,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
 import {useFamilyMember} from '../api/queries';
 import FamilyDetailsSkeleton from '../components/home/FamilyDetailsSkeleton';
+import {useTranslation} from 'react-i18next';
 
 const FamilyMemberDetails = ({navigation, route}) => {
+  const {t} = useTranslation();
   const {memberId} = route.params || {};
   const {data: memberData, isLoading} = useFamilyMember(memberId);
   const member = memberData?.data;
@@ -27,7 +29,7 @@ const FamilyMemberDetails = ({navigation, route}) => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Member Details" onBack={() => navigation?.goBack()} />
+        <Header title={t('familyMemberDetails', 'Member Details')} onBack={() => navigation?.goBack()} />
         <FamilyDetailsSkeleton />
       </SafeAreaView>
     );
@@ -36,9 +38,9 @@ const FamilyMemberDetails = ({navigation, route}) => {
   if (!member) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-        <Header title="Member Details" onBack={() => navigation?.goBack()} />
+        <Header title={t('familyMemberDetails', 'Member Details')} onBack={() => navigation?.goBack()} />
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Member not found</Text>
+          <Text style={styles.loadingText}>{t('memberNotFound', 'Member not found')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -47,14 +49,14 @@ const FamilyMemberDetails = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header
-        title="Member Details"
+        title={t('familyMemberDetails', 'Member Details')}
         onBack={() => navigation?.goBack()}
         rightComponent={
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleEdit}
             hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-            <Text style={styles.editButton}>Edit</Text>
+            <Text style={styles.editButton}>{t('edit', 'Edit')}</Text>
           </TouchableOpacity>
         }
       />

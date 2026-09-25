@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -57,6 +58,8 @@ const CancelBookingSheet = ({
     onClose?.();
   };
 
+  const {t} = useTranslation();
+
   return (
     <Modal
       visible={visible}
@@ -75,10 +78,10 @@ const CancelBookingSheet = ({
                 <View style={styles.handle} />
               </View>
 
-              <Text style={styles.title}>Cancel booking</Text>
+              <Text style={styles.title}>{t('cancelBookingTitle')}</Text>
               <Text style={styles.subtitle}>
                 {canCancel
-                  ? 'Review the refund policy before cancelling.'
+                  ? t('cancelBookingDesc')
                   : 'This booking can no longer be cancelled from the app.'}
               </Text>
 
@@ -141,7 +144,7 @@ const CancelBookingSheet = ({
                 {submitting ? (
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
-                  <Text style={styles.submitText}>Cancel booking</Text>
+                  <Text style={styles.submitText}>{t('yesCancelBooking')}</Text>
                 )}
               </TouchableOpacity>
 
@@ -149,7 +152,7 @@ const CancelBookingSheet = ({
                 style={styles.keepBtn}
                 onPress={handleClose}
                 activeOpacity={0.7}>
-                <Text style={styles.keepText}>Keep booking</Text>
+                <Text style={styles.keepText}>{t('keepBooking')}</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -20,6 +21,8 @@ const ReviewScreen = ({route, navigation}) => {
   const [review, setReview] = useState('');
   const [loading, setLoading] = useState(false);
   const {showError, showSuccess} = useAppModal();
+
+  const {t} = useTranslation();
 
   const handleRating = value => {
     setRating(value);
@@ -55,7 +58,7 @@ const ReviewScreen = ({route, navigation}) => {
           onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={24} color="#111820" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Write a Review</Text>
+        <Text style={styles.headerTitle}>{t('writeReview')}</Text>
       </View>
 
       <ScrollView
@@ -63,7 +66,7 @@ const ReviewScreen = ({route, navigation}) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         <View style={styles.ratingContainer}>
-          <Text style={styles.ratingTitle}>Rate your experience</Text>
+          <Text style={styles.ratingTitle}>{t('rateExperience')}</Text>
           <View style={styles.starsContainer}>
             {[1, 2, 3, 4, 5].map(star => (
               <TouchableOpacity
@@ -81,7 +84,7 @@ const ReviewScreen = ({route, navigation}) => {
         </View>
 
         <View style={styles.reviewContainer}>
-          <Text style={styles.reviewTitle}>Your review</Text>
+          <Text style={styles.reviewTitle}>{t('review')}</Text>
           <TextInput
             style={styles.reviewInput}
             placeholder="Share your experience with the caregiver..."
@@ -95,7 +98,7 @@ const ReviewScreen = ({route, navigation}) => {
         </View>
 
         <PrimaryButton
-          title="Submit Review"
+          title={t('submitReview')}
           onPress={submitReview}
           disabled={loading}
           loading={loading}

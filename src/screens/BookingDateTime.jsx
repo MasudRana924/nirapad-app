@@ -1,4 +1,5 @@
 import React, {useState, useMemo, useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -273,6 +274,8 @@ const BookingDateTime = ({navigation, route}) => {
 
   const canContinue = !!selectedDate && !!selectedTime;
 
+  const {t} = useTranslation();
+
   const handleNext = () => {
     if (!selectedDate || !selectedTime) {
       showError('Please select date and time', 'Schedule');
@@ -298,7 +301,7 @@ const BookingDateTime = ({navigation, route}) => {
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Header title="Book appointment" onBack={() => navigation?.goBack()} />
+        <Header title={t('selectDateTime')} onBack={() => navigation?.goBack()} />
 
         <ScrollView
           style={styles.scrollView}
@@ -311,7 +314,7 @@ const BookingDateTime = ({navigation, route}) => {
           </Text>
 
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Date</Text>
+            <Text style={styles.sectionTitle}>{t('startDate')}</Text>
             <MonthCalendar
               selectedDate={selectedDate}
               onSelectDate={dateObj => {
@@ -321,7 +324,7 @@ const BookingDateTime = ({navigation, route}) => {
             />
 
             <Text style={[styles.sectionTitle, styles.sectionTitleSpaced]}>
-              Start time
+              {t('startTime')}
             </Text>
             <View style={styles.timeDropdownWrap}>
               <TouchableOpacity
@@ -349,7 +352,7 @@ const BookingDateTime = ({navigation, route}) => {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.sectionTitle}>Duration</Text>
+            <Text style={styles.sectionTitle}>{t('selectDuration')}</Text>
             <View style={styles.durationRow}>
               {DURATIONS.map(hours => {
                 const selected = durationHours === hours;
@@ -367,7 +370,7 @@ const BookingDateTime = ({navigation, route}) => {
                         styles.chipText,
                         selected && styles.chipTextSelected,
                       ]}>
-                      {hours}h
+                      {hours}{t('hour')}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -389,7 +392,7 @@ const BookingDateTime = ({navigation, route}) => {
 
         <View style={styles.bottomContainer}>
           <PrimaryButton
-            title="Preview booking"
+            title={t('next')}
             onPress={handleNext}
             disabled={!canContinue}
           />

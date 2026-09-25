@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 const TEAL = '#008178';
 const INK = '#0B3F3C';
@@ -8,40 +9,42 @@ const MINT = '#E8F5F2';
 const DISABLED = '#C5CDD6';
 const DISABLED_BG = '#F5F5F5';
 
-const ACTIONS = [
-  {
-    key: 'caregiver',
-    label: 'Book Caregiver',
-    icon: 'person',
-    onPress: navigation =>
-      navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'}),
-  },
-  {
-    key: 'nurse',
-    label: 'Book Nurse',
-    icon: 'medical',
-    onPress: navigation => navigation?.navigate('SelectNurse'),
-  },
-];
-
-const DISABLED_SERVICES = [
-  {
-    key: 'physio',
-    label: 'Physiotherapy',
-    icon: 'fitness',
-  },
-  {
-    key: 'medicine',
-    label: 'Medicine',
-    icon: 'medkit',
-  },
-];
-
 const BookingButtons = ({navigation}) => {
+  const {t} = useTranslation();
+
+  const ACTIONS = [
+    {
+      key: 'caregiver',
+      label: t('bookCaregiver'),
+      icon: 'person',
+      onPress: navigation =>
+        navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'}),
+    },
+    {
+      key: 'nurse',
+      label: t('bookNurse'),
+      icon: 'medical',
+      onPress: navigation => navigation?.navigate('SelectNurse'),
+    },
+  ];
+
+  const DISABLED_SERVICES = [
+    {
+      key: 'physio',
+      label: t('physiotherapy'),
+      icon: 'fitness',
+    },
+    {
+      key: 'medicine',
+      label: t('medicine'),
+      icon: 'medkit',
+    },
+  ];
+
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Quick actions</Text>
+        <Text style={styles.sectionTitle}>{t('quickActions')}</Text>
         <Icon name="arrow-forward" size={18} color={INK} />
       </View>
 

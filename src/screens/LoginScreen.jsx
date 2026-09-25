@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
-import {Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 import CustomLoader from '../components/common/CustomLoader';
 import AuthLayout, {
   AuthField,
@@ -12,8 +13,10 @@ import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
 import {useAppModal} from '../contexts/ModalContext';
 import notificationService from '../services/notificationService';
+import LanguageSwitch from '../components/common/LanguageSwitch';
 
 const LoginScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,13 +29,13 @@ const LoginScreen = ({navigation}) => {
     if (!identifier.trim()) {
       showError(
         isPhoneLogin
-          ? 'Please enter your phone number'
-          : 'Please enter your email',
+          ? t('pleaseEnterPhone')
+          : t('pleaseEnterEmail'),
       );
       return;
     }
     if (!password.trim()) {
-      showError('Please enter your password');
+      showError(t('pleaseEnterPassword'));
       return;
     }
 
@@ -41,7 +44,7 @@ const LoginScreen = ({navigation}) => {
       const response = await loginUser(identifier.trim(), password);
       const {token, refreshToken, user} = extractAuthPayload(response);
       if (!token) {
-        showError('Login failed');
+        showError(t('loginFailed'));
         return;
       }
 
@@ -51,7 +54,7 @@ const LoginScreen = ({navigation}) => {
     } catch (err) {
       const message = getApiErrorMessage(
         err,
-        'Something went wrong. Please try again.',
+        t('somethingWentWrong'),
       );
       const needsVerify =
         err?.errors?.some?.(e =>
@@ -65,7 +68,7 @@ const LoginScreen = ({navigation}) => {
       if (err?.code === API_CODES.OTP_INVALID) {
         showError(message);
       } else if (err?.code === API_CODES.TOO_MANY_REQUESTS) {
-        showError(message || 'Too many attempts. Please wait and try again.');
+        showError(message || t('tooManyAttempts'));
       } else {
         showError(message);
       }
@@ -79,13 +82,18 @@ const LoginScreen = ({navigation}) => {
     <>
       <CustomLoader overlay visible={loading} />
       <AuthLayout
-        title="Welcome Back"
-        subtitle="Sign in to continue caring for your loved ones">
+        title={t('welcomeBack')}
+        subtitle={t('signInSubtitle')}
+        extra={
+          <View style={styles.langSwitchWrap}>
+            <LanguageSwitch />
+          </View>
+        }>
         <AuthField
           icon={isPhoneLogin ? 'call-outline' : 'mail-outline'}
           value={identifier}
           onChangeText={setIdentifier}
-          placeholder={isPhoneLogin ? 'Phone number' : 'Email address'}
+          placeholder={isPhoneLogin ? t('phoneNumber') : t('emailAddress')}
           keyboardType={isPhoneLogin ? 'phone-pad' : 'email-address'}
           autoCapitalize="none"
         />
@@ -94,7 +102,7 @@ const LoginScreen = ({navigation}) => {
           icon="lock-closed-outline"
           value={password}
           onChangeText={setPassword}
-          placeholder="Password"
+          placeholder={t('password')}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           right={
@@ -115,17 +123,17 @@ const LoginScreen = ({navigation}) => {
           activeOpacity={0.7}
           style={styles.forgotButton}
           onPress={() => navigation?.navigate('ForgotPassword')}>
-          <Text style={styles.forgotText}>Forgot password?</Text>
+          <Text style={styles.forgotText}>{t('forgotPassword')}</Text>
         </TouchableOpacity>
 
         <AuthPrimaryButton
-          title="Login"
+          title={t('login')}
           disabled={loading}
           onPress={handleLogin}
         />
         <AuthFooterLink
-          prompt="Don't have an account? "
-          actionLabel="Register"
+          prompt={t('dontHaveAccount')}
+          actionLabel={t('register')}
           onPress={() => navigation?.navigate('Register')}
         />
       </AuthLayout>
@@ -145,5 +153,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#008178',
+  },
+  langSwitchWrap: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
 });

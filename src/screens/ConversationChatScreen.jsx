@@ -1,4 +1,5 @@
 import React, {useCallback, useState, useEffect, useRef} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -148,6 +149,8 @@ const ConversationChatScreen = ({route, navigation}) => {
       }, 100);
     }
   }, [messagesLoading, messages.length]);
+
+  const {t} = useTranslation();
 
   const handleSendMessage = async () => {
     if (!messageText.trim() || isSending) {
@@ -303,7 +306,7 @@ const ConversationChatScreen = ({route, navigation}) => {
                         styles.messageTime,
                         isOwn ? styles.messageTimeOwn : styles.messageTimeOther,
                       ]}>
-                      {formatTime(message.created_at)}
+                        {formatTime(message.created_at)}
                     </Text>
                   </View>
                 </View>
@@ -315,7 +318,7 @@ const ConversationChatScreen = ({route, navigation}) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Type a message..."
+            placeholder={t('typeMessage')}
             placeholderTextColor="#8190A7"
             value={messageText}
             onChangeText={setMessageText}

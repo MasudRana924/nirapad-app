@@ -1,4 +1,5 @@
 import React, {useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -48,6 +49,8 @@ const AreaSelectScreen = ({navigation, route}) => {
 
   const thanaOptions = useMemo(() => getThanasByDistrict(district), [district]);
 
+  const {t} = useTranslation();
+
   const handleDistrictSelect = value => {
     setDistrict(value);
     setThana('');
@@ -57,7 +60,7 @@ const AreaSelectScreen = ({navigation, route}) => {
 
   const handleNext = async () => {
     if (!district || !thana) {
-      showError('Please select both district and thana', 'Select area');
+      showError('Please select both district and thana', t('selectArea'));
       return;
     }
     if (!fullAddress.trim()) {
@@ -93,7 +96,7 @@ const AreaSelectScreen = ({navigation, route}) => {
             onPress={() => navigation?.goBack()}>
             <Icon name="arrow-back" size={22} color={INK} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Select Location</Text>
+          <Text style={styles.headerTitle}>{t('selectArea')}</Text>
           <View style={styles.headerSpacer} />
         </View>
 
@@ -125,10 +128,10 @@ const AreaSelectScreen = ({navigation, route}) => {
               />
             </View>
 
-            <FieldLabel icon="home-outline" title="District" />
+            <FieldLabel icon="home-outline" title={t('district')} />
             <SearchableDropdown
               data={bangladeshDistricts}
-              placeholder="Select district"
+              placeholder={t('selectDistrict')}
               value={district}
               onSelect={handleDistrictSelect}
               icon="business-outline"
@@ -137,10 +140,10 @@ const AreaSelectScreen = ({navigation, route}) => {
 
             <View style={styles.fieldGap} />
 
-            <FieldLabel icon="location-outline" title="Thana" />
+            <FieldLabel icon="location-outline" title={t('thana')} />
             <SearchableDropdown
               data={thanaOptions}
-              placeholder={district ? 'Select thana' : 'Select district first'}
+              placeholder={district ? t('selectThana') : 'Select district first'}
               value={thana}
               onSelect={setThana}
               icon="location-outline"
@@ -179,7 +182,7 @@ const AreaSelectScreen = ({navigation, route}) => {
               {paddingBottom: Math.max(16, insets.bottom + 8)},
             ]}>
             <PrimaryButton
-              title="Next"
+              title={t('next')}
               onPress={handleNext}
               disabled={!canContinue}
             />

@@ -20,8 +20,10 @@ import {
   resolveInboxBookingId,
   openBookingDetails,
 } from '../utils/notificationHandler';
+import {useTranslation} from 'react-i18next';
 
 const InboxScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const {data: notificationsData, isLoading, refetch} = useNotifications({
     page: 1,
     limit: 20,
@@ -55,7 +57,7 @@ const InboxScreen = ({navigation}) => {
     const diffInHours = Math.floor(diffInMs / 3600000);
     const diffInDays = Math.floor(diffInMs / 86400000);
 
-    if (diffInMins < 1) return 'Just now';
+    if (diffInMins < 1) return t('justNow');
     if (diffInMins < 60) return `${diffInMins}m ago`;
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInDays < 7) return `${diffInDays}d ago`;
@@ -130,7 +132,7 @@ const InboxScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Inbox" showBack={true} />
+      <Header title={t('inbox')} showBack={true} />
 
       <ScrollView
         style={styles.scrollView}
@@ -151,9 +153,9 @@ const InboxScreen = ({navigation}) => {
             <View style={styles.emptyIcon}>
               <Icon name="notifications-outline" size={32} color="#008178" />
             </View>
-            <Text style={styles.emptyTitle}>No notifications</Text>
+            <Text style={styles.emptyTitle}>{t('noNotifications')}</Text>
             <Text style={styles.emptyText}>
-              Updates about bookings and caregivers will show up here
+              {t('notificationEmptyDesc')}
             </Text>
           </View>
         ) : (

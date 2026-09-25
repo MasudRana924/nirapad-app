@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -28,6 +29,8 @@ const DisputeSheet = ({visible, submitting = false, onSubmit, onClose}) => {
 
   const canSubmit = reason.trim().length > 0 && !submitting;
 
+  const {t} = useTranslation();
+
   return (
     <Modal
       visible={visible}
@@ -54,12 +57,12 @@ const DisputeSheet = ({visible, submitting = false, onSubmit, onClose}) => {
                   <Icon name="close" size={22} color="#8190A7" />
                 </TouchableOpacity>
 
-                <Text style={styles.title}>Open a dispute</Text>
+                <Text style={styles.title}>{t('openDispute')}</Text>
                 <Text style={styles.subtitle}>
-                  Tell us what went wrong after payment. Our team will review it.
+                  {t('disputeDesc')}
                 </Text>
 
-                <Text style={styles.label}>Reason</Text>
+                <Text style={styles.label}>{t('disputeReason')}</Text>
                 <TextInput
                   style={styles.input}
                   value={reason}
@@ -90,7 +93,7 @@ const DisputeSheet = ({visible, submitting = false, onSubmit, onClose}) => {
                   {submitting ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.submitText}>Submit dispute</Text>
+                    <Text style={styles.submitText}>{t('submitDispute')}</Text>
                   )}
                 </TouchableOpacity>
               </View>

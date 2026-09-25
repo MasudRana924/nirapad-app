@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -34,6 +35,7 @@ const PAYMENT_OPTIONS = [
 
 const CheckoutScreen = ({navigation, route}) => {
   const {cart = {}, medicines = []} = route?.params || {};
+  const {t} = useTranslation();
   const [selectedPayment, setSelectedPayment] = useState('bkash');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
@@ -76,7 +78,7 @@ const CheckoutScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="Checkout" onBack={() => navigation?.goBack()} />
+      <Header title={t('checkout')} onBack={() => navigation?.goBack()} />
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -159,7 +161,7 @@ const CheckoutScreen = ({navigation, route}) => {
             );
           })}
 
-          <Text style={styles.sectionTitle}>Order summary</Text>
+          <Text style={styles.sectionTitle}>{t('orderSummary')}</Text>
           <View style={styles.summaryCard}>
             {cartItems.map((item, index) => (
               <View
@@ -199,11 +201,11 @@ const CheckoutScreen = ({navigation, route}) => {
 
         <View style={styles.bottomBar}>
           <View>
-            <Text style={styles.bottomLabel}>Payable</Text>
+            <Text style={styles.bottomLabel}>{t('totalCost')}</Text>
             <Text style={styles.bottomPrice}>৳{total}</Text>
           </View>
           <PrimaryButton
-            title="Place order"
+            title={t('placeOrder')}
             onPress={handlePlaceOrder}
             style={styles.placeBtn}
           />

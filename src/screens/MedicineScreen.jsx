@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -116,6 +117,8 @@ const MedicineScreen = ({navigation}) => {
   const [cart, setCart] = useState({});
   const [search, setSearch] = useState('');
 
+  const {t} = useTranslation();
+
   const filteredMedicines = medicines.filter(item => {
     const matchesCategory =
       selectedCategory === 'All' || item.category === selectedCategory;
@@ -155,7 +158,7 @@ const MedicineScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Header
-        title="Medicines"
+        title={t('medicines')}
         onBack={() => navigation?.goBack()}
         rightComponent={
           <TouchableOpacity
@@ -179,7 +182,7 @@ const MedicineScreen = ({navigation}) => {
           <Icon name="search-outline" size={18} color="#8190A7" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search medicines..."
+            placeholder={t('search')}
             placeholderTextColor="#8190A7"
             value={search}
             onChangeText={setSearch}
@@ -280,7 +283,7 @@ const MedicineScreen = ({navigation}) => {
                         style={styles.addBtn}
                         onPress={() => addToCart(medicine)}>
                         <Icon name="add" size={16} color="#FFFFFF" />
-                        <Text style={styles.addBtnText}>Add</Text>
+                        <Text style={styles.addBtnText}>{t('addToCart')}</Text>
                       </TouchableOpacity>
                     )}
                   </View>

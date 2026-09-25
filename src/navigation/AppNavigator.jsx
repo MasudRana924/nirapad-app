@@ -4,6 +4,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 import {useAuth} from '../context/AuthContext';
 
@@ -53,6 +54,7 @@ const Tab = createBottomTabNavigator();
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
+  const {t} = useTranslation();
   // Manual bottom inset so tab bar sits above system nav (not under it)
   // Increased default padding for Windows device action panel
   const bottomInset = insets.bottom > 0 ? insets.bottom : 20;
@@ -85,6 +87,7 @@ function MainTabs() {
         name="Home"
         component={HomeScreen}
         options={{
+          tabBarLabel: t('tabHome'),
           tabBarIcon: ({focused, color}) => (
             <Icon
               name={focused ? 'home' : 'home-outline'}
@@ -98,6 +101,7 @@ function MainTabs() {
         name="Family"
         component={FamilyScreen}
         options={{
+          tabBarLabel: t('tabFamily'),
           tabBarIcon: ({focused, color}) => (
             <Icon
               name={focused ? 'people' : 'people-outline'}
@@ -111,6 +115,7 @@ function MainTabs() {
         name="Bookings"
         component={BookingsScreen}
         options={{
+          tabBarLabel: t('tabBookings'),
           tabBarIcon: ({focused, color}) => (
             <Icon
               name={focused ? 'calendar' : 'calendar-outline'}
@@ -124,6 +129,7 @@ function MainTabs() {
         name="Profile"
         component={ProfileScreen}
         options={{
+          tabBarLabel: t('tabProfile'),
           tabBarIcon: ({focused, color}) => (
             <Icon
               name={focused ? 'person' : 'person-outline'}

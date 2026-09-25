@@ -1,4 +1,5 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   Text,
   StyleSheet,
@@ -12,12 +13,13 @@ import {usePrivacyPolicy} from '../api/queries';
 import {getApiErrorMessage} from '../api/client';
 
 const PrivacyPolicyScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const audience = route?.params?.audience || 'USER';
   const {data, isLoading, isFetching, isError, error, refetch} =
     usePrivacyPolicy(audience);
 
   const policy = data?.data && typeof data.data === 'object' ? data.data : {};
-  const title = policy.title || 'Privacy and Policy';
+  const title = policy.title || t('privacyPolicyTitle');
   const content =
     typeof policy.content === 'string' ? policy.content.trim() : '';
   const showLoader = isLoading || (!data && isFetching);

@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -39,6 +40,8 @@ const StarReviewModal = ({
     onSubmit(rating, comment.trim());
   };
 
+  const {t} = useTranslation();
+
   return (
     <Modal
       visible={visible}
@@ -66,7 +69,7 @@ const StarReviewModal = ({
                   <Icon name="close" size={22} color="#8190A7" />
                 </TouchableOpacity>
 
-                <Text style={styles.title}>Rate Your Experience</Text>
+                <Text style={styles.title}>{t('rateExperience')}</Text>
                 <Text style={styles.subtitle}>
                   {caregiverName
                     ? `How was the service of ${caregiverName}?`
@@ -112,7 +115,7 @@ const StarReviewModal = ({
                   {submitting ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text style={styles.submitText}>Submit Rating</Text>
+                    <Text style={styles.submitText}>{t('submitRating')}</Text>
                   )}
                 </TouchableOpacity>
               </View>

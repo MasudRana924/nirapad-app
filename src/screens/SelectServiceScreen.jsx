@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {CARE_SERVICES} from '../data/careServices';
 import {storage} from '../utils/storage';
 import PrimaryButton from '../components/common/PrimaryButton';
+import {useTranslation} from 'react-i18next';
 
 const PAGE = '#FFFFFF';
 const TEAL = '#008178';
@@ -20,6 +21,7 @@ const INK = '#163532';
 const MUTED = '#6F8480';
 
 const SelectServiceScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const {selectedMember, serviceType} = route.params || {};
   const preselected =
@@ -51,7 +53,7 @@ const SelectServiceScreen = ({navigation, route}) => {
             <Icon name="arrow-back" size={22} color={INK} />
           </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            Select a care service
+            {t('selectServiceTitle', 'Select a care service')}
           </Text>
           <View style={styles.headerSpacer} />
         </View>
@@ -61,8 +63,7 @@ const SelectServiceScreen = ({navigation, route}) => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}>
           <Text style={styles.subtitle}>
-            Choose the type of care your family member needs. Prices shown are
-            starting rates.
+            {t('selectServiceDesc', 'Choose the type of care your family member needs. Prices shown are starting rates.')}
           </Text>
 
           {CARE_SERVICES.map(service => {
@@ -113,7 +114,7 @@ const SelectServiceScreen = ({navigation, route}) => {
                       <View />
                     )}
                     <View style={styles.priceBlock}>
-                      <Text style={styles.priceFrom}>From</Text>
+                      <Text style={styles.priceFrom}>{t('from', 'From')}</Text>
                       <Text style={styles.price}>
                         ৳{service.price.toLocaleString('en-BD')}/{service.priceUnit}
                       </Text>
@@ -131,7 +132,7 @@ const SelectServiceScreen = ({navigation, route}) => {
             {paddingBottom: Math.max(16, insets.bottom + 8)},
           ]}>
           <PrimaryButton
-            title="Next"
+            title={t('next', 'Next')}
             onPress={handleNext}
             disabled={!selectedService}
           />

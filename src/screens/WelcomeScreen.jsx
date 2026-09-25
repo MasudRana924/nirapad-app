@@ -14,25 +14,27 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import {requestAppPermissions} from '../utils/permissions';
 import PrimaryButton from '../components/common/PrimaryButton';
+import {useTranslation} from 'react-i18next';
 
 const WelcomeScreen = ({navigation}) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const {t} = useTranslation();
 
   const steps = [
     {
-      heading: 'Professional Care,',
-      headingBlue: 'Anytime You Need',
-      description: 'Verified caregivers, nurses, and hospital attendants — available when your family needs it most.',
+      heading: t('welcomeHeading1'),
+      headingBlue: t('welcomeHeadingBlue1'),
+      description: t('welcomeDesc1'),
     },
     {
-      heading: 'Book Nurses',
-      headingBlue: 'For Family Members',
-      description: 'Easily book professional nurses and caregivers for your loved ones with just a few taps.',
+      heading: t('welcomeHeading2'),
+      headingBlue: t('welcomeHeadingBlue2'),
+      description: t('welcomeDesc2'),
     },
     {
-      heading: 'Order Medicines',
-      headingBlue: 'At Your Doorstep',
-      description: 'Get your prescribed medicines delivered to your home quickly and safely.',
+      heading: t('welcomeHeading3'),
+      headingBlue: t('welcomeHeadingBlue3'),
+      description: t('welcomeDesc3'),
     },
   ];
 
@@ -84,7 +86,7 @@ const WelcomeScreen = ({navigation}) => {
             activeOpacity={0.7}
             style={styles.skipButtonTop}
             onPress={handleSkip}>
-            <Text style={styles.skipText}>Skip</Text>
+            <Text style={styles.skipText}>{t('skip')}</Text>
           </TouchableOpacity>
         ) : (
           <View style={styles.skipPlaceholder} />
@@ -133,14 +135,14 @@ const WelcomeScreen = ({navigation}) => {
           {/* Buttons */}
           <View style={styles.buttonSection}>
             {currentStep === 2 ? (
-              <PrimaryButton title="Get Started" onPress={handleGetStarted} />
+              <PrimaryButton title={t('getStarted')} onPress={handleGetStarted} />
             ) : (
-              <PrimaryButton title="Next" onPress={handleNext} />
+              <PrimaryButton title={t('next')} onPress={handleNext} />
             )}
 
             {currentStep === 2 && (
               <PrimaryButton
-                title="I already have an account"
+                title={t('iAlreadyHaveAccount')}
                 variant="secondary"
                 onPress={() => navigation?.navigate('Login')}
                 style={styles.secondarySpacing}
@@ -152,16 +154,16 @@ const WelcomeScreen = ({navigation}) => {
           {currentStep === 2 && (
             <View style={styles.termsContainer}>
               <Text style={styles.termsText}>
-                By continuing, you agree to our{' '}
+                {t('byContinuingYouAgree')}
                 <Text style={styles.linkText}>
-                  Terms of Service
+                  {t('termsOfService')}
                 </Text>
-                {' '}and
+                {t('and')}
               </Text>
 
               <Text style={styles.privacyText}>
                 <Text style={styles.linkText}>
-                  Privacy Policy
+                  {t('privacyPolicy')}
                 </Text>
               </Text>
             </View>

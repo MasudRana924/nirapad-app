@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 const TEAL = '#008178';
 const INK = '#0B3F3C';
@@ -11,6 +12,7 @@ const MINT = '#E8F5F2';
  * Empty active-booking state — matches home mock exactly.
  */
 const EmptyActiveBookingCard = () => {
+  const {t} = useTranslation();
   return (
     <View style={styles.card}>
       <View style={styles.iconCircle}>
@@ -23,11 +25,11 @@ const EmptyActiveBookingCard = () => {
       <View style={styles.copy}>
         <View style={styles.statusPill}>
           <View style={styles.statusDot} />
-          <Text style={styles.statusText}>No active booking</Text>
+          <Text style={styles.statusText}>{t('noActiveBooking')}</Text>
         </View>
-        <Text style={styles.title}>You don't have an active booking</Text>
+        <Text style={styles.title}>{t('youDontHaveActiveBooking')}</Text>
         <Text style={styles.subtitle}>
-          Your upcoming care bookings will appear here.
+          {t('upcomingCareBookings')}
         </Text>
       </View>
     </View>

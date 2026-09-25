@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -23,6 +24,7 @@ import {
 const OTP_LENGTH = 4;
 
 const VerifyPhoneScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const [otp, setOtp] = useState(['', '', '', '']);
   const [seconds, setSeconds] = useState(42);
   const [loading, setLoading] = useState(false);
@@ -87,15 +89,15 @@ const VerifyPhoneScreen = ({navigation, route}) => {
     try {
       const response = await resendOtp(email);
       if (!isEmailSent(response)) {
-        showError(EMAIL_NOT_SENT_MESSAGE, 'Email not sent');
+        showError(EMAIL_NOT_SENT_MESSAGE, t('emailNotSent'));
         return;
       }
       setSeconds(42);
       setDevHint(getDevOtpHint(response));
-      showSuccess('OTP has been resent to your email');
+      showSuccess(t('otpResent'));
     } catch (error) {
       showError(
-        getApiErrorMessage(error, 'Something went wrong. Please try again.'),
+        getApiErrorMessage(error, t('somethingWentWrong')),
       );
       console.error('Resend OTP error:', error);
     } finally {
@@ -114,7 +116,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
       const response = await verifyOtp(email, enteredOtp);
       const {token, refreshToken, user} = extractAuthPayload(response);
       if (!token) {
-        showError('OTP verification failed');
+        showError(t('otpVerificationFailed'));
         return;
       }
 
@@ -124,8 +126,8 @@ const VerifyPhoneScreen = ({navigation, route}) => {
     } catch (error) {
       const fallback =
         error?.code === API_CODES.OTP_INVALID
-          ? 'Invalid OTP. Please try again.'
-          : 'Something went wrong. Please try again.';
+          ? t('invalidOtp')
+          : t('somethingWentWrong');
       showError(getApiErrorMessage(error, fallback));
       console.error('❌ Verify OTP error:', error);
     } finally {
@@ -141,8 +143,8 @@ const VerifyPhoneScreen = ({navigation, route}) => {
       <AuthLayout
         showBack
         onBack={() => navigation?.goBack()}
-        title="Verify OTP"
-        subtitle="Enter the 4-digit code sent to your email"
+        title={t('verifyOtp')}
+        subtitle={t('enterOtpSubtitle')}
         extra={email ? <Text style={styles.emailText}>{email}</Text> : null}>
         <View style={styles.otpContainer}>
           {otp.map((value, index) => (
@@ -168,7 +170,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         )}
 
         <View style={styles.resendRow}>
-          <Text style={styles.resendText}>Didn't get the code? </Text>
+          <Text style={styles.resendText}>{t('didntGetCode')}</Text>
           <TouchableOpacity
             activeOpacity={0.7}
             disabled={seconds > 0 || resending}
@@ -179,16 +181,16 @@ const VerifyPhoneScreen = ({navigation, route}) => {
                 seconds > 0 && styles.resendLinkDisabled,
               ]}>
               {resending
-                ? 'Sending...'
+                ? t('sending')
                 : seconds > 0
-                  ? `Resend in 0:${String(seconds).padStart(2, '0')}`
-                  : 'Resend'}
+                  ? `${t('resendIn')} 0:${String(seconds).padStart(2, '0')}`
+                  : t('resend')}
             </Text>
           </TouchableOpacity>
         </View>
 
         <AuthPrimaryButton
-          title="Verify"
+          title={t('verify')}
           disabled={!isOtpComplete || loading}
           onPress={handleVerify}
         />

@@ -15,6 +15,7 @@ import {useSearchCaregivers} from '../api/queries';
 import CaregiverSkeleton from '../components/home/CaregiverSkeleton';
 import PrimaryButton from '../components/common/PrimaryButton';
 import {storage} from '../utils/storage';
+import {useTranslation} from 'react-i18next';
 
 const TEAL = '#008178';
 const INK = '#163532';
@@ -63,6 +64,7 @@ const formatRate = rate => {
 };
 
 const SelectCaregiverScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
@@ -80,9 +82,9 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   const selectedThana = thana || selectedArea?.thana || '';
 
   const filters = [
-    {id: 'all', label: 'All'},
-    {id: 'male', label: 'Male'},
-    {id: 'female', label: 'Female'},
+    {id: 'all', label: t('all', 'All')},
+    {id: 'male', label: t('male', 'Male')},
+    {id: 'female', label: t('female', 'Female')},
   ];
 
   const {data: caregiversData, isLoading} = useSearchCaregivers({
@@ -132,7 +134,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
             <Icon name="arrow-back" size={22} color={INK} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>Select Caregiver</Text>
+            <Text style={styles.headerTitle}>{t('selectCaregiver', 'Select Caregiver')}</Text>
 
           </View>
           <View style={styles.headerSpacer} />
@@ -147,7 +149,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
             <TextInput
               value={search}
               onChangeText={handleSearch}
-              placeholder="Search by name"
+              placeholder={t('searchByName', 'Search by name')}
               placeholderTextColor={MUTED}
               style={styles.searchInput}
             />
@@ -164,7 +166,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                 onPress={() => navigation?.goBack()}
                 hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
                 style={styles.changeRow}>
-                <Text style={styles.changeAreaText}>Change</Text>
+                <Text style={styles.changeAreaText}>{t('change', 'Change')}</Text>
                 <Icon name="chevron-forward" size={14} color={TEAL} />
               </TouchableOpacity>
             </View>
@@ -199,14 +201,14 @@ const SelectCaregiverScreen = ({navigation, route}) => {
             </ScrollView>
             <TouchableOpacity activeOpacity={0.7} style={styles.sortButton}>
               <Icon name="swap-vertical" size={16} color={TEAL} />
-              <Text style={styles.sortText}>Sort</Text>
+              <Text style={styles.sortText}>{t('sort', 'Sort')}</Text>
               <Icon name="chevron-down" size={14} color={TEAL} />
             </TouchableOpacity>
           </View>
 
           <Text style={styles.resultCount}>
-            {caregivers.length} caregiver
-            {caregivers.length === 1 ? '' : 's'} available
+            {caregivers.length} {t('caregiverProfile', 'caregiver')}
+            {caregivers.length === 1 ? '' : 's'} {t('available', 'available')}
           </Text>
 
           {isLoading ? (
@@ -216,7 +218,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
               <View style={styles.emptyIcon}>
                 <Icon name="people-outline" size={32} color={TEAL} />
               </View>
-              <Text style={styles.emptyTitle}>No caregiver found</Text>
+              <Text style={styles.emptyTitle}>{t('noCaregiversFound', 'No caregiver found')}</Text>
               <Text style={styles.emptyText}>
                 No caregivers are available in{' '}
                 {[selectedThana, selectedDistrict].filter(Boolean).join(', ') ||
@@ -227,7 +229,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                 activeOpacity={0.85}
                 style={styles.changeAreaButton}
                 onPress={() => navigation?.goBack()}>
-                <Text style={styles.changeAreaButtonText}>Change area</Text>
+                <Text style={styles.changeAreaButtonText}>{t('changeArea', 'Change area')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -267,13 +269,13 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                       <View style={styles.userInfo}>
                         <View style={styles.nameRow}>
                           <Text style={styles.name} numberOfLines={1}>
-                            {caregiver.name || 'Caregiver'}
+                            {caregiver.name || t('caregiverProfile', 'Caregiver')}
                           </Text>
                           {caregiver.is_available ? (
                             <View style={styles.availableBadge}>
                               <View style={styles.availableDot} />
                               <Text style={styles.availableBadgeText}>
-                                Available
+                                {t('available', 'Available')}
                               </Text>
                             </View>
                           ) : null}
@@ -287,7 +289,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                               ? ` (${caregiver.completed_bookings})`
                               : ' (0)'}
                             {'  ·  '}
-                            {caregiver.experience_years ?? 0} yrs exp
+                            {caregiver.experience_years ?? 0} {t('experience', 'yrs exp')}
                           </Text>
                         </View>
 
@@ -298,7 +300,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                               .filter(Boolean)
                               .join(', ') ||
                               caregiver.service_areas?.join(', ') ||
-                              'No location'}
+                              t('noLocation', 'No location')}
                           </Text>
                         </View>
                       </View>
@@ -331,10 +333,10 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                             <Icon name="cash-outline" size={16} color={TEAL} />
                           </View>
                           <View>
-                            <Text style={styles.rateLabel}>Rate</Text>
+                            <Text style={styles.rateLabel}>{t('rate', 'Rate')}</Text>
                             <Text style={styles.price}>
                               ৳{formatRate(rate)}
-                              <Text style={styles.perHour}> / hr</Text>
+                              <Text style={styles.perHour}> {t('perDay', '/ hr')}</Text>
                             </Text>
                           </View>
                         </View>
@@ -352,7 +354,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                             styles.selectPillText,
                             isSelected && styles.selectPillTextActive,
                           ]}>
-                          {isSelected ? 'Selected' : 'Select'}
+                          {isSelected ? t('selected', 'Selected') : t('select', 'Select')}
                         </Text>
                         {!isSelected ? (
                           <Icon name="arrow-forward" size={14} color="#FFFFFF" />
@@ -372,7 +374,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
             {paddingBottom: Math.max(16, insets.bottom + 8)},
           ]}>
           <PrimaryButton
-            title="Next"
+            title={t('next', 'Next')}
             onPress={handleNext}
             disabled={!selectedCaregiver}
           />

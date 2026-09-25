@@ -11,8 +11,10 @@ import {
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useCaregiver} from '../api/queries';
+import {useTranslation} from 'react-i18next';
 
 const CaregiverDetailsScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const routeCaregiver = route?.params?.caregiver || {};
   const caregiverId = routeCaregiver.id || route?.params?.caregiverId;
@@ -111,7 +113,7 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
             </Text>
 
             <Text style={styles.caregiverRole}>
-              Hospital Attendant & Caregiver
+              {t('caregiverProfile', 'Hospital Attendant & Caregiver')}
             </Text>
 
             {/* Rating */}
@@ -136,13 +138,13 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
               <View style={styles.verificationBadge}>
                 <Icon name="shield-checkmark" size={12} color="#FFFFFF" />
 
-                <Text style={styles.verificationText}>ID Verified</Text>
+                <Text style={styles.verificationText}>{t('idVerified', 'ID Verified')}</Text>
               </View>
 
               <View style={styles.verificationBadge}>
                 <Icon name="shield-checkmark" size={12} color="#FFFFFF" />
 
-                <Text style={styles.verificationText}>Background Checked</Text>
+                <Text style={styles.verificationText}>{t('bgChecked', 'Background Checked')}</Text>
               </View>
             </View>
           </View>
@@ -156,19 +158,19 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>142</Text>
 
-            <Text style={styles.statLabel}>Jobs Done</Text>
+            <Text style={styles.statLabel}>{t('jobsDone', 'Jobs Done')}</Text>
           </View>
 
           <View style={styles.statCard}>
             <Text style={styles.statNumber}>4 yrs</Text>
 
-            <Text style={styles.statLabel}>Experience</Text>
+            <Text style={styles.statLabel}>{t('experience', 'Experience')}</Text>
           </View>
 
           <View style={styles.statCard}>
             <Text style={[styles.statNumber, styles.satisfaction]}>98%</Text>
 
-            <Text style={styles.statLabel}>Satisfaction</Text>
+            <Text style={styles.statLabel}>{t('satisfaction', 'Satisfaction')}</Text>
           </View>
         </View>
 
@@ -177,7 +179,7 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
         ================================================= */}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.sectionTitle}>{t('about', 'About')}</Text>
 
           <Text style={styles.aboutText}>
             {caregiver.bio ||
@@ -190,15 +192,15 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
         ================================================= */}
 
         <View style={styles.sectionSkills}>
-          <Text style={styles.sectionTitle}>Skills</Text>
+          <Text style={styles.sectionTitle}>{t('skills', 'Skills')}</Text>
 
           <View style={styles.skillsContainer}>
-            <Skill title="Hospital Visit" />
-            <Skill title="Elderly Companion" />
-            <Skill title="Wheelchair Assist" />
-            <Skill title="Registration" />
-            <Skill title="Billing Help" />
-            <Skill title="Medicine Pickup" />
+            <Skill title={t('hospitalVisit', 'Hospital Visit')} />
+            <Skill title={t('elderlyCompanion', 'Elderly Companion')} />
+            <Skill title={t('wheelchairAssist', 'Wheelchair Assist')} />
+            <Skill title={t('registration', 'Registration')} />
+            <Skill title={t('billingHelp', 'Billing Help')} />
+            <Skill title={t('medicinePickup', 'Medicine Pickup')} />
           </View>
         </View>
 
@@ -208,17 +210,17 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
 
         <View style={styles.pricingCard}>
           <View style={styles.pricingHeader}>
-            <Text style={styles.pricingTitle}>Availability & Pricing</Text>
+            <Text style={styles.pricingTitle}>{t('availability', 'Availability & Pricing')}</Text>
 
             <View style={styles.availableToday}>
-              <Text style={styles.availableTodayText}>Available Today</Text>
+              <Text style={styles.availableTodayText}>{t('availableToday', 'Available Today')}</Text>
             </View>
           </View>
 
           <View style={styles.pricingItems}>
-            <PriceItem title="Half Day (4 hrs)" price="৳800" />
-            <PriceItem title="Full Day (8 hrs)" price="৳1,400" />
-            <PriceItem title="Overnight" price="৳2,000" />
+            <PriceItem title={t('halfDay', 'Half Day (4 hrs)')} price="৳800" />
+            <PriceItem title={t('fullDay', 'Full Day (8 hrs)')} price="৳1,400" />
+            <PriceItem title={t('overnight', 'Overnight')} price="৳2,000" />
           </View>
         </View>
 
@@ -227,7 +229,7 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
         ================================================= */}
 
         <View style={styles.reviewsSection}>
-          <Text style={styles.sectionTitle}>Reviews</Text>
+          <Text style={styles.sectionTitle}>{t('reviews', 'Reviews')}</Text>
 
           <View style={styles.reviewCard}>
             <View style={styles.reviewTop}>
@@ -271,7 +273,7 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
           onPress={() => navigation?.navigate('SelectFamilyMember', {selectedCaregiver: caregiver})}>
           <Icon name="calendar-outline" size={19} color="#FFFFFF" />
 
-          <Text style={styles.bookButtonText}>Book {caregiver.name} — {caregiver.price}/visit</Text>
+          <Text style={styles.bookButtonText}>{t('bookNow')} {caregiver.name} — {caregiver.price}{t('perDay', '/visit')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

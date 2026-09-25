@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PrimaryButton from '../common/PrimaryButton';
+import {useTranslation} from 'react-i18next';
 
 const TEAL = '#008178';
 const INK = '#0B3F3C';
@@ -18,18 +19,19 @@ const MUTED = '#6F8480';
  * Home "Your family" section — empty state matches mock; list when members exist.
  */
 const HomeFamilySection = ({navigation, members = []}) => {
+  const {t} = useTranslation();
   const hasMembers = Array.isArray(members) && members.length > 0;
 
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Your family</Text>
+        <Text style={styles.sectionTitle}>{t('yourFamily')}</Text>
         <TouchableOpacity
           activeOpacity={0.7}
           hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
           onPress={() => navigation?.navigate('Main', {screen: 'Family'})}
           style={styles.viewAllBtn}>
-          <Text style={styles.viewAllText}>View all</Text>
+          <Text style={styles.viewAllText}>{t('viewAll')}</Text>
           <Icon name="chevron-forward" size={14} color={TEAL} />
         </TouchableOpacity>
       </View>
@@ -59,10 +61,10 @@ const HomeFamilySection = ({navigation, members = []}) => {
                   </View>
                 )}
                 <Text style={styles.memberName} numberOfLines={1}>
-                  {member.name || 'Member'}
+                  {member.name || t('member')}
                 </Text>
                 <Text style={styles.memberMeta} numberOfLines={1}>
-                  {member.relationship || 'Family'}
+                  {member.relationship || t('family')}
                 </Text>
               </TouchableOpacity>
             );
@@ -72,7 +74,7 @@ const HomeFamilySection = ({navigation, members = []}) => {
             style={styles.addMini}
             onPress={() => navigation?.navigate('AddFamilyMember')}>
             <Icon name="add" size={22} color={TEAL} />
-            <Text style={styles.addMiniText}>Add</Text>
+            <Text style={styles.addMiniText}>{t('add')}</Text>
           </TouchableOpacity>
         </ScrollView>
       ) : (
@@ -83,12 +85,12 @@ const HomeFamilySection = ({navigation, members = []}) => {
               <Icon name="heart" size={12} color={TEAL} />
             </View>
           </View>
-          <Text style={styles.emptyTitle}>No family members yet</Text>
+          <Text style={styles.emptyTitle}>{t('noFamilyMembersYet')}</Text>
           <Text style={styles.emptySubtitle}>
-            Add your family members to book care for your loved ones.
+            {t('addFamilyMembersDesc')}
           </Text>
           <PrimaryButton
-            title="+ Add family member"
+            title={t('addFamilyMember')}
             variant="secondary"
             onPress={() => navigation?.navigate('AddFamilyMember')}
             style={styles.addButton}

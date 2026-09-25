@@ -13,17 +13,19 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchCaregivers} from '../api/queries';
 import Header from '../components/common/Header';
+import {useTranslation} from 'react-i18next';
 
 const AllCaregiversScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
   const [gender, setGender] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
 
   const filters = [
-    {id: 'all', label: 'All'},
-    {id: 'male', label: 'Male'},
-    {id: 'female', label: 'Female'},
+    {id: 'all', label: t('all', 'All')},
+    {id: 'male', label: t('male', 'Male')},
+    {id: 'female', label: t('female', 'Female')},
   ];
 
   const {data: caregiversData, isLoading} = useSearchCaregivers({
@@ -46,7 +48,7 @@ const AllCaregiversScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title="All Caregivers" onBack={() => navigation?.goBack()} />
+      <Header title={t('allCaregivers')} onBack={() => navigation?.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -59,7 +61,7 @@ const AllCaregiversScreen = ({navigation}) => {
             <TextInput
               value={search}
               onChangeText={handleSearch}
-              placeholder="Search by name..."
+              placeholder={t('searchByName', 'Search by name...')}
               placeholderTextColor="#7D8BA5"
               style={styles.searchInput}
             />
@@ -75,7 +77,7 @@ const AllCaregiversScreen = ({navigation}) => {
           <TextInput
             value={location}
             onChangeText={setLocation}
-            placeholder="Filter by location..."
+            placeholder={t('filter')}
             placeholderTextColor="#7D8BA5"
             style={styles.locationInput}
           />
@@ -109,13 +111,13 @@ const AllCaregiversScreen = ({navigation}) => {
         {/* ================= CAREGIVER LIST ================= */}
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading...</Text>
+            <Text style={styles.loadingText}>{t('loading', 'Loading...')}</Text>
           </View>
         ) : caregivers.length === 0 ? (
           <View style={styles.emptyState}>
             <Icon name="people-outline" size={64} color="#E3E8F0" />
-            <Text style={styles.emptyTitle}>No Caregivers Found</Text>
-            <Text style={styles.emptyText}>Try adjusting your filters</Text>
+            <Text style={styles.emptyTitle}>{t('noCaregiversFound')}</Text>
+            <Text style={styles.emptyText}>{t('tryAdjustingFilters', 'Try adjusting your filters')}</Text>
           </View>
         ) : (
           <View style={styles.caregiverList}>
@@ -141,28 +143,28 @@ const AllCaregiversScreen = ({navigation}) => {
                   <View style={styles.cardRight}>
                     <View style={styles.nameRow}>
                       <Text style={styles.caregiverName}>
-                        {caregiver.name || 'Caregiver'}
+                        {caregiver.name || t('caregiverProfile', 'Caregiver')}
                       </Text>
                       {caregiver.is_available && (
                         <View style={styles.availableBadge}>
-                          <Text style={styles.availableBadgeText}>Available</Text>
+                          <Text style={styles.availableBadgeText}>{t('available', 'Available')}</Text>
                         </View>
                       )}
                     </View>
 
                     <Text style={styles.locationText}>
-                      {caregiver.experience_years} yrs exp ·{' '}
+                      {caregiver.experience_years} {t('experience')} ·{' '}
                       {[caregiver.thana, caregiver.district]
                         .filter(Boolean)
                         .join(', ') ||
                         caregiver.service_areas?.join(', ') ||
-                        'No location'}
+                        t('noLocation', 'No location')}
                     </Text>
-                    <Text style={styles.priceText}>৳{caregiver.hourly_rate}/hr</Text>
+                    <Text style={styles.priceText}>৳{caregiver.hourly_rate}{t('perDay', '/hr')}</Text>
                   </View>
 
                   <View style={styles.ratingSection}>
-                    <Text style={styles.ratingText}>{caregiver.rating}</Text>
+                    <Text style={styles.ratingText}>{caregiver.rating || t('rating', '0.0')}</Text>
                     <Icon name="star" size={16} color="#F6A900" />
                   </View>
                 </View>

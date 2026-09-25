@@ -3,18 +3,20 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
 import {useInbox, useInboxUnreadCount, useConversations} from '../../api/queries';
+import {useTranslation} from 'react-i18next';
 
 const INK = '#0B3F3C';
 const MUTED = '#8A9A97';
 
-const getGreeting = () => {
+const getGreeting = (t) => {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return t('goodMorning');
+  if (hour < 17) return t('goodAfternoon');
+  return t('goodEvening');
 };
 
 const HomeHeader = ({navigation}) => {
+  const {t} = useTranslation();
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
@@ -25,9 +27,9 @@ const HomeHeader = ({navigation}) => {
   const conversations = Array.isArray(conversationsData?.data) ? conversationsData.data : [];
   const conversationUnread = conversations.reduce((sum, conv) => sum + (conv.user_unread_count || 0), 0);
   
-  const greeting = getGreeting();
+  const greeting = getGreeting(t);
   const displayName =
-    user?.name || user?.full_name || user?.first_name || 'there';
+    user?.name || user?.full_name || user?.first_name || t('there');
   const photo = user?.photo || user?.profile_photo || user?.avatar;
 
   return (

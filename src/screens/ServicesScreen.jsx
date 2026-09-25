@@ -9,48 +9,51 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 const ServicesScreen = () => {
+  const {t} = useTranslation();
+  
   const services = [
     {
       id: 1,
-      name: 'Home Caregiver',
-      desc: 'Daily care for elderly & patients',
+      name: t('homeCaregiver'),
+      desc: t('homeCaregiverDesc'),
       icon: 'heart-outline',
       color: '#008178',
     },
     {
       id: 2,
-      name: 'Registered Nurse',
-      desc: 'Professional nursing at home',
+      name: t('registeredNurse'),
+      desc: t('registeredNurseDesc'),
       icon: 'fitness-outline',
       color: '#16B890',
     },
     {
       id: 3,
-      name: 'Hospital Attendant',
-      desc: '24/7 hospital companionship',
+      name: t('hospitalAttendant'),
+      desc: t('hospitalAttendantDesc'),
       icon: 'business-outline',
       color: '#E67E22',
     },
     {
       id: 4,
-      name: 'Physiotherapy',
-      desc: 'Recovery & rehabilitation at home',
+      name: t('physiotherapyService'),
+      desc: t('physiotherapyDesc'),
       icon: 'pulse',
       color: '#9B59B6',
     },
     {
       id: 5,
-      name: 'Baby Care',
-      desc: 'Newborn & infant care support',
+      name: t('babyCare'),
+      desc: t('babyCareDesc'),
       icon: 'happy-outline',
       color: '#E74C3C',
     },
     {
       id: 6,
-      name: 'Medical Equipment',
-      desc: 'Rent medical devices & supplies',
+      name: t('medicalEquipment'),
+      desc: t('medicalEquipmentDesc'),
       icon: 'medkit',
       color: '#3498DB',
     },
@@ -62,7 +65,7 @@ const ServicesScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Services</Text>
+        <Text style={styles.headerTitle}>{t('services')}</Text>
       </View>
 
       <ScrollView
@@ -70,7 +73,7 @@ const ServicesScreen = () => {
         contentContainerStyle={styles.scrollContent}>
 
         <Text style={styles.subtitle}>
-          Choose from our professional care services
+          {t('chooseServices')}
         </Text>
 
         {services.map(service => (

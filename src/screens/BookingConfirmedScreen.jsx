@@ -9,8 +9,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import PrimaryButton from '../components/common/PrimaryButton';
 import {getStatusMeta} from '../utils/bookingStatus';
+import {useTranslation} from 'react-i18next';
 
 const BookingConfirmedScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const {message, status, bookingNumber} = route.params || {};
 
   const handleTrackBooking = () => {
@@ -36,7 +38,7 @@ const BookingConfirmedScreen = ({navigation, route}) => {
           <Icon name="checkmark" size={40} color="#FFFFFF" />
         </View>
 
-        <Text style={styles.title}>Booking confirmed</Text>
+        <Text style={styles.title}>{t('bookingConfirmed', 'Booking confirmed')}</Text>
         {/* <Text style={styles.subtitle}>
           {message || 'Your booking has been placed successfully.'}
         </Text> */}
@@ -44,13 +46,13 @@ const BookingConfirmedScreen = ({navigation, route}) => {
         <View style={styles.card}>
           {!!bookingNumber && (
             <>
-              <Text style={styles.metaLabel}>Booking number</Text>
+              <Text style={styles.metaLabel}>{t('bookingNumber', 'Booking number')}</Text>
               <Text style={styles.metaValue}>{bookingNumber}</Text>
               <View style={styles.divider} />
             </>
           )}
 
-          <Text style={styles.metaLabel}>Status</Text>
+          <Text style={styles.metaLabel}>{t('status', 'Status')}</Text>
           <View style={styles.statusBadge}>
             <Text style={styles.statusText}>{statusLabel}</Text>
           </View>
@@ -59,17 +61,16 @@ const BookingConfirmedScreen = ({navigation, route}) => {
         <View style={styles.noteBox}>
           <Icon name="notifications-outline" size={20} color="#008178" />
           <Text style={styles.noteText}>
-            Your selected caregiver has been notified. You will get an update
-            when they accept, or if we need to find another caregiver.
+            {t('notifiedCaregiver', 'Your selected caregiver has been notified. You will get an update when they accept, or if we need to find another caregiver.')}
           </Text>
         </View>
 
         <View style={styles.spacer} />
 
-        <PrimaryButton title="View bookings" onPress={handleTrackBooking} />
+        <PrimaryButton title={t('goToBookings', 'View bookings')} onPress={handleTrackBooking} />
 
         <PrimaryButton
-          title="Back to home"
+          title={t('goHome', 'Back to home')}
           variant="secondary"
           onPress={handleBackHome}
           style={styles.secondarySpacing}

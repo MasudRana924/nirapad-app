@@ -15,6 +15,7 @@ import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
 import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAppModal} from '../contexts/ModalContext';
+import {useTranslation} from 'react-i18next';
 
 const toStartTime = timeValue => {
   if (!timeValue) {
@@ -68,6 +69,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
     notes = '',
   } = route.params || {};
 
+  const {t} = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createBooking = useCreateBooking();
   const {showError} = useAppModal();
@@ -153,24 +155,24 @@ const BookingPreviewScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={isSubmitting} />
-      <Header title="Booking Preview" onBack={() => navigation?.goBack()} />
+      <Header title={t('bookingPreview', 'Booking Preview')} onBack={() => navigation?.goBack()} />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         <Text style={styles.hint}>
-          Review your booking details before confirming
+          {t('reviewBookingDesc', 'Review your booking details before confirming')}
         </Text>
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Icon name="person-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>Care recipient</Text>
+            <Text style={styles.cardTitle}>{t('patient', 'Care recipient')}</Text>
           </View>
-          <Row label="Name" value={selectedMember?.name} />
+          <Row label={t('name', 'Name')} value={selectedMember?.name} />
           <Row
-            label="Relation"
+            label={t('relationship', 'Relation')}
             value={selectedMember?.relationship}
             last
           />
@@ -179,23 +181,23 @@ const BookingPreviewScreen = ({navigation, route}) => {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Icon name="grid-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>Service</Text>
+            <Text style={styles.cardTitle}>{t('service', 'Service')}</Text>
           </View>
-          <Row label="Type" value={selectedService?.title} />
-          <Row label="Rate" value={selectedService?.priceLabel} last />
+          <Row label={t('type', 'Type')} value={selectedService?.title} />
+          <Row label={t('rate', 'Rate')} value={selectedService?.priceLabel} last />
         </View>
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Icon name="medkit-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>Care provider</Text>
+            <Text style={styles.cardTitle}>{t('caregiverDetails', 'Care provider')}</Text>
           </View>
-          <Row label="Name" value={selectedCaregiver?.name} />
+          <Row label={t('name', 'Name')} value={selectedCaregiver?.name} />
           <Row
-            label="Experience"
+            label={t('experience', 'Experience')}
             value={
               selectedCaregiver?.experience_years
-                ? `${selectedCaregiver.experience_years} years`
+                ? `${selectedCaregiver.experience_years} ${t('yrs', 'years')}`
                 : '—'
             }
             last
@@ -206,7 +208,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Icon name="business-outline" size={18} color="#008178" />
-              <Text style={styles.cardTitle}>Hospital</Text>
+              <Text style={styles.cardTitle}>{t('hospital', 'Hospital')}</Text>
             </View>
             <Text style={styles.locationText}>{selectedHospital.name}</Text>
           </View>
@@ -215,7 +217,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Icon name="location-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>Location</Text>
+            <Text style={styles.cardTitle}>{t('location', 'Location')}</Text>
           </View>
           <Text style={styles.locationText}>{locationText || '—'}</Text>
         </View>
@@ -223,7 +225,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Icon name="calendar-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>Schedule</Text>
+            <Text style={styles.cardTitle}>{t('schedule', 'Schedule')}</Text>
           </View>
           <Text style={styles.locationText}>{scheduleText}</Text>
         </View>
@@ -232,24 +234,24 @@ const BookingPreviewScreen = ({navigation, route}) => {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Icon name="document-text-outline" size={18} color="#008178" />
-              <Text style={styles.cardTitle}>Notes</Text>
+              <Text style={styles.cardTitle}>{t('notes', 'Notes')}</Text>
             </View>
             <Text style={styles.locationText}>{notes}</Text>
           </View>
         )}
 
         <View style={styles.pricingCard}>
-          <Text style={styles.pricingLabel}>Estimated pricing</Text>
+          <Text style={styles.pricingLabel}>{t('estimatedPricing', 'Estimated pricing')}</Text>
           <Text style={styles.pricingValue}>৳{estimatedTotal}</Text>
           <Text style={styles.pricingNote}>
-            ৳{hourlyRate}/hr × {durationHours} hours
+            ৳{hourlyRate}/{t('hr', 'hr')} × {durationHours} {t('hours', 'hours')}
           </Text>
         </View>
       </ScrollView>
 
       <View style={styles.bottomContainer}>
         <PrimaryButton
-          title="Confirm booking"
+          title={t('confirmBooking', 'Confirm booking')}
           onPress={handleConfirm}
           disabled={isSubmitting}
           loading={isSubmitting}

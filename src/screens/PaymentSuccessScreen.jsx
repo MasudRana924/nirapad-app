@@ -8,8 +8,10 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from 'react-i18next';
 
 const PaymentSuccessScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const handleGoHome = () => {
     navigation?.reset({
       index: 0,
@@ -29,10 +31,9 @@ const PaymentSuccessScreen = ({navigation}) => {
             </View>
           </View>
 
-          <Text style={styles.title}>Payment Successful!</Text>
+          <Text style={styles.title}>{t('paymentSuccess')}</Text>
           <Text style={styles.subtitle}>
-            Your payment has been processed successfully. Thank you for using
-            Nirapod.
+            {t('paymentSuccessDesc')}
           </Text>
         </View>
 
@@ -42,7 +43,7 @@ const PaymentSuccessScreen = ({navigation}) => {
             style={styles.goHomeButton}
             onPress={handleGoHome}>
             {/* <Icon name="home-outline" size={20} color="#FFFFFF" /> */}
-            <Text style={styles.goHomeText}>Go Home</Text>
+            <Text style={styles.goHomeText}>{t('goHome')}</Text>
           </TouchableOpacity>
         </View>
       </View>

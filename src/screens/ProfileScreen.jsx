@@ -8,50 +8,27 @@ import {
   Image,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../context/AuthContext';
 import {useUserProfile} from '../api/queries';
 import Toast from '../components/common/Toast';
 import {storage} from '../utils/storage';
 import {useAppModal} from '../contexts/ModalContext';
-
-const LANG_KEY = 'app_language';
+import {useTranslation} from 'react-i18next';
+import LanguageSwitch from '../components/common/LanguageSwitch';
 
 const ProfileScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const {logout} = useAuth();
   const {showConfirm} = useAppModal();
   const {data: profileData, isLoading} = useUserProfile();
-  const [language, setLanguage] = useState('en');
   const [toast, setToast] = useState({
     visible: false,
     message: '',
     type: 'success',
   });
 
-  useEffect(() => {
-    let mounted = true;
-    AsyncStorage.getItem(LANG_KEY)
-      .then(saved => {
-        if (mounted && (saved === 'en' || saved === 'bn')) {
-          setLanguage(saved);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   const user = profileData?.data || {};
-
-  const handleLanguageChange = next => {
-    if (next === language) {
-      return;
-    }
-    setLanguage(next);
-    AsyncStorage.setItem(LANG_KEY, next).catch(() => {});
-  };
 
   const handleUpdateDetails = () => {
     navigation?.navigate('EditProfile');
@@ -59,10 +36,10 @@ const ProfileScreen = ({navigation}) => {
 
   const handleLogout = () => {
     showConfirm({
-      title: 'Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
+      title: t('logout'),
+      message: t('logoutConfirm'),
+      confirmText: t('logout'),
+      cancelText: t('cancel'),
       confirmDestructive: true,
       onConfirm: async () => {
         await storage.clearBookingData();
@@ -86,35 +63,35 @@ const ProfileScreen = ({navigation}) => {
   const menuItems = [
     {
       id: 'edit',
-      name: 'Edit profile',
-      subtitle: 'Name, photo & contact',
+      name: t('editProfile'),
+      subtitle: t('namePhotoContact'),
       icon: 'person-outline',
       onPress: handleUpdateDetails,
     },
     {
       id: 'family',
-      name: 'Family members',
-      subtitle: 'Manage your family',
+      name: t('familyMembers'),
+      subtitle: t('manageYourFamily'),
       icon: 'people-outline',
       onPress: () => navigation?.navigate('Family'),
     },
     {
       id: 'bookings',
-      name: 'My bookings',
-      subtitle: 'History & upcoming',
+      name: t('myBookings'),
+      subtitle: t('historyUpcoming'),
       icon: 'calendar-outline',
       onPress: () => navigation?.navigate('Bookings'),
     },
     {
       id: 'privacy',
-      name: 'Privacy & security',
-      subtitle: 'Account protection',
+      name: t('privacySecurity'),
+      subtitle: t('accountProtection'),
       icon: 'lock-closed-outline',
     },
     {
       id: 'settings',
-      name: 'Notifications',
-      subtitle: 'Mute alerts',
+      name: t('notifications'),
+      subtitle: t('muteAlerts'),
       icon: 'notifications-outline',
       onPress: () => navigation?.navigate('NotificationSettings'),
     },
@@ -123,41 +100,8 @@ const ProfileScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My account</Text>
-
-        <View style={styles.langSwitch}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={[
-              styles.langOption,
-              language === 'en' && styles.langOptionActive,
-            ]}
-            onPress={() => handleLanguageChange('en')}>
-            <Text
-              style={[
-                styles.langText,
-                language === 'en' && styles.langTextActive,
-              ]}>
-              EN
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={[
-              styles.langOption,
-              language === 'bn' && styles.langOptionActive,
-            ]}
-            onPress={() => handleLanguageChange('bn')}>
-            <Text
-              style={[
-                styles.langText,
-                language === 'bn' && styles.langTextActive,
-              ]}>
-              বাং
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.headerTitle}>{t('myAccount')}</Text>
+        <LanguageSwitch />
       </View>
 
       <ScrollView
@@ -177,12 +121,12 @@ const ProfileScreen = ({navigation}) => {
 
           <View style={styles.profileInfo}>
             <Text style={styles.profileName} numberOfLines={1}>
-              {isLoading ? 'Loading...' : user.name || 'Your profile'}
+              {isLoading ? t('loading') : user.name || t('yourProfile')}
             </Text>
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Account</Text>
+        <Text style={styles.sectionTitle}>{t('account')}</Text>
         <View style={styles.menuContainer}>
           {menuItems.map((item, index) => (
             <TouchableOpacity
@@ -208,7 +152,7 @@ const ProfileScreen = ({navigation}) => {
         </View>
 
         <View style={styles.versionRow}>
-          <Text style={styles.versionText}>Nirapod v1.0.0</Text>
+          <Text style={styles.versionText}>{t('appVersion')}</Text>
         </View>
 
         <TouchableOpacity
@@ -216,7 +160,7 @@ const ProfileScreen = ({navigation}) => {
           style={styles.logoutButton}
           onPress={handleLogout}>
           <Icon name="log-out-outline" size={20} color="#E74C3C" />
-          <Text style={styles.logoutText}>Log out</Text>
+          <Text style={styles.logoutText}>{t('logOut')}</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -252,36 +196,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#111820',
     letterSpacing: -0.3,
-  },
-
-  langSwitch: {
-    flexDirection: 'row',
-    backgroundColor: '#F0F2F5',
-    borderRadius: 22,
-    padding: 3,
-  },
-
-  langOption: {
-    minWidth: 48,
-    height: 32,
-    paddingHorizontal: 12,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  langOptionActive: {
-    backgroundColor: '#008178',
-  },
-
-  langText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#8190A7',
-  },
-
-  langTextActive: {
-    color: '#FFFFFF',
   },
 
   scrollContent: {

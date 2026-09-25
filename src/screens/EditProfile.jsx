@@ -24,10 +24,12 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import {requestGalleryPermission} from '../utils/permissions';
 import {useAppModal} from '../contexts/ModalContext';
 import {useAuth} from '../context/AuthContext';
+import {useTranslation} from 'react-i18next';
 
 const LANG_KEY = 'app_language';
 
 const EditProfile = ({navigation}) => {
+  const {t} = useTranslation();
   const {data: profileData} = useUserProfile();
   const updateMutation = useUpdateProfile();
   const {showError} = useAppModal();
@@ -122,8 +124,8 @@ const EditProfile = ({navigation}) => {
       const granted = await requestGalleryPermission();
       if (!granted) {
         showError(
-          'Please allow photo library access to update your profile picture.',
-          'Permission Required',
+          t('pleaseAllowPhotoAccess'),
+          t('permissionRequired')
         );
         return;
       }
@@ -136,7 +138,7 @@ const EditProfile = ({navigation}) => {
 
       if (result.didCancel) return;
       if (result.errorCode) {
-        showError(result.errorMessage || 'Failed to open image picker');
+        showError(result.errorMessage || t('failedToOpenImagePicker'));
         return;
       }
 
@@ -147,7 +149,7 @@ const EditProfile = ({navigation}) => {
       }
     } catch (error) {
       console.error('Image picker error:', error);
-      showError('Failed to open image picker');
+      showError(t('failedToOpenImagePicker'));
     }
   };
 
@@ -167,11 +169,11 @@ const EditProfile = ({navigation}) => {
     } = formData;
 
     if (!name.trim()) {
-      showError('Please enter name');
+      showError(t('enterName'));
       return;
     }
     if (!email.trim()) {
-      showError('Please enter email');
+      showError(t('enterEmail'));
       return;
     }
 
@@ -210,12 +212,12 @@ const EditProfile = ({navigation}) => {
         updateUser(response.data);
       }
 
-      showToast('Profile updated successfully');
+      showToast(t('profileUpdated'));
       navigation?.goBack();
     } catch (error) {
       console.error('Failed to update profile:', error);
       showToast(
-        getApiErrorMessage(error, 'Failed to update profile'),
+        getApiErrorMessage(error, t('failedToUpdateProfile')),
         'error',
       );
     }
@@ -228,7 +230,7 @@ const EditProfile = ({navigation}) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         style={styles.flex}>
-        <Header title="Edit profile" onBack={() => navigation?.goBack()} />
+        <Header title={t('editProfile')} onBack={() => navigation?.goBack()} />
 
         <ScrollView
           style={styles.flex}
@@ -250,34 +252,34 @@ const EditProfile = ({navigation}) => {
               <Icon name="pencil" size={12} color="#FFFFFF" />
             </View>
           </TouchableOpacity>
-          <Text style={styles.photoHint}>Tap to change photo</Text>
+          <Text style={styles.photoHint}>{t('tapToChangePhoto')}</Text>
 
-          <Text style={styles.label}>Name *</Text>
+          <Text style={styles.label}>{t('nameLabel')}</Text>
           <TextInput
             style={styles.input}
             value={formData.name}
             onChangeText={text => updateField('name', text)}
-            placeholder="Enter name"
+            placeholder={t('enterName')}
             placeholderTextColor="#8190A7"
           />
 
-          <Text style={styles.label}>Email *</Text>
+          <Text style={styles.label}>{t('emailLabel')}</Text>
           <TextInput
             style={styles.input}
             value={formData.email}
             onChangeText={text => updateField('email', text)}
-            placeholder="Enter email"
+            placeholder={t('enterEmail')}
             placeholderTextColor="#8190A7"
             keyboardType="email-address"
             autoCapitalize="none"
           />
 
-          <Text style={styles.label}>Phone</Text>
+          <Text style={styles.label}>{t('phoneLabel')}</Text>
           <TextInput
             style={styles.input}
             value={formData.phone}
             onChangeText={text => updateField('phone', text)}
-            placeholder="Enter phone number"
+            placeholder={t('enterPhoneNumber')}
             placeholderTextColor="#8190A7"
             keyboardType="phone-pad"
           />
@@ -292,16 +294,16 @@ const EditProfile = ({navigation}) => {
             keyboardType="phone-pad"
           /> */}
 
-          <Text style={styles.label}>Address</Text>
+          <Text style={styles.label}>{t('addressLabel')}</Text>
           <TextInput
             style={styles.input}
             value={formData.address}
             onChangeText={text => updateField('address', text)}
-            placeholder="Enter address"
+            placeholder={t('enterAddress')}
             placeholderTextColor="#8190A7"
           />
 
-          <Text style={styles.label}>Date of birth</Text>
+          <Text style={styles.label}>{t('dateOfBirthLabel')}</Text>
           <TextInput
             style={styles.input}
             value={formData.date_of_birth}
@@ -313,7 +315,7 @@ const EditProfile = ({navigation}) => {
 
         <View style={styles.bottomContainer}>
           <PrimaryButton
-            title="Save changes"
+            title={t('saveChanges')}
             onPress={handleSaveProfile}
             disabled={updateMutation.isPending}
             loading={updateMutation.isPending}

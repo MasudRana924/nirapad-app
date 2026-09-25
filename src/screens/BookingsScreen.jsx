@@ -1,4 +1,5 @@
 import React, {useCallback, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -47,46 +48,47 @@ const isCompleted = booking => isCompletedStatus(booking?.status);
 const isPending = booking =>
   !isCompletedStatus(booking?.status) && !isCancelledStatus(booking?.status);
 
-const getStatusMetaForCard = booking => {
+const getStatusMetaForCard = (booking, t) => {
   if (isSearchingStatus(booking?.status)) {
     return {
       ...getStatusMeta(booking?.status),
-      label: 'Finding another caregiver…',
+      label: t('findingAnotherCaregiver'),
     };
   }
   return getStatusMeta(booking?.status);
 };
 
-const getServiceLabel = booking => {
+const getServiceLabel = (booking, t) => {
   const requirements = String(booking?.patient_requirements || '');
   const known = [
-    'Hospital Companion',
-    'Nurse Care',
-    'Elderly Support',
-    'Caregiver Service',
+    {name: 'Hospital Companion', key: 'hospitalCompanion'},
+    {name: 'Nurse Care', key: 'nurseCare'},
+    {name: 'Elderly Support', key: 'elderlySupport'},
+    {name: 'Caregiver Service', key: 'caregiverService'},
   ];
-  const matched = known.find(name => requirements.includes(name));
+  const matched = known.find(k => requirements.includes(k.name));
   if (matched) {
-    return matched;
+    return t(matched.key);
   }
 
   const type = String(booking?.service_type || '').toUpperCase();
   if (type.includes('HOSPITAL')) {
-    return 'Hospital Companion';
+    return t('hospitalCompanion');
   }
   if (type.includes('NURSE')) {
-    return 'Nurse Care';
+    return t('nurseCare');
   }
   if (type.includes('ELDER')) {
-    return 'Elderly Support';
+    return t('elderlySupport');
   }
   if (type) {
     return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
-  return 'Caregiver Service';
+  return t('caregiverService');
 };
 
 const BookingsScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const [filter, setFilter] = useState('all');
   const {data: bookingsData, isLoading, refetch} = useBookings({
     page: 1,
@@ -124,9 +126,9 @@ const BookingsScreen = ({navigation}) => {
         : bookings;
 
   const tabs = [
-    {id: 'all', label: 'All', count: counts.all},
-    {id: 'pending', label: 'Pending', count: counts.pending},
-    {id: 'completed', label: 'Completed', count: counts.completed},
+    {id: 'all', label: t('all'), count: counts.all},
+    {id: 'pending', label: t('pending'), count: counts.pending},
+    {id: 'completed', label: t('completed'), count: counts.completed},
   ];
 
   return (
@@ -145,7 +147,7 @@ const BookingsScreen = ({navigation}) => {
             <Icon name="arrow-back" size={22} color={INK} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>My Bookings</Text>
+            <Text style={styles.headerTitle}>{t('myBookings')}</Text>
           
           </View>
           <View style={styles.headerSpacer} />
@@ -195,16 +197,16 @@ const BookingsScreen = ({navigation}) => {
           ) : visibleBookings.length === 0 ? (
             <View style={styles.emptyState}>
               <Icon name="calendar-outline" size={64} color="#E3E8F0" />
-              <Text style={styles.emptyTitle}>No Bookings</Text>
+              <Text style={styles.emptyTitle}>{t('noBookings')}</Text>
               <Text style={styles.emptyText}>
-                You don't have any bookings yet
+                {t('youDontHaveBookings')}
               </Text>
             </View>
           ) : (
             visibleBookings.map((booking, index) => {
               const theme = CARD_THEMES[index % CARD_THEMES.length];
-              const status = getStatusMetaForCard(booking);
-              const serviceLabel = getServiceLabel(booking);
+              const status = getStatusMetaForCard(booking, t);
+              const serviceLabel = getServiceLabel(booking, t);
 
               return (
                 <TouchableOpacity

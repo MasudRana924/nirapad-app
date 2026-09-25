@@ -6,25 +6,28 @@ import {
   getStatusMeta,
   isSearchingStatus,
 } from '../../utils/bookingStatus';
+import {useTranslation} from 'react-i18next';
 
-const getServiceLabel = booking => {
+const getServiceLabel = (booking, t) => {
   const type = String(booking?.service_type || '').toUpperCase();
   if (type.includes('HOSPITAL')) {
-    return 'Hospital Assistance';
+    return t('hospitalAssistance');
   }
   if (type.includes('NURSE')) {
-    return 'Nurse Care';
+    return t('nurseCare');
   }
   if (type.includes('ELDER')) {
-    return 'Elderly Support';
+    return t('elderlySupport');
   }
   if (type) {
     return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
-  return 'Caregiver Service';
+  return t('caregiverService');
 };
 
 const ActiveBookingCard = ({navigation, booking, searching}) => {
+  const {t} = useTranslation();
+
   if (!booking) {
     return null;
   }
@@ -33,7 +36,7 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
   const liveTracking = !finding && canShowLiveTracking(booking);
   const status = getStatusMeta(booking.status);
   const caregiverName =
-    booking.caregiver_name || booking.caregiver?.name || 'Caregiver';
+    booking.caregiver_name || booking.caregiver?.name || t('caregiver');
   const hospitalName =
     booking.hospital_name || booking.hospital?.name || booking.booking_number;
 
@@ -63,12 +66,12 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
 
         <View style={styles.headerText}>
           <Text style={styles.title} numberOfLines={1}>
-            {getServiceLabel(booking)}
+            {getServiceLabel(booking, t)}
           </Text>
           <View style={styles.statusRow}>
             <View style={styles.statusDot} />
             <Text style={styles.statusText}>
-              {finding ? 'Finding another caregiver…' : status.label}
+              {finding ? t('findingAnotherCaregiver') : status.label}
             </Text>
           </View>
         </View>
@@ -79,7 +82,7 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
       <View style={styles.infoRow}>
         <Icon name="person-outline" size={15} color="#303944" />
         <Text style={styles.infoText} numberOfLines={1}>
-          {finding ? 'Assigning a caregiver' : caregiverName}
+          {finding ? t('assigningCaregiver') : caregiverName}
         </Text>
       </View>
 
@@ -95,7 +98,7 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
         style={styles.trackBtn}
         onPress={handlePress}>
         <Text style={styles.trackBtnText}>
-          {finding ? 'View status' : liveTracking ? 'Track live' : 'View details'}
+          {finding ? t('viewStatus') : liveTracking ? t('trackLive') : t('viewDetails')}
         </Text>
         <Icon name="chevron-forward" size={16} color="#008178" />
       </TouchableOpacity>

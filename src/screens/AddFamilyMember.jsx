@@ -23,25 +23,28 @@ import PrimaryButton from '../components/common/PrimaryButton';
 import {requestGalleryPermission} from '../utils/permissions';
 import FamilyDetailsSkeleton from '../components/home/FamilyDetailsSkeleton';
 import {useAppModal} from '../contexts/ModalContext';
-
-const RELATIONSHIPS = [
-  'Father',
-  'Mother',
-  'Spouse',
-  'Son',
-  'Daughter',
-  'Brother',
-  'Sister',
-  'Grandfather',
-  'Grandmother',
-  'Other',
-];
-const GENDERS = ['Male', 'Female', 'Other'];
+import {useTranslation} from 'react-i18next';
 
 const capitalize = value =>
   value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : '';
 
 const AddFamilyMember = ({navigation, route}) => {
+  const {t} = useTranslation();
+  
+  const RELATIONSHIPS = [
+    'Father',
+    'Mother',
+    'Spouse',
+    'Son',
+    'Daughter',
+    'Brother',
+    'Sister',
+    'Grandfather',
+    'Grandmother',
+    'Other',
+  ];
+  const GENDERS = ['Male', 'Female', 'Other'];
+
   const {memberId} = route.params || {};
   const isEditMode = !!memberId;
 
@@ -83,8 +86,8 @@ const AddFamilyMember = ({navigation, route}) => {
       const granted = await requestGalleryPermission();
       if (!granted) {
         showError(
-          'Please allow photo library access to add a photo.',
-          'Permission Required',
+          t('pleaseAllowPhotoAccessFamily'),
+          t('permissionRequired'),
         );
         return;
       }
@@ -117,15 +120,15 @@ const AddFamilyMember = ({navigation, route}) => {
     const {name, relationship, gender} = formData;
 
     if (!name.trim()) {
-      showError('Please enter name');
+      showError(t('pleaseEnterName'));
       return;
     }
     if (!relationship.trim()) {
-      showError('Please select relationship');
+      showError(t('pleaseSelectRelationship'));
       return;
     }
     if (!gender.trim()) {
-      showError('Please select gender');
+      showError(t('pleaseSelectGender'));
       return;
     }
 
@@ -145,10 +148,10 @@ const AddFamilyMember = ({navigation, route}) => {
 
       if (isEditMode) {
         await updateMutation.mutateAsync({id: memberId, formData: data});
-        showToast('Family member updated successfully');
+        showToast(t('familyMemberUpdated'));
       } else {
         await addMutation.mutateAsync(data);
-        showToast('Family member added successfully');
+        showToast(t('familyMemberAdded'));
       }
       navigation?.goBack();
     } catch (error) {
@@ -156,8 +159,8 @@ const AddFamilyMember = ({navigation, route}) => {
       showToast(
         error?.message ||
           (isEditMode
-            ? 'Failed to update family member'
-            : 'Failed to add family member'),
+            ? t('failedToUpdateFamilyMember')
+            : t('failedToAddFamilyMember')),
         'error',
       );
     }
@@ -169,7 +172,7 @@ const AddFamilyMember = ({navigation, route}) => {
     return (
       <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
         <Header
-          title="Edit family member"
+          title={t('editFamilyMember')}
           onBack={() => navigation?.goBack()}
         />
         <FamilyDetailsSkeleton />
@@ -184,7 +187,7 @@ const AddFamilyMember = ({navigation, route}) => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}>
         <Header
-          title={isEditMode ? 'Edit family member' : 'Add family member'}
+          title={isEditMode ? t('editFamilyMember') : t('addFamilyMemberTitle')}
           onBack={() => navigation?.goBack()}
         />
 
@@ -208,30 +211,30 @@ const AddFamilyMember = ({navigation, route}) => {
               <Icon name="pencil" size={12} color="#FFFFFF" />
             </View>
           </TouchableOpacity>
-          <Text style={styles.photoHint}>Tap to add photo</Text>
+          <Text style={styles.photoHint}>{t('tapToAddPhoto')}</Text>
 
-          <Text style={styles.label}>Name *</Text>
+          <Text style={styles.label}>{t('nameRequired')}</Text>
           <TextInput
             style={styles.input}
             value={formData.name}
             onChangeText={text => setFormData({...formData, name: text})}
-            placeholder="Enter name"
+            placeholder={t('pleaseEnterName')}
             placeholderTextColor="#8190A7"
           />
 
-          <Text style={styles.label}>Relationship *</Text>
+          <Text style={styles.label}>{t('relationshipRequired')}</Text>
           <SearchableDropdown
             data={RELATIONSHIPS}
-            placeholder="Select relationship"
+            placeholder={t('selectRelationship')}
             value={formData.relationship}
             onSelect={value => setFormData({...formData, relationship: value})}
             icon="person-outline"
           />
 
-          <Text style={styles.label}>Gender *</Text>
+          <Text style={styles.label}>{t('genderRequired')}</Text>
           <SearchableDropdown
             data={GENDERS}
-            placeholder="Select gender"
+            placeholder={t('selectGender')}
             value={formData.gender}
             onSelect={value => setFormData({...formData, gender: value})}
             icon="male-female-outline"
@@ -240,7 +243,7 @@ const AddFamilyMember = ({navigation, route}) => {
 
         <View style={styles.bottomContainer}>
           <PrimaryButton
-            title={isEditMode ? 'Update member' : 'Add member'}
+            title={isEditMode ? t('updateMember') : t('addMember')}
             onPress={handleSubmit}
             disabled={isPending}
             loading={isPending}

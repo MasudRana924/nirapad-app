@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   View,
   Text,
@@ -29,6 +30,7 @@ const AuthLayout = ({
   showBack = false,
   onBack,
 }) => {
+  const {t} = useTranslation();
   const insets = useSafeAreaInsets();
 
   return (
@@ -70,7 +72,7 @@ const AuthLayout = ({
               resizeMode="contain"
             />
             {/* <Text style={styles.brandName}>Nirapod</Text> */}
-            <Text style={styles.brandTagline}>Care for a better tomorrow</Text>
+            <Text style={styles.brandTagline}>{t('careForBetterTomorrow')}</Text>
           </View>
 
           <Text style={styles.title}>{title}</Text>
@@ -132,13 +134,16 @@ export const AuthOutlineButton = ({title, icon, onPress}) => (
   </TouchableOpacity>
 );
 
-export const AuthOrDivider = () => (
-  <View style={styles.orRow}>
-    <View style={styles.orLine} />
-    <Text style={styles.orText}>OR</Text>
-    <View style={styles.orLine} />
-  </View>
-);
+export const AuthOrDivider = () => {
+  const {t} = useTranslation();
+  return (
+    <View style={styles.orRow}>
+      <View style={styles.orLine} />
+      <Text style={styles.orText}>{t('or')}</Text>
+      <View style={styles.orLine} />
+    </View>
+  );
+};
 
 export const AuthFooterLink = ({prompt, actionLabel, onPress}) => (
   <View style={styles.footer}>

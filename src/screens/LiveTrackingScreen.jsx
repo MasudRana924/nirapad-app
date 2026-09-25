@@ -1,11 +1,13 @@
 import React, {useEffect} from 'react';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
+import {useTranslation} from 'react-i18next';
 
 /**
  * Legacy route — live map now lives on Booking Details.
  * Redirects so old deep links / stacks still work.
  */
 const LiveTrackingScreen = ({navigation, route}) => {
+  const {t} = useTranslation();
   const {bookingId} = route.params || {};
 
   useEffect(() => {

@@ -15,8 +15,10 @@ import {
   getDevOtpHint,
   isEmailSent,
 } from '../utils/otpHelpers';
+import {useTranslation} from 'react-i18next';
 
 const CreateAccountScreen = ({navigation}) => {
+  const {t} = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,19 +37,19 @@ const CreateAccountScreen = ({navigation}) => {
     const {name, email, password} = form;
 
     if (!name.trim()) {
-      showError('Please enter your name');
+      showError(t('pleaseEnterName'));
       return;
     }
     if (!email.trim()) {
-      showError('Please enter your email');
+      showError(t('pleaseEnterEmail'));
       return;
     }
     if (!password.trim()) {
-      showError('Please enter a password');
+      showError(t('pleaseEnterAPassword'));
       return;
     }
     if (!agreed) {
-      showError('Please accept the Privacy and Policy');
+      showError(t('pleaseAcceptPrivacy'));
       return;
     }
 
@@ -55,7 +57,7 @@ const CreateAccountScreen = ({navigation}) => {
     try {
       const response = await registerUser(name.trim(), email.trim(), password);
       if (!isEmailSent(response)) {
-        showError(EMAIL_NOT_SENT_MESSAGE, 'Email not sent');
+        showError(EMAIL_NOT_SENT_MESSAGE, t('emailNotSent'));
         return;
       }
       const params = {email: email.trim()};
@@ -66,7 +68,7 @@ const CreateAccountScreen = ({navigation}) => {
       navigation?.navigate('VerifyPhone', params);
     } catch (error) {
       showError(
-        getApiErrorMessage(error, 'Something went wrong. Please try again.'),
+        getApiErrorMessage(error, t('somethingWentWrong')),
       );
       console.error('Register error:', error);
     } finally {
@@ -80,11 +82,11 @@ const CreateAccountScreen = ({navigation}) => {
       <AuthLayout
         showBack
         onBack={() => navigation?.goBack()}
-        title="Create Account"
-        subtitle="Register to start caring for your family">
+        title={t('createAccount')}
+        subtitle={t('registerSubtitle')}>
         <AuthField
           icon="person-outline"
-          placeholder="Full name"
+          placeholder={t('fullName')}
           value={form.name}
           onChangeText={text => updateField('name', text)}
           autoCapitalize="words"
@@ -92,7 +94,7 @@ const CreateAccountScreen = ({navigation}) => {
 
         <AuthField
           icon="mail-outline"
-          placeholder="Email address"
+          placeholder={t('emailAddress')}
           keyboardType="email-address"
           autoCapitalize="none"
           value={form.email}
@@ -101,7 +103,7 @@ const CreateAccountScreen = ({navigation}) => {
 
         <AuthField
           icon="lock-closed-outline"
-          placeholder="Password"
+          placeholder={t('password')}
           secureTextEntry={!showPassword}
           value={form.password}
           onChangeText={text => updateField('password', text)}
@@ -127,25 +129,25 @@ const CreateAccountScreen = ({navigation}) => {
             {agreed ? <Icon name="checkmark" size={14} color="#FFFFFF" /> : null}
           </TouchableOpacity>
           <Text style={styles.termsText}>
-            I accept all{' '}
+            {t('iAcceptAll')}
             <Text
               style={styles.link}
               onPress={() => navigation?.navigate('PrivacyPolicy')}>
-              Privacy and Policy
+              {t('privacyAndPolicy')}
             </Text>
           </Text>
         </View>
 
         <AuthPrimaryButton
-          title="Create account"
+          title={t('createAccountBtn')}
           disabled={loading}
           onPress={handleRegister}
         />
 
 
         <AuthFooterLink
-          prompt="Already have an account? "
-          actionLabel="Login"
+          prompt={t('alreadyHaveAccount')}
+          actionLabel={t('login')}
           onPress={() => navigation?.navigate('Login')}
         />
       </AuthLayout>
