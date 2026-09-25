@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 import CustomLoader from '../components/common/CustomLoader';
@@ -28,9 +28,7 @@ const LoginScreen = ({navigation}) => {
   const handleLogin = async () => {
     if (!identifier.trim()) {
       showError(
-        isPhoneLogin
-          ? t('pleaseEnterPhone')
-          : t('pleaseEnterEmail'),
+        isPhoneLogin ? t('pleaseEnterPhone') : t('pleaseEnterEmail'),
       );
       return;
     }
@@ -52,10 +50,7 @@ const LoginScreen = ({navigation}) => {
       await notificationService.initialize(token);
       await notificationService.registerTokenWithServer(token);
     } catch (err) {
-      const message = getApiErrorMessage(
-        err,
-        t('somethingWentWrong'),
-      );
+      const message = getApiErrorMessage(err, t('somethingWentWrong'));
       const needsVerify =
         err?.errors?.some?.(e =>
           String(e?.message || e)
@@ -84,11 +79,7 @@ const LoginScreen = ({navigation}) => {
       <AuthLayout
         title={t('welcomeBack')}
         subtitle={t('signInSubtitle')}
-        extra={
-          <View style={styles.langSwitchWrap}>
-            <LanguageSwitch />
-          </View>
-        }>
+        langSwitch={<LanguageSwitch />}>
         <AuthField
           icon={isPhoneLogin ? 'call-outline' : 'mail-outline'}
           value={identifier}
@@ -153,10 +144,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#008178',
-  },
-  langSwitchWrap: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
   },
 });

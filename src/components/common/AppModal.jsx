@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 /**
  * Common app alert/confirm modal — bottom sheet style.
@@ -25,6 +26,7 @@ const AppModal = ({
   cancelText = 'Cancel',
   confirmDestructive = false,
 }) => {
+  const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(40)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const iconScale = useRef(new Animated.Value(0)).current;
@@ -133,7 +135,11 @@ const AppModal = ({
         <Animated.View
           style={[
             styles.sheetWrap,
-            {transform: [{translateY: slideAnim}], opacity: fadeAnim},
+            {
+              transform: [{translateY: slideAnim}],
+              opacity: fadeAnim,
+              marginBottom: Math.max(15, insets.bottom + 12),
+            },
           ]}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
@@ -164,7 +170,6 @@ const styles = StyleSheet.create({
   sheetWrap: {
     marginLeft: 15,
     marginRight: 15,
-    marginBottom: 15,
   },
   card: {
     width: '100%',

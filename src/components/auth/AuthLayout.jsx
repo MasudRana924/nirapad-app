@@ -27,6 +27,7 @@ const AuthLayout = ({
   title,
   subtitle,
   extra,
+  langSwitch,
   showBack = false,
   onBack,
 }) => {
@@ -40,6 +41,15 @@ const AuthLayout = ({
       <View pointerEvents="none" style={styles.blobTopSoft} />
       <View pointerEvents="none" style={styles.blobBottomLeft} />
       <View pointerEvents="none" style={styles.blobBottomRight} />
+
+      {/* Language switch pinned to top-right, below status bar / notch */}
+      {langSwitch ? (
+        <View
+          style={[styles.langSwitchOverlay, {top: insets.top + 10}]}
+          pointerEvents="box-none">
+          {langSwitch}
+        </View>
+      ) : null}
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -161,6 +171,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: PAGE,
     overflow: 'hidden',
+  },
+  langSwitchOverlay: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 10,
   },
   flex: {
     flex: 1,
