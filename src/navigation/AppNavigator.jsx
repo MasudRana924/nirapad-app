@@ -55,25 +55,26 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
-  // Manual bottom inset so tab bar sits above system nav (not under it)
-  // Increased default padding for Windows device action panel
-  const bottomInset = insets.bottom > 0 ? insets.bottom : 20;
+
+  // insets.bottom = real system navigation bar height reported by the OS
+  // after WindowCompat.setDecorFitsSystemWindows(window, false) in MainActivity.kt.
+  // Fallback 16 covers older Android devices where inset hasn't loaded yet.
+  const safeBottom = insets.bottom > 0 ? insets.bottom : 16;
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-        // Enable auto inset for proper device action panel handling
         tabBarStyle: {
-          height: 56 + bottomInset,
-          paddingBottom: bottomInset,
-          paddingTop: 8,
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E3E8F0',
           elevation: 0,
           shadowOpacity: 0,
+          paddingTop: 8,
+          paddingBottom: safeBottom,
+          height: 56 + safeBottom,
         },
         tabBarLabelStyle: {
           fontSize: 11,
