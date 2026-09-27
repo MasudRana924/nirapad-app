@@ -152,6 +152,12 @@ class NotificationService {
 
       const deviceId = await this.getOrCreateDeviceId();
 
+      console.log('📤 Token registration payload:', {
+        token: token.substring(0, 20) + '...',
+        device_id: deviceId,
+        platform: Platform.OS,
+      });
+
       const response = await apiRequest(
         '/notifications/tokens',
         'POST',
@@ -163,6 +169,8 @@ class NotificationService {
         false,
       );
 
+      console.log('📤 Token registration response:', response);
+
       const tokenId = response?.data?.id;
       await AsyncStorage.setItem('tokenRegistered', 'true');
       if (tokenId) {
@@ -172,6 +180,11 @@ class NotificationService {
       return true;
     } catch (error) {
       console.error('❌ Token registration error:', error);
+      console.error('❌ Error details:', {
+        message: error?.message,
+        status: error?.status,
+        response: error?.response,
+      });
       return false;
     }
   }
@@ -232,6 +245,8 @@ class NotificationService {
         messagingInstance,
         async remoteMessage => {
           console.log('📱 Foreground message received:', remoteMessage);
+          console.log('📱 Message data:', remoteMessage?.data);
+          console.log('📱 Message notification:', remoteMessage?.notification);
           this.handleNotification(remoteMessage, navigation);
         },
       );
@@ -240,6 +255,7 @@ class NotificationService {
         messagingInstance,
         remoteMessage => {
           console.log('📱 Notification opened app:', remoteMessage);
+          console.log('📱 Opened message data:', remoteMessage?.data);
           this.navigateToScreen(remoteMessage?.data || {}, navigation);
         },
       );
@@ -248,6 +264,7 @@ class NotificationService {
         .then(remoteMessage => {
           if (remoteMessage) {
             console.log('📱 Initial notification (app killed):', remoteMessage);
+            console.log('📱 Initial message data:', remoteMessage?.data);
             this.navigateToScreen(remoteMessage?.data || {}, navigation);
           }
         })
@@ -322,11 +339,12 @@ class NotificationService {
     const bookingId = data.booking_id || data.bookingId;
     const inboxId = data.inbox_id || data.inboxId;
     const conversationId = data.conversation_id || data.conversationId;
+    const messageId = data.message_id || data.messageId;
     const type = data.type || data.action;
     
     // Handle conversation message notifications
     if (type === 'conversation_message' && conversationId) {
-      navigation.navigate('ConversationChat', {conversationId});
+      navigation.navigate('ConversationChat', {conversationId, messageId});
       return;
     }
     

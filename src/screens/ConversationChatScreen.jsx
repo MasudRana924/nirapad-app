@@ -17,25 +17,14 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../context/AuthContext';
 import {useMessages, useConversationDetails} from '../api/queries';
 import {useSendMessage, useMarkMessagesAsRead} from '../api/mutations';
-import {
-  initializeSocket,
-  disconnectSocket,
-  subscribeToConversation,
-  unsubscribeFromConversation,
-  onNewMessage,
-  onConversationStatus,
-  sendSocketMessage,
-  isSocketConnected,
-} from '../services/websocket';
 import Header from '../components/common/Header';
 
 const ConversationChatScreen = ({route, navigation}) => {
-  const {conversationId} = route.params;
+  const {conversationId, messageId} = route.params;
   const {user} = useAuth();
   const scrollViewRef = useRef(null);
 
   const [messageText, setMessageText] = useState('');
-  const [localMessages, setLocalMessages] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const hasMarkedAsRead = useRef(false);
 
@@ -52,65 +41,7 @@ const ConversationChatScreen = ({route, navigation}) => {
 
   const messages = Array.isArray(messagesData?.data)
     ? messagesData.data
-    : localMessages;
-
-  // Initialize WebSocket and join conversation
-  useEffect(() => {
-    const token = user?.token;
-    if (token) {
-      initializeSocket(token);
-    }
-
-    return () => {
-      unsubscribeFromConversation(conversationId);
-    };
-  }, [user?.token, conversationId]);
-
-  // Subscribe to conversation when socket is ready
-  useEffect(() => {
-    if (isSocketConnected() && conversationId) {
-      subscribeToConversation(conversationId).catch(err => {
-        console.error('Failed to subscribe to conversation:', err);
-      });
-    }
-  }, [conversationId]);
-
-  // Listen for new messages
-  useEffect(() => {
-    const handleNewMessage = data => {
-      const message = data.message;
-      if (data.conversation_id === conversationId && message) {
-        setLocalMessages(prev => [...prev, message]);
-        // Scroll to bottom when new message arrives
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({animated: true});
-        }, 100);
-      }
-    };
-
-    onNewMessage(handleNewMessage);
-
-    return () => {
-      // Cleanup would happen in disconnectSocket
-    };
-  }, [conversationId]);
-
-  // Listen for conversation status changes
-  useEffect(() => {
-    const handleStatusChange = data => {
-      if (data.conversation_id === conversationId) {
-        console.log('Conversation status changed:', data.status);
-        // Optionally refetch conversation details to update UI
-        refetchConversation();
-      }
-    };
-
-    onConversationStatus(handleStatusChange);
-
-    return () => {
-      // Cleanup would happen in disconnectSocket
-    };
-  }, [conversationId]);
+    : [];
 
   // Mark messages as read when screen is focused
   useFocusEffect(
@@ -138,7 +69,7 @@ const ConversationChatScreen = ({route, navigation}) => {
       return () => {
         hasMarkedAsRead.current = false;
       };
-    }, [conversationId, markAsReadMutation]),
+    }, [conversationId]),
   );
 
   // Scroll to bottom when messages load
@@ -149,6 +80,19 @@ const ConversationChatScreen = ({route, navigation}) => {
       }, 100);
     }
   }, [messagesLoading, messages.length]);
+
+  // Scroll to specific message if messageId provided from notification
+  useEffect(() => {
+    if (messageId && messages.length > 0) {
+      const messageIndex = messages.findIndex(msg => msg.id === messageId);
+      if (messageIndex !== -1) {
+        setTimeout(() => {
+          // You could implement specific message highlighting here
+          scrollViewRef.current?.scrollToEnd({animated: true});
+        }, 200);
+      }
+    }
+  }, [messageId, messages]);
 
   const {t} = useTranslation();
 
@@ -162,20 +106,14 @@ const ConversationChatScreen = ({route, navigation}) => {
     setMessageText('');
 
     try {
-      // Try WebSocket first for real-time
-      if (isSocketConnected()) {
-        await sendSocketMessage(conversationId, messageToSend, 'text');
-      } else {
-        // Fallback to HTTP
-        await sendMessageMutation.mutateAsync({
-          conversation_id: conversationId,
-          message: messageToSend,
-          message_type: 'text',
-        });
-      }
+      // Send message via HTTP API
+      await sendMessageMutation.mutateAsync({
+        conversation_id: conversationId,
+        message: messageToSend,
+        message_type: 'text',
+      });
 
-      // Refresh messages after sending
-      refetchMessages();
+      // React Query will automatically refetch due to cache invalidation in mutation
     } catch (error) {
       console.error('Failed to send message:', error);
       setMessageText(messageToSend); // Restore message on error
@@ -238,7 +176,7 @@ const ConversationChatScreen = ({route, navigation}) => {
           style={styles.messagesContainer}
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}>
-          {messagesLoading && localMessages.length === 0 ? (
+          {messagesLoading ? (
             <View style={styles.skeletonContainer}>
               {[1, 2, 3, 4].map(index => {
                 const isLeft = index % 2 === 1; // Left (admin) for odd indices

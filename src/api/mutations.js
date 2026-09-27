@@ -274,9 +274,9 @@ export const useSendMessage = () => {
     mutationFn: ({conversation_id, message, message_type = 'text'}) =>
       messageService.sendMessage({conversation_id, message, message_type}),
     onSuccess: (data, variables) => {
-      // Invalidate messages list for this conversation
+      // Invalidate all messages queries for this conversation
       queryClient.invalidateQueries({
-        queryKey: queryKeys.messages.list(variables.conversation_id),
+        queryKey: ['messages', 'list', variables.conversation_id],
       });
       // Invalidate conversations list to update last message
       queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});
@@ -290,9 +290,9 @@ export const useMarkMessagesAsRead = () => {
   return useMutation({
     mutationFn: conversationId => messageService.markAsRead(conversationId),
     onSuccess: (data, variables) => {
-      // Invalidate messages list for this conversation
+      // Invalidate all messages queries for this conversation
       queryClient.invalidateQueries({
-        queryKey: queryKeys.messages.list(variables),
+        queryKey: ['messages', 'list', variables],
       });
       // Invalidate conversations list to update unread status
       queryClient.invalidateQueries({queryKey: queryKeys.conversations.all});

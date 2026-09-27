@@ -91,10 +91,18 @@ export const handleNotificationClick = (data, navigation) => {
 
   const bookingId = getBookingId(data);
   const inboxId = getInboxId(data);
+  const conversationId = data?.conversation_id || data?.conversationId;
+  const messageId = data?.message_id || data?.messageId;
   const type = getType(data);
 
   if (shouldOpenLiveTracking(data)) {
     openLiveTracking(bookingId, navigation);
+    return;
+  }
+
+  // Handle conversation message notifications
+  if (type === 'conversation_message' && conversationId) {
+    navigation.navigate('ConversationChat', {conversationId, messageId});
     return;
   }
 
