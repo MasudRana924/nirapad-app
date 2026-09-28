@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, Switch, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
-import Loader from '../components/common/Loader';
+import CustomLoader from '../components/common/CustomLoader';
 import {useNotificationPreferences} from '../api/queries';
 import {useUpdateNotificationPreferences} from '../api/mutations';
 import {useAppModal} from '../contexts/ModalContext';
@@ -61,7 +61,7 @@ const NotificationSettingsScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Loader visible={isLoading || saving} />
+      <CustomLoader overlay visible={isLoading || saving} />
       <Header title={t('notificationSettings')} onBack={() => navigation?.goBack()} />
 
       <View style={styles.card}>
@@ -74,12 +74,17 @@ const NotificationSettingsScreen = ({navigation}) => {
             {t('muteNotificationsDesc')}
           </Text>
         </View>
-        <Switch
-          value={muted}
-          onValueChange={handleToggle}
-          trackColor={{false: '#D1D5DB', true: '#7BC9C3'}}
-          thumbColor={muted ? '#008178' : '#F4F4F5'}
-        />
+
+        <View style={styles.switchWrap}>
+          <Switch
+            value={muted}
+            onValueChange={handleToggle}
+            trackColor={{false: '#D1D5DB', true: '#7BC9C3'}}
+            thumbColor={muted ? '#008178' : '#F4F4F5'}
+            ios_backgroundColor="#E5E7EB"
+            style={styles.switch}
+          />
+        </View>
       </View>
 
       <TouchableOpacity
@@ -118,6 +123,14 @@ const styles = StyleSheet.create({
   textBlock: {
     flex: 1,
     marginRight: 8,
+  },
+  switchWrap: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  switch: {
+    transform: [{scaleX: 1.05}, {scaleY: 1.05}],
   },
   title: {
     fontSize: 15,

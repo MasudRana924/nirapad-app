@@ -69,20 +69,7 @@ const ProfileScreen = ({navigation}) => {
       icon: 'person-outline',
       onPress: handleUpdateDetails,
     },
-    {
-      id: 'family',
-      name: t('familyMembers'),
-      subtitle: t('manageYourFamily'),
-      icon: 'people-outline',
-      onPress: () => navigation?.navigate('Family'),
-    },
-    {
-      id: 'bookings',
-      name: t('myBookings'),
-      subtitle: t('historyUpcoming'),
-      icon: 'calendar-outline',
-      onPress: () => navigation?.navigate('Bookings'),
-    },
+
     {
       id: 'privacy',
       name: t('privacySecurity'),
@@ -96,14 +83,14 @@ const ProfileScreen = ({navigation}) => {
       icon: 'notifications-outline',
       onPress: () => navigation?.navigate('NotificationSettings'),
     },
-    {
-      id: 'support',
-      name: t('supportChat'),
-      subtitle: t('supportChatSubtitle'),
-      icon: 'chatbubbles-outline',
-      badgeCount: supportUnread,
-      onPress: () => navigation?.navigate('SupportChat'),
-    },
+    // {
+    //   id: 'support',
+    //   name: t('supportChat'),
+    //   subtitle: t('supportChatSubtitle'),
+    //   icon: 'chatbubbles-outline',
+    //   badgeCount: supportUnread,
+    //   onPress: () => navigation?.navigate('SupportChat'),
+    // },
   ];
 
   return (

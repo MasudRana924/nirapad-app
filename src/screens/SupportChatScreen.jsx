@@ -751,10 +751,12 @@ const SupportChatScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title={t('careMateSupport')} showBack />
+      <Header title={t('NirapodSupport')} showBack />
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        enabled
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}>
         {initialLoading ? (
           <ChatSkeleton />
         ) : loadError && messages.length === 0 ? (
@@ -914,7 +916,7 @@ const SupportChatScreen = () => {
               <Icon name="close" size={26} color="#FFFFFF" />
             </TouchableOpacity>
             <Text numberOfLines={1} style={styles.viewerTitle}>
-              {viewer?.name || t('careMateSupport')}
+              {viewer?.name || t('NirapodSupport')}
             </Text>
             {viewer && isRemoteUrl(viewer.url) ? (
               <TouchableOpacity
@@ -1008,7 +1010,7 @@ export default SupportChatScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F6F8',
+    backgroundColor: '#fff',
   },
   flex: {
     flex: 1,
@@ -1046,7 +1048,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   dateChip: {
-    backgroundColor: '#E6EEF2',
+    backgroundColor: '#F4F6F8',
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -1079,7 +1081,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   bubbleOther: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F4F6F8',
     borderBottomLeftRadius: 4,
   },
   bubbleFailed: {
@@ -1199,8 +1201,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E3E8F0',
+
   },
   attachButton: {
     width: 40,
