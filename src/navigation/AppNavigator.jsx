@@ -13,10 +13,8 @@ import LoginScreen from '../screens/LoginScreen';
 import CreateAccountScreen from '../screens/CreateAccountScreen';
 import VerifyPhoneScreen from '../screens/VerifyPhoneScreen';
 import HomeScreen from '../screens/HomeScreen';
-import ServicesScreen from '../screens/ServicesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile';
-import FamilyScreen from '../screens/FamilyScreen';
 import AddFamilyMember from '../screens/AddFamilyMember';
 import FamilyMemberDetails from '../screens/FamilyMemberDetails';
 import SelectCaregiverScreen from '../screens/SelectCaregiverScreen';
@@ -34,7 +32,6 @@ import AllCaregiversScreen from '../screens/AllCaregiversScreen';
 import BookingsScreen from '../screens/BookingsScreen';
 import BookingDetailsScreen from '../screens/BookingDetailsScreen';
 import LiveTrackingScreen from '../screens/LiveTrackingScreen';
-import InboxScreen from '../screens/InboxScreen';
 import SupportChatScreen from '../screens/SupportChatScreen';
 import AreaSelectScreen from '../screens/AreaSelectScreen';
 import SelectServiceScreen from '../screens/SelectServiceScreen';
@@ -60,6 +57,20 @@ function MainTabs() {
   // Fallback 16 covers older Android devices where inset hasn't loaded yet.
   const safeBottom = insets.bottom > 0 ? insets.bottom : 16;
 
+  const renderTabIcon = (iconName, focused, color) => (
+    <View
+      style={[
+        tabStyles.iconContainer,
+        focused && tabStyles.activeIconContainer,
+      ]}>
+      <Icon
+        name={iconName}
+        size={24}
+        color={focused ? '#008178' : '#7D8BA2'}
+      />
+    </View>
+  );
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -67,48 +78,38 @@ function MainTabs() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#E3E8F0',
+          borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          paddingTop: 8,
-          paddingBottom: safeBottom,
-          height: 56 + safeBottom,
+          paddingTop: 10,
+          paddingBottom: safeBottom + 8,
+          height: 78 + safeBottom,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: '600',
-          marginTop: 2,
+          marginTop: 4,
         },
         tabBarActiveTintColor: '#008178',
         tabBarInactiveTintColor: '#7D8BA2',
+        tabBarShowLabel: true,
       }}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: t('tabHome'),
-          tabBarIcon: ({focused, color}) => (
-            <Icon
-              name={focused ? 'home' : 'home-outline'}
-              size={24}
-              color={color}
-            />
-          ),
+          tabBarIcon: ({focused, color}) =>
+            renderTabIcon(focused ? 'home' : 'home-outline', focused, color),
         }}
       />
       <Tab.Screen
         name="Family"
-        component={FamilyScreen}
+        component={ProfileScreen}
         options={{
-          tabBarLabel: t('tabFamily'),
-          tabBarIcon: ({focused, color}) => (
-            <Icon
-              name={focused ? 'people' : 'people-outline'}
-              size={24}
-              color={color}
-            />
-          ),
+          tabBarLabel: 'Family',
+          tabBarIcon: ({focused, color}) =>
+            renderTabIcon(focused ? 'people' : 'people-outline', focused, color),
         }}
       />
       <Tab.Screen
@@ -116,13 +117,12 @@ function MainTabs() {
         component={BookingsScreen}
         options={{
           tabBarLabel: t('tabBookings'),
-          tabBarIcon: ({focused, color}) => (
-            <Icon
-              name={focused ? 'calendar' : 'calendar-outline'}
-              size={24}
-              color={color}
-            />
-          ),
+          tabBarIcon: ({focused, color}) =>
+            renderTabIcon(
+              focused ? 'calendar' : 'calendar-outline',
+              focused,
+              color,
+            ),
         }}
       />
       <Tab.Screen
@@ -130,13 +130,8 @@ function MainTabs() {
         component={ProfileScreen}
         options={{
           tabBarLabel: t('tabProfile'),
-          tabBarIcon: ({focused, color}) => (
-            <Icon
-              name={focused ? 'person' : 'person-outline'}
-              size={24}
-              color={color}
-            />
-          ),
+          tabBarIcon: ({focused, color}) =>
+            renderTabIcon(focused ? 'person' : 'person-outline', focused, color),
         }}
       />
     </Tab.Navigator>
@@ -216,6 +211,22 @@ function AppNavigator() {
     </Stack.Navigator>
   );
 }
+
+const tabStyles = StyleSheet.create({
+  iconContainer: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  activeIconContainer: {
+    backgroundColor: '#DDF3F1',
+    borderColor: '#CFEAE7',
+    borderWidth: 1,
+  },
+});
 
 const loadingStyles = StyleSheet.create({
   container: {
