@@ -24,6 +24,7 @@ import StarReviewModal from '../components/common/StarReviewModal';
 import CancelBookingSheet from '../components/common/CancelBookingSheet';
 import DisputeSheet from '../components/common/DisputeSheet';
 import LiveTrackingMapSection from '../components/booking/LiveTrackingMapSection';
+import BookingHeroIllustration from '../components/booking/BookingHeroIllustration';
 import {useAppModal} from '../contexts/ModalContext';
 import {useTranslation} from 'react-i18next';
 import {
@@ -303,20 +304,36 @@ const BookingDetailsScreen = ({navigation, route}) => {
   }
 
   const infoRows = [
-    {label: t('bookingNumber', 'Booking number'), value: booking.booking_number},
-    {label: t('date', 'Date'), value: formatDate(booking.booking_date)},
+    {
+      label: t('bookingNumber', 'Booking number'),
+      value: booking.booking_number,
+      icon: 'pricetag-outline',
+    },
+    {
+      label: t('date', 'Date'),
+      value: formatDate(booking.booking_date),
+      icon: 'calendar-outline',
+    },
     {
       label: t('time', 'Time'),
       value: `${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}`,
+      icon: 'time-outline',
     },
-    {label: t('duration', 'Duration'), value: `${booking.duration_hours} ${t('hours', 'hours')}`},
+    {
+      label: t('duration', 'Duration'),
+      value: `${booking.duration_hours} ${t('hours', 'hours')}`,
+      icon: 'hourglass-outline',
+    },
     {
       label: t('service', 'Service'),
       value: (booking.service_type || '').replace(/_/g, ' '),
+      icon: 'medkit-outline',
     },
     {
       label: t('payment', 'Payment'),
       value: (booking.payment_status || '').replace(/_/g, ' '),
+      icon: 'card-outline',
+      pill: true,
     },
   ];
 
@@ -391,33 +408,46 @@ const BookingDetailsScreen = ({navigation, route}) => {
         <View style={styles.heroCard}>
           <View style={styles.heroTop}>
             <View style={styles.heroLeft}>
+              <View style={[styles.statusBadge, {backgroundColor: statusMeta.bg}]}>
+                <Icon name="checkmark-circle" size={14} color={statusMeta.color} />
+                <Text style={[styles.statusText, {color: statusMeta.color}]}>
+                  {statusMeta.label}
+                </Text>
+              </View>
               <Text style={styles.heroLabel}>{t('totalAmount', 'Total amount')}</Text>
               <Text style={styles.heroAmount}>
                 ৳{booking.pay_amount ?? booking.total_amount}
               </Text>
             </View>
-            <View style={[styles.statusBadge, {backgroundColor: statusMeta.bg}]}>
-              <Text style={[styles.statusText, {color: statusMeta.color}]}>
-                {statusMeta.label}
-              </Text>
-            </View>
+            <BookingHeroIllustration />
           </View>
 
-          <View style={styles.heroDivider} />
-
-          {infoRows.map((row, index) => (
-            <View
-              key={row.label}
-              style={[
-                styles.infoRow,
-                index === infoRows.length - 1 && styles.infoRowLast,
-              ]}>
-              <Text style={styles.infoLabel}>{row.label}</Text>
-              <Text style={styles.infoValue} numberOfLines={1}>
-                {row.value || '--'}
-              </Text>
-            </View>
-          ))}
+          <View style={styles.heroBody}>
+            {infoRows.map((row, index) => (
+              <View
+                key={row.label}
+                style={[
+                  styles.infoRow,
+                  index === infoRows.length - 1 && styles.infoRowLast,
+                ]}>
+                <View style={styles.infoLabelWrap}>
+                  <Icon name={row.icon} size={15} color="#6B7F7C" />
+                  <Text style={styles.infoLabel}>{row.label}</Text>
+                </View>
+                {row.pill && row.value ? (
+                  <View style={styles.infoValueWrap}>
+                    <View style={styles.infoPill}>
+                      <Text style={styles.infoPillText}>{row.value}</Text>
+                    </View>
+                  </View>
+                ) : (
+                  <Text style={styles.infoValue} numberOfLines={1}>
+                    {row.value || '--'}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* ── Card 2: Patient, Caregiver, Hospital, Patient Details, Notes ── */}
@@ -656,16 +686,16 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   heroCard: {
-    backgroundColor: '#F6F6F6',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 12,
+    marginBottom: 4,
   },
   heroTop: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    paddingTop: 4,
+    paddingBottom: 14,
+    // borderBottomWidth: StyleSheet.hairlineWidth,
+    // borderBottomColor: '#DCE7E4',
   },
   heroLeft: {
     flex: 1,
@@ -673,17 +703,26 @@ const styles = StyleSheet.create({
   },
   heroLabel: {
     fontSize: 11,
-    color: '#8190A7',
+    color: '#6B7F7C',
+    marginTop: 10,
     marginBottom: 2,
   },
   heroAmount: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: '700',
-    color: '#111820',
+    color: '#10302D',
+  },
+  heroBody: {
+    paddingTop: 8,
+    paddingBottom: 10,
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: 16,
   },
   statusText: {
@@ -691,49 +730,65 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'capitalize',
   },
-  heroDivider: {
-    height: 1,
-    backgroundColor: '#EAEAEA',
-    marginBottom: 8,
-  },
   infoRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 5,
+    paddingVertical: 8,
     gap: 10,
   },
   infoRowLast: {
     paddingBottom: 0,
   },
+  infoLabelWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   infoLabel: {
     fontSize: 12,
-    color: '#8190A7',
+    color: '#6B7F7C',
   },
   infoValue: {
     flex: 1,
-    textAlign: 'right',
     fontSize: 12,
-    fontWeight: '600',
-    color: '#111820',
+    fontWeight: '700',
+    color: '#10302D',
     textTransform: 'capitalize',
   },
+  infoValueWrap: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  infoPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+    backgroundColor: '#E3F4EF',
+  },
+  infoPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#008178',
+    textTransform: 'uppercase',
+  },
   card: {
-    backgroundColor: '#F6F6F6',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 12,
+    paddingVertical: 14,
+    // borderTopWidth: StyleSheet.hairlineWidth,
+    // borderTopColor: '#DCE7E4',
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#111820',
-    marginBottom: 8,
+    fontSize: 10.5,
+    fontWeight: '600',
+    color: '#6B7F7C',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: 10,
   },
   sectionDivider: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-    marginVertical: 12,
+    height: StyleSheet.hairlineWidth,
+    // backgroundColor: '#E6EEEC',
+    marginVertical: 14,
   },
   personRow: {
     flexDirection: 'row',
@@ -746,22 +801,22 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   avatarPlaceholder: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#E6F4F3',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#E6F4F1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 12,
   },
   personInfo: {
     flex: 1,
     minWidth: 0,
   },
   personName: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#111820',
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#10302D',
     marginBottom: 2,
   },
   personMeta: {
@@ -773,7 +828,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 1,
   },
   metaChip: {
     flexDirection: 'row',
@@ -819,12 +873,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   cancelButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FDEEEE',
     borderWidth: 1,
-    borderColor: '#DC2626',
+    borderColor: '#F7D4D4',
   },
   cancelButtonText: {
-    color: '#DC2626',
+    color: '#E5484D',
   },
   disputeButton: {
     backgroundColor: '#111820',
