@@ -8,6 +8,7 @@ import ActiveBookingCard from '../components/home/ActiveBookingCard';
 import EmptyActiveBookingCard from '../components/home/EmptyActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
 import HomeFamilySection from '../components/home/HomeFamilySection';
+import HomeRecentActivity from '../components/home/HomeRecentActivity';
 import HomeSkeleton from '../components/home/HomeSkeleton';
 import {
   useUserProfile,
@@ -34,6 +35,8 @@ const HomeScreen = ({navigation}) => {
 
   const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
   const activeBooking = bookings.find(item => isActiveStatus(item?.status));
+  const recentBooking =
+    bookings.find(item => item?.id !== activeBooking?.id) || activeBooking;
   const familyMembers = Array.isArray(familyData?.data) ? familyData.data : [];
   const [refreshing, setRefreshing] = useState(false);
 
@@ -102,6 +105,8 @@ const HomeScreen = ({navigation}) => {
           navigation={navigation}
           members={familyMembers}
         />
+
+        <HomeRecentActivity navigation={navigation} booking={recentBooking} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -112,10 +117,10 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 36,
+    paddingBottom: 12,
   },
 });

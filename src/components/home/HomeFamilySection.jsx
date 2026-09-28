@@ -6,21 +6,22 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import PrimaryButton from '../common/PrimaryButton';
 import {useTranslation} from 'react-i18next';
 
-const TEAL = '#008178';
-const INK = '#0B3F3C';
-const MUTED = '#6F8480';
+const TEAL = '#0B7A6E';
+const INK = '#0F1A19';
+const MUTED = '#7A8886';
+const SCREEN_PADDING = 20;
+const GAP = 10;
 
-/**
- * Home "Your family" section — empty state matches mock; list when members exist.
- */
 const HomeFamilySection = ({navigation, members = []}) => {
   const {t} = useTranslation();
-  const hasMembers = Array.isArray(members) && members.length > 0;
+  const {width} = useWindowDimensions();
+  const list = Array.isArray(members) ? members : [];
+  const cardWidth = (width - SCREEN_PADDING * 2 - GAP * 2) / 3;
 
   return (
     <View style={styles.section}>
@@ -32,72 +33,64 @@ const HomeFamilySection = ({navigation, members = []}) => {
           onPress={() => navigation?.navigate('Main', {screen: 'Family'})}
           style={styles.viewAllBtn}>
           <Text style={styles.viewAllText}>{t('viewAll')}</Text>
-          <Icon name="chevron-forward" size={14} color={TEAL} />
+          <Icon name="arrow-forward" size={14} color={TEAL} />
         </TouchableOpacity>
       </View>
 
-      {hasMembers ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}>
-          {members.slice(0, 8).map(member => {
-            const photo = member.photo || member.profile_photo;
-            return (
-              <TouchableOpacity
-                key={member.id || member.uuid}
-                activeOpacity={0.85}
-                style={styles.memberCard}
-                onPress={() =>
-                  navigation?.navigate('FamilyMemberDetails', {
-                    memberId: member.id || member.uuid,
-                  })
-                }>
-                {photo ? (
-                  <Image source={{uri: photo}} style={styles.avatar} />
-                ) : (
-                  <View style={styles.avatarFallback}>
-                    <Icon name="person" size={22} color={TEAL} />
-                  </View>
-                )}
-                <Text style={styles.memberName} numberOfLines={1}>
-                  {member.name || t('member')}
-                </Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}>
+        {list.slice(0, 8).map(member => {
+          const photo = member.photo || member.profile_photo;
+          const title = member.relationship || member.name || t('member');
+          const meta =
+            member.age != null
+              ? String(member.age)
+              : member.relationship
+                ? member.name
+                : '';
+          return (
+            <TouchableOpacity
+              key={member.id || member.uuid}
+              activeOpacity={0.85}
+              style={[styles.memberCard, {width: cardWidth}]}
+              onPress={() =>
+                navigation?.navigate('FamilyMemberDetails', {
+                  memberId: member.id || member.uuid,
+                })
+              }>
+              {photo ? (
+                <Image source={{uri: photo}} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarFallback}>
+                  <Icon name="person" size={20} color={TEAL} />
+                </View>
+              )}
+              <Text style={styles.memberName} numberOfLines={1}>
+                {title}
+              </Text>
+              {meta ? (
                 <Text style={styles.memberMeta} numberOfLines={1}>
-                  {member.relationship || t('family')}
+                  {meta}
                 </Text>
-              </TouchableOpacity>
-            );
-          })}
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.addMini}
-            onPress={() => navigation?.navigate('AddFamilyMember')}>
-            <Icon name="add" size={22} color={TEAL} />
-            <Text style={styles.addMiniText}>{t('add')}</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      ) : (
-        <View style={styles.emptyWrap}>
-          <View style={styles.emptyIcon}>
-            <Icon name="home-outline" size={36} color={TEAL} />
-            <View style={styles.heartOverlay}>
-              <Icon name="heart" size={12} color={TEAL} />
-            </View>
+              ) : null}
+            </TouchableOpacity>
+          );
+        })}
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={[styles.addCard, {width: cardWidth}]}
+          onPress={() => navigation?.navigate('AddFamilyMember')}>
+          <View style={styles.addIcon}>
+            <Icon name="add" size={20} color={TEAL} />
           </View>
-          <Text style={styles.emptyTitle}>{t('noFamilyMembersYet')}</Text>
-          <Text style={styles.emptySubtitle}>
-            {t('addFamilyMembersDesc')}
+          <Text style={styles.addText} numberOfLines={1}>
+            {t('addMember')}
           </Text>
-          <PrimaryButton
-            title={t('addFamilyMember')}
-            variant="secondary"
-            onPress={() => navigation?.navigate('AddFamilyMember')}
-            style={styles.addButton}
-            textStyle={styles.addButtonText}
-          />
-        </View>
-      )}
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };
@@ -106,13 +99,13 @@ export default HomeFamilySection;
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 28,
+    marginTop: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 18,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,
@@ -122,82 +115,40 @@ const styles = StyleSheet.create({
   viewAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    gap: 4,
   },
   viewAllText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: TEAL,
   },
-  emptyWrap: {
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  emptyIcon: {
-    width: 64,
-    height: 64,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 14,
-  },
-  heartOverlay: {
-    position: 'absolute',
-    bottom: 10,
-    alignSelf: 'center',
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: INK,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: MUTED,
-    textAlign: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 12,
-  },
-  addButton: {
-    height: 48,
-    borderRadius: 14,
-    maxWidth: 260,
-    alignSelf: 'center',
-  },
-  addButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
   listContent: {
-    paddingRight: 8,
-    gap: 12,
+    gap: GAP,
   },
   memberCard: {
-    width: 96,
-    alignItems: 'center',
-    backgroundColor: '#F6F8F7',
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginBottom: 8,
-  },
-  avatarFallback: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E8F5F2',
+    height: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E3ECEA',
+    paddingHorizontal: 6,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginBottom: 6,
+  },
+  avatarFallback: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E6F4F1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
   },
   memberName: {
     fontSize: 13,
@@ -206,26 +157,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   memberMeta: {
-    marginTop: 2,
+    marginTop: 1,
     fontSize: 11,
     color: MUTED,
     textAlign: 'center',
   },
-  addMini: {
-    width: 96,
+  addCard: {
+    height: 80,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#C9E4E0',
+    borderRadius: 14,
+    borderWidth: 1.2,
+    borderColor: '#C9DCD8',
     borderStyle: 'dashed',
-    paddingVertical: 18,
   },
-  addMiniText: {
-    marginTop: 4,
+  addIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#E6F4F1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  addText: {
     fontSize: 12,
     fontWeight: '600',
-    color: TEAL,
+    color: '#34413F',
   },
 });

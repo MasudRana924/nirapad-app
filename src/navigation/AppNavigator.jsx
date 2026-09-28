@@ -66,7 +66,7 @@ function MainTabs() {
       ]}>
       <Icon
         name={iconName}
-        size={24}
+        size={22}
         color={focused ? '#008178' : '#7D8BA2'}
       />
     </View>
@@ -82,14 +82,14 @@ function MainTabs() {
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          paddingTop: 10,
-          paddingBottom: safeBottom + 8,
-          height: 78 + safeBottom,
+          paddingTop: 6,
+          paddingBottom: safeBottom + 4,
+          height: 64 + safeBottom,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
-          marginTop: 4,
+          marginTop: 2,
         },
         tabBarActiveTintColor: '#008178',
         tabBarInactiveTintColor: '#7D8BA2',
@@ -216,17 +216,15 @@ function AppNavigator() {
 
 const tabStyles = StyleSheet.create({
   iconContainer: {
-    width: 42,
-    height: 42,
+    width: 50,
+    height: 30,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
   activeIconContainer: {
-    backgroundColor: '#DDF3F1',
-    borderColor: '#CFEAE7',
-    borderWidth: 1,
+    backgroundColor: '#DDF3EE',
   },
 });
 

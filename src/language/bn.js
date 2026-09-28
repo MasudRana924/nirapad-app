@@ -118,6 +118,18 @@ export default {
   bookNurse: 'নার্স বুক করুন',
   physiotherapy: 'ফিজিওথেরাপি',
   medicine: 'ওষুধ',
+  whatDoYouNeedToday: 'আজ আপনার কী প্রয়োজন?',
+  homeCaregiver: 'কেয়ারগিভার',
+  homeNurse: 'নার্স',
+  homeBookNow: 'এখনই বুক করুন',
+  comingSoon: 'শীঘ্রই আসছে',
+  activeBadge: 'সক্রিয়',
+  requestReceived: 'অনুরোধ গ্রহণ করা হয়েছে',
+  findingCaregiverStep: 'কেয়ারগিভার খোঁজা হচ্ছে',
+  caregiverAssignedStep: 'কেয়ারগিভার নিযুক্ত',
+  recentActivity: 'সাম্প্রতিক কার্যক্রম',
+  caregiverBooking: 'কেয়ারগিভার বুকিং',
+  nurseBooking: 'নার্স বুকিং',
 
   // Home - Family Section
   yourFamily: 'আপনার পরিবার',

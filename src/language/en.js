@@ -118,6 +118,18 @@ export default {
   bookNurse: 'Book Nurse',
   physiotherapy: 'Physiotherapy',
   medicine: 'Medicine',
+  whatDoYouNeedToday: 'What do you need today?',
+  homeCaregiver: 'Caregiver',
+  homeNurse: 'Nurse',
+  homeBookNow: 'Book now',
+  comingSoon: 'Coming soon',
+  activeBadge: 'Active',
+  requestReceived: 'Request received',
+  findingCaregiverStep: 'Finding caregiver',
+  caregiverAssignedStep: 'Caregiver assigned',
+  recentActivity: 'Recent activity',
+  caregiverBooking: 'Caregiver booking',
+  nurseBooking: 'Nurse booking',
 
   // Home - Family Section
   yourFamily: 'Your family',

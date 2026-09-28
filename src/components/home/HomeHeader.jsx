@@ -6,7 +6,6 @@ import {useInbox, useInboxUnreadCount, useSupportUnreadCount} from '../../api/qu
 import {useTranslation} from 'react-i18next';
 
 const INK = '#0B3F3C';
-const MUTED = '#8A9A97';
 
 const getGreeting = (t) => {
   const hour = new Date().getHours();
@@ -57,7 +56,7 @@ const HomeHeader = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.iconButton}
           onPress={() => navigation?.navigate('SupportChat')}>
-          <Icon name="chatbubbles-outline" size={22} color={INK} />
+          <Icon name="chatbubble-ellipses-outline" size={22} color={INK} />
           {Number(supportUnread) > 0 ? (
             <View style={styles.countBadge}>
               <Text style={styles.countBadgeText}>
@@ -83,12 +82,12 @@ export default HomeHeader;
 
 const styles = StyleSheet.create({
   header: {
-    minHeight: 56,
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
-    marginBottom: 4,
+    marginTop: 6,
+    marginBottom: 2,
   },
   headerLeft: {
     flex: 1,
@@ -97,12 +96,12 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   profileButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     overflow: 'hidden',
     backgroundColor: '#EEF2F1',
-    marginRight: 12,
+    marginRight: 14,
   },
   profileImage: {
     width: '100%',
@@ -120,30 +119,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   goodMorning: {
-    fontSize: 10,
-    lineHeight: 18,
-    color: MUTED,
+    fontSize: 13,
+    lineHeight: 17,
+    color: '#5F6F6C',
     fontWeight: '400',
   },
   userName: {
-    fontSize: 16,
-    lineHeight: 20,
-    color: INK,
-    fontWeight: '600',
-    marginTop: 1,
+    fontSize: 20,
+    lineHeight: 25,
+    color: '#0F1A19',
+    fontWeight: '700',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F3F2',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#E8F2F0',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: 10,
   },
   countBadge: {
     position: 'absolute',
@@ -157,7 +155,7 @@ const styles = StyleSheet.create({
     right: 2,
     top: 2,
     borderWidth: 1.5,
-    borderColor: '#F0F3F2',
+    borderColor: '#E8F2F0',
   },
   countBadgeText: {
     color: '#FFFFFF',
@@ -171,8 +169,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#E34242',
     borderWidth: 1.5,
-    borderColor: '#F0F3F2',
+    borderColor: '#E8F2F0',
     right: 11,
-    top: 11,
+    top: 10,
   },
 });

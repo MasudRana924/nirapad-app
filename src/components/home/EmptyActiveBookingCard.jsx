@@ -1,37 +1,24 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import {useTranslation} from 'react-i18next';
 
-const TEAL = '#008178';
-const INK = '#0B3F3C';
-const MUTED = '#6F8480';
-const MINT = '#E8F5F2';
+const TEAL = '#0B7A6E';
+const INK = '#0F3D38';
+const cardBg = require('../../assets/home-active-card-bg.png');
 
-/**
- * Empty active-booking state — matches home mock exactly.
- */
 const EmptyActiveBookingCard = () => {
   const {t} = useTranslation();
   return (
     <View style={styles.card}>
-      <View style={styles.iconCircle}>
-        <Icon name="calendar-outline" size={26} color={TEAL} />
-        <View style={styles.plusBadge}>
-          <Icon name="add" size={10} color="#FFFFFF" />
-        </View>
+      <Image source={cardBg} style={styles.bgImage} resizeMode="cover" />
+
+      <View style={styles.statusPill}>
+        <View style={styles.statusDot} />
+        <Text style={styles.statusText}>{t('noActiveBooking')}</Text>
       </View>
 
-      <View style={styles.copy}>
-        <View style={styles.statusPill}>
-          <View style={styles.statusDot} />
-          <Text style={styles.statusText}>{t('noActiveBooking')}</Text>
-        </View>
-        <Text style={styles.title}>{t('youDontHaveActiveBooking')}</Text>
-        <Text style={styles.subtitle}>
-          {t('upcomingCareBookings')}
-        </Text>
-      </View>
+      <Text style={styles.title}>{t('youDontHaveActiveBooking')}</Text>
+      <Text style={styles.subtitle}>{t('upcomingCareBookings')}</Text>
     </View>
   );
 };
@@ -40,73 +27,57 @@ export default EmptyActiveBookingCard;
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: MINT,
+    marginTop: 12,
     borderRadius: 20,
-    paddingVertical: 18,
+    overflow: 'hidden',
+    backgroundColor: '#F2FAF8',
+    borderWidth: 1,
+    borderColor: '#D9ECE8',
     paddingHorizontal: 16,
-    marginTop: 18,
+    paddingVertical: 16,
+    minHeight: 150,
   },
-  iconCircle: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#C9E8E2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-  },
-  plusBadge: {
+  bgImage: {
     position: 'absolute',
-    right: 6,
-    bottom: 8,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: TEAL,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  copy: {
-    flex: 1,
-    minWidth: 0,
+    top: -20,
+    left: 0,
+    width: '100%',
+    aspectRatio: 16 / 9,
   },
   statusPill: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 8,
-    gap: 6,
+    backgroundColor: '#DDF1EC',
+    borderRadius: 12,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    gap: 5,
   },
   statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
     backgroundColor: TEAL,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: TEAL,
   },
   title: {
-    fontSize: 16,
-    lineHeight: 22,
+    marginTop: 10,
+    fontSize: 18,
+    lineHeight: 24,
     fontWeight: '700',
     color: INK,
-    marginBottom: 4,
+    maxWidth: '64%',
   },
   subtitle: {
+    marginTop: 4,
     fontSize: 13,
     lineHeight: 18,
-    color: MUTED,
-    fontWeight: '400',
+    color: '#4F6360',
+    maxWidth: '64%',
   },
 });
