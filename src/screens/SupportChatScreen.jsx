@@ -1010,7 +1010,7 @@ export default SupportChatScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   flex: {
     flex: 1,
