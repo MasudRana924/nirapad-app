@@ -17,8 +17,8 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
   return (
     <>
       <StatusBar
-        barStyle="light-content"
-        backgroundColor="#008178"
+        barStyle="dark-content"
+        backgroundColor="#FFFFFF"
       />
       <View style={styles.container}>
         <View style={styles.content}>

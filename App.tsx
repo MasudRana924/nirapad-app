@@ -6,6 +6,7 @@
 
 import './src/language/i18n';
 import React, {useState, useCallback, useEffect, useRef} from 'react';
+import {StatusBar} from 'react-native';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AuthProvider, useAuth} from './src/context/AuthContext';
@@ -156,6 +157,7 @@ function AppContent() {
 function App() {
   return (
     <SafeAreaProvider>
+      <StatusBar barStyle="dark-content" />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ModalProvider>

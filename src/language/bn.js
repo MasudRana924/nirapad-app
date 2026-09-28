@@ -139,6 +139,7 @@ export default {
 
   // Profile Screen
   myAccount: 'আমার অ্যাকাউন্ট',
+  manageProfileSettings: 'আপনার প্রোফাইল ও সেটিংস পরিচালনা করুন',
   editProfile: 'প্রোফাইল সম্পাদনা',
   namePhotoContact: 'নাম, ছবি ও যোগাযোগ',
   familyMembers: 'পরিবারের সদস্য',

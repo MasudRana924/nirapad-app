@@ -121,15 +121,12 @@ const styles = StyleSheet.create({
   card: {
     minHeight: 64,
     borderRadius: 24,
-    backgroundColor: '#2C2C2E',
+    backgroundColor: 'rgba(35, 33, 32, 0.85)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 8},
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 16,
   },
   left: {
     flex: 1,
