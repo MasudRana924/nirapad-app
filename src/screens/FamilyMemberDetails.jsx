@@ -77,11 +77,11 @@ const FamilyMemberDetails = ({navigation, route}) => {
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{member.name}</Text>
             <Text style={styles.profileRelation}>{member.relationship}</Text>
-            <Text style={styles.profileGender}>
+            {/* <Text style={styles.profileGender}>
               {member.gender
                 ? member.gender.charAt(0).toUpperCase() + member.gender.slice(1)
                 : '—'}
-            </Text>
+            </Text> */}
           </View>
         </View>
       </ScrollView>
@@ -127,14 +127,14 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   profilePhoto: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
   },
   profilePhotoEmpty: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
@@ -144,18 +144,18 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   profileName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#111820',
     marginBottom: 4,
   },
   profileRelation: {
-    fontSize: 15,
+    fontSize: 13,
     color: '#8190A7',
     marginBottom: 2,
   },
   profileGender: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#8190A7',
   },
 });
