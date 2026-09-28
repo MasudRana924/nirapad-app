@@ -1,19 +1,17 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   BOOKING_STATUS,
   canShowLiveTracking,
-  getStatusMeta,
   isSearchingStatus,
 } from '../../utils/bookingStatus';
 import {useTranslation} from 'react-i18next';
+import ActiveCardBackground from './ActiveCardBackground';
 
 const TEAL = '#0B7A6E';
 const INK = '#0F3D38';
 const MUTED = '#7E8F8C';
-const cardBg = require('../../assets/home-active-card-bg.png');
-
 const getServiceLabel = (booking, t) => {
   const type = String(booking?.service_type || '').toUpperCase();
   if (type.includes('HOSPITAL')) {
@@ -85,9 +83,8 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
 
   const finding = searching || isSearchingStatus(booking.status);
   const liveTracking = !finding && canShowLiveTracking(booking);
-  const status = getStatusMeta(booking.status);
-  const caregiverName =
-    booking.caregiver_name || booking.caregiver?.name || t('caregiver');
+  const caregiverName = booking.caregiver_name || booking.caregiver?.name;
+  const hasCaregiver = Boolean(caregiverName);
   const hospitalName =
     booking.hospital_name || booking.hospital?.name || booking.booking_number;
 
@@ -107,19 +104,19 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
 
   return (
     <View style={styles.card}>
-      <Image source={cardBg} style={styles.bgImage} resizeMode="cover" />
-
-      <View style={styles.badge}>
-        <View style={styles.badgeDot} />
-        <Text style={styles.badgeText}>{t('activeBadge').toUpperCase()}</Text>
-      </View>
+      <ActiveCardBackground />
 
       <Text style={styles.title} numberOfLines={1}>
         {getServiceLabel(booking, t)}
       </Text>
-      <Text style={styles.subtitle} numberOfLines={1}>
-        {finding ? t('findingAnotherCaregiver') : status.label}
-      </Text>
+      <View style={styles.metaRow}>
+        <Icon name="location-outline" size={12} color={MUTED} />
+        <Text style={styles.metaText} numberOfLines={1}>
+          {finding || !hasCaregiver
+            ? hospitalName || '—'
+            : `${caregiverName} · ${hospitalName || '—'}`}
+        </Text>
+      </View>
 
       <View style={styles.steps}>
         {steps.map((label, index) => (
@@ -136,22 +133,6 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
             }
           />
         ))}
-      </View>
-
-      <View style={styles.divider} />
-
-      <View style={styles.infoRow}>
-        <Icon name="person-outline" size={14} color={TEAL} />
-        <Text style={styles.infoText} numberOfLines={1}>
-          {finding ? t('assigningCaregiver') : caregiverName}
-        </Text>
-      </View>
-
-      <View style={styles.infoRow}>
-        <Icon name="location-outline" size={14} color={TEAL} />
-        <Text style={styles.infoText} numberOfLines={1}>
-          {hospitalName || '—'}
-        </Text>
       </View>
 
       <TouchableOpacity
@@ -178,54 +159,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D9ECE8',
     paddingHorizontal: 14,
-    paddingTop: 11,
-    paddingBottom: 11,
-  },
-  bgImage: {
-    position: 'absolute',
-    top: -44,
-    left: 0,
-    width: '100%',
-    aspectRatio: 16 / 9,
-  },
-  badge: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#DDF1EC',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    gap: 4,
-  },
-  badgeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#14A37F',
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: TEAL,
-    letterSpacing: 0.4,
+    paddingTop: 14,
+    paddingBottom: 12,
   },
   title: {
-    marginTop: 5,
     fontSize: 17,
     lineHeight: 21,
     fontWeight: '700',
     color: INK,
-    maxWidth: '72%',
+    maxWidth: '68%',
   },
-  subtitle: {
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+    maxWidth: '68%',
+    gap: 4,
+  },
+  metaText: {
+    flexShrink: 1,
     fontSize: 11.5,
     lineHeight: 15,
-    color: '#4F6360',
-    maxWidth: '72%',
+    color: '#5A6D6A',
   },
   steps: {
-    marginTop: 6,
+    marginTop: 10,
   },
   stepRow: {
     flexDirection: 'row',
@@ -289,26 +247,8 @@ const styles = StyleSheet.create({
   stepLabelDone: {
     color: '#5F716E',
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#DCEAE7',
-    marginTop: 6,
-    marginBottom: 2,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  infoText: {
-    marginLeft: 8,
-    flex: 1,
-    fontSize: 11.5,
-    fontWeight: '500',
-    color: '#1F3431',
-  },
   trackBtn: {
-    marginTop: 8,
+    marginTop: 12,
     height: 32,
     borderRadius: 16,
     backgroundColor: '#DDF0EB',

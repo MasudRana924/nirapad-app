@@ -1,16 +1,15 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {useTranslation} from 'react-i18next';
+import ActiveCardBackground from './ActiveCardBackground';
 
 const TEAL = '#0B7A6E';
 const INK = '#0F3D38';
-const cardBg = require('../../assets/home-active-card-bg.png');
-
 const EmptyActiveBookingCard = () => {
   const {t} = useTranslation();
   return (
     <View style={styles.card}>
-      <Image source={cardBg} style={styles.bgImage} resizeMode="cover" />
+      <ActiveCardBackground />
 
       <View style={styles.statusPill}>
         <View style={styles.statusDot} />
@@ -36,13 +35,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     minHeight: 120,
-  },
-  bgImage: {
-    position: 'absolute',
-    top: -40,
-    left: 0,
-    width: '100%',
-    aspectRatio: 16 / 9,
   },
   statusPill: {
     alignSelf: 'flex-start',
