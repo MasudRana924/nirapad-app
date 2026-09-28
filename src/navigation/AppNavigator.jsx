@@ -13,6 +13,7 @@ import LoginScreen from '../screens/LoginScreen';
 import CreateAccountScreen from '../screens/CreateAccountScreen';
 import VerifyPhoneScreen from '../screens/VerifyPhoneScreen';
 import HomeScreen from '../screens/HomeScreen';
+import FamilyScreen from '../screens/FamilyScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import EditProfile from '../screens/EditProfile';
 import AddFamilyMember from '../screens/AddFamilyMember';
@@ -105,7 +106,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="Family"
-        component={ProfileScreen}
+        component={FamilyScreen}
         options={{
           tabBarLabel: 'Family',
           tabBarIcon: ({focused, color}) =>
@@ -179,6 +180,7 @@ function AppNavigator() {
           <Stack.Screen name="AddFamilyMember" component={AddFamilyMember} />
           <Stack.Screen name="FamilyMemberDetails" component={FamilyMemberDetails} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name="FamilyScreen" component={FamilyScreen} />
           <Stack.Screen name="HospitalSelection" component={HospitalSelection} />
           <Stack.Screen name="BookingDateTime" component={BookingDateTime} />
           <Stack.Screen name="BookingPreview" component={BookingPreviewScreen} />

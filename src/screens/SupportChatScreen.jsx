@@ -751,7 +751,7 @@ const SupportChatScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title={t('NirapodSupport')} showBack />
+      <Header title={t('Nirapod Support')} showBack />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
