@@ -307,7 +307,7 @@ const MedicineScreen = ({navigation}) => {
             style={styles.checkoutBtn}
             onPress={goToCart}>
             <Text style={styles.checkoutBtnText}>View cart</Text>
-            <Icon name="arrow-forward" size={16} color="#FFFFFF" />
+            <Icon name="chevron-forward-sharp" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       )}

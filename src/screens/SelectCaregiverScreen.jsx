@@ -357,7 +357,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                           {isSelected ? t('selected', 'Selected') : t('select', 'Select')}
                         </Text>
                         {!isSelected ? (
-                          <Icon name="arrow-forward" size={14} color="#FFFFFF" />
+                          <Icon name="chevron-forward-sharp" size={14} color="#FFFFFF" />
                         ) : null}
                       </View>
                     </View>

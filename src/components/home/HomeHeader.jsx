@@ -56,7 +56,7 @@ const HomeHeader = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.iconButton}
           onPress={() => navigation?.navigate('SupportChat')}>
-          <Icon name="chatbubble-ellipses-outline" size={22} color={INK} />
+          <Icon name="chatbubble-ellipses-outline" size={19} color={INK} />
           {Number(supportUnread) > 0 ? (
             <View style={styles.countBadge}>
               <Text style={styles.countBadgeText}>
@@ -70,7 +70,7 @@ const HomeHeader = ({navigation}) => {
           activeOpacity={0.8}
           style={styles.iconButton}
           onPress={() => navigation?.navigate('Inbox')}>
-          <Icon name="notifications-outline" size={22} color={INK} />
+          <Icon name="notifications-outline" size={19} color={INK} />
           {Number(unread) > 0 ? <View style={styles.notificationDot} /> : null}
         </TouchableOpacity>
       </View>
@@ -82,12 +82,11 @@ export default HomeHeader;
 
 const styles = StyleSheet.create({
   header: {
-    minHeight: 52,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 6,
-    marginBottom: 2,
+    marginTop: 4,
   },
   headerLeft: {
     flex: 1,
@@ -96,12 +95,12 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   profileButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     overflow: 'hidden',
     backgroundColor: '#EEF2F1',
-    marginRight: 14,
+    marginRight: 10,
   },
   profileImage: {
     width: '100%',
@@ -119,29 +118,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   goodMorning: {
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: 11,
+    lineHeight: 15,
     color: '#5F6F6C',
     fontWeight: '400',
   },
   userName: {
-    fontSize: 20,
-    lineHeight: 25,
+    fontSize: 15,
+    lineHeight: 21,
     color: '#0F1A19',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#E8F2F0',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10,
+    marginLeft: 8,
   },
   countBadge: {
     position: 'absolute',
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E34242',
     borderWidth: 1.5,
     borderColor: '#E8F2F0',
-    right: 11,
-    top: 10,
+    right: 9,
+    top: 8,
   },
 });

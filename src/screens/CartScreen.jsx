@@ -179,7 +179,7 @@ const CartScreen = ({navigation, route}) => {
               })
             }>
             <Text style={styles.checkoutBtnText}>{t('checkout')}</Text>
-            <Icon name="arrow-forward" size={16} color="#FFFFFF" />
+            <Icon name="chevron-forward-sharp" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       )}

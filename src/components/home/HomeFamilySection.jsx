@@ -32,8 +32,8 @@ const HomeFamilySection = ({navigation, members = []}) => {
           hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
           onPress={() => navigation?.navigate('Main', {screen: 'Family'})}
           style={styles.viewAllBtn}>
-          <Text style={styles.viewAllText}>{t('viewAll')}</Text>
-          <Icon name="arrow-forward" size={14} color={TEAL} />
+          {/* <Text style={styles.viewAllText}>{t('viewAll')}</Text> */}
+          <Icon name="chevron-forward-sharp" size={15} color={TEAL} />
         </TouchableOpacity>
       </View>
 
@@ -64,17 +64,13 @@ const HomeFamilySection = ({navigation, members = []}) => {
                 <Image source={{uri: photo}} style={styles.avatar} />
               ) : (
                 <View style={styles.avatarFallback}>
-                  <Icon name="person" size={20} color={TEAL} />
+                  <Icon name="person" size={15} color={TEAL} />
                 </View>
               )}
               <Text style={styles.memberName} numberOfLines={1}>
                 {title}
               </Text>
-              {meta ? (
-                <Text style={styles.memberMeta} numberOfLines={1}>
-                  {meta}
-                </Text>
-              ) : null}
+              
             </TouchableOpacity>
           );
         })}
@@ -84,7 +80,7 @@ const HomeFamilySection = ({navigation, members = []}) => {
           style={[styles.addCard, {width: cardWidth}]}
           onPress={() => navigation?.navigate('AddFamilyMember')}>
           <View style={styles.addIcon}>
-            <Icon name="add" size={20} color={TEAL} />
+            <Icon name="add" size={16} color={TEAL} />
           </View>
           <Text style={styles.addText} numberOfLines={1}>
             {t('addMember')}
@@ -99,26 +95,26 @@ export default HomeFamilySection;
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 16,
+    marginTop: 12,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
     color: INK,
   },
   viewAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
   },
   viewAllText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: TEAL,
   },
@@ -126,64 +122,66 @@ const styles = StyleSheet.create({
     gap: GAP,
   },
   memberCard: {
-    height: 80,
+    height: 66,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E3ECEA',
+    borderColor: '#FFFFFF',
     paddingHorizontal: 6,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginBottom: 6,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginBottom: 4,
   },
   avatarFallback: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#E6F4F1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   memberName: {
-    fontSize: 13,
+    fontSize: 11.5,
+    lineHeight: 14,
     fontWeight: '600',
     color: INK,
     textAlign: 'center',
   },
   memberMeta: {
-    marginTop: 1,
-    fontSize: 11,
+    fontSize: 10,
+    lineHeight: 12,
     color: MUTED,
     textAlign: 'center',
   },
   addCard: {
-    height: 80,
+    height: 66,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1.2,
     borderColor: '#C9DCD8',
     borderStyle: 'dashed',
   },
   addIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: '#E6F4F1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   addText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#34413F',
   },
 });
+

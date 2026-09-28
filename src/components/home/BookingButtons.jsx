@@ -61,7 +61,7 @@ const BookingButtons = ({navigation}) => {
               resizeMode="cover"
               style={styles.cardInner}>
               <View style={styles.iconCircle}>
-                <Icon name={action.icon} size={24} color={TEAL} />
+                <Icon name={action.icon} size={17} color={TEAL} />
               </View>
 
               <Text style={styles.cardLabel} numberOfLines={1}>
@@ -73,7 +73,7 @@ const BookingButtons = ({navigation}) => {
 
               <View style={styles.bookNowRow}>
                 <Text style={styles.bookNowText}>{t('homeBookNow')}</Text>
-                <Icon name="arrow-forward" size={14} color={TEAL} />
+                <Icon name="chevron-forward-sharp" size={12} color={TEAL} />
               </View>
             </ImageBackground>
           </TouchableOpacity>
@@ -83,7 +83,7 @@ const BookingButtons = ({navigation}) => {
       <View style={styles.disabledRow}>
         {DISABLED_SERVICES.map(service => (
           <View key={service.key} style={styles.disabledCard}>
-            <Icon name={service.icon} size={24} color="#8E9A98" />
+            <Icon name={service.icon} size={18} color="#8E9A98" />
             <View style={styles.disabledCopy}>
               <Text style={styles.disabledLabel} numberOfLines={1}>
                 {service.label}
@@ -92,7 +92,7 @@ const BookingButtons = ({navigation}) => {
                 {t('comingSoon')}
               </Text>
             </View>
-            <Icon name="arrow-forward" size={14} color="#A7B2B0" />
+            <Icon name="chevron-forward-sharp" size={12} color="#A7B2B0" />
           </View>
         ))}
       </View>
@@ -104,13 +104,13 @@ export default BookingButtons;
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 16,
+    marginTop: 12,
   },
   sectionTitle: {
-    fontSize: 19,
+    fontSize: 15,
     fontWeight: '700',
     color: INK,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   grid: {
     flexDirection: 'row',
@@ -118,82 +118,85 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48.5%',
-    borderRadius: 18,
+    borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
   },
   caregiverCard: {
     backgroundColor: '#DDF1EB',
-    borderColor: '#CDE8E0',
+    borderColor: '#DDF1EB',
   },
   nurseCard: {
     backgroundColor: '#FBF1D6',
-    borderColor: '#F1E4BD',
+    borderColor: '#FBF1D6',
   },
   cardInner: {
-    paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 12,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   cardLabel: {
-    fontSize: 17,
+    fontSize: 13.5,
+    lineHeight: 18,
     fontWeight: '700',
     color: INK,
   },
   cardSubLabel: {
-    marginTop: 3,
-    fontSize: 13,
+    marginTop: 1,
+    fontSize: 10,
+    lineHeight: 14,
     color: '#34413F',
   },
   bookNowRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
-    gap: 6,
+    marginTop: 6,
+    gap: 4,
   },
   bookNowText: {
-    fontSize: 14,
+    fontSize: 14.5,
     fontWeight: '700',
     color: TEAL,
   },
   disabledRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 8,
   },
   disabledCard: {
     width: '48.5%',
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F1F4F4',
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E4E9E8',
-    paddingHorizontal: 12,
-    paddingVertical: 9,
+    borderColor: '#F1F4F4',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   disabledCopy: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 8,
     marginRight: 4,
   },
   disabledLabel: {
-    fontSize: 12.5,
+    fontSize: 11.5,
+    lineHeight: 14,
     fontWeight: '600',
     color: '#6B7775',
   },
   disabledSub: {
-    marginTop: 1,
-    fontSize: 11,
+    fontSize: 10,
+    lineHeight: 13,
     color: '#9AA5A3',
   },
 });

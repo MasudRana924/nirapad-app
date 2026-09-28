@@ -61,7 +61,8 @@ const HomeRecentActivity = ({navigation, booking}) => {
         style={styles.header}
         onPress={() => navigation?.navigate('Main', {screen: 'Bookings'})}>
         <Text style={styles.title}>{t('recentActivity')}</Text>
-        <Icon name="chevron-forward" size={16} color="#6B7775" />
+        
+        <Icon name="chevron-forward" size={15} color="#0B7A6E" />
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -72,7 +73,7 @@ const HomeRecentActivity = ({navigation, booking}) => {
           navigation?.navigate('BookingDetails', {bookingId: booking.id})
         }>
         <View style={styles.iconCircle}>
-          <Icon name="person-outline" size={17} color={TEAL} />
+          <Icon name="person-outline" size={13} color={TEAL} />
         </View>
         <View style={styles.copy}>
           <Text style={styles.rowTitle} numberOfLines={1}>
@@ -96,16 +97,16 @@ export default HomeRecentActivity;
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 14,
+    marginTop: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   title: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: INK,
   },
@@ -113,20 +114,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E3ECEA',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   iconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: '#E6F4F1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 8,
   },
   copy: {
     flex: 1,
@@ -134,22 +135,24 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   rowTitle: {
-    fontSize: 13,
+    fontSize: 11.5,
+    lineHeight: 14,
     fontWeight: '600',
     color: INK,
   },
   rowMeta: {
-    marginTop: 2,
-    fontSize: 11,
+    fontSize: 10,
+    lineHeight: 13,
     color: '#7A8886',
   },
   pill: {
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   pillText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
   },
 });
+

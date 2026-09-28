@@ -50,7 +50,7 @@ const ProgressStep = ({label, state, isLast}) => {
       <View style={styles.stepRail}>
         {done ? (
           <View style={styles.stepDone}>
-            <Icon name="checkmark" size={12} color="#FFFFFF" />
+            <Icon name="checkmark" size={9} color="#FFFFFF" />
           </View>
         ) : active ? (
           <View style={styles.stepActive}>
@@ -141,14 +141,14 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
       <View style={styles.divider} />
 
       <View style={styles.infoRow}>
-        <Icon name="person-outline" size={17} color={TEAL} />
+        <Icon name="person-outline" size={14} color={TEAL} />
         <Text style={styles.infoText} numberOfLines={1}>
           {finding ? t('assigningCaregiver') : caregiverName}
         </Text>
       </View>
 
       <View style={styles.infoRow}>
-        <Icon name="location-outline" size={17} color={TEAL} />
+        <Icon name="location-outline" size={14} color={TEAL} />
         <Text style={styles.infoText} numberOfLines={1}>
           {hospitalName || '—'}
         </Text>
@@ -161,7 +161,7 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
         <Text style={styles.trackBtnText}>
           {finding ? t('viewStatus') : liveTracking ? t('trackLive') : t('viewDetails')}
         </Text>
-        <Icon name="arrow-forward" size={15} color={TEAL} />
+        <Icon name="chevron-forward-sharp" size={13} color={TEAL} />
       </TouchableOpacity>
     </View>
   );
@@ -171,19 +171,19 @@ export default ActiveBookingCard;
 
 const styles = StyleSheet.create({
   card: {
-    marginTop: 12,
-    borderRadius: 20,
+    marginTop: 10,
+    borderRadius: 18,
     overflow: 'hidden',
     backgroundColor: '#F2FAF8',
     borderWidth: 1,
     borderColor: '#D9ECE8',
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 14,
+    paddingHorizontal: 14,
+    paddingTop: 11,
+    paddingBottom: 11,
   },
   bgImage: {
     position: 'absolute',
-    top: -36,
+    top: -44,
     left: 0,
     width: '100%',
     aspectRatio: 16 / 9,
@@ -193,83 +193,84 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#DDF1EC',
-    borderRadius: 12,
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    gap: 5,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    gap: 4,
   },
   badgeDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: '#14A37F',
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
     color: TEAL,
     letterSpacing: 0.4,
   },
   title: {
-    marginTop: 6,
-    fontSize: 21,
+    marginTop: 5,
+    fontSize: 17,
+    lineHeight: 21,
     fontWeight: '700',
     color: INK,
     maxWidth: '72%',
   },
   subtitle: {
-    marginTop: 2,
-    fontSize: 13,
+    fontSize: 11.5,
+    lineHeight: 15,
     color: '#4F6360',
     maxWidth: '72%',
   },
   steps: {
-    marginTop: 8,
+    marginTop: 6,
   },
   stepRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   stepRail: {
-    width: 18,
+    width: 14,
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   stepDone: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 13,
+    height: 13,
+    borderRadius: 7,
     backgroundColor: '#14A37F',
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepActive: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 2,
+    width: 13,
+    height: 13,
+    borderRadius: 7,
+    borderWidth: 1.5,
     borderColor: TEAL,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepActiveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+    width: 5,
+    height: 5,
+    borderRadius: 3,
     backgroundColor: TEAL,
   },
   stepPending: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1.5,
+    width: 13,
+    height: 13,
+    borderRadius: 7,
+    borderWidth: 1.2,
     borderColor: '#C9D6D3',
     backgroundColor: '#FFFFFF',
   },
   stepLine: {
-    width: 1.5,
-    height: 7,
+    width: 1.2,
+    height: 5,
     backgroundColor: '#D3E0DD',
   },
   stepLineDone: {
@@ -277,8 +278,8 @@ const styles = StyleSheet.create({
   },
   stepLabel: {
     flex: 1,
-    fontSize: 12.5,
-    lineHeight: 16,
+    fontSize: 11,
+    lineHeight: 13,
     color: MUTED,
   },
   stepLabelActive: {
@@ -291,34 +292,35 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#DCEAE7',
-    marginTop: 8,
-    marginBottom: 4,
+    marginTop: 6,
+    marginBottom: 2,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 4,
   },
   infoText: {
-    marginLeft: 10,
+    marginLeft: 8,
     flex: 1,
-    fontSize: 13,
+    fontSize: 11.5,
     fontWeight: '500',
     color: '#1F3431',
   },
   trackBtn: {
-    marginTop: 10,
-    height: 38,
-    borderRadius: 20,
+    marginTop: 8,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#DDF0EB',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 5,
   },
   trackBtnText: {
-    fontSize: 14,
+    fontSize: 12.5,
     fontWeight: '700',
     color: TEAL,
   },
 });
+
