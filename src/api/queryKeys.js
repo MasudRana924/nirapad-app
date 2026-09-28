@@ -84,22 +84,11 @@ export const queryKeys = {
     byAudience: audience => ['privacyPolicies', audience],
   },
 
-  // Conversations keys
-  conversations: {
-    all: ['conversations'],
-    lists: () => ['conversations', 'list'],
-    list: filters => ['conversations', 'list', filters],
-    details: () => ['conversations', 'detail'],
-    detail: id => ['conversations', 'detail', id],
-  },
-
-  // Messages keys
-  messages: {
-    all: ['messages'],
-    lists: () => ['messages', 'list'],
-    list: (conversationId, filters) => ['messages', 'list', conversationId, filters],
-    details: () => ['messages', 'detail'],
-    detail: id => ['messages', 'detail', id],
+  // Single support-chat thread
+  supportChat: {
+    all: ['supportChat'],
+    thread: () => ['supportChat', 'thread'],
+    unread: () => ['supportChat', 'unread'],
   },
 };
 

@@ -10,7 +10,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../context/AuthContext';
-import {useUserProfile} from '../api/queries';
+import {useUserProfile, useSupportUnreadCount} from '../api/queries';
 import Toast from '../components/common/Toast';
 import {storage} from '../utils/storage';
 import {useAppModal} from '../contexts/ModalContext';
@@ -22,6 +22,7 @@ const ProfileScreen = ({navigation}) => {
   const {logout} = useAuth();
   const {showConfirm} = useAppModal();
   const {data: profileData, isLoading} = useUserProfile();
+  const {count: supportUnread} = useSupportUnreadCount();
   const [toast, setToast] = useState({
     visible: false,
     message: '',
@@ -95,6 +96,14 @@ const ProfileScreen = ({navigation}) => {
       icon: 'notifications-outline',
       onPress: () => navigation?.navigate('NotificationSettings'),
     },
+    {
+      id: 'support',
+      name: t('supportChat'),
+      subtitle: t('supportChatSubtitle'),
+      icon: 'chatbubbles-outline',
+      badgeCount: supportUnread,
+      onPress: () => navigation?.navigate('SupportChat'),
+    },
   ];
 
   return (
@@ -146,6 +155,13 @@ const ProfileScreen = ({navigation}) => {
                   <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
                 )}
               </View>
+              {item.badgeCount > 0 ? (
+                <View style={styles.menuBadge}>
+                  <Text style={styles.menuBadgeText}>
+                    {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                  </Text>
+                </View>
+              ) : null}
               <Icon name="chevron-forward" size={18} color="#8190A7" />
             </TouchableOpacity>
           ))}
@@ -306,6 +322,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8190A7',
     marginTop: 2,
+  },
+
+  menuBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#E34242',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    marginRight: 8,
+  },
+
+  menuBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 
   versionRow: {

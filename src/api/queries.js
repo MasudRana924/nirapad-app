@@ -4,8 +4,9 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService, conversationService, messageService} from './services';
+import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService, conversationService} from './services';
 import {queryKeys} from './queryKeys';
+import {isSupportChatScreenFocused} from '../services/supportChatEvents';
 
 /**
  * User Profile Queries
@@ -201,36 +202,30 @@ export const usePrivacyPolicy = (audience = 'USER', options = {}) => {
 };
 
 /**
- * Conversations Queries
+ * Unread count for the single support chat thread.
  */
-export const useConversations = (params = {}, options = {}) => {
-  return useQuery({
-    queryKey: queryKeys.conversations.lists(params),
-    queryFn: () => conversationService.getMyConversations(params),
+export const useSupportUnreadCount = (options = {}) => {
+  const query = useQuery({
+    queryKey: queryKeys.supportChat.unread(),
+    queryFn: async () => {
+      const result = await conversationService.getUnreadCount();
+      if (isSupportChatScreenFocused()) {
+        return {
+          ...result,
+          data: {
+            ...(result?.data || {}),
+            unread_count: 0,
+          },
+        };
+      }
+      return result;
+    },
+    staleTime: 20 * 1000,
     ...options,
   });
-};
 
-export const useConversationDetails = (id, options = {}) => {
-  return useQuery({
-    queryKey: queryKeys.conversations.detail(id),
-    queryFn: () => conversationService.getConversationDetails(id),
-    enabled: !!id,
-    ...options,
-  });
-};
-
-
-/**
- * Messages Queries
- */
-export const useMessages = (conversationId, params = {}, options = {}) => {
-  return useQuery({
-    queryKey: queryKeys.messages.list(conversationId, params),
-    queryFn: () => messageService.getMessages(conversationId, params),
-    enabled: !!conversationId,
-    ...options,
-  });
+  const count = Number(query.data?.data?.unread_count || 0);
+  return {...query, count};
 };
 
 export default {
@@ -252,10 +247,6 @@ export default {
   useHospitals,
   useHospital,
 
-  // Conversations
-  useConversations,
-  useConversationDetails,
-
-  // Messages
-  useMessages,
+  // Support chat
+  useSupportUnreadCount,
 };

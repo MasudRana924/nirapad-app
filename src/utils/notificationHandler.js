@@ -1,4 +1,5 @@
 import notificationService from '../services/notificationService';
+import {isSupportMessagePush} from './supportPush';
 
 const getBookingId = data =>
   data?.booking_id || data?.bookingId || data?.reference_id || null;
@@ -91,18 +92,19 @@ export const handleNotificationClick = (data, navigation) => {
 
   const bookingId = getBookingId(data);
   const inboxId = getInboxId(data);
-  const conversationId = data?.conversation_id || data?.conversationId;
-  const messageId = data?.message_id || data?.messageId;
   const type = getType(data);
 
-  if (shouldOpenLiveTracking(data)) {
-    openLiveTracking(bookingId, navigation);
+  if (!navigation) {
     return;
   }
 
-  // Handle conversation message notifications
-  if (type === 'conversation_message' && conversationId) {
-    navigation.navigate('ConversationChat', {conversationId, messageId});
+  if (isSupportMessagePush(data)) {
+    navigation.navigate('SupportChat');
+    return;
+  }
+
+  if (shouldOpenLiveTracking(data)) {
+    openLiveTracking(bookingId, navigation);
     return;
   }
 

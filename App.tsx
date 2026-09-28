@@ -15,6 +15,7 @@ import notificationService from './src/services/notificationService';
 import {NavigationContainer} from '@react-navigation/native';
 import NotificationBanner from './src/components/common/NotificationBanner';
 import {handleNotificationClick, parseNotificationData} from './src/utils/notificationHandler';
+import {isSupportMessagePush} from './src/utils/supportPush';
 import {queryKeys} from './src/api/queryKeys';
 import {ModalProvider} from './src/contexts/ModalContext';
 
@@ -71,8 +72,26 @@ function AppContent() {
   useEffect(() => {
     const unsubscribe = notificationService.setForegroundBannerHandler(
       payload => {
-        queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
-        queryClient.invalidateQueries({queryKey: queryKeys.bookings.all});
+        const data = payload?.data || {};
+        if (isSupportMessagePush(data)) {
+          queryClient.setQueryData(queryKeys.supportChat.unread(), (current: any) => {
+            const previous = Number(current?.data?.unread_count || 0);
+            return {
+              success: true,
+              ...(current || {}),
+              data: {
+                ...(current?.data || {}),
+                unread_count: previous + 1,
+              },
+            };
+          });
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.supportChat.unread(),
+          });
+        } else {
+          queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
+          queryClient.invalidateQueries({queryKey: queryKeys.bookings.all});
+        }
         setBanner({
           visible: true,
           title: payload?.title || 'Notification',

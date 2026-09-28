@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
-import {useInbox, useInboxUnreadCount, useConversations} from '../../api/queries';
+import {useInbox, useInboxUnreadCount, useSupportUnreadCount} from '../../api/queries';
 import {useTranslation} from 'react-i18next';
 
 const INK = '#0B3F3C';
@@ -20,12 +20,8 @@ const HomeHeader = ({navigation}) => {
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
-  const {data: conversationsData} = useConversations();
+  const {count: supportUnread} = useSupportUnreadCount();
   const unread = inboxData?.meta?.unread ?? unreadCount ?? 0;
-  
-  // Calculate conversation unread count from conversations list
-  const conversations = Array.isArray(conversationsData?.data) ? conversationsData.data : [];
-  const conversationUnread = conversations.reduce((sum, conv) => sum + (conv.user_unread_count || 0), 0);
   
   const greeting = getGreeting(t);
   const displayName =
@@ -60,10 +56,14 @@ const HomeHeader = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.iconButton}
-          onPress={() => navigation?.navigate('ConversationList')}>
+          onPress={() => navigation?.navigate('SupportChat')}>
           <Icon name="chatbubbles-outline" size={22} color={INK} />
-          {Number(conversationUnread) > 0 ? (
-            <View style={styles.notificationDot} />
+          {Number(supportUnread) > 0 ? (
+            <View style={styles.countBadge}>
+              <Text style={styles.countBadgeText}>
+                {supportUnread > 9 ? '9+' : supportUnread}
+              </Text>
+            </View>
           ) : null}
         </TouchableOpacity>
 
@@ -144,6 +144,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
+  },
+  countBadge: {
+    position: 'absolute',
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#E34242',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    right: 2,
+    top: 2,
+    borderWidth: 1.5,
+    borderColor: '#F0F3F2',
+  },
+  countBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '700',
   },
   notificationDot: {
     position: 'absolute',

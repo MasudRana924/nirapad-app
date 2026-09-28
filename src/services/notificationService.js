@@ -13,6 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import {apiRequest} from './api';
 import {requestNotificationPermission} from '../utils/permissions';
+import {isSupportMessagePush} from '../utils/supportPush';
+import {
+  emitSupportChatRefresh,
+  isSupportChatScreenFocused,
+} from './supportChatEvents';
 
 const AUTHORIZED = 1;
 const PROVISIONAL = 2;
@@ -309,6 +314,11 @@ class NotificationService {
 
     console.log('🔔 Notification:', {title, body, type, id, data: payload});
 
+    if (isSupportMessagePush(payload) && isSupportChatScreenFocused()) {
+      emitSupportChatRefresh();
+      return;
+    }
+
     if (typeof this.foregroundBannerHandler === 'function') {
       this.foregroundBannerHandler({
         title: title || 'Notification',
@@ -328,6 +338,10 @@ class NotificationService {
    * Step 8: Navigate to appropriate screen based on notification
    */
   navigateToScreen(data, navigation) {
+    if (!navigation) {
+      return;
+    }
+
     if (!data) {
       console.log('⚠️ No navigation data in notification');
       navigation.navigate('Inbox');
@@ -338,16 +352,13 @@ class NotificationService {
 
     const bookingId = data.booking_id || data.bookingId;
     const inboxId = data.inbox_id || data.inboxId;
-    const conversationId = data.conversation_id || data.conversationId;
-    const messageId = data.message_id || data.messageId;
     const type = data.type || data.action;
-    
-    // Handle conversation message notifications
-    if (type === 'conversation_message' && conversationId) {
-      navigation.navigate('ConversationChat', {conversationId, messageId});
+
+    if (isSupportMessagePush(data)) {
+      navigation.navigate('SupportChat');
       return;
     }
-    
+
     const openBooking =
       type === 'SERVICE_STARTED' ||
       type === 'SERVICE_COMPLETED' ||

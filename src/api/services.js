@@ -3,7 +3,7 @@
  * HTTP client and service functions for API calls
  */
 
-import {apiRequest, createUuid} from './client';
+import {apiRequest, apiUpload, createUuid} from './client';
 
 export {apiRequest, ApiError, extractAuthPayload, createUuid} from './client';
 
@@ -257,45 +257,39 @@ export const hospitalService = {
 };
 
 /**
- * Conversations Services
+ * Support chat — one thread per user at /conversations/me.
+ * New admin replies arrive by push; the app then refetches this REST API.
  */
 export const conversationService = {
-  getMyConversations: (params = {}) => {
-    const {status, page = 1, limit = 10} = params;
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-    });
-    if (status) {
-      queryParams.append('status', status);
+  getMyThread: () => apiRequest('/conversations/me', 'GET'),
+
+  getUnreadCount: () => apiRequest('/conversations/me/unread-count', 'GET'),
+
+  getMessages: ({limit = 30, before, after} = {}) => {
+    const queryParams = new URLSearchParams();
+    queryParams.append('limit', String(limit));
+    if (before) {
+      queryParams.append('before', before);
     }
-    return apiRequest(`/conversations?${queryParams.toString()}`, 'GET');
+    if (after) {
+      queryParams.append('after', after);
+    }
+    return apiRequest(
+      `/conversations/me/messages?${queryParams.toString()}`,
+      'GET',
+    );
   },
 
-  getConversationDetails: id => apiRequest(`/conversations/${id}`, 'GET'),
+  sendText: ({message, client_message_id}) =>
+    apiRequest('/conversations/me/messages', 'POST', {
+      message,
+      client_message_id,
+    }),
 
-  createConversation: ({subject, first_message}) =>
-    apiRequest('/conversations', 'POST', {subject, first_message}),
-};
+  sendFile: (formData, onProgress) =>
+    apiUpload('/conversations/me/messages', formData, {onProgress}),
 
-/**
- * Messages Services
- */
-export const messageService = {
-  sendMessage: ({conversation_id, message, message_type = 'text'}) =>
-    apiRequest(`/conversations/${conversation_id}/messages`, 'POST', {message_type, message}),
-
-  getMessages: (conversationId, params = {}) => {
-    const {page = 1, limit = 20} = params;
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-    });
-    return apiRequest(`/conversations/${conversationId}/messages?${queryParams.toString()}`, 'GET');
-  },
-
-  markAsRead: conversationId =>
-    apiRequest(`/conversations/${conversationId}/read`, 'PUT'),
+  markAsRead: () => apiRequest('/conversations/me/read', 'PUT'),
 };
 
 export default {
@@ -311,5 +305,4 @@ export default {
   notificationPreferenceService,
   privacyPolicyService,
   conversationService,
-  messageService,
 };

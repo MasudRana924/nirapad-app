@@ -381,12 +381,29 @@ export default {
   callCaregiver: 'কেয়ারগিভারকে কল করুন',
   messageCaregiver: 'কেয়ারগিভারকে মেসেজ করুন',
 
-  // Conversations / Chat
+  // Support chat
   messages: 'মেসেজ',
-  conversations: 'কথোপকথন',
-  noConversations: 'এখনো কোনো কথোপকথন নেই',
+  supportChat: 'সাপোর্ট চ্যাট',
+  supportChatSubtitle: 'CareMate সাপোর্টে মেসেজ করুন',
+  careMateSupport: 'CareMate সাপোর্ট',
+  supportEmpty:
+    'আমাদের একটি মেসেজ পাঠান — সাপোর্ট টিম সাধারণত কয়েক মিনিটের মধ্যে উত্তর দেয়।',
   typeMessage: 'একটি মেসেজ লিখুন...',
   send: 'পাঠান',
+  today: 'আজ',
+  yesterday: 'গতকাল',
+  camera: 'ক্যামেরা',
+  gallery: 'গ্যালারি',
+  document: 'ডকুমেন্ট',
+  fileTooLarge: 'ফাইল অনেক বড়। সর্বোচ্চ সাইজ ১০ এমবি।',
+  unsupportedFile: 'JPG, PNG, WEBP ছবি অথবা PDF বেছে নিন।',
+  messageTooLong: 'মেসেজটি অনেক লম্বা।',
+  tapToRetry: 'আবার পাঠাতে ট্যাপ করুন',
+  couldNotSend: 'মেসেজ পাঠানো যায়নি',
+  couldNotLoadChat: 'চ্যাট লোড করা যায়নি',
+  cameraPermission: 'ছবি পাঠাতে ক্যামেরা ব্যবহারের অনুমতি দিন।',
+  galleryPermission: 'ছবি পাঠাতে গ্যালারি ব্যবহারের অনুমতি দিন।',
+  failedToPickDocument: 'ডকুমেন্ট পিকার খোলা যায়নি।',
 
   // Review Screen
   review: 'রিভিউ',

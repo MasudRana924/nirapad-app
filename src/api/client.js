@@ -283,4 +283,68 @@ export const apiRequest = async (
   return parseEnvelope(json, response.status);
 };
 
+/**
+ * Multipart upload with progress. Uses the same auth refresh and envelope
+ * parsing as apiRequest. Do not set Content-Type; the boundary is added
+ * by the runtime.
+ */
+export const apiUpload = async (
+  endpoint,
+  formData,
+  {onProgress, retry = true} = {},
+) => {
+  const token = await AsyncStorage.getItem('userToken');
+
+  const send = authToken =>
+    new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', getFullUrl(endpoint));
+      if (authToken) {
+        xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+      }
+      xhr.onload = () => {
+        let json = null;
+        try {
+          json = xhr.responseText ? JSON.parse(xhr.responseText) : null;
+        } catch (error) {
+          json = null;
+        }
+        if (!xhr.status) {
+          reject(new ApiError(undefined, 'Network request failed', [], 0));
+          return;
+        }
+        resolve({status: xhr.status, json});
+      };
+      xhr.onerror = () => {
+        reject(new ApiError(undefined, 'Network request failed', [], 0));
+      };
+      if (xhr.upload && typeof onProgress === 'function') {
+        xhr.upload.onprogress = event => {
+          if (event.lengthComputable && event.total > 0) {
+            onProgress(Math.min(1, event.loaded / event.total));
+          }
+        };
+      }
+      xhr.send(formData);
+    });
+
+  const {status, json} = await send(token);
+
+  if (isAuthFailure(json, status) && retry && token) {
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      return apiUpload(endpoint, formData, {onProgress, retry: false});
+    }
+    await notifyAuthFailure();
+    throw new ApiError(
+      json?.code || API_CODES.UNAUTHORIZED,
+      json?.message || 'Session expired. Please log in again.',
+      json?.errors,
+      json?.statusCode || status,
+    );
+  }
+
+  return parseEnvelope(json, status);
+};
+
 export default apiRequest;

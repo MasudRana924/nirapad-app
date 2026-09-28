@@ -381,12 +381,29 @@ export default {
   callCaregiver: 'Call Caregiver',
   messageCaregiver: 'Message Caregiver',
 
-  // Conversations / Chat
+  // Support chat
   messages: 'Messages',
-  conversations: 'Conversations',
-  noConversations: 'No conversations yet',
+  supportChat: 'Support Chat',
+  supportChatSubtitle: 'Message CareMate Support',
+  careMateSupport: 'CareMate Support',
+  supportEmpty:
+    'Send us a message — our support team usually replies within a few minutes.',
   typeMessage: 'Type a message...',
   send: 'Send',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  camera: 'Camera',
+  gallery: 'Gallery',
+  document: 'Document',
+  fileTooLarge: 'File too large. Maximum size is 10MB.',
+  unsupportedFile: 'Please choose a JPG, PNG, WEBP image or a PDF.',
+  messageTooLong: 'Message is too long.',
+  tapToRetry: 'Tap to retry',
+  couldNotSend: 'Could not send message',
+  couldNotLoadChat: 'Could not load chat',
+  cameraPermission: 'Please allow camera access to send a photo.',
+  galleryPermission: 'Please allow photo access to send an image.',
+  failedToPickDocument: 'Could not open the document picker.',
 
   // Review Screen
   review: 'Review',

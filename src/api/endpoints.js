@@ -104,13 +104,12 @@ export const ENDPOINTS = {
     BY_AUDIENCE: audience => `/privacy-policies/${audience}`,
   },
 
-  // Conversations endpoints
+  // Single support thread (one conversation per user)
   CONVERSATIONS: {
-    LIST: '/conversations',
-    CREATE: '/conversations',
-    DETAIL: id => `/conversations/${id}`,
-    MESSAGES: id => `/conversations/${id}/messages`,
-    MARK_READ: id => `/conversations/${id}/read`,
+    ME: '/conversations/me',
+    UNREAD: '/conversations/me/unread-count',
+    MESSAGES: '/conversations/me/messages',
+    READ: '/conversations/me/read',
   },
 };
 
