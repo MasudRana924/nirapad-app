@@ -20,6 +20,7 @@ import {
   isSearchingStatus,
   getStatusMeta,
 } from '../utils/bookingStatus';
+import {getBookingPatient} from '../utils/bookingPatient';
 
 const INK = '#163532';
 const MUTED = '#7B9390';
@@ -207,6 +208,10 @@ const BookingsScreen = ({navigation}) => {
               const theme = CARD_THEMES[index % CARD_THEMES.length];
               const status = getStatusMetaForCard(booking, t);
               const serviceLabel = getServiceLabel(booking, t);
+              const patient = getBookingPatient(booking);
+              const patientLabel = patient?.isSelf
+                ? t('myself', 'Myself')
+                : patient?.name;
 
               return (
                 <TouchableOpacity
@@ -240,6 +245,14 @@ const BookingsScreen = ({navigation}) => {
                           {formatDate(booking.booking_date)}
                         </Text>
                       </View>
+                      {!!patientLabel && (
+                        <View style={styles.dateInfo}>
+                          <Icon name="person-outline" size={14} color={MUTED} />
+                          <Text style={styles.dateText} numberOfLines={1}>
+                            {patientLabel}
+                          </Text>
+                        </View>
+                      )}
                     </View>
 
                     <View style={styles.cardRight}>

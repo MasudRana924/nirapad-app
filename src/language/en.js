@@ -309,6 +309,12 @@ export default {
   // Select Family Member
   selectFamilyMember: 'Select Patient',
   selectFamilyMemberDesc: 'Choose a family member for this booking',
+  myself: 'Myself',
+  bookForMyselfDesc: 'Book care for yourself',
+  familyMembersTitle: 'Family members',
+  addNameBeforeSelfBooking:
+    'Add your name on your profile before booking for yourself',
+  profileNameRequired: 'Profile name required',
 
   // Select Service
   selectServiceTitle: 'Select Service',

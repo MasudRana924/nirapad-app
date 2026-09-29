@@ -37,6 +37,7 @@ import {
   canShowLiveTracking,
 } from '../utils/bookingStatus';
 import {formatOfferCountdown} from '../utils/offerCountdown';
+import {getBookingPatient} from '../utils/bookingPatient';
 
 const isTrue = value => value === true || value === 'true';
 
@@ -214,19 +215,13 @@ const BookingDetailsScreen = ({navigation, route}) => {
       ? formatOfferCountdown(booking.offer_expires_at)
       : null;
 
-  const familyName =
-    booking?.family_member_name || booking?.family_member?.name;
-  const familyMeta = [
-    booking?.family_member?.relationship,
-    booking?.family_member?.blood_group,
-  ]
-    .filter(Boolean)
-    .join(' · ');
-  const familyAddress = [
-    booking?.family_member_house,
-    booking?.family_member_thana,
-    booking?.family_member_district,
-  ]
+  const patient = getBookingPatient(booking);
+  const patientIsSelf = !!patient?.isSelf;
+  const familyName = patientIsSelf ? t('myself', 'Myself') : patient?.name;
+  const familyMeta = patientIsSelf
+    ? patient?.name || ''
+    : [patient?.relationship, patient?.bloodGroup].filter(Boolean).join(' · ');
+  const familyAddress = [patient?.house, patient?.thana, patient?.district]
     .filter(Boolean)
     .join(', ');
   const caregiverName =
@@ -457,9 +452,9 @@ const BookingDetailsScreen = ({navigation, route}) => {
               <>
                 <Text style={styles.sectionTitle}>{t('patient', 'Patient')}</Text>
                 <View style={styles.personRow}>
-                  {booking.family_member?.photo ? (
+                  {patient?.photo ? (
                     <Image
-                      source={{uri: booking.family_member.photo}}
+                      source={{uri: patient.photo}}
                       style={styles.avatar}
                     />
                   ) : (

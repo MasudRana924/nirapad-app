@@ -9,21 +9,36 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useFamilyMembers} from '../api/queries';
+import {useFamilyMembers, useUserProfile} from '../api/queries';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import FamilySkeleton from '../components/home/FamilySkeleton';
 import {storage} from '../utils/storage';
 import {useTranslation} from 'react-i18next';
+import {useAppModal} from '../contexts/ModalContext';
+import {SELF_MEMBER_ID, isSelfMember} from '../utils/bookingPatient';
 
 const SelectFamilyMember = ({navigation, route}) => {
   const {t} = useTranslation();
+  const {showConfirm} = useAppModal();
   const [selectedMember, setSelectedMember] = useState(route.params?.selectedMember);
   const {selectedCaregiver} = route.params || {};
   const {data: familyMembersData, isLoading} = useFamilyMembers();
+  const {data: profileData} = useUserProfile();
   const familyMembers = Array.isArray(familyMembersData?.data)
     ? familyMembersData.data
     : [];
+  const profile = profileData?.data || {};
+  const profileName = String(profile.name || '').trim();
+  const selfSelected = isSelfMember(selectedMember);
+
+  const buildSelfMember = () => ({
+    id: SELF_MEMBER_ID,
+    isSelf: true,
+    name: profileName,
+    relationship: t('myself', 'Myself'),
+    photo: profile.profile_photo || null,
+  });
 
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A';
@@ -38,20 +53,35 @@ const SelectFamilyMember = ({navigation, route}) => {
   };
 
   const handleNext = () => {
-    if (selectedMember) {
-      storage.saveSelectedFamilyMember(selectedMember);
-      if (selectedCaregiver) {
-        navigation?.navigate('SelectService', {
-          selectedMember,
-          selectedCaregiver,
-          serviceType: route.params?.serviceType,
-        });
-      } else {
-        navigation?.navigate('SelectService', {
-          selectedMember,
-          serviceType: route.params?.serviceType || 'caregiver',
-        });
-      }
+    if (!selectedMember) {
+      return;
+    }
+    if (selfSelected && !profileName) {
+      showConfirm({
+        title: t('profileNameRequired', 'Profile name required'),
+        message: t(
+          'addNameBeforeSelfBooking',
+          'Add your name on your profile before booking for yourself',
+        ),
+        confirmText: t('editProfile', 'Edit profile'),
+        cancelText: t('cancel', 'Cancel'),
+        onConfirm: () => navigation?.navigate('EditProfile'),
+      });
+      return;
+    }
+    const member = selfSelected ? buildSelfMember() : selectedMember;
+    storage.saveSelectedFamilyMember(member);
+    if (selectedCaregiver) {
+      navigation?.navigate('SelectService', {
+        selectedMember: member,
+        selectedCaregiver,
+        serviceType: route.params?.serviceType,
+      });
+    } else {
+      navigation?.navigate('SelectService', {
+        selectedMember: member,
+        serviceType: route.params?.serviceType || 'caregiver',
+      });
     }
   };
 
@@ -79,6 +109,36 @@ const SelectFamilyMember = ({navigation, route}) => {
           <View>
             <Text style={styles.sectionTitle}>{t('selectFamilyMemberDesc', 'Who needs assistance?')}</Text>
           </View>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={[styles.familyCard, selfSelected && styles.selectedCard]}
+          onPress={() => setSelectedMember(buildSelfMember())}>
+          <View style={styles.cardContent}>
+            <View style={styles.cardLeft}>
+              <View style={styles.avatarContainer}>
+                {profile.profile_photo ? (
+                  <Image source={{uri: profile.profile_photo}} style={styles.avatar} />
+                ) : (
+                  <View style={[styles.placeholderAvatar, styles.selfAvatar]}>
+                    <Icon name="person" size={24} color="#008178" />
+                  </View>
+                )}
+              </View>
+              <View style={styles.userInfo}>
+                <Text style={styles.name}>{t('myself', 'Myself')}</Text>
+                <Text style={styles.relation} numberOfLines={1}>
+                  {profileName || t('bookForMyselfDesc', 'Book care for yourself')}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <Text style={styles.groupTitle}>
+          {t('familyMembersTitle', 'Family members')}
+        </Text>
+
         {isLoading ? (
           <FamilySkeleton />
         ) : familyMembers.length === 0 ? (
@@ -104,7 +164,9 @@ const SelectFamilyMember = ({navigation, route}) => {
                 activeOpacity={0.85}
                 style={[
                   styles.familyCard,
-                  selectedMember?.id === member.id && styles.selectedCard,
+                  !selfSelected &&
+                    selectedMember?.id === member.id &&
+                    styles.selectedCard,
                 ]}
                 onPress={() => setSelectedMember(member)}>
                 <View style={styles.cardContent}>
@@ -176,6 +238,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
+  groupTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#8190A7',
+    marginTop: 4,
+    marginBottom: 10,
+  },
+
+  selfAvatar: {
+    backgroundColor: '#E6F4F3',
+  },
+
   scrollContent: {
     padding: 16,
     paddingBottom: 24,
@@ -199,7 +273,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 80,
+    paddingVertical: 32,
   },
 
   emptyTitle: {

@@ -16,6 +16,7 @@ import {storage} from '../utils/storage';
 import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAppModal} from '../contexts/ModalContext';
 import {useTranslation} from 'react-i18next';
+import {isMissingProfileNameError, isSelfMember} from '../utils/bookingPatient';
 
 const toStartTime = timeValue => {
   if (!timeValue) {
@@ -72,7 +73,8 @@ const BookingPreviewScreen = ({navigation, route}) => {
   const {t} = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createBooking = useCreateBooking();
-  const {showError} = useAppModal();
+  const {showError, showConfirm} = useAppModal();
+  const bookingForSelf = isSelfMember(selectedMember);
 
   const hourlyRate =
     selectedCaregiver?.hourly_rate ||
@@ -113,8 +115,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
 
     setIsSubmitting(true);
 
-    const bookingData = {
-      family_member_id: selectedMember.id || selectedMember.uuid,
+    const commonData = {
       provider_id: selectedCaregiver.id || selectedCaregiver.uuid,
       hospital_id: selectedHospital.id,
       booking_date: selectedDate.fullDate,
@@ -127,6 +128,21 @@ const BookingPreviewScreen = ({navigation, route}) => {
       notes: notes || '',
     };
 
+    const bookingData = bookingForSelf
+      ? {
+          book_for: 'SELF',
+          ...commonData,
+          ...(selectedArea?.district ? {district: selectedArea.district} : {}),
+          ...(selectedArea?.thana ? {thana: selectedArea.thana} : {}),
+          ...(selectedArea?.fullAddress
+            ? {house: selectedArea.fullAddress}
+            : {}),
+        }
+      : {
+          family_member_id: selectedMember.id || selectedMember.uuid,
+          ...commonData,
+        };
+
     try {
       const response = await createBooking.mutateAsync(bookingData);
       await storage.clearBookingData();
@@ -136,6 +152,22 @@ const BookingPreviewScreen = ({navigation, route}) => {
         bookingNumber: response.data?.booking_number,
       });
     } catch (error) {
+      if (bookingForSelf && isMissingProfileNameError(error)) {
+        showConfirm({
+          title: t('profileNameRequired', 'Profile name required'),
+          message: getApiErrorMessage(
+            error,
+            t(
+              'addNameBeforeSelfBooking',
+              'Add your name on your profile before booking for yourself',
+            ),
+          ),
+          confirmText: t('editProfile', 'Edit profile'),
+          cancelText: t('cancel', 'Cancel'),
+          onConfirm: () => navigation?.navigate('EditProfile'),
+        });
+        return;
+      }
       const message =
         error?.code === API_CODES.CONFLICT
           ? getApiErrorMessage(
@@ -173,7 +205,9 @@ const BookingPreviewScreen = ({navigation, route}) => {
           <Row label={t('name', 'Name')} value={selectedMember?.name} />
           <Row
             label={t('relationship', 'Relation')}
-            value={selectedMember?.relationship}
+            value={
+              bookingForSelf ? t('myself', 'Myself') : selectedMember?.relationship
+            }
             last
           />
         </View>

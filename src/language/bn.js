@@ -309,6 +309,12 @@ export default {
   // Select Family Member
   selectFamilyMember: 'রোগী নির্বাচন করুন',
   selectFamilyMemberDesc: 'এই বুকিংয়ের জন্য একজন পরিবারের সদস্য বেছে নিন',
+  myself: 'আমি নিজে',
+  bookForMyselfDesc: 'নিজের জন্য সেবা বুক করুন',
+  familyMembersTitle: 'পরিবারের সদস্য',
+  addNameBeforeSelfBooking:
+    'নিজের জন্য বুক করার আগে প্রোফাইলে আপনার নাম যোগ করুন',
+  profileNameRequired: 'প্রোফাইলে নাম প্রয়োজন',
 
   // Select Service
   selectServiceTitle: 'সেবা নির্বাচন করুন',
