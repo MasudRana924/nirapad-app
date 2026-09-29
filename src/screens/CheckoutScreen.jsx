@@ -248,9 +248,9 @@ const styles = StyleSheet.create({
   inputBox: {
     height: 52,
     borderRadius: 14,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#D4DCDA',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
@@ -270,7 +270,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   noteInput: {
+    backgroundColor: '#FFFFFF',
     height: '100%',
+    borderColor: '#D4DCDA',
+    borderWidth: 1,
   },
   paymentCard: {
     flexDirection: 'row',

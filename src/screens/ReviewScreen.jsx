@@ -172,12 +172,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   reviewInput: {
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     fontSize: 14,
     color: '#111820',
     minHeight: 120,
+    borderColor: '#D4DCDA',
+    borderWidth: 1,
   },
   submitButton: {
     backgroundColor: '#008178',

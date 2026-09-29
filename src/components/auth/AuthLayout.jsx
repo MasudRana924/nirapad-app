@@ -20,8 +20,6 @@ const TEAL = '#008178';
 const INK = '#163532';
 const MUTED = '#7E9390';
 const PAGE = '#EAF6F1';
-const BORDER = '#C9DDD7';
-
 const AuthLayout = ({
   children,
   title,
@@ -279,7 +277,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: BORDER,
+    borderColor: '#D4DCDA',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 18,

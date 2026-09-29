@@ -234,10 +234,14 @@ const styles = StyleSheet.create({
     height: 48,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 14,
     marginRight: 10,
+
+    borderColor: '#D4DCDA',
+
+    borderWidth: 1,
   },
 
   searchInput: {
@@ -268,10 +272,16 @@ const styles = StyleSheet.create({
   },
 
   locationInput: {
+
+    backgroundColor: '#FFFFFF',
     flex: 1,
     marginLeft: 10,
     fontSize: 14,
     color: '#172333',
+
+    borderColor: '#D4DCDA',
+
+    borderWidth: 1,
   },
 
   // =====================================================

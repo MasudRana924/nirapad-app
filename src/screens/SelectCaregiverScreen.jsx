@@ -436,11 +436,13 @@ const styles = StyleSheet.create({
   searchBox: {
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     gap: 8,
+    borderColor: '#D4DCDA',
+    borderWidth: 1,
   },
   searchInput: {
     flex: 1,

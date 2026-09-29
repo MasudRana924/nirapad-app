@@ -394,13 +394,13 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 52,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     paddingHorizontal: 14,
     fontSize: 15,
     color: '#111820',
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#D4DCDA',
     marginBottom: 16,
   },
   langSwitch: {

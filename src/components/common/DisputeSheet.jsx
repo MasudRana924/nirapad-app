@@ -163,17 +163,20 @@ const styles = StyleSheet.create({
   input: {
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#D4DCDA',
     paddingHorizontal: 14,
     fontSize: 15,
     color: '#111820',
     marginBottom: 14,
   },
   detailsInput: {
+    backgroundColor: '#FFFFFF',
     height: 96,
     paddingTop: 12,
+    borderColor: '#D4DCDA',
+    borderWidth: 1,
   },
   submitBtn: {
     width: '100%',

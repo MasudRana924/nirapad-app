@@ -352,9 +352,9 @@ const styles = StyleSheet.create({
   searchBox: {
     height: 48,
     borderRadius: 14,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#D4DCDA',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,

@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#D4DCDA',
     textAlign: 'center',
     fontSize: 22,
     fontWeight: '700',

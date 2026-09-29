@@ -250,10 +250,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   dropdownButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#D4DCDA',
   },
   pillButton: {
     backgroundColor: '#F3FAF7',
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#D4DCDA',
   },
   dropdownButtonActive: {
     borderColor: '#008178',
@@ -352,10 +352,10 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#D4DCDA',
     paddingHorizontal: 12,
     height: 44,
     marginVertical: 12,
