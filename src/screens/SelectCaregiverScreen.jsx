@@ -124,7 +124,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
 
   return (
     <View style={styles.page}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
       <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
         <View style={styles.topBar}>
           <TouchableOpacity
@@ -389,7 +389,7 @@ export default SelectCaregiverScreen;
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   flex: {
     flex: 1,
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E8EEEC',
+    borderColor: '#FFFFFF',
     marginBottom: 12,
 
   },
@@ -739,7 +739,7 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
     paddingHorizontal: 16,
     paddingTop: 12,
   },

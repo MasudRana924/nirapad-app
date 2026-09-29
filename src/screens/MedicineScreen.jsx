@@ -320,7 +320,7 @@ export default MedicineScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   cartHeaderBtn: {
     width: 36,
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderTopWidth: 1,
     borderTopColor: '#F0F2F5',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   bottomLabel: {
     fontSize: 12,

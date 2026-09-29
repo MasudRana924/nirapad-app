@@ -97,7 +97,7 @@ const PaymentScreen = ({route, navigation}) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   header: {
     flexDirection: 'row',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
-    borderColor: '#E3E8F0',
+    borderColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,

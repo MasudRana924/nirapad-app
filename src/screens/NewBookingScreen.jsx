@@ -61,7 +61,7 @@ const NewBookingScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
 
       {/* =====================================================
           HEADER
@@ -245,7 +245,7 @@ export default NewBookingScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5FAF9',
   },
 
   // =======================================================
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     height: 61,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5FAF9',
     paddingHorizontal: 19,
   },
 
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#DFE5EE',
+    borderColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 13,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#DFE5EE',
+    borderColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 13,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 76,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5FAF9',
     paddingTop: 9,
   },
 

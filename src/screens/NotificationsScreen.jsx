@@ -58,7 +58,7 @@ const NotificationsScreen = () => {
   const {t} = useTranslation();
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FC" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -109,7 +109,7 @@ export default NotificationsScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: '#F5FAF9',
   },
 
   header: {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#EDF1F7',
+    borderColor: '#FFFFFF',
     alignItems: 'flex-start',
   },
 

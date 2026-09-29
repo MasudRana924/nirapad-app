@@ -14,6 +14,8 @@ const INK = '#0F1A19';
 
 const caregiverBg = require('../../assets/home-caregiver-card-bg.png');
 const nurseBg = require('../../assets/home-nurse-card-bg.png');
+const physioBg = require('../../assets/home-physio-card-bg.png');
+const medicineBg = require('../../assets/home-medicine-card-bg.png');
 
 const BookingButtons = ({navigation}) => {
   const {t} = useTranslation();
@@ -41,8 +43,24 @@ const BookingButtons = ({navigation}) => {
   ];
 
   const DISABLED_SERVICES = [
-    {key: 'physio', label: t('physiotherapy'), icon: 'accessibility-outline'},
-    {key: 'medicine', label: t('medicine'), icon: 'bandage-outline'},
+    {
+      key: 'physio',
+      label: t('physiotherapy'),
+      subLabel: 'Home rehab sessions',
+      icon: 'accessibility-outline',
+      iconColor: '#5B63B7',
+      background: physioBg,
+      cardStyle: styles.physioCard,
+    },
+    {
+      key: 'medicine',
+      label: t('medicine'),
+      subLabel: 'Doorstep delivery',
+      icon: 'bandage-outline',
+      iconColor: '#C2505F',
+      background: medicineBg,
+      cardStyle: styles.medicineCard,
+    },
   ];
 
   return (
@@ -80,19 +98,34 @@ const BookingButtons = ({navigation}) => {
         ))}
       </View>
 
-      <View style={styles.disabledRow}>
+      <View style={[styles.grid, styles.disabledRow]}>
         {DISABLED_SERVICES.map(service => (
-          <View key={service.key} style={styles.disabledCard}>
-            <Icon name={service.icon} size={18} color="#8E9A98" />
-            <View style={styles.disabledCopy}>
-              <Text style={styles.disabledLabel} numberOfLines={1}>
+          <View
+            key={service.key}
+            style={[styles.card, service.cardStyle]}
+            accessibilityState={{disabled: true}}>
+            <ImageBackground
+              source={service.background}
+              resizeMode="cover"
+              style={styles.cardInner}>
+              <View style={styles.iconCircle}>
+                <Icon name={service.icon} size={17} color={service.iconColor} />
+              </View>
+
+              <Text style={styles.cardLabel} numberOfLines={1}>
                 {service.label}
               </Text>
-              <Text style={styles.disabledSub} numberOfLines={1}>
-                {t('comingSoon')}
+              <Text style={styles.cardSubLabel} numberOfLines={1}>
+                {service.subLabel}
               </Text>
-            </View>
-            <Icon name="chevron-forward-sharp" size={12} color="#A7B2B0" />
+
+              <View style={styles.bookNowRow}>
+                <View style={styles.soonPill}>
+                  <Icon name="time-outline" size={11} color="#6B7775" />
+                  <Text style={styles.soonText}>{t('comingSoon')}</Text>
+                </View>
+              </View>
+            </ImageBackground>
           </View>
         ))}
       </View>
@@ -159,6 +192,7 @@ const styles = StyleSheet.create({
   bookNowRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 20,
     marginTop: 6,
     gap: 4,
   },
@@ -168,35 +202,28 @@ const styles = StyleSheet.create({
     color: TEAL,
   },
   disabledRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 8,
   },
-  disabledCard: {
-    width: '48.5%',
+  physioCard: {
+    backgroundColor: '#E4E7F8',
+    borderColor: '#E4E7F8',
+  },
+  medicineCard: {
+    backgroundColor: '#FCE3E6',
+    borderColor: '#FCE3E6',
+  },
+  soonPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F4F4',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#F1F4F4',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    gap: 4,
+    height: 19,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
   },
-  disabledCopy: {
-    flex: 1,
-    marginLeft: 8,
-    marginRight: 4,
-  },
-  disabledLabel: {
-    fontSize: 11.5,
-    lineHeight: 14,
-    fontWeight: '600',
+  soonText: {
+    fontSize: 10.5,
+    fontWeight: '700',
     color: '#6B7775',
-  },
-  disabledSub: {
-    fontSize: 10,
-    lineHeight: 13,
-    color: '#9AA5A3',
   },
 });

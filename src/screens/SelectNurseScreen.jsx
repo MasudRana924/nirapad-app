@@ -78,7 +78,7 @@ const SelectNurseScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
 
       {/* ================= HEADER ================= */}
 
@@ -243,7 +243,7 @@ export default SelectNurseScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5FAF9',
   },
 
   // =====================================================
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     height: 55,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5FAF9',
     paddingHorizontal: 18,
   },
 
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#DFE5EE',
+    borderColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 9,
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#DDE4EE',
+    borderColor: '#FFFFFF',
     marginBottom: 14,
     paddingTop: 13,
     paddingBottom: 12,

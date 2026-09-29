@@ -61,7 +61,7 @@ const ServicesScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -106,7 +106,7 @@ export default ServicesScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5FAF9',
   },
 
   header: {
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     padding: 18,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#EDF1F7',
+    borderColor: '#FFFFFF',
   },
 
   iconBg: {

@@ -266,7 +266,7 @@ export default AddFamilyMember;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   flex: {
     flex: 1,
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   submitButton: {
     height: 52,

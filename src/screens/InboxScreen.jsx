@@ -203,7 +203,7 @@ export default InboxScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   scrollView: {
     flex: 1,

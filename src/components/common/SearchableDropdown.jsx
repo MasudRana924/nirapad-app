@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#FFFFFF',
   },
   pillButton: {
     backgroundColor: '#F3FAF7',
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#DCEEE9',
+    borderColor: '#FFFFFF',
   },
   dropdownButtonActive: {
     borderColor: '#008178',

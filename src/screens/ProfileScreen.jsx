@@ -202,7 +202,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
 
   header: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     backgroundColor: '#FFFFFF',
     borderWidth: 4,
-    borderColor: '#EEF7F5',
+    borderColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E6EEEC',
+    borderColor: '#FFFFFF',
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 16,

@@ -100,13 +100,14 @@ const HomeSkeleton = () => {
         </View>
 
         <View style={[styles.row, styles.mt8]}>
-          {[1, 2].map(i => (
-            <View key={i} style={styles.disabledTile}>
-              <Circle size={18} />
-              <View style={styles.disabledCopy}>
-                <Bone width={70} height={9} />
-                <Bone width={50} height={8} style={styles.mt4} />
-              </View>
+          {['#E4E7F8', '#FCE3E6'].map(bg => (
+            <View
+              key={bg}
+              style={[styles.serviceCard, {backgroundColor: bg}]}>
+              <View style={styles.whiteCircle} />
+              <Bone width={80} height={13} style={styles.mt6} />
+              <Bone width={96} height={10} style={styles.mt5} />
+              <Bone width={72} height={11} style={styles.mt8} />
             </View>
           ))}
         </View>
@@ -221,20 +222,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#FFFFFF',
   },
-  disabledTile: {
-    width: '48.5%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F1F4F4',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E4E9E8',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  disabledCopy: {
-    marginLeft: 8,
-  },
   familyHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -253,7 +240,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E3ECEA',
+    borderColor: '#FFFFFF',
   },
   addCard: {
     borderStyle: 'dashed',
@@ -269,7 +256,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E3ECEA',
+    borderColor: '#FFFFFF',
     paddingHorizontal: 10,
     paddingVertical: 8,
   },

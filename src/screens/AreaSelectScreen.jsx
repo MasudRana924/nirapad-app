@@ -87,7 +87,7 @@ const AreaSelectScreen = ({navigation, route}) => {
 
   return (
     <View style={styles.page}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
       <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
         <View style={styles.topBar}>
           <TouchableOpacity
@@ -198,7 +198,7 @@ export default AreaSelectScreen;
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   flex: {
     flex: 1,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#DCEEE9',
+    borderColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: 14,

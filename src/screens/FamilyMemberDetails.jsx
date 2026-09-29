@@ -94,7 +94,7 @@ export default FamilyMemberDetails;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   scroll: {
     flex: 1,

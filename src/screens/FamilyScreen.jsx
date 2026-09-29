@@ -130,7 +130,7 @@ export default FamilyScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5FAF9',
   },
 
   // ================= HEADER =================
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderWidth: 1,
-    borderColor: '#E3E8F0',
+    borderColor: '#FFFFFF',
     marginBottom: 12,
   },
 

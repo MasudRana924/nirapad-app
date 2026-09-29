@@ -644,7 +644,7 @@ export default BookingDetailsScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   scrollView: {
     flex: 1,
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 14,
    
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5FAF9',
   },
   actionButton: {
     flex: 1,

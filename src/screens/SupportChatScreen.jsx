@@ -30,6 +30,7 @@ import {
 } from '@react-native-documents/picker';
 import WebView from 'react-native-webview';
 import Header from '../components/common/Header';
+import ChatThemeBackground from '../components/chat/ChatThemeBackground';
 import Toast from '../components/common/Toast';
 import {conversationService} from '../api/services';
 import {createUuid, getApiErrorMessage} from '../api/client';
@@ -751,6 +752,7 @@ const SupportChatScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <ChatThemeBackground />
       <Header title={t('Nirapod Support')} showBack />
       <KeyboardAvoidingView
         style={styles.flex}
@@ -1010,7 +1012,7 @@ export default SupportChatScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F5FAF9',
   },
   flex: {
     flex: 1,
@@ -1048,7 +1050,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   dateChip: {
-    backgroundColor: '#F4F6F8',
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -1081,7 +1083,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   bubbleOther: {
-    backgroundColor: '#F4F6F8',
+    backgroundColor: '#FFFFFF',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#FFFFFF',
     borderBottomLeftRadius: 4,
   },
   bubbleFailed: {
