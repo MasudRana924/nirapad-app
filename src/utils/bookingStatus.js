@@ -69,10 +69,29 @@ export const normalizeBooking = payload => {
     review: raw.review !== undefined ? raw.review : base.review,
     status: raw.status ?? base.status,
     refund: raw.refund ?? base.refund,
+    awaiting_next_caregiver:
+      raw.awaiting_next_caregiver ?? base.awaiting_next_caregiver,
+    can_accept_next_caregiver:
+      raw.can_accept_next_caregiver ?? base.can_accept_next_caregiver,
+    can_decline_next_caregiver:
+      raw.can_decline_next_caregiver ?? base.can_decline_next_caregiver,
+    suggested_caregiver:
+      raw.suggested_caregiver ?? base.suggested_caregiver ?? null,
+    suggestion_expires_at:
+      raw.suggestion_expires_at ?? base.suggestion_expires_at ?? null,
+    suggestion_response_timeout_minutes:
+      raw.suggestion_response_timeout_minutes ??
+      base.suggestion_response_timeout_minutes,
   };
 };
 
 const isTrueFlag = value => value === true || value === 'true' || value === 1;
+
+/** Backend is waiting for the user to confirm the suggested next caregiver. */
+export const isAwaitingNextCaregiver = booking =>
+  !!booking &&
+  isTrueFlag(booking.awaiting_next_caregiver) &&
+  isSearchingStatus(booking.status);
 
 /** Show Live Tracking when service is in progress or API flags allow it. */
 export const canShowLiveTracking = booking => {

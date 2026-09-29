@@ -14,6 +14,7 @@ import DeviceInfo from 'react-native-device-info';
 import {apiRequest} from './api';
 import {requestNotificationPermission} from '../utils/permissions';
 import {isSupportMessagePush} from '../utils/supportPush';
+import {routeBookingAlertTap} from '../utils/bookingAlerts';
 import {
   emitSupportChatRefresh,
   isSupportChatScreenFocused,
@@ -359,9 +360,14 @@ class NotificationService {
       return;
     }
 
+    if (routeBookingAlertTap(data, navigation)) {
+      return;
+    }
+
     const openBooking =
       type === 'SERVICE_STARTED' ||
       type === 'SERVICE_COMPLETED' ||
+      type === 'SERVICE_MISSED_START' ||
       type === 'BOOKING_ACCEPTED' ||
       type === 'BOOKING_REASSIGNED' ||
       type === 'BOOKING_SEARCHING' ||

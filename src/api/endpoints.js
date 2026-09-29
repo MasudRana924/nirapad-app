@@ -63,6 +63,8 @@ export const ENDPOINTS = {
     DISPUTE: id => `/bookings/${id}/dispute`,
     DISPUTES: id => `/bookings/${id}/disputes`,
     LIVE_LOCATION: id => `/bookings/${id}/live-location`,
+    ACCEPT_NEXT_CAREGIVER: id => `/bookings/${id}/accept-next-caregiver`,
+    DECLINE_NEXT_CAREGIVER: id => `/bookings/${id}/decline-next-caregiver`,
   },
 
   // Hospitals endpoints
@@ -73,11 +75,12 @@ export const ENDPOINTS = {
 
   // Inbox endpoints
   INBOX: {
-    LIST: '/inbox',
-    UNREAD_COUNT: '/inbox/unread-count',
+    LIST: '/user/notifications',
+    UNREAD_COUNT: '/user/notifications/unread-count',
     DETAIL: id => `/inbox/${id}`,
-    READ: id => `/inbox/${id}/read`,
-    READ_ALL: '/inbox/read-all',
+    READ: id => `/user/notifications/${id}/read`,
+    READ_ALL: '/user/notifications/read-all',
+    DELETE: id => `/notifications/${id}`,
   },
 
   // Payments endpoints

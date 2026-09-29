@@ -10,27 +10,33 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useNotifications} from '../api/queries';
+import {useInbox} from '../api/queries';
+import {useMarkInboxRead, useMarkAllInboxRead} from '../api/mutations';
 import Header from '../components/common/Header';
 import NotificationSkeleton from '../components/home/NotificationSkeleton';
-import {apiRequest} from '../services/api';
 import {
   parseNotificationData,
   handleNotificationClick,
   resolveInboxBookingId,
-  openBookingDetails,
 } from '../utils/notificationHandler';
+import {isEmergencyData} from '../utils/bookingAlerts';
 import {useTranslation} from 'react-i18next';
+
+const byNewest = (a, b) =>
+  new Date(b?.created_at || 0).getTime() - new Date(a?.created_at || 0).getTime();
 
 const InboxScreen = ({navigation}) => {
   const {t} = useTranslation();
-  const {data: notificationsData, isLoading, refetch} = useNotifications({
+  const {data: notificationsData, isLoading, refetch} = useInbox({
     page: 1,
     limit: 20,
   });
+  const markRead = useMarkInboxRead();
+  const markAllRead = useMarkAllInboxRead();
   const notifications = Array.isArray(notificationsData?.data)
-    ? notificationsData.data
+    ? [...notificationsData.data].sort(byNewest)
     : [];
+  const hasUnread = notifications.some(item => !item.is_read);
   const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
@@ -66,6 +72,13 @@ const InboxScreen = ({navigation}) => {
 
   const getNotificationIcon = type => {
     switch (type) {
+      case 'SUGGEST_NEXT_CAREGIVER':
+        return 'person-remove-outline';
+      case 'SERVICE_NOT_STARTED_EMERGENCY':
+        return 'warning-outline';
+      case 'SERVICE_NOT_STARTED_REASON':
+      case 'SERVICE_MISSED_START':
+        return 'alert-circle-outline';
       case 'BOOKING':
       case 'BOOKING_CREATED':
       case 'BOOKING_ACCEPTED':
@@ -86,53 +99,52 @@ const InboxScreen = ({navigation}) => {
     }
   };
 
-  const handleNotificationPress = async notification => {
+  const notificationData = notification => {
+    const nested = parseNotificationData(notification.data);
+    const bookingId = resolveInboxBookingId(notification);
+    return {
+      ...nested,
+      type: notification.type || nested.type,
+      title: nested.title || notification.title,
+      body: nested.body || notification.body,
+      booking_id: nested.booking_id || bookingId || undefined,
+      inbox_id: notification.id,
+    };
+  };
+
+  const handleNotificationPress = notification => {
+    if (notification.id && !notification.is_read) {
+      markRead.mutate(notification.id);
+    }
     try {
-      if (notification.id) {
-        await apiRequest(`/inbox/${notification.id}/read`, 'PUT');
-      }
-
-      let detail = notification;
-      if (notification.id) {
-        try {
-          const detailResponse = await apiRequest(
-            `/inbox/${notification.id}`,
-            'GET',
-          );
-          if (detailResponse?.data) {
-            detail = detailResponse.data;
-          }
-        } catch (error) {
-          console.log('Inbox detail fetch failed, using list item');
-        }
-      }
-
-      const nested = parseNotificationData(detail.data);
-      const bookingId = resolveInboxBookingId(detail);
-
-      if (bookingId) {
-        openBookingDetails(bookingId, navigation, {
-          inboxId: detail.id || notification.id,
-        });
-        return;
-      }
-
-      handleNotificationClick(
-        {
-          ...nested,
-          type: detail.type || nested.type,
-          inbox_id: detail.id || notification.id,
-        },
-        navigation,
-      );
+      handleNotificationClick(notificationData(notification), navigation);
     } catch (error) {
       console.error('Error handling notification press:', error);
     }
   };
 
+  const markAllButton = (
+    <TouchableOpacity
+      activeOpacity={0.7}
+      style={styles.markAllBtn}
+      disabled={!hasUnread || markAllRead.isPending}
+      onPress={() => markAllRead.mutate()}
+      accessibilityLabel={t('markAllRead', 'Mark all read')}>
+      <Icon
+        name="checkmark-done-outline"
+        size={22}
+        color={hasUnread ? '#008178' : '#B7C3C1'}
+      />
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Header title={t('inbox')} showBack={true} />
+      <Header
+        title={t('notificationsTitle', 'Notifications')}
+        showBack={true}
+        rightComponent={markAllButton}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -161,28 +173,49 @@ const InboxScreen = ({navigation}) => {
         ) : (
           notifications.map(notification => {
             const unread = !notification.is_read;
+            const emergency = isEmergencyData(notificationData(notification));
+            const body = notification.body || notification.message;
             return (
               <TouchableOpacity
                 key={notification.id}
-                style={[styles.card, unread && styles.cardUnread]}
+                style={[
+                  styles.card,
+                  unread && styles.cardUnread,
+                  emergency && styles.cardEmergency,
+                ]}
                 onPress={() => handleNotificationPress(notification)}>
                 <View style={styles.iconWrap}>
                   <Icon
                     name={getNotificationIcon(notification.type)}
                     size={20}
-                    color="#008178"
+                    color={emergency ? '#DC2626' : '#008178'}
                   />
                 </View>
 
                 <View style={styles.content}>
                   <View style={styles.topRow}>
-                    <Text
-                      style={[styles.message, unread && styles.messageUnread]}
-                      numberOfLines={3}>
-                      {notification.body ||
-                        notification.message ||
-                        notification.title}
-                    </Text>
+                    <View style={styles.textCol}>
+                      {notification.title ? (
+                        <Text
+                          style={[
+                            styles.title,
+                            emergency && styles.titleEmergency,
+                          ]}
+                          numberOfLines={1}>
+                          {notification.title}
+                        </Text>
+                      ) : null}
+                      {body ? (
+                        <Text
+                          style={[
+                            styles.message,
+                            unread && styles.messageUnread,
+                          ]}
+                          numberOfLines={3}>
+                          {body}
+                        </Text>
+                      ) : null}
+                    </View>
                     {unread && <View style={styles.unreadDot} />}
                   </View>
                   <Text style={styles.time}>
@@ -249,6 +282,30 @@ const styles = StyleSheet.create({
   },
   cardUnread: {
     backgroundColor: '#E6F4F3',
+  },
+  cardEmergency: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+  },
+  markAllBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textCol: {
+    flex: 1,
+    minWidth: 0,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111820',
+    marginBottom: 2,
+  },
+  titleEmergency: {
+    color: '#B91C1C',
   },
   iconWrap: {
     width: 40,

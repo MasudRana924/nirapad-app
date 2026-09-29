@@ -35,7 +35,9 @@ import {
   normalizeBooking,
   formatRefund,
   canShowLiveTracking,
+  isAwaitingNextCaregiver,
 } from '../utils/bookingStatus';
+import {emitBookingAlert, suggestAlertFromBooking} from '../utils/bookingAlerts';
 import {formatOfferCountdown} from '../utils/offerCountdown';
 import {getBookingPatient} from '../utils/bookingPatient';
 
@@ -95,6 +97,25 @@ const BookingDetailsScreen = ({navigation, route}) => {
     }, 1000);
     return () => clearInterval(timer);
   }, [booking?.status, booking?.offer_expires_at]);
+
+  const awaitingNextCaregiver = isAwaitingNextCaregiver(booking);
+  const suggestionShownRef = useRef(null);
+  const suggestionKey = awaitingNextCaregiver
+    ? `${booking?.id}:${booking?.suggested_caregiver?.id || ''}`
+    : null;
+
+  useEffect(() => {
+    if (!suggestionKey || suggestionShownRef.current === suggestionKey) {
+      return;
+    }
+    suggestionShownRef.current = suggestionKey;
+    emitBookingAlert(suggestAlertFromBooking(booking));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestionKey]);
+
+  const openSuggestion = () => {
+    emitBookingAlert(suggestAlertFromBooking(booking));
+  };
 
   useEffect(() => {
     if (reviewDismissed || isLoading || !booking) {
@@ -371,7 +392,24 @@ const BookingDetailsScreen = ({navigation, route}) => {
             enabled={showLiveTracking}
           />
         )}
-        {searching && (
+        {awaitingNextCaregiver && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={openSuggestion}
+            style={styles.searchingBanner}>
+            <Icon name="person-remove-outline" size={18} color="#D97706" />
+            <View style={styles.waitingCopy}>
+              <Text style={styles.searchingText}>
+                {t('caregiverIsBusy', 'Caregiver is busy')}
+              </Text>
+              <Text style={styles.suggestionLink}>
+                {t('reviewNextCaregiver', 'Tap to choose the next caregiver')}
+              </Text>
+            </View>
+            <Icon name="chevron-forward" size={16} color="#D97706" />
+          </TouchableOpacity>
+        )}
+        {searching && !awaitingNextCaregiver && (
           <View style={styles.searchingBanner}>
             <Icon name="search-outline" size={18} color="#D97706" />
             <Text style={styles.searchingText}>
@@ -877,6 +915,12 @@ const styles = StyleSheet.create({
   },
   disputeButton: {
     backgroundColor: '#111820',
+  },
+  suggestionLink: {
+    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#B45309',
   },
   searchingBanner: {
     flexDirection: 'row',

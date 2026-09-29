@@ -125,16 +125,18 @@ export const inboxService = {
     if (type) {
       queryParams.append('type', type);
     }
-    return apiRequest(`/inbox?${queryParams.toString()}`, 'GET');
+    return apiRequest(`/user/notifications?${queryParams.toString()}`, 'GET');
   },
 
   getInboxItem: id => apiRequest(`/inbox/${id}`, 'GET'),
 
-  getUnreadCount: () => apiRequest('/inbox/unread-count', 'GET'),
+  getUnreadCount: () => apiRequest('/user/notifications/unread-count', 'GET'),
 
-  markAsRead: id => apiRequest(`/inbox/${id}/read`, 'PUT'),
+  markAsRead: id => apiRequest(`/user/notifications/${id}/read`, 'PUT'),
 
-  markAllAsRead: () => apiRequest('/inbox/read-all', 'PUT'),
+  markAllAsRead: () => apiRequest('/user/notifications/read-all', 'POST'),
+
+  deleteNotification: id => apiRequest(`/notifications/${id}`, 'DELETE'),
 };
 
 export const notificationPreferenceService = {
@@ -210,6 +212,12 @@ export const bookingService = {
     apiRequest(`/bookings/${id}/cancel`, 'POST', {
       reason: reason || 'Plans changed',
     }),
+
+  acceptNextCaregiver: id =>
+    apiRequest(`/bookings/${id}/accept-next-caregiver`, 'POST'),
+
+  declineNextCaregiver: id =>
+    apiRequest(`/bookings/${id}/decline-next-caregiver`, 'POST'),
 };
 
 /**

@@ -316,6 +316,30 @@ export default {
     'Add your name on your profile before booking for yourself',
   profileNameRequired: 'Profile name required',
 
+  // Notifications & next caregiver
+  markAllRead: 'Mark all read',
+  caregiverIsBusy: 'Caregiver is busy',
+  suggestNextCaregiverMsg:
+    'This caregiver is busy. Do you want to select the next caregiver?',
+  nextCaregiverAlsoBusy:
+    'That caregiver is no longer available. Do you want to select the next caregiver?',
+  suggestedCaregiver: 'Suggested caregiver',
+  respondWithin: 'Respond within',
+  reviewNextCaregiver: 'Tap to choose the next caregiver',
+  yearsShort: 'yrs',
+  bookingCancelledTitle: 'Booking cancelled',
+  bookingCancelledDeclinedMsg:
+    'Your booking has been cancelled. You can create a new booking anytime.',
+  bookingCancelledBookAgainMsg:
+    'No caregiver was confirmed in time, so this booking was cancelled. Please book again.',
+  bookAgain: 'Book again',
+  viewBooking: 'View booking',
+  emergency: 'EMERGENCY',
+  serviceNotStarted: 'Service not started',
+  serviceNotStartedEmergency: 'Service not started — emergency',
+  caregiverReason: "Caregiver's reason",
+  noReasonProvided: 'No reason provided',
+
   // Select Service
   selectServiceTitle: 'Select Service',
 

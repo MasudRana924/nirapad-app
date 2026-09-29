@@ -316,6 +316,30 @@ export default {
     'নিজের জন্য বুক করার আগে প্রোফাইলে আপনার নাম যোগ করুন',
   profileNameRequired: 'প্রোফাইলে নাম প্রয়োজন',
 
+  // Notifications & next caregiver
+  markAllRead: 'সব পড়া হয়েছে',
+  caregiverIsBusy: 'কেয়ারগিভার ব্যস্ত',
+  suggestNextCaregiverMsg:
+    'এই কেয়ারগিভার ব্যস্ত। আপনি কি পরবর্তী কেয়ারগিভার নির্বাচন করতে চান?',
+  nextCaregiverAlsoBusy:
+    'ওই কেয়ারগিভার এখন আর ফ্রি নেই। আপনি কি পরবর্তী কেয়ারগিভার নির্বাচন করতে চান?',
+  suggestedCaregiver: 'প্রস্তাবিত কেয়ারগিভার',
+  respondWithin: 'উত্তর দিন',
+  reviewNextCaregiver: 'পরবর্তী কেয়ারগিভার বেছে নিতে ট্যাপ করুন',
+  yearsShort: 'বছর',
+  bookingCancelledTitle: 'বুকিং বাতিল হয়েছে',
+  bookingCancelledDeclinedMsg:
+    'আপনার বুকিং বাতিল হয়েছে। যেকোনো সময় নতুন বুকিং করতে পারবেন।',
+  bookingCancelledBookAgainMsg:
+    'সময়মতো কোনো কেয়ারগিভার নিশ্চিত না হওয়ায় বুকিংটি বাতিল হয়েছে। আবার বুক করুন।',
+  bookAgain: 'আবার বুক করুন',
+  viewBooking: 'বুকিং দেখুন',
+  emergency: 'জরুরি',
+  serviceNotStarted: 'সেবা শুরু হয়নি',
+  serviceNotStartedEmergency: 'সেবা শুরু হয়নি — জরুরি',
+  caregiverReason: 'কেয়ারগিভারের কারণ',
+  noReasonProvided: 'কোনো কারণ দেওয়া হয়নি',
+
   // Select Service
   selectServiceTitle: 'সেবা নির্বাচন করুন',
 

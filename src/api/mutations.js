@@ -211,6 +211,53 @@ export const useMarkInboxRead = () => {
   });
 };
 
+export const useMarkAllInboxRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => inboxService.markAllAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
+    },
+  });
+};
+
+export const useDeleteNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: id => inboxService.deleteNotification(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
+    },
+  });
+};
+
+const invalidateBooking = (queryClient, id) => {
+  queryClient.invalidateQueries({queryKey: queryKeys.bookings.all});
+  if (id) {
+    queryClient.invalidateQueries({queryKey: queryKeys.bookings.detail(id)});
+  }
+};
+
+export const useAcceptNextCaregiver = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: id => bookingService.acceptNextCaregiver(id),
+    onSuccess: (_data, id) => invalidateBooking(queryClient, id),
+  });
+};
+
+export const useDeclineNextCaregiver = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: id => bookingService.declineNextCaregiver(id),
+    onSuccess: (_data, id) => invalidateBooking(queryClient, id),
+  });
+};
+
 /**
  * Auth Mutations
  */
@@ -269,6 +316,10 @@ export default {
   useExecuteBkashPayment,
   useUpdateNotificationPreferences,
   useMarkInboxRead,
+  useMarkAllInboxRead,
+  useDeleteNotification,
+  useAcceptNextCaregiver,
+  useDeclineNextCaregiver,
 
   // Auth
   useLogin,

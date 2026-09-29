@@ -1,5 +1,6 @@
 import notificationService from '../services/notificationService';
 import {isSupportMessagePush} from './supportPush';
+import {routeBookingAlertTap} from './bookingAlerts';
 
 const getBookingId = data =>
   data?.booking_id || data?.bookingId || data?.reference_id || null;
@@ -69,6 +70,7 @@ const shouldOpenBookingDetails = data => {
   return (
     type === 'SERVICE_STARTED' ||
     type === 'SERVICE_COMPLETED' ||
+    type === 'SERVICE_MISSED_START' ||
     type === 'BOOKING_ACCEPTED' ||
     type === 'BOOKING_REASSIGNED' ||
     type === 'BOOKING_SEARCHING' ||
@@ -100,6 +102,10 @@ export const handleNotificationClick = (data, navigation) => {
 
   if (isSupportMessagePush(data)) {
     navigation.navigate('SupportChat');
+    return;
+  }
+
+  if (routeBookingAlertTap(data, navigation)) {
     return;
   }
 

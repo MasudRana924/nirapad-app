@@ -45,6 +45,7 @@ import PaymentSuccessScreen from '../screens/PaymentSuccessScreen';
 import PaymentCancelledScreen from '../screens/PaymentCancelledScreen';
 import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
+import InboxScreen from '../screens/InboxScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -194,6 +195,7 @@ function AppNavigator() {
           <Stack.Screen name="PaymentSuccess" component={PaymentSuccessScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="PaymentCancelled" component={PaymentCancelledScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+          <Stack.Screen name="Inbox" component={InboxScreen} />
           <Stack.Screen name="SupportChat" component={SupportChatScreen} options={{headerShown: false}} />
         </>
       ) : (

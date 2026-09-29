@@ -19,6 +19,8 @@ import {handleNotificationClick, parseNotificationData} from './src/utils/notifi
 import {isSupportMessagePush} from './src/utils/supportPush';
 import {queryKeys} from './src/api/queryKeys';
 import {ModalProvider} from './src/contexts/ModalContext';
+import BookingAlertHost from './src/components/booking/BookingAlertHost';
+import {showBookingAlertFromPush} from './src/utils/bookingAlerts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -92,6 +94,14 @@ function AppContent() {
         } else {
           queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
           queryClient.invalidateQueries({queryKey: queryKeys.bookings.all});
+          if (
+            showBookingAlertFromPush(data, {
+              title: payload?.title,
+              body: payload?.body,
+            })
+          ) {
+            return;
+          }
         }
         setBanner({
           visible: true,
@@ -150,6 +160,7 @@ function AppContent() {
           }
         }}
       />
+      {userToken ? <BookingAlertHost navigationRef={navigationRef} /> : null}
     </>
   );
 }
