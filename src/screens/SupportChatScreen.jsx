@@ -1087,9 +1087,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   bubbleOther: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#E6ECEB',
+    backgroundColor: '#DDF1EC',
     borderBottomLeftRadius: 4,
   },
   bubbleFailed: {

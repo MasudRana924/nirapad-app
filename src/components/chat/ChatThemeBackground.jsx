@@ -44,7 +44,7 @@ const ChatThemeBackground = () => {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <LinearGradient
-        colors={['#FFFFFF', '#FFFFFF']}
+        colors={['#EAF6F2', '#FFFFFF', '#E7F3EF']}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}
         style={StyleSheet.absoluteFill}
