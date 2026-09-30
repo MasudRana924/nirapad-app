@@ -210,19 +210,15 @@ const BookingPreviewScreen = ({navigation, route}) => {
             }
             last
           />
-        </View>
 
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
+          <View style={styles.sectionHeader}>
             <Icon name="grid-outline" size={18} color="#008178" />
             <Text style={styles.cardTitle}>{t('service', 'Service')}</Text>
           </View>
           <Row label={t('type', 'Type')} value={selectedService?.title} />
           <Row label={t('rate', 'Rate')} value={selectedService?.priceLabel} last />
-        </View>
 
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
+          <View style={styles.sectionHeader}>
             <Icon name="medkit-outline" size={18} color="#008178" />
             <Text style={styles.cardTitle}>{t('caregiverDetails', 'Care provider')}</Text>
           </View>
@@ -236,50 +232,50 @@ const BookingPreviewScreen = ({navigation, route}) => {
             }
             last
           />
-        </View>
 
         {!!selectedHospital?.name && (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
+          <View>
+            <View style={styles.sectionHeader}>
               <Icon name="business-outline" size={18} color="#008178" />
               <Text style={styles.cardTitle}>{t('hospital', 'Hospital')}</Text>
             </View>
-            <Text style={styles.locationText}>{selectedHospital.name}</Text>
+            <Row label={t('name', 'Name')} value={selectedHospital.name} last />
           </View>
         )}
 
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Icon name="location-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>{t('location', 'Location')}</Text>
-          </View>
-          <Text style={styles.locationText}>{locationText || '—'}</Text>
+        <View style={styles.sectionHeader}>
+          <Icon name="location-outline" size={18} color="#008178" />
+          <Text style={styles.cardTitle}>{t('location', 'Location')}</Text>
         </View>
+        <Row label={t('address', 'Address')} value={locationText} last />
 
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Icon name="calendar-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>{t('schedule', 'Schedule')}</Text>
-          </View>
-          <Text style={styles.locationText}>{scheduleText}</Text>
+        <View style={styles.sectionHeader}>
+          <Icon name="calendar-outline" size={18} color="#008178" />
+          <Text style={styles.cardTitle}>{t('schedule', 'Schedule')}</Text>
         </View>
+        <Row label={t('dateAndTime', 'Date and time')} value={scheduleText} last />
 
         {!!notes && (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
+          <View>
+            <View style={styles.sectionHeader}>
               <Icon name="document-text-outline" size={18} color="#008178" />
               <Text style={styles.cardTitle}>{t('notes', 'Notes')}</Text>
             </View>
-            <Text style={styles.locationText}>{notes}</Text>
+            <Row label={t('notes', 'Notes')} value={notes} last />
           </View>
         )}
 
-        <View style={styles.pricingCard}>
-          <Text style={styles.pricingLabel}>{t('estimatedPricing', 'Estimated pricing')}</Text>
+        <View style={styles.pricingSummary}>
+          <View style={styles.pricingCopy}>
+            <Text style={styles.pricingLabel}>
+              {t('estimatedPricing', 'Estimated pricing')}
+            </Text>
+            <Text style={styles.pricingNote}>
+              ৳{hourlyRate}/{t('hr', 'hr')} × {durationHours} {t('hours', 'hours')}
+            </Text>
+          </View>
           <Text style={styles.pricingValue}>৳{estimatedTotal}</Text>
-          <Text style={styles.pricingNote}>
-            ৳{hourlyRate}/{t('hr', 'hr')} × {durationHours} {t('hours', 'hours')}
-          </Text>
+        </View>
         </View>
       </ScrollView>
 
@@ -327,6 +323,13 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 16,
+    marginBottom: 4,
+  },
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
@@ -337,12 +340,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
     gap: 12,
   },
   rowLast: {
-    borderBottomWidth: 0,
     paddingBottom: 0,
   },
   rowLabel: {
@@ -356,17 +356,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111820',
   },
-  locationText: {
-    fontSize: 14,
-    lineHeight: 21,
-    color: '#111820',
-    fontWeight: '500',
+  pricingSummary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
   },
-  pricingCard: {
-    backgroundColor: '#E6F4F3',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 4,
+  pricingCopy: {
+    flex: 1,
+    marginRight: 12,
   },
   pricingLabel: {
     fontSize: 13,
@@ -374,7 +372,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   pricingValue: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '700',
     color: '#111820',
   },
