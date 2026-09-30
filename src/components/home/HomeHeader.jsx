@@ -1,80 +1,67 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
-import {useInbox, useInboxUnreadCount, useSupportUnreadCount} from '../../api/queries';
+import {useInbox, useInboxUnreadCount} from '../../api/queries';
 import {useTranslation} from 'react-i18next';
 
-const INK = '#0B3F3C';
-
-const getGreeting = (t) => {
-  const hour = new Date().getHours();
-  if (hour < 12) return t('goodMorning');
-  if (hour < 17) return t('goodAfternoon');
-  return t('goodEvening');
-};
+const logo = require('../../assets/logo-mark.png');
 
 const HomeHeader = ({navigation}) => {
   const {t} = useTranslation();
+  const insets = useSafeAreaInsets();
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
-  const {count: supportUnread} = useSupportUnreadCount();
   const unread = inboxData?.meta?.unread ?? unreadCount ?? 0;
-  
-  const greeting = getGreeting(t);
-  const displayName =
-    user?.name || user?.full_name || user?.first_name || t('there');
   const photo = user?.photo || user?.profile_photo || user?.avatar;
 
   return (
-    <View style={styles.header}>
-      <View style={styles.headerLeft}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.profileButton}
-          onPress={() => navigation?.navigate('Profile')}>
-          {photo ? (
-            <Image source={{uri: photo}} style={styles.profileImage} />
-          ) : (
-            <View style={styles.placeholderAvatar}>
-              <Icon name="person" size={20} color="#9AA8A5" />
-            </View>
-          )}
-        </TouchableOpacity>
+    <LinearGradient
+      colors={['#14A08C', '#0E8B78', '#0C7C6C']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 1}}
+      style={[styles.header, {paddingTop: insets.top + 8}]}>
+      <View style={styles.blobTop} />
+      <View style={styles.blobSide} />
 
-        <View style={styles.greetingBlock}>
-          <Text style={styles.goodMorning}>{greeting}</Text>
-          <Text style={styles.userName} numberOfLines={1}>
-            {displayName}
-          </Text>
+      <View style={styles.row}>
+        <View style={styles.brand}>
+          <Image source={logo} style={styles.logoMark} resizeMode="contain" />
+          <View style={styles.brandCopy}>
+            <Text style={styles.brandName}>Nirapod</Text>
+            <Text style={styles.tagline} numberOfLines={1}>
+              {t('careTodayPeace')}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.actions}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.bellButton}
+            onPress={() => navigation?.navigate('Inbox')}>
+            <Icon name="notifications-outline" size={20} color="#FFFFFF" />
+            {Number(unread) > 0 ? <View style={styles.bellDot} /> : null}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={styles.avatarButton}
+            onPress={() => navigation?.navigate('Profile')}>
+            {photo ? (
+              <Image source={{uri: photo}} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <Icon name="person" size={18} color="#0E8B78" />
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
-
-      <View style={styles.headerRight}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.iconButton}
-          onPress={() => navigation?.navigate('SupportChat')}>
-          <Icon name="chatbubble-ellipses-outline" size={19} color={INK} />
-          {Number(supportUnread) > 0 ? (
-            <View style={styles.countBadge}>
-              <Text style={styles.countBadgeText}>
-                {supportUnread > 9 ? '9+' : supportUnread}
-              </Text>
-            </View>
-          ) : null}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.iconButton}
-          onPress={() => navigation?.navigate('Inbox')}>
-          <Icon name="notifications-outline" size={19} color={INK} />
-          {Number(unread) > 0 ? <View style={styles.notificationDot} /> : null}
-        </TouchableOpacity>
-      </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -82,94 +69,104 @@ export default HomeHeader;
 
 const styles = StyleSheet.create({
   header: {
-    minHeight: 44,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    overflow: 'hidden',
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+  },
+  blobTop: {
+    position: 'absolute',
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    top: -90,
+    right: -50,
+  },
+  blobSide: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(8,70,62,0.12)',
+    left: -60,
+    bottom: -40,
+  },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
   },
-  headerLeft: {
+  brand: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 12,
   },
-  profileButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    overflow: 'hidden',
-    backgroundColor: '#EEF2F1',
-    marginRight: 10,
+  logoMark: {
+    width: 42,
+    height: 42,
   },
-  profileImage: {
-    width: '100%',
-    height: '100%',
-  },
-  placeholderAvatar: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#EEF2F1',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  greetingBlock: {
+  brandCopy: {
     flex: 1,
-    justifyContent: 'center',
+    marginLeft: 10,
   },
-  goodMorning: {
+  brandName: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    lineHeight: 26,
+    fontWeight: '800',
+    letterSpacing: -0.4,
+  },
+  tagline: {
+    marginTop: 1,
+    color: 'rgba(255,255,255,0.88)',
     fontSize: 11,
-    lineHeight: 15,
-    color: '#5F6F6C',
-    fontWeight: '400',
+    lineHeight: 14,
+    fontWeight: '500',
   },
-  userName: {
-    fontSize: 15,
-    lineHeight: 21,
-    color: '#0F1A19',
-    fontWeight: '600',
-  },
-  headerRight: {
+  actions: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#E8F2F0',
+  bellButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.16)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    marginRight: 10,
   },
-  countBadge: {
+  bellDot: {
     position: 'absolute',
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#E34242',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 3,
-    right: 2,
-    top: 2,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#FF4B4B',
     borderWidth: 1.5,
-    borderColor: '#E8F2F0',
-  },
-  countBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 9,
-    fontWeight: '700',
-  },
-  notificationDot: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E34242',
-    borderWidth: 1.5,
-    borderColor: '#E8F2F0',
-    right: 9,
+    borderColor: '#149684',
     top: 8,
+    right: 8,
+  },
+  avatarButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.85)',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarFallback: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E7F6F2',
   },
 });

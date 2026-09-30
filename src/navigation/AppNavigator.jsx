@@ -46,6 +46,8 @@ import PaymentCancelledScreen from '../screens/PaymentCancelledScreen';
 import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 import InboxScreen from '../screens/InboxScreen';
+import ServicesScreen from '../screens/ServicesScreen';
+import {useSupportUnreadCount} from '../api/queries';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,23 +55,27 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
+  const {count: supportUnread} = useSupportUnreadCount();
 
   // insets.bottom = real system navigation bar height reported by the OS
   // after WindowCompat.setDecorFitsSystemWindows(window, false) in MainActivity.kt.
   // Fallback 16 covers older Android devices where inset hasn't loaded yet.
   const safeBottom = insets.bottom > 0 ? insets.bottom : 16;
 
-  const renderTabIcon = (iconName, focused, color) => (
-    <View
-      style={[
-        tabStyles.iconContainer,
-        focused && tabStyles.activeIconContainer,
-      ]}>
-      <Icon
-        name={iconName}
-        size={22}
-        color={focused ? '#008178' : '#7D8BA2'}
-      />
+  const renderTabIcon = (iconName, focused, showDot = false) => (
+    <View>
+      <View
+        style={[
+          tabStyles.iconContainer,
+          focused && tabStyles.activeIconContainer,
+        ]}>
+        <Icon
+          name={iconName}
+          size={21}
+          color={focused ? '#0E8B78' : '#8B9894'}
+        />
+      </View>
+      {showDot ? <View style={tabStyles.badgeDot} /> : null}
     </View>
   );
 
@@ -88,12 +94,12 @@ function MainTabs() {
           height: 64 + safeBottom,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
-          marginTop: 2,
+          marginTop: 1,
         },
-        tabBarActiveTintColor: '#008178',
-        tabBarInactiveTintColor: '#7D8BA2',
+        tabBarActiveTintColor: '#0E8B78',
+        tabBarInactiveTintColor: '#8B9894',
         tabBarShowLabel: true,
       }}>
       <Tab.Screen
@@ -101,17 +107,17 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarLabel: t('tabHome'),
-          tabBarIcon: ({focused, color}) =>
-            renderTabIcon(focused ? 'home' : 'home-outline', focused, color),
+          tabBarIcon: ({focused}) =>
+            renderTabIcon(focused ? 'home' : 'home-outline', focused),
         }}
       />
       <Tab.Screen
         name="Family"
         component={FamilyScreen}
         options={{
-          tabBarLabel: 'Family',
-          tabBarIcon: ({focused, color}) =>
-            renderTabIcon(focused ? 'people' : 'people-outline', focused, color),
+          tabBarLabel: t('tabFamily'),
+          tabBarIcon: ({focused}) =>
+            renderTabIcon(focused ? 'people' : 'people-outline', focused),
         }}
       />
       <Tab.Screen
@@ -119,11 +125,23 @@ function MainTabs() {
         component={BookingsScreen}
         options={{
           tabBarLabel: t('tabBookings'),
-          tabBarIcon: ({focused, color}) =>
+          tabBarIcon: ({focused}) =>
             renderTabIcon(
               focused ? 'calendar' : 'calendar-outline',
               focused,
-              color,
+            ),
+        }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={SupportChatScreen}
+        options={{
+          tabBarLabel: t('tabMessages'),
+          tabBarIcon: ({focused}) =>
+            renderTabIcon(
+              focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline',
+              focused,
+              Number(supportUnread) > 0,
             ),
         }}
       />
@@ -132,8 +150,8 @@ function MainTabs() {
         component={ProfileScreen}
         options={{
           tabBarLabel: t('tabProfile'),
-          tabBarIcon: ({focused, color}) =>
-            renderTabIcon(focused ? 'person' : 'person-outline', focused, color),
+          tabBarIcon: ({focused}) =>
+            renderTabIcon(focused ? 'person' : 'person-outline', focused),
         }}
       />
     </Tab.Navigator>
@@ -196,6 +214,7 @@ function AppNavigator() {
           <Stack.Screen name="PaymentCancelled" component={PaymentCancelledScreen} options={{gestureEnabled: false}} />
           <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
           <Stack.Screen name="Inbox" component={InboxScreen} />
+          <Stack.Screen name="Services" component={ServicesScreen} />
           <Stack.Screen name="SupportChat" component={SupportChatScreen} options={{headerShown: false}} />
         </>
       ) : (
@@ -218,15 +237,26 @@ function AppNavigator() {
 
 const tabStyles = StyleSheet.create({
   iconContainer: {
-    width: 50,
-    height: 30,
-    borderRadius: 12,
+    width: 46,
+    height: 28,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
   activeIconContainer: {
-    backgroundColor: '#DDF3EE',
+    backgroundColor: '#E5F6F1',
+  },
+  badgeDot: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FF4B4B',
+    top: 2,
+    right: 6,
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
   },
 });
 

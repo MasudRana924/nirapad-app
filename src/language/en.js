@@ -119,7 +119,18 @@ export default {
   physiotherapy: 'Physiotherapy',
   medicine: 'Medicine',
   whatDoYouNeedToday: 'What do you need today?',
-  homeCaregiver: 'Caregiver',
+  chooseServiceHint: 'Choose a service and get started in just a few taps.',
+  trustedCareAlways: 'Trusted Care, Always',
+  lovedOnesDeserve: 'Your loved ones deserve the best care',
+  lovedOnesSubtitle:
+    'Book trusted caregivers, nurses and get support for your family members — anytime, anywhere.',
+  bookACaregiver: 'Book a Caregiver',
+  careTodayPeace: 'Care Today  ·  Peace Tomorrow',
+  elderlyCaregiver: 'Elderly Caregiver',
+  elderlyCaregiverDesc: 'Personal care, companionship and daily support.',
+  nurseCardDesc: 'Professional nursing care at home or hospital.',
+  physioCardDesc: 'Regain mobility and live better.',
+  medicineCardDesc: 'Get medicines delivered at your doorstep.',
   homeNurse: 'Nurse',
   homeBookNow: 'Book now',
   comingSoon: 'Coming soon',
@@ -132,7 +143,12 @@ export default {
   nurseBooking: 'Nurse booking',
 
   // Home - Family Section
-  yourFamily: 'Your family',
+  yourFamily: 'Your Family',
+  manageFamilyHint: 'Manage your family members and their care needs.',
+  homeFamilyMembers: 'Family Members',
+  viewAndManage: 'View & manage',
+  homeAddMember: 'Add Member',
+  includeALovedOne: 'Include a loved one',
   noFamilyMembersYet: 'No family members yet',
   addFamilyMembersDesc: 'Add your family members to book care for your loved ones.',
   addFamilyMember: '+ Add family member',
@@ -251,6 +267,7 @@ export default {
   tabHome: 'Home',
   tabFamily: 'Family',
   tabBookings: 'Bookings',
+  tabMessages: 'Messages',
   tabProfile: 'Profile',
 
   // Booking Details Screen

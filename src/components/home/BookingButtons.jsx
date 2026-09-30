@@ -1,132 +1,103 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ImageBackground,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 
-const TEAL = '#0B7A6E';
-const INK = '#0F1A19';
+const TEAL = '#0E8B78';
+const INK = '#172824';
 
-const caregiverBg = require('../../assets/home-caregiver-card-bg.png');
-const nurseBg = require('../../assets/home-nurse-card-bg.png');
-const physioBg = require('../../assets/home-physio-card-bg.png');
-const medicineBg = require('../../assets/home-medicine-card-bg.png');
+const caregiverArt = require('../../assets/home-card-caregiver.jpg');
+const nurseArt = require('../../assets/home-card-nurse.jpg');
+const physioArt = require('../../assets/home-card-physio.jpg');
+const medicineArt = require('../../assets/home-card-medicine.jpg');
 
 const BookingButtons = ({navigation}) => {
   const {t} = useTranslation();
 
-  const ACTIONS = [
+  const services = [
     {
       key: 'caregiver',
-      label: t('homeCaregiver'),
-      subLabel: 'From ৳500/day',
+      title: t('elderlyCaregiver'),
+      description: t('elderlyCaregiverDesc'),
       icon: 'heart-outline',
-      background: caregiverBg,
-      cardStyle: styles.caregiverCard,
-      onPress: nav =>
-        nav?.navigate('SelectFamilyMember', {serviceType: 'caregiver'}),
+      iconColor: '#128A78',
+      background: '#D7F3EA',
+      image: caregiverArt,
+      onPress: () =>
+        navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'}),
     },
     {
       key: 'nurse',
-      label: t('homeNurse'),
-      subLabel: 'From ৳1,200/visit',
-      icon: 'medkit-outline',
-      background: nurseBg,
-      cardStyle: styles.nurseCard,
-      onPress: nav => nav?.navigate('SelectNurse'),
+      title: t('homeNurse'),
+      description: t('nurseCardDesc'),
+      icon: 'pulse-outline',
+      iconColor: '#1C8F86',
+      background: '#FFF1DE',
+      image: nurseArt,
+      onPress: () => navigation?.navigate('SelectNurse'),
     },
-  ];
-
-  const DISABLED_SERVICES = [
     {
       key: 'physio',
-      label: t('physiotherapy'),
-      subLabel: 'Home rehab sessions',
+      title: t('physiotherapy'),
+      description: t('physioCardDesc'),
       icon: 'accessibility-outline',
-      iconColor: '#5B63B7',
-      background: physioBg,
-      cardStyle: styles.physioCard,
+      iconColor: '#6A63C6',
+      background: '#ECEEFB',
+      image: physioArt,
+      onPress: () =>
+        navigation?.navigate('SelectFamilyMember', {serviceType: 'physio'}),
     },
     {
       key: 'medicine',
-      label: t('medicine'),
-      subLabel: 'Doorstep delivery',
-      icon: 'bandage-outline',
-      iconColor: '#C2505F',
-      background: medicineBg,
-      cardStyle: styles.medicineCard,
+      title: t('medicine'),
+      description: t('medicineCardDesc'),
+      icon: 'medkit-outline',
+      iconColor: '#E15B73',
+      background: '#FDE8EE',
+      image: medicineArt,
+      onPress: () => navigation?.navigate('Medicine'),
     },
   ];
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{t('whatDoYouNeedToday')}</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>{t('whatDoYouNeedToday')}</Text>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.viewAll}
+          onPress={() => navigation?.navigate('Services')}>
+          <Text style={styles.viewAllText}>{t('viewAll')}</Text>
+          <Icon name="chevron-forward" size={14} color={TEAL} />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.hint}>{t('chooseServiceHint')}</Text>
 
       <View style={styles.grid}>
-        {ACTIONS.map(action => (
+        {services.map(service => (
           <TouchableOpacity
-            key={action.key}
-            activeOpacity={0.9}
-            style={[styles.card, action.cardStyle]}
-            onPress={() => action.onPress(navigation)}>
-            <ImageBackground
-              source={action.background}
-              resizeMode="cover"
-              style={styles.cardInner}>
-              <View style={styles.iconCircle}>
-                <Icon name={action.icon} size={17} color={TEAL} />
-              </View>
-
-              <Text style={styles.cardLabel} numberOfLines={1}>
-                {action.label}
-              </Text>
-              <Text style={styles.cardSubLabel} numberOfLines={1}>
-                {action.subLabel}
-              </Text>
-
-              <View style={styles.bookNowRow}>
-                <Text style={styles.bookNowText}>{t('homeBookNow')}</Text>
-                <Icon name="chevron-forward-sharp" size={12} color={TEAL} />
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={[styles.grid, styles.disabledRow]}>
-        {DISABLED_SERVICES.map(service => (
-          <View
             key={service.key}
-            style={[styles.card, service.cardStyle]}
-            accessibilityState={{disabled: true}}>
-            <ImageBackground
-              source={service.background}
-              resizeMode="cover"
-              style={styles.cardInner}>
+            activeOpacity={0.9}
+            style={[styles.card, {backgroundColor: service.background}]}
+            onPress={service.onPress}>
+            <Image source={service.image} style={styles.art} resizeMode="cover" />
+            <View style={styles.cardBody}>
               <View style={styles.iconCircle}>
-                <Icon name={service.icon} size={17} color={service.iconColor} />
+                <Icon name={service.icon} size={18} color={service.iconColor} />
               </View>
-
-              <Text style={styles.cardLabel} numberOfLines={1}>
-                {service.label}
+              <Text style={styles.cardTitle} numberOfLines={1}>
+                {service.title}
               </Text>
-              <Text style={styles.cardSubLabel} numberOfLines={1}>
-                {service.subLabel}
+              <Text style={styles.cardDesc} numberOfLines={3}>
+                {service.description}
               </Text>
-
-              <View style={styles.bookNowRow}>
-                <View style={styles.soonPill}>
-                  <Icon name="time-outline" size={11} color="#6B7775" />
-                  <Text style={styles.soonText}>{t('comingSoon')}</Text>
-                </View>
+              <View style={styles.spacer} />
+              <View style={styles.bookRow}>
+                <Text style={styles.bookText}>{t('homeBookNow')}</Text>
+                <Icon name="chevron-forward" size={14} color={TEAL} />
               </View>
-            </ImageBackground>
-          </View>
+            </View>
+          </TouchableOpacity>
         ))}
       </View>
     </View>
@@ -137,93 +108,101 @@ export default BookingButtons;
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 12,
+    marginTop: 26,
+    paddingHorizontal: 16,
   },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: INK,
-    marginBottom: 8,
-  },
-  grid: {
+  headerRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
-  card: {
-    width: '48.5%',
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-  },
-  caregiverCard: {
-    backgroundColor: '#DDF1EB',
-    borderColor: '#DDF1EB',
-  },
-  nurseCard: {
-    backgroundColor: '#FBF1D6',
-    borderColor: '#FBF1D6',
-  },
-  cardInner: {
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  iconCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  cardLabel: {
-    fontSize: 13.5,
-    lineHeight: 18,
-    fontWeight: '700',
+  title: {
+    flex: 1,
+    fontSize: 20,
+    lineHeight: 26,
+    fontWeight: '800',
     color: INK,
+    letterSpacing: -0.3,
+    marginRight: 8,
   },
-  cardSubLabel: {
-    marginTop: 1,
-    fontSize: 10,
-    lineHeight: 14,
-    color: '#34413F',
-  },
-  bookNowRow: {
+  viewAll: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 20,
-    marginTop: 6,
-    gap: 4,
+    gap: 2,
   },
-  bookNowText: {
-    fontSize: 14.5,
+  viewAllText: {
+    fontSize: 13.5,
     fontWeight: '700',
     color: TEAL,
   },
-  disabledRow: {
-    marginTop: 8,
+  hint: {
+    marginTop: 4,
+    marginBottom: 16,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#6E7E7A',
   },
-  physioCard: {
-    backgroundColor: '#E4E7F8',
-    borderColor: '#E4E7F8',
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
-  medicineCard: {
-    backgroundColor: '#FCE3E6',
-    borderColor: '#FCE3E6',
+  card: {
+    width: '48.4%',
+    aspectRatio: 0.92,
+    borderRadius: 22,
+    overflow: 'hidden',
+    marginBottom: 12,
   },
-  soonPill: {
+  art: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    right: -4,
+    bottom: -6,
+  },
+  cardBody: {
+    flex: 1,
+    paddingHorizontal: 14,
+    paddingTop: 16,
+    paddingBottom: 14,
+  },
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  cardTitle: {
+    maxWidth: '78%',
+    fontSize: 15.5,
+    lineHeight: 20,
+    fontWeight: '800',
+    color: INK,
+  },
+  cardDesc: {
+    maxWidth: '72%',
+    marginTop: 3,
+    fontSize: 11.5,
+    lineHeight: 15.5,
+    color: '#3E514C',
+    fontWeight: '500',
+  },
+  spacer: {
+    flex: 1,
+    minHeight: 8,
+  },
+  bookRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    height: 19,
-    paddingHorizontal: 8,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    gap: 2,
   },
-  soonText: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: '#6B7775',
+  bookText: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: TEAL,
   },
 });

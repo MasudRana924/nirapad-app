@@ -119,7 +119,18 @@ export default {
   physiotherapy: 'ফিজিওথেরাপি',
   medicine: 'ওষুধ',
   whatDoYouNeedToday: 'আজ আপনার কী প্রয়োজন?',
-  homeCaregiver: 'কেয়ারগিভার',
+  chooseServiceHint: 'একটি সেবা বেছে নিন এবং কয়েকটি ট্যাপেই শুরু করুন।',
+  trustedCareAlways: 'বিশ্বস্ত যত্ন, সবসময়',
+  lovedOnesDeserve: 'আপনার প্রিয়জনরা সেরা যত্নের যোগ্য',
+  lovedOnesSubtitle:
+    'বিশ্বস্ত কেয়ারগিভার, নার্স বুক করুন এবং পরিবারের সদস্যদের জন্য সহায়তা নিন — যেকোনো সময়, যেকোনো জায়গায়।',
+  bookACaregiver: 'কেয়ারগিভার বুক করুন',
+  careTodayPeace: 'আজ যত্ন  ·  আগামী শান্তি',
+  elderlyCaregiver: 'বয়স্ক কেয়ারগিভার',
+  elderlyCaregiverDesc: 'ব্যক্তিগত যত্ন, সঙ্গ ও দৈনন্দিন সহায়তা।',
+  nurseCardDesc: 'বাড়ি বা হাসপাতালে পেশাদার নার্সিং সেবা।',
+  physioCardDesc: 'চলাফেরা ফিরিয়ে আনুন এবং ভালো থাকুন।',
+  medicineCardDesc: 'ওষুধ পৌঁছে যাবে আপনার দোরগোড়ায়।',
   homeNurse: 'নার্স',
   homeBookNow: 'এখনই বুক করুন',
   comingSoon: 'শীঘ্রই আসছে',
@@ -133,6 +144,11 @@ export default {
 
   // Home - Family Section
   yourFamily: 'আপনার পরিবার',
+  manageFamilyHint: 'পরিবারের সদস্য ও তাদের যত্নের প্রয়োজন দেখুন।',
+  homeFamilyMembers: 'পরিবারের সদস্য',
+  viewAndManage: 'দেখুন ও পরিচালনা করুন',
+  homeAddMember: 'সদস্য যোগ',
+  includeALovedOne: 'একজন প্রিয়জনকে যোগ করুন',
   noFamilyMembersYet: 'এখনো কোনো পরিবারের সদস্য নেই',
   addFamilyMembersDesc: 'আপনার প্রিয়জনদের জন্য সেবা বুক করতে পরিবারের সদস্য যোগ করুন।',
   addFamilyMember: '+ পরিবারের সদস্য যোগ করুন',
@@ -251,6 +267,7 @@ export default {
   tabHome: 'হোম',
   tabFamily: 'পরিবার',
   tabBookings: 'বুকিং',
+  tabMessages: 'বার্তা',
   tabProfile: 'প্রোফাইল',
 
   // Booking Details Screen

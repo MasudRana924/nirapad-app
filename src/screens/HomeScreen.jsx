@@ -1,14 +1,12 @@
 import React, {useCallback, useState} from 'react';
-import {StyleSheet, ScrollView, RefreshControl} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {StyleSheet, ScrollView, RefreshControl, View, StatusBar} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
 import HomeHeader from '../components/home/HomeHeader';
+import HomeHeroCard from '../components/home/HomeHeroCard';
 import ActiveBookingCard from '../components/home/ActiveBookingCard';
-import EmptyActiveBookingCard from '../components/home/EmptyActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
 import HomeFamilySection from '../components/home/HomeFamilySection';
-import HomeRecentActivity from '../components/home/HomeRecentActivity';
 import HomeSkeleton from '../components/home/HomeSkeleton';
 import {
   useUserProfile,
@@ -16,6 +14,8 @@ import {
   useFamilyMembers,
 } from '../api/queries';
 import {isActiveStatus, isSearchingStatus} from '../utils/bookingStatus';
+
+const PAGE = '#F4F7F6';
 
 const HomeScreen = ({navigation}) => {
   const {
@@ -32,12 +32,10 @@ const HomeScreen = ({navigation}) => {
     data: familyData,
     refetch: refetchFamily,
   } = useFamilyMembers();
+  const familyMembers = Array.isArray(familyData?.data) ? familyData.data : [];
 
   const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
   const activeBooking = bookings.find(item => isActiveStatus(item?.status));
-  const recentBooking =
-    bookings.find(item => item?.id !== activeBooking?.id) || activeBooking;
-  const familyMembers = Array.isArray(familyData?.data) ? familyData.data : [];
   const [refreshing, setRefreshing] = useState(false);
 
   const reloadHome = useCallback(async () => {
@@ -68,14 +66,17 @@ const HomeScreen = ({navigation}) => {
 
   if (isInitialLoading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor="#0E8B78" />
         <HomeSkeleton />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <View style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor="#0E8B78" />
+      <HomeHeader navigation={navigation} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -83,32 +84,26 @@ const HomeScreen = ({navigation}) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#008178']}
-            tintColor="#008178"
+            colors={['#0E8B78']}
+            tintColor="#0E8B78"
           />
         }>
-        <HomeHeader navigation={navigation} />
+        <HomeHeroCard navigation={navigation} />
 
         {activeBooking ? (
-          <ActiveBookingCard
-            navigation={navigation}
-            booking={activeBooking}
-            searching={isSearchingStatus(activeBooking.status)}
-          />
-        ) : (
-          <EmptyActiveBookingCard />
-        )}
+          <View style={styles.activeWrap}>
+            <ActiveBookingCard
+              navigation={navigation}
+              booking={activeBooking}
+              searching={isSearchingStatus(activeBooking.status)}
+            />
+          </View>
+        ) : null}
 
         <BookingButtons navigation={navigation} />
-
-        <HomeFamilySection
-          navigation={navigation}
-          members={familyMembers}
-        />
-
-        <HomeRecentActivity navigation={navigation} booking={recentBooking} />
+        <HomeFamilySection navigation={navigation} members={familyMembers} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -117,10 +112,13 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: PAGE,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingBottom: 18,
+  },
+  activeWrap: {
+    marginTop: 4,
+    paddingHorizontal: 16,
   },
 });

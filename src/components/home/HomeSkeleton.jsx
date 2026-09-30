@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useEffect, useRef} from 'react';
 import {View, StyleSheet, Animated, useWindowDimensions} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const PulseContext = createContext(null);
 
@@ -20,14 +21,11 @@ const Circle = ({size, style}) => (
   <Bone width={size} height={size} radius={size / 2} style={style} />
 );
 
-const SCREEN_PADDING = 20;
-const FAMILY_GAP = 10;
-
 const HomeSkeleton = () => {
   const pulse = useRef(new Animated.Value(0.55)).current;
+  const insets = useSafeAreaInsets();
   const {width} = useWindowDimensions();
-  const familyCardWidth =
-    (width - SCREEN_PADDING * 2 - FAMILY_GAP * 2) / 3;
+  const cardWidth = (width - 32 - 12) / 2;
 
   useEffect(() => {
     const loop = Animated.loop(
@@ -51,100 +49,57 @@ const HomeSkeleton = () => {
   return (
     <PulseContext.Provider value={pulse}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Circle size={38} />
-          <View style={styles.greetingBlock}>
-            <Bone width={70} height={10} />
-            <Bone width={120} height={16} style={styles.mt5} />
+        <View style={[styles.header, {paddingTop: insets.top + 8}]}>
+          <Circle size={44} style={styles.lightBone} />
+          <View style={styles.brand}>
+            <Bone width={110} height={16} radius={6} style={styles.lightBone} />
+            <Bone width={150} height={10} radius={5} style={[styles.lightBone, styles.mt6]} />
           </View>
-          <Circle size={36} />
-          <Circle size={36} style={styles.ml8} />
+          <Circle size={40} style={styles.lightBone} />
+          <Circle size={40} style={[styles.lightBone, styles.ml8]} />
         </View>
 
-        <View style={styles.activeCard}>
-          <View style={styles.activeTop}>
-            <View style={styles.flex1}>
-              <Bone width={160} height={17} />
-              <Bone width={130} height={10} style={styles.mt6} />
-            </View>
-            <Bone width={84} height={64} radius={12} />
-          </View>
+        <View style={styles.hero} />
 
-          <View style={styles.steps}>
-            {[100, 90, 110].map((w, index) => (
-              <View
-                key={w}
-                style={[styles.stepRow, index > 0 && styles.mt6]}>
-                <Circle size={13} />
-                <Bone width={w} height={9} style={styles.ml10} />
-              </View>
-            ))}
-          </View>
-
-          <Bone width="100%" height={32} radius={16} style={styles.mt12} />
+        <View style={styles.sectionHead}>
+          <Bone width={180} height={16} />
+          <Bone width={58} height={12} />
         </View>
+        <Bone width={220} height={10} style={styles.hint} />
 
-        <Bone width={170} height={14} style={styles.sectionTitle} />
-
-        <View style={styles.row}>
-          {['#DDF1EB', '#FBF1D6'].map(bg => (
+        <View style={styles.grid}>
+          {['#D7F3EA', '#FFF1DE', '#ECEEFB', '#FDE8EE'].map(color => (
             <View
-              key={bg}
-              style={[styles.serviceCard, {backgroundColor: bg}]}>
-              <View style={styles.whiteCircle} />
-              <Bone width={80} height={13} style={styles.mt6} />
-              <Bone width={96} height={10} style={styles.mt5} />
-              <Bone width={62} height={11} style={styles.mt8} />
+              key={color}
+              style={[styles.card, {width: cardWidth, backgroundColor: color}]}>
+              <Circle size={36} style={styles.whiteCircle} />
+              <Bone width={90} height={12} style={styles.mt10} />
+              <Bone width={110} height={8} style={styles.mt6} />
+              <Bone width={70} height={10} style={styles.mt12} />
             </View>
           ))}
         </View>
 
-        <View style={[styles.row, styles.mt8]}>
-          {['#E4E7F8', '#FCE3E6'].map(bg => (
-            <View
-              key={bg}
-              style={[styles.serviceCard, {backgroundColor: bg}]}>
-              <View style={styles.whiteCircle} />
-              <Bone width={80} height={13} style={styles.mt6} />
-              <Bone width={96} height={10} style={styles.mt5} />
-              <Bone width={72} height={11} style={styles.mt8} />
-            </View>
-          ))}
+        <View style={styles.sectionHead}>
+          <Bone width={120} height={16} />
+          <Circle size={16} />
         </View>
-
-        <View style={styles.familyHeader}>
-          <Bone width={90} height={14} />
-          <Bone width={50} height={10} />
-        </View>
+        <Bone width={240} height={10} style={styles.hint} />
         <View style={styles.familyRow}>
-          {[1, 2].map(i => (
-            <View
-              key={i}
-              style={[styles.familyCard, {width: familyCardWidth}]}>
-              <Circle size={30} />
-              <Bone width={50} height={9} style={styles.mt6} />
-              <Bone width={30} height={7} style={styles.mt4} />
+          <View style={styles.familyCard}>
+            <Circle size={40} />
+            <View style={styles.familyCopy}>
+              <Bone width={80} height={10} />
+              <Bone width={60} height={8} style={styles.mt6} />
             </View>
-          ))}
-          <View
-            style={[
-              styles.familyCard,
-              styles.addCard,
-              {width: familyCardWidth},
-            ]}>
-            <Circle size={26} />
-            <Bone width={56} height={9} style={styles.mt6} />
           </View>
-        </View>
-
-        <Bone width={90} height={11} style={styles.recentTitle} />
-        <View style={styles.recentRow}>
-          <Circle size={26} />
-          <View style={styles.recentCopy}>
-            <Bone width={110} height={10} />
-            <Bone width={80} height={8} style={styles.mt4} />
+          <View style={[styles.familyCard, styles.addCard]}>
+            <Circle size={40} />
+            <View style={styles.familyCopy}>
+              <Bone width={70} height={10} />
+              <Bone width={84} height={8} style={styles.mt6} />
+            </View>
           </View>
-          <Bone width={62} height={18} radius={8} />
         </View>
       </View>
     </PulseContext.Provider>
@@ -155,112 +110,87 @@ export default HomeSkeleton;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: SCREEN_PADDING,
-    paddingBottom: 12,
+    flex: 1,
+    backgroundColor: '#F4F7F6',
   },
   bone: {
-    backgroundColor: '#DCE7E4',
+    backgroundColor: '#D5E4E0',
   },
-  flex1: {
-    flex: 1,
+  lightBone: {
+    backgroundColor: 'rgba(255,255,255,0.35)',
   },
-  mt4: {marginTop: 4},
-  mt5: {marginTop: 5},
+  whiteCircle: {
+    backgroundColor: '#FFFFFF',
+  },
   mt6: {marginTop: 6},
-  mt8: {marginTop: 8},
+  mt10: {marginTop: 10},
   mt12: {marginTop: 12},
   ml8: {marginLeft: 8},
-  ml10: {marginLeft: 10},
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
   header: {
-    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    backgroundColor: '#0E8B78',
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
-  greetingBlock: {
+  brand: {
     flex: 1,
     marginLeft: 10,
   },
-  activeCard: {
-    marginTop: 10,
-    borderRadius: 18,
-    backgroundColor: '#F2FAF8',
-    borderWidth: 1,
-    borderColor: '#D9ECE8',
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 12,
+  hero: {
+    marginTop: 16,
+    marginHorizontal: 16,
+    height: 214,
+    borderRadius: 26,
+    backgroundColor: '#B7DDD4',
   },
-  activeTop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  steps: {
-    marginTop: 10,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    marginTop: 14,
-    marginBottom: 8,
-  },
-  serviceCard: {
-    width: '48.5%',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  whiteCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-  },
-  familyHeader: {
+  sectionHead: {
+    marginTop: 22,
+    marginHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 14,
-    marginBottom: 8,
+  },
+  hint: {
+    marginTop: 8,
+    marginLeft: 16,
+  },
+  grid: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    height: 168,
+    borderRadius: 22,
+    padding: 12,
+    marginBottom: 12,
   },
   familyRow: {
+    marginTop: 12,
+    paddingHorizontal: 16,
     flexDirection: 'row',
-    gap: FAMILY_GAP,
+    gap: 10,
   },
   familyCard: {
-    height: 66,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
+    height: 92,
+    borderRadius: 18,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
-  },
-  addCard: {
-    borderStyle: 'dashed',
-    borderColor: '#C9DCD8',
-  },
-  recentTitle: {
-    marginTop: 12,
-    marginBottom: 6,
-  },
-  recentRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
     paddingHorizontal: 10,
-    paddingVertical: 8,
   },
-  recentCopy: {
+  addCard: {
+    borderWidth: 1.4,
+    borderColor: '#D5E4E0',
+    borderStyle: 'dashed',
+  },
+  familyCopy: {
     flex: 1,
     marginLeft: 8,
   },

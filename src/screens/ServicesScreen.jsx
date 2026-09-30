@@ -8,11 +8,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 
 const ServicesScreen = () => {
   const {t} = useTranslation();
+  const navigation = useNavigation();
   
   const services = [
     {
@@ -65,6 +67,12 @@ const ServicesScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={22} color="#182331" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('services')}</Text>
       </View>
 
@@ -110,9 +118,19 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    paddingHorizontal: 24,
-    paddingTop: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 10,
     paddingBottom: 6,
+  },
+
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
   },
 
   headerTitle: {

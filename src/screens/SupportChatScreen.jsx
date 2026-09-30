@@ -17,7 +17,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useQueryClient} from '@tanstack/react-query';
 import {useTranslation} from 'react-i18next';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -161,6 +161,8 @@ const pdfViewerUri = url =>
 const SupportChatScreen = () => {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const isTab = navigation.getParent()?.getState()?.type === 'tab';
   const queryClient = useQueryClient();
   const messagesRef = useRef([]);
   const hasMoreRef = useRef(false);
@@ -751,9 +753,11 @@ const SupportChatScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={isTab ? ['top', 'bottom', 'left', 'right'] : ['bottom', 'left', 'right']}>
       <ChatThemeBackground />
-      <Header title={t('Nirapod Support')} showBack />
+      <Header title={t('Nirapod Support')} showBack={!isTab} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
