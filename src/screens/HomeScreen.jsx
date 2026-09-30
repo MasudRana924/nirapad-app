@@ -67,7 +67,7 @@ const HomeScreen = ({navigation}) => {
   if (isInitialLoading) {
     return (
       <View style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#0E8B78" />
+        <StatusBar barStyle="light-content" backgroundColor="#0A5A53" />
         <HomeSkeleton />
       </View>
     );
@@ -75,7 +75,7 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <View style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#0E8B78" />
+      <StatusBar barStyle="light-content" backgroundColor="#0A5A53" />
       <HomeHeader navigation={navigation} />
       <ScrollView
         showsVerticalScrollIndicator={false}

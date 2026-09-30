@@ -129,9 +129,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0E8B78',
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+    backgroundColor: '#0C6E65',
+    paddingHorizontal: 18,
+    paddingBottom: 40,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
   },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   hero: {
-    marginTop: 16,
+    marginTop: 4,
     marginHorizontal: 16,
     height: 214,
     borderRadius: 26,

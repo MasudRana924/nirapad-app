@@ -47,7 +47,7 @@ export default HomeHeroCard;
 
 const styles = StyleSheet.create({
   wrap: {
-    marginTop: 16,
+    marginTop: 4,
     marginHorizontal: 16,
     borderRadius: 26,
     shadowColor: '#0B6A5C',

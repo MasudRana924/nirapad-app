@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+  useWindowDimensions,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 
@@ -13,6 +20,9 @@ const medicineArt = require('../../assets/home-card-medicine.jpg');
 
 const BookingButtons = ({navigation}) => {
   const {t} = useTranslation();
+  const {width} = useWindowDimensions();
+  const cardWidth = (width - 32 - 10) / 2;
+  const cardSize = {width: cardWidth, height: Math.round(cardWidth / 0.9)};
 
   const services = [
     {
@@ -22,6 +32,7 @@ const BookingButtons = ({navigation}) => {
       icon: 'heart-outline',
       iconColor: '#128A78',
       background: '#D7F3EA',
+      border: '#BFE6D9',
       image: caregiverArt,
       onPress: () =>
         navigation?.navigate('SelectFamilyMember', {serviceType: 'caregiver'}),
@@ -33,6 +44,7 @@ const BookingButtons = ({navigation}) => {
       icon: 'pulse-outline',
       iconColor: '#1C8F86',
       background: '#FFF1DE',
+      border: '#F6DDBA',
       image: nurseArt,
       onPress: () => navigation?.navigate('SelectNurse'),
     },
@@ -43,6 +55,7 @@ const BookingButtons = ({navigation}) => {
       icon: 'accessibility-outline',
       iconColor: '#6A63C6',
       background: '#ECEEFB',
+      border: '#D6DAF4',
       image: physioArt,
       onPress: () =>
         navigation?.navigate('SelectFamilyMember', {serviceType: 'physio'}),
@@ -54,6 +67,7 @@ const BookingButtons = ({navigation}) => {
       icon: 'medkit-outline',
       iconColor: '#E15B73',
       background: '#FDE8EE',
+      border: '#F7CFD9',
       image: medicineArt,
       onPress: () => navigation?.navigate('Medicine'),
     },
@@ -78,10 +92,20 @@ const BookingButtons = ({navigation}) => {
           <TouchableOpacity
             key={service.key}
             activeOpacity={0.9}
-            style={[styles.card, {backgroundColor: service.background}]}
+            style={[styles.cardShadow, cardSize]}
             onPress={service.onPress}>
-            <Image source={service.image} style={styles.art} resizeMode="cover" />
-            <View style={styles.cardBody}>
+            <ImageBackground
+              source={service.image}
+              resizeMode="cover"
+              style={[
+                styles.card,
+                cardSize,
+                {backgroundColor: service.background, borderColor: service.border},
+              ]}
+              imageStyle={[
+                styles.art,
+                {right: -cardWidth * 0.14, bottom: -cardWidth * 0.14},
+              ]}>
               <View style={styles.iconCircle}>
                 <Icon name={service.icon} size={18} color={service.iconColor} />
               </View>
@@ -91,12 +115,11 @@ const BookingButtons = ({navigation}) => {
               <Text style={styles.cardDesc} numberOfLines={3}>
                 {service.description}
               </Text>
-              <View style={styles.spacer} />
               <View style={styles.bookRow}>
                 <Text style={styles.bookText}>{t('homeBookNow')}</Text>
                 <Icon name="chevron-forward" size={14} color={TEAL} />
               </View>
-            </View>
+            </ImageBackground>
           </TouchableOpacity>
         ))}
       </View>
@@ -147,25 +170,27 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  card: {
-    width: '48.4%',
-    aspectRatio: 0.92,
+  cardShadow: {
+    marginBottom: 10,
     borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#17332E',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 4},
+    elevation: 3,
+  },
+  card: {
+    borderRadius: 22,
+    borderWidth: 1,
     overflow: 'hidden',
-    marginBottom: 12,
-  },
-  art: {
-    position: 'absolute',
-    width: 220,
-    height: 220,
-    right: -4,
-    bottom: -6,
-  },
-  cardBody: {
-    flex: 1,
     paddingHorizontal: 14,
     paddingTop: 16,
     paddingBottom: 14,
+  },
+  art: {
+    width: undefined,
+    height: undefined,
   },
   iconCircle: {
     width: 36,
@@ -184,18 +209,17 @@ const styles = StyleSheet.create({
     color: INK,
   },
   cardDesc: {
-    maxWidth: '72%',
+    maxWidth: '64%',
     marginTop: 3,
     fontSize: 11.5,
     lineHeight: 15.5,
     color: '#3E514C',
     fontWeight: '500',
   },
-  spacer: {
-    flex: 1,
-    minHeight: 8,
-  },
   bookRow: {
+    position: 'absolute',
+    left: 14,
+    bottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
