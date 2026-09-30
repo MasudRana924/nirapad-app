@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     backgroundColor: PAGE,
   },
   scrollContent: {
-    paddingBottom: 18,
+    paddingBottom: 110,
   },
   activeWrap: {
     marginTop: 4,

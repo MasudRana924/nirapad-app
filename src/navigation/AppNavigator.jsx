@@ -2,7 +2,13 @@ import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {View, ActivityIndicator, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 
@@ -52,15 +58,69 @@ import {useSupportUnreadCount} from '../api/queries';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs() {
-  const insets = useSafeAreaInsets();
-  const {t} = useTranslation();
-  const {count: supportUnread} = useSupportUnreadCount();
+const HIDDEN_TAB_BAR_ROUTES = ['Messages'];
 
+function FloatingTabBar({state, descriptors, navigation}) {
+  const insets = useSafeAreaInsets();
   // insets.bottom = real system navigation bar height reported by the OS
   // after WindowCompat.setDecorFitsSystemWindows(window, false) in MainActivity.kt.
   // Fallback 16 covers older Android devices where inset hasn't loaded yet.
   const safeBottom = insets.bottom > 0 ? insets.bottom : 16;
+  const activeRoute = state.routes[state.index];
+
+  if (HIDDEN_TAB_BAR_ROUTES.includes(activeRoute.name)) {
+    return null;
+  }
+
+  return (
+    <View
+      pointerEvents="box-none"
+      style={[tabStyles.barWrap, {bottom: safeBottom + 6}]}>
+      <View style={tabStyles.bar}>
+        {state.routes.map((route, index) => {
+          const {options} = descriptors[route.key];
+          const focused = state.index === index;
+          const label =
+            typeof options.tabBarLabel === 'string' ? options.tabBarLabel : null;
+
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!focused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          return (
+            <TouchableOpacity
+              key={route.key}
+              activeOpacity={0.8}
+              style={tabStyles.item}
+              onPress={onPress}>
+              {options.tabBarIcon?.({focused})}
+              {label ? (
+                <Text
+                  numberOfLines={1}
+                  style={[tabStyles.label, focused && tabStyles.labelActive]}>
+                  {label}
+                </Text>
+              ) : null}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+const renderTabBar = props => <FloatingTabBar {...props} />;
+
+function MainTabs() {
+  const {t} = useTranslation();
+  const {count: supportUnread} = useSupportUnreadCount();
 
   const renderTabIcon = (iconName, focused) => (
     <Icon
@@ -74,31 +134,9 @@ function MainTabs() {
     <Tab.Navigator
       initialRouteName="Home"
       backBehavior="history"
+      tabBar={renderTabBar}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#111414',
-          borderTopWidth: 0,
-          elevation: 0,
-          shadowOpacity: 0,
-          marginHorizontal: '10%',
-          marginBottom: safeBottom + 6,
-          height: 62,
-          borderRadius: 31,
-          paddingTop: 6,
-          paddingBottom: 6,
-        },
-        tabBarItemStyle: {
-          justifyContent: 'center',
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
-          marginTop: 1,
-        },
-        tabBarActiveTintColor: '#FFFFFF',
-        tabBarInactiveTintColor: '#8A9290',
-        tabBarShowLabel: true,
       }}>
       <Tab.Screen
         name="Home"
@@ -122,8 +160,6 @@ function MainTabs() {
         name="Messages"
         component={SupportChatScreen}
         options={{
-          tabBarLabel: () => null,
-          tabBarStyle: {display: 'none'},
           tabBarIcon: () => renderChatIcon(Number(supportUnread) > 0),
         }}
       />
@@ -237,6 +273,36 @@ const renderChatIcon = hasUnread => (
 );
 
 const tabStyles = StyleSheet.create({
+  barWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  bar: {
+    width: '80%',
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#111414',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  item: {
+    flex: 1,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    marginTop: 3,
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#8A9290',
+  },
+  labelActive: {
+    color: '#FFFFFF',
+  },
   chatButton: {
     width: 46,
     height: 46,

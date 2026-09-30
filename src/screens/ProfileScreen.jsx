@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 28,
+    paddingBottom: 110,
   },
 
   profileCardWrap: {
