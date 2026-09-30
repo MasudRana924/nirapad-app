@@ -13,7 +13,7 @@ import {AuthProvider, useAuth} from './src/context/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import SplashScreen from './src/screens/SplashScreen';
 import notificationService from './src/services/notificationService';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import NotificationBanner from './src/components/common/NotificationBanner';
 import {handleNotificationClick, parseNotificationData} from './src/utils/notificationHandler';
 import {isSupportMessagePush} from './src/utils/supportPush';
@@ -21,6 +21,11 @@ import {queryKeys} from './src/api/queryKeys';
 import {ModalProvider} from './src/contexts/ModalContext';
 import BookingAlertHost from './src/components/booking/BookingAlertHost';
 import {showBookingAlertFromPush} from './src/utils/bookingAlerts';
+
+const navTheme = {
+  ...DefaultTheme,
+  colors: {...DefaultTheme.colors, background: '#FFFFFF'},
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -142,7 +147,10 @@ function AppContent() {
 
   return (
     <>
-      <NavigationContainer ref={navigationRef} onReady={setupNotificationListeners}>
+      <NavigationContainer
+        ref={navigationRef}
+        theme={navTheme}
+        onReady={setupNotificationListeners}>
         <AppNavigator />
       </NavigationContainer>
       <NotificationBanner

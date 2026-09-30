@@ -62,44 +62,42 @@ function MainTabs() {
   // Fallback 16 covers older Android devices where inset hasn't loaded yet.
   const safeBottom = insets.bottom > 0 ? insets.bottom : 16;
 
-  const renderTabIcon = (iconName, focused, showDot = false) => (
-    <View>
-      <View
-        style={[
-          tabStyles.iconContainer,
-          focused && tabStyles.activeIconContainer,
-        ]}>
-        <Icon
-          name={iconName}
-          size={21}
-          color={focused ? '#0E8B78' : '#8B9894'}
-        />
-      </View>
-      {showDot ? <View style={tabStyles.badgeDot} /> : null}
-    </View>
+  const renderTabIcon = (iconName, focused) => (
+    <Icon
+      name={iconName}
+      size={21}
+      color={focused ? '#FFFFFF' : '#8A9290'}
+    />
   );
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#111414',
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
+          marginHorizontal: '10%',
+          marginBottom: safeBottom + 6,
+          height: 62,
+          borderRadius: 31,
           paddingTop: 6,
-          paddingBottom: safeBottom + 4,
-          height: 64 + safeBottom,
+          paddingBottom: 6,
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
           marginTop: 1,
         },
-        tabBarActiveTintColor: '#0E8B78',
-        tabBarInactiveTintColor: '#8B9894',
+        tabBarActiveTintColor: '#FFFFFF',
+        tabBarInactiveTintColor: '#8A9290',
         tabBarShowLabel: true,
       }}>
       <Tab.Screen
@@ -121,6 +119,15 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
+        name="Messages"
+        component={SupportChatScreen}
+        options={{
+          tabBarLabel: () => null,
+          tabBarStyle: {display: 'none'},
+          tabBarIcon: () => renderChatIcon(Number(supportUnread) > 0),
+        }}
+      />
+      <Tab.Screen
         name="Bookings"
         component={BookingsScreen}
         options={{
@@ -129,19 +136,6 @@ function MainTabs() {
             renderTabIcon(
               focused ? 'calendar' : 'calendar-outline',
               focused,
-            ),
-        }}
-      />
-      <Tab.Screen
-        name="Messages"
-        component={SupportChatScreen}
-        options={{
-          tabBarLabel: t('tabMessages'),
-          tabBarIcon: ({focused}) =>
-            renderTabIcon(
-              focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline',
-              focused,
-              Number(supportUnread) > 0,
             ),
         }}
       />
@@ -235,28 +229,32 @@ function AppNavigator() {
   );
 }
 
+const renderChatIcon = hasUnread => (
+  <View style={tabStyles.chatButton}>
+    <Icon name="chatbubble-ellipses" size={22} color="#FFFFFF" />
+    {hasUnread ? <View style={tabStyles.badgeDot} /> : null}
+  </View>
+);
+
 const tabStyles = StyleSheet.create({
-  iconContainer: {
+  chatButton: {
     width: 46,
-    height: 28,
-    borderRadius: 10,
-    justifyContent: 'center',
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#0E8B78',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  activeIconContainer: {
-    backgroundColor: '#E5F6F1',
+    justifyContent: 'center',
   },
   badgeDot: {
     position: 'absolute',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: '#FF4B4B',
     top: 2,
-    right: 6,
+    right: 2,
     borderWidth: 1.5,
-    borderColor: '#E6ECEB',
+    borderColor: '#111414',
   },
 });
 

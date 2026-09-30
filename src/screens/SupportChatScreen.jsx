@@ -757,7 +757,7 @@ const SupportChatScreen = () => {
       style={styles.safeArea}
       edges={isTab ? ['top', 'bottom', 'left', 'right'] : ['bottom', 'left', 'right']}>
       <ChatThemeBackground />
-      <Header title={t('Nirapod Support')} showBack={!isTab} />
+      <Header title={t('Nirapod Support')} showBack />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

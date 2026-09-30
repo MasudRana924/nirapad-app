@@ -1,10 +1,7 @@
 import React from 'react';
-import {View, Image, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-
-const careArt = require('../../assets/home-active-booking-bg.png');
-
-const ART_SIZE = 190;
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ActiveCardBackground = () => (
   <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -18,21 +15,9 @@ const ActiveCardBackground = () => (
     <View style={styles.cornerBlob} />
     <View style={styles.wave} />
 
-    <View style={styles.artWrap}>
-      <Image source={careArt} style={styles.art} resizeMode="cover" />
-      <LinearGradient
-        colors={['#EEF8F5', 'rgba(238, 248, 245, 0)']}
-        start={{x: 0, y: 0.5}}
-        end={{x: 1, y: 0.5}}
-        style={styles.artFadeLeft}
-      />
-      <LinearGradient
-        colors={['rgba(232, 245, 241, 0)', '#E6F4F0']}
-        start={{x: 0.5, y: 0}}
-        end={{x: 0.5, y: 1}}
-        style={styles.artFadeBottom}
-      />
-    </View>
+    <Icon name="heart" size={96} color="rgba(14, 139, 120, 0.08)" style={styles.heart} />
+    <Icon name="medkit" size={44} color="rgba(14, 139, 120, 0.10)" style={styles.medkit} />
+    <Icon name="leaf" size={38} color="rgba(14, 139, 120, 0.10)" style={styles.leaf} />
   </View>
 );
 
@@ -70,35 +55,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#D6EFE8',
     opacity: 0.55,
   },
-  artWrap: {
+  heart: {
     position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    width: 160,
-    justifyContent: 'center',
-    overflow: 'hidden',
+    right: 14,
+    top: 18,
+    transform: [{rotate: '-12deg'}],
   },
-  art: {
+  medkit: {
     position: 'absolute',
-    right: -22,
-    top: '50%',
-    marginTop: -ART_SIZE / 2 - 6,
-    width: ART_SIZE,
-    height: ART_SIZE,
+    right: 96,
+    top: 12,
+    transform: [{rotate: '10deg'}],
   },
-  artFadeLeft: {
+  leaf: {
     position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    width: 36,
-  },
-  artFadeBottom: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 18,
+    right: 90,
+    bottom: 14,
+    transform: [{rotate: '-20deg'}],
   },
 });
