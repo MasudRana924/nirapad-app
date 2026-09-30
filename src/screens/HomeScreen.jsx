@@ -1,12 +1,11 @@
 import React, {useCallback, useState} from 'react';
 import {StyleSheet, ScrollView, RefreshControl, View, StatusBar} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-
 import HomeHeader from '../components/home/HomeHeader';
-import HomeHeroCard from '../components/home/HomeHeroCard';
 import ActiveBookingCard from '../components/home/ActiveBookingCard';
 import BookingButtons from '../components/home/BookingButtons';
 import HomeFamilySection from '../components/home/HomeFamilySection';
+import HomeRecentActivity from '../components/home/HomeRecentActivity';
 import HomeSkeleton from '../components/home/HomeSkeleton';
 import {
   useUserProfile,
@@ -20,6 +19,7 @@ const PAGE = '#FFFFFF';
 const HomeScreen = ({navigation}) => {
   const {
     isLoading: profileLoading,
+    data: profileData,
     refetch: refetchProfile,
   } = useUserProfile();
   const {
@@ -76,7 +76,7 @@ const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <HomeHeader navigation={navigation} />
+      <HomeHeader navigation={navigation} profile={profileData?.data || profileData} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -100,6 +100,9 @@ const HomeScreen = ({navigation}) => {
 
         <BookingButtons navigation={navigation} />
         <HomeFamilySection navigation={navigation} members={familyMembers} />
+        <View style={styles.recentActivityWrap}>
+          <HomeRecentActivity navigation={navigation} booking={bookings[0]} />
+        </View>
       </ScrollView>
     </View>
   );
@@ -117,6 +120,9 @@ const styles = StyleSheet.create({
   },
   activeWrap: {
     marginTop: 4,
+    paddingHorizontal: 16,
+  },
+  recentActivityWrap: {
     paddingHorizontal: 16,
   },
 });

@@ -326,7 +326,7 @@ export default {
   // Select Family Member
   selectFamilyMember: 'Select Patient',
   selectFamilyMemberDesc: 'Choose a family member for this booking',
-  myself: 'Myself',
+  myself: 'Yourself',
   bookForMyselfDesc: 'Book care for yourself',
   familyMembersTitle: 'Family members',
   addNameBeforeSelfBooking:

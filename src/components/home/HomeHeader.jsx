@@ -6,28 +6,67 @@ import {useAuth} from '../../context/AuthContext';
 import {useInbox, useInboxUnreadCount} from '../../api/queries';
 import {useTranslation} from 'react-i18next';
 
-const logo = require('../../assets/logo-mark.png');
-
 const TEAL = '#0B6E65';
 const INK = '#172824';
 
-const HomeHeader = ({navigation}) => {
+const HomeHeader = ({navigation, profile}) => {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const {user} = useAuth();
   const {data: inboxData} = useInbox({page: 1, limit: 1});
   const {data: unreadCount} = useInboxUnreadCount();
   const unread = inboxData?.meta?.unread ?? unreadCount ?? 0;
-  const photo = user?.photo || user?.profile_photo || user?.avatar;
+  const userData = profile || user;
+  const photo =
+    userData?.photo ||
+    userData?.profile_photo ||
+    userData?.avatar ||
+    userData?.profilePhoto;
+  const name =
+    userData?.name ||
+    userData?.full_name ||
+    userData?.fullName ||
+    userData?.username ||
+    t('profile');
+  const currentHour = new Date().getHours();
+  const greeting =
+    currentHour < 12
+      ? t('goodMorning')
+      : currentHour < 18
+        ? t('goodAfternoon')
+        : t('goodEvening');
+  const greetingIcon =
+    currentHour < 12
+      ? 'sunny-outline'
+      : currentHour < 18
+        ? 'partly-sunny-outline'
+        : 'moon-outline';
 
   return (
     <View style={[styles.header, {paddingTop: insets.top + 10}]}>
-      <View style={styles.brand}>
-        <Image source={logo} style={styles.logoMark} resizeMode="contain" />
-        <View style={styles.brandCopy}>
-          <Text style={styles.brandName}>Nirapod</Text>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        style={styles.brand}
+        onPress={() => navigation?.navigate('Profile')}>
+        <View style={styles.avatarButton}>
+          {photo ? (
+            <Image source={{uri: photo}} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatarFallback}>
+              <Icon name="person" size={18} color={TEAL} />
+            </View>
+          )}
         </View>
-      </View>
+        <View style={styles.brandCopy}>
+          <View style={styles.greetingRow}>
+            <Text style={styles.greeting}>{greeting}</Text>
+            <Icon name={greetingIcon} size={13} color="#6E7E7A" />
+          </View>
+          <Text style={styles.brandName} numberOfLines={1}>
+            {name}
+          </Text>
+        </View>
+      </TouchableOpacity>
 
       <View style={styles.actions}>
         <TouchableOpacity
@@ -36,22 +75,6 @@ const HomeHeader = ({navigation}) => {
           onPress={() => navigation?.navigate('Inbox')}>
           <Icon name="notifications-outline" size={20} color={INK} />
           {Number(unread) > 0 ? <View style={styles.bellDot} /> : null}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.profile}
-          onPress={() => navigation?.navigate('Profile')}>
-          <View style={styles.avatarButton}>
-            {photo ? (
-              <Image source={{uri: photo}} style={styles.avatarImage} />
-            ) : (
-              <View style={styles.avatarFallback}>
-                <Icon name="person" size={18} color={TEAL} />
-              </View>
-            )}
-          </View>
-          <Icon name="chevron-down" size={16} color={INK} />
         </TouchableOpacity>
       </View>
     </View>
@@ -74,20 +97,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
-  logoMark: {
-    width: 46,
-    height: 40,
-    tintColor: TEAL,
-  },
   brandCopy: {
     flex: 1,
-    marginLeft: 8,
+    marginLeft: 10,
+    minWidth: 0,
+  },
+  greetingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  greeting: {
+    color: '#6E7E7A',
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '500',
   },
   brandName: {
     color: TEAL,
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 28,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: -0.3,
   },
   tagline: {

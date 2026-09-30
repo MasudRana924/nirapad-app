@@ -207,14 +207,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   illustration: {
-    width: 86,
-    height: 86,
+    width: 56,
+    height: 56,
     borderRadius: 16,
     backgroundColor: '#F3FAF7',
   },
   illustrationFallback: {
-    width: 86,
-    height: 86,
+    width: 56,
+    height: 56,
     borderRadius: 16,
     backgroundColor: '#F3FAF7',
     alignItems: 'center',
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: INK,
   },
   radio: {
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     color: TEAL,
   },
@@ -288,8 +288,8 @@ const styles = StyleSheet.create({
     color: MUTED,
   },
   price: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 12,
+    fontWeight: '600',
     color: INK,
   },
   bottomContainer: {

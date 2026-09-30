@@ -106,9 +106,9 @@ const SelectFamilyMember = ({navigation, route}) => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-          <View>
+          {/* <View>
             <Text style={styles.sectionTitle}>{t('selectFamilyMemberDesc', 'Who needs assistance?')}</Text>
-          </View>
+          </View> */}
 
         <TouchableOpacity
           activeOpacity={0.85}
@@ -126,10 +126,10 @@ const SelectFamilyMember = ({navigation, route}) => {
                 )}
               </View>
               <View style={styles.userInfo}>
-                <Text style={styles.name}>{t('myself', 'Myself')}</Text>
-                <Text style={styles.relation} numberOfLines={1}>
+                <Text style={styles.name}>{t('myself', 'Yourself')}</Text>
+                {/* <Text style={styles.relation} numberOfLines={1}>
                   {profileName || t('bookForMyselfDesc', 'Book care for yourself')}
-                </Text>
+                </Text> */}
               </View>
             </View>
           </View>
@@ -379,8 +379,8 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: '#111820',
     marginBottom: 4,
   },

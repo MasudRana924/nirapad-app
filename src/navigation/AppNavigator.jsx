@@ -283,7 +283,7 @@ const tabStyles = StyleSheet.create({
     width: '80%',
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#111414',
+    backgroundColor: '#008178',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 6,
@@ -307,7 +307,7 @@ const tabStyles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: '#0E8B78',
+    backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -320,7 +320,7 @@ const tabStyles = StyleSheet.create({
     top: 2,
     right: 2,
     borderWidth: 1.5,
-    borderColor: '#111414',
+    borderColor: '#000000',
   },
 });
 
