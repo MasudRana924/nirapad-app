@@ -228,10 +228,8 @@ const BookingDateTime = ({navigation, route}) => {
   const {showError} = useAppModal();
   const {
     selectedMember,
-    selectedCaregiver,
     selectedService,
     selectedArea,
-    selectedHospital,
     serviceType,
   } = route.params || {};
 
@@ -251,12 +249,12 @@ const BookingDateTime = ({navigation, route}) => {
       return;
     }
 
-    navigation?.navigate('BookingPreview', {
+    navigation?.navigate('SelectCaregiver', {
       selectedMember,
-      selectedCaregiver,
       selectedService,
       selectedArea,
-      selectedHospital,
+      district: selectedArea?.district,
+      thana: selectedArea?.thana,
       serviceType,
       selectedDate,
       selectedTime,

@@ -76,6 +76,10 @@ const SelectCaregiverScreen = ({navigation, route}) => {
     thana = '',
     selectedArea,
     serviceType = 'caregiver',
+    selectedDate,
+    selectedTime,
+    durationHours,
+    notes,
   } = route.params || {};
 
   const selectedDistrict = district || selectedArea?.district || '';
@@ -91,6 +95,7 @@ const SelectCaregiverScreen = ({navigation, route}) => {
     name: search,
     district: selectedDistrict,
     thana: selectedThana,
+    booking_date: selectedDate?.fullDate,
     gender: selectedFilter === 'all' ? '' : selectedFilter,
   });
 
@@ -118,6 +123,10 @@ const SelectCaregiverScreen = ({navigation, route}) => {
           thana: selectedThana,
         },
         serviceType,
+        selectedDate,
+        selectedTime,
+        durationHours,
+        notes,
       });
     }
   };

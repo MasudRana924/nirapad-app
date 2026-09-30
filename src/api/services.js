@@ -74,6 +74,7 @@ export const caregiverService = {
       name,
       district,
       thana,
+      booking_date,
       min_rating,
       verification_status,
       service_area,
@@ -89,6 +90,9 @@ export const caregiverService = {
     }
     if (thana) {
       queryParams.append('thana', thana);
+    }
+    if (booking_date) {
+      queryParams.append('booking_date', booking_date);
     }
     if (gender) {
       queryParams.append('gender', gender);

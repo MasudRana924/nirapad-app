@@ -75,12 +75,10 @@ const AreaSelectScreen = ({navigation, route}) => {
     };
     await storage.saveSelectedArea(selectedArea);
 
-    navigation?.navigate('SelectCaregiver', {
+    navigation?.navigate('BookingDateTime', {
       selectedMember,
       selectedService,
       selectedArea,
-      district,
-      thana,
       serviceType,
     });
   };

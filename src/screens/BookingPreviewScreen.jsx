@@ -4,13 +4,13 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Loader from '../components/common/Loader';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Toast from '../components/common/Toast';
 import {useCreateBooking} from '../api/mutations';
 import {storage} from '../utils/storage';
 import {API_CODES, getApiErrorMessage} from '../api/client';
@@ -72,6 +72,11 @@ const BookingPreviewScreen = ({navigation, route}) => {
 
   const {t} = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'error',
+  });
   const createBooking = useCreateBooking();
   const {showError, showConfirm} = useAppModal();
   const bookingForSelf = isSelfMember(selectedMember);
@@ -168,16 +173,19 @@ const BookingPreviewScreen = ({navigation, route}) => {
         });
         return;
       }
+      if (error?.code === API_CODES.CONFLICT) {
+        setToast({
+          visible: true,
+          message: getApiErrorMessage(
+            error,
+            'Caregiver already has a booking in this time slot',
+          ),
+          type: 'error',
+        });
+        return;
+      }
       const message =
-        error?.code === API_CODES.CONFLICT
-          ? getApiErrorMessage(
-              error,
-              'This time overlaps another booking or the slot is unavailable.',
-            )
-          : getApiErrorMessage(
-              error,
-              'Failed to create booking. Please try again.',
-            );
+        getApiErrorMessage(error, 'Failed to create booking. Please try again.');
       showError(message);
     } finally {
       setIsSubmitting(false);
@@ -187,6 +195,12 @@ const BookingPreviewScreen = ({navigation, route}) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <Loader visible={isSubmitting} />
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() => setToast(current => ({...current, visible: false}))}
+      />
       <Header title={t('bookingPreview', 'Booking Preview')} onBack={() => navigation?.goBack()} />
 
       <ScrollView

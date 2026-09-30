@@ -43,8 +43,17 @@ const formatRating = value => {
 
 const HospitalSelection = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
-  const {selectedMember, selectedCaregiver, selectedService, selectedArea, serviceType} =
-    route.params || {};
+  const {
+    selectedMember,
+    selectedCaregiver,
+    selectedService,
+    selectedArea,
+    serviceType,
+    selectedDate,
+    selectedTime,
+    durationHours,
+    notes,
+  } = route.params || {};
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [district, setDistrict] = useState(selectedArea?.district || '');
   const [city, setCity] = useState(selectedArea?.thana || '');
@@ -62,13 +71,17 @@ const HospitalSelection = ({navigation, route}) => {
   const handleSelectHospital = (hospital) => {
     setSelectedHospital(hospital);
     storage.saveSelectedHospital(hospital);
-    navigation?.navigate('BookingDateTime', {
+    navigation?.navigate('BookingPreview', {
       selectedMember,
       selectedCaregiver,
       selectedService,
       selectedHospital: hospital,
       selectedArea,
       serviceType,
+      selectedDate,
+      selectedTime,
+      durationHours,
+      notes,
     });
   };
 
