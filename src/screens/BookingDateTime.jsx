@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   View,
@@ -17,12 +17,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import {useAppModal} from '../contexts/ModalContext';
-import {useCaregiverAvailability} from '../api/queries';
-import {
-  unwrapAvailability,
-  slotsForDay,
-  isHourInSlots,
-} from '../utils/availability';
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MONTH_NAMES = [
@@ -241,36 +235,11 @@ const BookingDateTime = ({navigation, route}) => {
     serviceType,
   } = route.params || {};
 
-  const caregiverId =
-    selectedCaregiver?.id || selectedCaregiver?.uuid || null;
-  const {data: availabilityData} = useCaregiverAvailability(caregiverId);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [timeModalOpen, setTimeModalOpen] = useState(false);
   const [durationHours, setDurationHours] = useState(4);
   const [notes, setNotes] = useState('');
-
-  const availability = unwrapAvailability(availabilityData);
-  const hasWeeklySlots = availability.length > 0;
-  const selectedDayOfWeek = selectedDate
-    ? new Date(`${selectedDate.fullDate}T00:00:00`).getDay()
-    : null;
-  const availableTimes = useMemo(() => {
-    if (!hasWeeklySlots || selectedDayOfWeek == null) {
-      return TIMES;
-    }
-    const daySlots = slotsForDay(availability, selectedDayOfWeek);
-    return TIMES.filter(time => isHourInSlots(time.hour, daySlots));
-  }, [availability, hasWeeklySlots, selectedDayOfWeek]);
-
-  useEffect(() => {
-    if (!selectedTime || !hasWeeklySlots) {
-      return;
-    }
-    if (!availableTimes.some(time => time.id === selectedTime.id)) {
-      setSelectedTime(null);
-    }
-  }, [availableTimes, hasWeeklySlots, selectedTime]);
 
   const canContinue = !!selectedDate && !!selectedTime;
 
@@ -334,7 +303,7 @@ const BookingDateTime = ({navigation, route}) => {
                   timeModalOpen && styles.timeDropdownButtonOpen,
                 ]}
                 onPress={() => {
-                  if (hasWeeklySlots && !selectedDate) {
+                  if (!selectedDate) {
                     showError('Please select a date first', 'Schedule');
                     return;
                   }
@@ -429,53 +398,38 @@ const BookingDateTime = ({navigation, route}) => {
                     style={styles.modalList}
                     contentContainerStyle={styles.modalListContent}
                     showsVerticalScrollIndicator={false}>
-                    {availableTimes.length === 0 ? (
-                      <View style={styles.noSlotsContainer}>
-                        <Icon
-                          name="time-outline"
-                          size={36}
-                          color="#C5CDD6"
-                          style={styles.noSlotsIcon}
-                        />
-                        <Text style={styles.noSlotsText}>
-                          No weekly slots on this day. Choose another date.
-                        </Text>
-                      </View>
-                    ) : (
-                      availableTimes.map((time, index) => {
-                        const selected = selectedTime?.id === time.id;
-                        return (
-                          <TouchableOpacity
-                            key={time.id}
-                            activeOpacity={0.7}
+                    {TIMES.map((time, index) => {
+                      const selected = selectedTime?.id === time.id;
+                      return (
+                        <TouchableOpacity
+                          key={time.id}
+                          activeOpacity={0.7}
+                          style={[
+                            styles.modalItem,
+                            index === TIMES.length - 1 && styles.modalItemLast,
+                            selected && styles.modalItemSelected,
+                          ]}
+                          onPress={() => {
+                            setSelectedTime(time);
+                            setTimeModalOpen(false);
+                          }}>
+                          <Text
                             style={[
-                              styles.modalItem,
-                              index === availableTimes.length - 1 &&
-                                styles.modalItemLast,
-                              selected && styles.modalItemSelected,
-                            ]}
-                            onPress={() => {
-                              setSelectedTime(time);
-                              setTimeModalOpen(false);
-                            }}>
-                            <Text
-                              style={[
-                                styles.modalItemText,
-                                selected && styles.modalItemTextSelected,
-                              ]}>
-                              {time.time}
-                            </Text>
-                            {selected && (
-                              <Icon
-                                name="checkmark-circle"
-                                size={20}
-                                color="#008178"
-                              />
-                            )}
-                          </TouchableOpacity>
-                        );
-                      })
-                    )}
+                              styles.modalItemText,
+                              selected && styles.modalItemTextSelected,
+                            ]}>
+                            {time.time}
+                          </Text>
+                          {selected ? (
+                            <Icon
+                              name="checkmark-circle"
+                              size={20}
+                              color="#008178"
+                            />
+                          ) : null}
+                        </TouchableOpacity>
+                      );
+                    })}
                   </ScrollView>
                 </View>
               </TouchableWithoutFeedback>
@@ -772,21 +726,6 @@ const styles = StyleSheet.create({
   modalItemTextSelected: {
     color: '#008178',
     fontWeight: '700',
-  },
-  noSlotsContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 36,
-    paddingHorizontal: 16,
-  },
-  noSlotsIcon: {
-    marginBottom: 8,
-  },
-  noSlotsText: {
-    fontSize: 14,
-    color: '#8190A7',
-    textAlign: 'center',
-    lineHeight: 20,
   },
 });
 
