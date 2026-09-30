@@ -338,7 +338,7 @@ export default EditProfile;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   flex: {
     flex: 1,
@@ -434,6 +434,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
 });

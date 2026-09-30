@@ -94,7 +94,7 @@ export default FamilyMemberDetails;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   scroll: {
     flex: 1,
@@ -121,7 +121,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     borderRadius: 12,
     marginHorizontal: 16,
     marginTop: 16,

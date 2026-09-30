@@ -192,7 +192,7 @@ export default CartScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   scroll: {
     flex: 1,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderTopWidth: 1,
     borderTopColor: '#F0F2F5',
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   bottomLabel: {
     fontSize: 12,

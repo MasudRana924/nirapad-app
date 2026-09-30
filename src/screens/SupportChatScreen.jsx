@@ -1016,7 +1016,7 @@ export default SupportChatScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   flex: {
     flex: 1,
@@ -1089,7 +1089,7 @@ const styles = StyleSheet.create({
   bubbleOther: {
     backgroundColor: '#FFFFFF',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
     borderBottomLeftRadius: 4,
   },
   bubbleFailed: {

@@ -18,7 +18,7 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
     <>
       <StatusBar
         barStyle="dark-content"
-        backgroundColor="#F5FAF9"
+        backgroundColor="#FFFFFF"
       />
       <View style={styles.container}>
         <View style={styles.content}>
@@ -45,7 +45,7 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: '#008178',
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   
   content: {

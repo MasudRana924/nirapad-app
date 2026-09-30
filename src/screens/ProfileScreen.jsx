@@ -106,7 +106,7 @@ const ProfileScreen = ({navigation}) => {
           onPress={handleUpdateDetails}
           style={styles.profileCardWrap}>
           <LinearGradient
-            colors={['#E4F4F0', '#F3FAF8']}
+            colors={['#FFFFFF', '#FFFFFF']}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
             style={styles.profileCard}>
@@ -202,7 +202,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
 
   header: {
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   profileCardWrap: {
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#D9ECE8',
+    borderColor: '#E6ECEB',
     overflow: 'hidden',
     marginBottom: 24,
   },
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 16,

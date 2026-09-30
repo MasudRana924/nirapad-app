@@ -21,7 +21,7 @@ const PaymentSuccessScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       <View style={styles.container}>
         <View style={styles.content}>
@@ -56,7 +56,7 @@ export default PaymentSuccessScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   container: {
     flex: 1,

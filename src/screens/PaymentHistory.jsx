@@ -154,7 +154,7 @@ const PaymentHistory = ({navigation}) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   paymentCard: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,

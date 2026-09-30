@@ -15,7 +15,7 @@ import {
 } from '../api/queries';
 import {isActiveStatus, isSearchingStatus} from '../utils/bookingStatus';
 
-const PAGE = '#F4F7F6';
+const PAGE = '#FFFFFF';
 
 const HomeScreen = ({navigation}) => {
   const {
@@ -67,7 +67,7 @@ const HomeScreen = ({navigation}) => {
   if (isInitialLoading) {
     return (
       <View style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#0A5A53" />
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
         <HomeSkeleton />
       </View>
     );
@@ -75,7 +75,7 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <View style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#0A5A53" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <HomeHeader navigation={navigation} />
       <ScrollView
         showsVerticalScrollIndicator={false}

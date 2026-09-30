@@ -100,7 +100,7 @@ const NotificationSettingsScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   card: {
     marginTop: 12,

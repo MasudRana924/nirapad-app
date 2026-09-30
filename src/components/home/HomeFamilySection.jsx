@@ -136,11 +136,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingHorizontal: 10,
     paddingVertical: 12,
-    shadowColor: '#17332E',
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    shadowOffset: {width: 0, height: 4},
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
   },
   addCard: {
     width: CARD_WIDTH,

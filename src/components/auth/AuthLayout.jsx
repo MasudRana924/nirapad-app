@@ -19,7 +19,7 @@ import PrimaryButton from '../common/PrimaryButton';
 const TEAL = '#008178';
 const INK = '#163532';
 const MUTED = '#7E9390';
-const PAGE = '#EAF6F1';
+const PAGE = '#FFFFFF';
 const AuthLayout = ({
   children,
   title,

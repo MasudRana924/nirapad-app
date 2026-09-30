@@ -134,7 +134,7 @@ const BookingsScreen = ({navigation}) => {
 
   return (
     <View style={styles.page}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F5FAF9" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
         <View style={styles.topBar}>
           <TouchableOpacity
@@ -284,7 +284,7 @@ const BookingsScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   flex: {
     flex: 1,
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
     gap: 6,
   },
   tabActive: {
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
     marginBottom: 12,
     overflow: 'hidden',
   },

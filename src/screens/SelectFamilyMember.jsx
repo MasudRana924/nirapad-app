@@ -223,7 +223,7 @@ export default SelectFamilyMember;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
 
   // ================= SCROLL =================
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
     marginBottom: 12,
   },
 
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   // ================= BOTTOM =================
   bottomContainer: {
     width: '100%',
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 16,

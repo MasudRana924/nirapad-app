@@ -15,7 +15,7 @@ import {storage} from '../utils/storage';
 import PrimaryButton from '../components/common/PrimaryButton';
 import {useTranslation} from 'react-i18next';
 
-const PAGE = '#F5FAF9';
+const PAGE = '#FFFFFF';
 const TEAL = '#008178';
 const INK = '#163532';
 const MUTED = '#6F8480';
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderWidth: 1.5,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
 
   },
   cardSelected: {

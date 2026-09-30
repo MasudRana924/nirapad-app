@@ -111,13 +111,13 @@ export default HomeSkeleton;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: '#FFFFFF',
   },
   bone: {
     backgroundColor: '#D5E4E0',
   },
   lightBone: {
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: '#E3ECEA',
   },
   whiteCircle: {
     backgroundColor: '#FFFFFF',
@@ -129,11 +129,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0C6E65',
     paddingHorizontal: 18,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    paddingBottom: 12,
   },
   brand: {
     flex: 1,

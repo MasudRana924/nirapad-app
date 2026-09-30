@@ -111,7 +111,7 @@ const ReviewScreen = ({route, navigation}) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5FAF9',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',

@@ -50,11 +50,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginHorizontal: 16,
     borderRadius: 26,
-    shadowColor: '#0B6A5C',
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    shadowOffset: {width: 0, height: 8},
-    elevation: 6,
   },
   card: {
     minHeight: 214,

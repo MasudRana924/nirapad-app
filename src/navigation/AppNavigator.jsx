@@ -256,7 +256,7 @@ const tabStyles = StyleSheet.create({
     top: 2,
     right: 6,
     borderWidth: 1.5,
-    borderColor: '#FFFFFF',
+    borderColor: '#E6ECEB',
   },
 });
 
