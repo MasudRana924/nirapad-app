@@ -88,8 +88,6 @@ const HomeScreen = ({navigation}) => {
             tintColor="#0E8B78"
           />
         }>
-        <HomeHeroCard navigation={navigation} />
-
         {activeBooking ? (
           <View style={styles.activeWrap}>
             <ActiveBookingCard

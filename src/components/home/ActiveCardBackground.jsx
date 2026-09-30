@@ -15,9 +15,9 @@ const ActiveCardBackground = () => (
     <View style={styles.cornerBlob} />
     <View style={styles.wave} />
 
-    <Icon name="heart" size={96} color="rgba(14, 139, 120, 0.08)" style={styles.heart} />
+    {/* <Icon name="heart" size={96} color="rgba(14, 139, 120, 0.08)" style={styles.heart} />
     <Icon name="medkit" size={44} color="rgba(14, 139, 120, 0.10)" style={styles.medkit} />
-    <Icon name="leaf" size={38} color="rgba(14, 139, 120, 0.10)" style={styles.leaf} />
+    <Icon name="leaf" size={38} color="rgba(14, 139, 120, 0.10)" style={styles.leaf} /> */}
   </View>
 );
 

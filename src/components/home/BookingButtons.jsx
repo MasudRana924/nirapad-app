@@ -77,13 +77,13 @@ const BookingButtons = ({navigation}) => {
     <View style={styles.section}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>{t('whatDoYouNeedToday')}</Text>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={0.7}
           style={styles.viewAll}
           onPress={() => navigation?.navigate('Services')}>
           <Text style={styles.viewAllText}>{t('viewAll')}</Text>
           <Icon name="chevron-forward" size={14} color={TEAL} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <Text style={styles.hint}>{t('chooseServiceHint')}</Text>
 
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 16,
     lineHeight: 26,
     fontWeight: '800',
     color: INK,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     maxWidth: '78%',
-    fontSize: 15.5,
+    fontSize: 15,
     lineHeight: 20,
     fontWeight: '800',
     color: INK,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   cardDesc: {
     maxWidth: '64%',
     marginTop: 3,
-    fontSize: 11.5,
+    fontSize: 10,
     lineHeight: 15.5,
     color: '#3E514C',
     fontWeight: '500',

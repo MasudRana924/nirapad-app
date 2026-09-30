@@ -126,7 +126,7 @@ export default {
     'Book trusted caregivers, nurses and get support for your family members — anytime, anywhere.',
   bookACaregiver: 'Book a Caregiver',
   careTodayPeace: 'Care Today  ·  Peace Tomorrow',
-  elderlyCaregiver: 'Elderly Caregiver',
+  elderlyCaregiver: 'Caregiver',
   elderlyCaregiverDesc: 'Personal care, companionship and daily support.',
   nurseCardDesc: 'Professional nursing care at home or hospital.',
   physioCardDesc: 'Regain mobility and live better.',

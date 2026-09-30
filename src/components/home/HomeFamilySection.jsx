@@ -21,15 +21,7 @@ const HomeFamilySection = ({navigation, members = []}) => {
     <View style={styles.section}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>{t('yourFamily')}</Text>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
-          onPress={() => navigation?.navigate('Family')}>
-          <Icon name="chevron-forward" size={18} color="#8AA09B" />
-        </TouchableOpacity>
       </View>
-      <Text style={styles.hint}>{t('manageFamilyHint')}</Text>
-
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -108,7 +100,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     lineHeight: 26,
     fontWeight: '800',
     color: INK,
@@ -126,6 +118,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 6,
     gap: 10,
+    marginTop: 10,
   },
   memberCard: {
     width: CARD_WIDTH,
@@ -181,14 +174,14 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   cardTitle: {
-    fontSize: 13.5,
+    fontSize: 10,
     lineHeight: 18,
-    fontWeight: '800',
+    fontWeight: '700',
     color: INK,
   },
   cardMeta: {
     marginTop: 2,
-    fontSize: 11,
+    fontSize: 9,
     lineHeight: 14,
     color: '#7A8C88',
     fontWeight: '500',

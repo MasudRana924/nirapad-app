@@ -26,9 +26,6 @@ const HomeHeader = ({navigation}) => {
         <Image source={logo} style={styles.logoMark} resizeMode="contain" />
         <View style={styles.brandCopy}>
           <Text style={styles.brandName}>Nirapod</Text>
-          <Text style={styles.tagline} numberOfLines={1}>
-            {t('careTodayPeace')}
-          </Text>
         </View>
       </View>
 
@@ -88,7 +85,7 @@ const styles = StyleSheet.create({
   },
   brandName: {
     color: TEAL,
-    fontSize: 24,
+    fontSize: 18,
     lineHeight: 28,
     fontWeight: '800',
     letterSpacing: -0.3,

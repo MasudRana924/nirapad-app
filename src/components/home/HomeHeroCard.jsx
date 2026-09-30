@@ -15,14 +15,8 @@ const HomeHeroCard = ({navigation}) => {
         resizeMode="cover"
         imageStyle={styles.image}
         style={styles.card}>
-        <View style={styles.trustPill}>
-          <Icon name="shield-checkmark" size={13} color="#FFFFFF" />
-          <Text style={styles.trustText}>{t('trustedCareAlways')}</Text>
-        </View>
 
         <Text style={styles.title}>{t('lovedOnesDeserve')}</Text>
-        <Text style={styles.subtitle}>{t('lovedOnesSubtitle')}</Text>
-
         <TouchableOpacity
           activeOpacity={0.9}
           style={styles.cta}
@@ -34,10 +28,6 @@ const HomeHeroCard = ({navigation}) => {
             <Icon name="arrow-forward" size={14} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
-
-        <View style={styles.happierBadge}>
-          <Text style={styles.happierText}>Better Care{'\n'}Happier Lives</Text>
-        </View>
       </ImageBackground>
     </View>
   );
@@ -83,9 +73,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     maxWidth: '62%',
     color: '#FFFFFF',
-    fontSize: 22,
+    fontSize: 15.5,
     lineHeight: 27,
-    fontWeight: '800',
+    fontWeight: '500',
     letterSpacing: -0.4,
   },
   subtitle: {
