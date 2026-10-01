@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import LocationMap from '../common/LocationMap';
 import Toast from '../common/Toast';
 import {bookingService} from '../../api/services';
@@ -77,9 +76,7 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
       return;
     }
     if (payload.is_active === false || payload.is_active === 'false') {
-      endedRef.current = true;
       setIsActive(false);
-      setEnded(true);
       return;
     }
     const next = toCoord(payload.latitude, payload.longitude);
@@ -130,17 +127,13 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
       if (!data) {
         return null;
       }
-      if (data.is_active === false || data.is_active === 'false') {
-        endTracking('Service ended');
-        return data;
-      }
       applyLocation(data);
       return data;
     } catch (error) {
       showToast(getApiErrorMessage(error, 'Could not load caregiver location'));
       return null;
     }
-  }, [bookingId, applyLocation, endTracking, showToast]);
+  }, [bookingId, applyLocation, showToast]);
 
   useEffect(() => {
     if (!enabled || !bookingId) {
@@ -178,7 +171,7 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
           'tracking:location': payload => {
             applyLocation(payload?.data ?? payload);
           },
-          'tracking:ended': () => endTracking('Service ended'),
+          'tracking:ended': () => endTracking(),
           'tracking:error': payload => {
             showToast(
               payload?.message ||
@@ -250,22 +243,6 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
 
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Icon name="navigate" size={16} color="#008178" />
-          <Text style={styles.headerTitle}>Live Tracking</Text>
-        </View>
-        {!ended && (
-          <View style={styles.livePill}>
-            <View style={styles.liveDot} />
-            <Text style={styles.livePillText}>
-              {isActive ? 'Live' : 'Paused'}
-              {!socketConnected ? ' · …' : ''}
-            </Text>
-          </View>
-        )}
-      </View>
-
       <View style={styles.mapBox}>
         <LocationMap
           latitude={coordinate?.latitude}
@@ -281,6 +258,16 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
           style={styles.map}
         />
 
+        {!ended && (
+          <View style={styles.livePill} pointerEvents="none">
+            <View style={styles.liveDot} />
+            <Text style={styles.livePillText}>
+              {isActive ? 'Live' : 'Paused'}
+              {!socketConnected ? ' · …' : ''}
+            </Text>
+          </View>
+        )}
+
         {loading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="small" color="#008178" />
@@ -292,12 +279,6 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
             <Text style={styles.waitingText}>
               Waiting for caregiver location…
             </Text>
-          </View>
-        )}
-
-        {ended && (
-          <View style={styles.endedBanner} pointerEvents="none">
-            <Text style={styles.endedText}>Service ended · tracking stopped</Text>
           </View>
         )}
       </View>
@@ -320,28 +301,13 @@ export default LiveTrackingMapSection;
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#F6F6F6',
-    borderRadius: 14,
-    padding: 12,
+    marginHorizontal: -16,
     marginBottom: 12,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  headerTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#111820',
-  },
   livePill: {
+    position: 'absolute',
+    top: 10,
+    right: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
@@ -362,8 +328,7 @@ const styles = StyleSheet.create({
     color: '#008178',
   },
   mapBox: {
-    height: 220,
-    borderRadius: 12,
+    height: 300,
     overflow: 'hidden',
     backgroundColor: '#E8EEF4',
   },
@@ -392,24 +357,9 @@ const styles = StyleSheet.create({
     color: '#4A5568',
     textAlign: 'center',
   },
-  endedBanner: {
-    position: 'absolute',
-    left: 10,
-    right: 10,
-    bottom: 10,
-    backgroundColor: '#E7F6F1',
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-  },
-  endedText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#0F8A7A',
-    textAlign: 'center',
-  },
   updatedAt: {
     marginTop: 8,
+    paddingHorizontal: 16,
     fontSize: 11,
     color: '#8190A7',
     fontWeight: '500',
