@@ -15,6 +15,7 @@ import {useSearchHospitals} from '../api/queries';
 import HospitalSkeleton from '../components/home/HospitalSkeleton';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Header from '../components/common/Header';
 import {bangladeshDistricts, bangladeshCities} from '../data/bangladeshLocations';
 import {storage} from '../utils/storage';
 
@@ -88,17 +89,8 @@ const HospitalSelection = ({navigation, route}) => {
   return (
     <View style={styles.page}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={22} color={INK} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('selectHospital')}</Text>
-          <View style={styles.headerSpacer} />
-        </View>
+      <SafeAreaView style={styles.flex} edges={['left', 'right']}>
+        <Header title={t('selectHospital')} onBack={() => navigation?.goBack()} />
         <Text style={styles.headerSubtitle}>
           Choose the hospital where you want to get care
         </Text>

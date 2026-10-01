@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {bookingService} from '../api/services';
 import {getApiErrorMessage} from '../api/client';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Header from '../components/common/Header';
 import {useAppModal} from '../contexts/ModalContext';
 
 const ReviewScreen = ({route, navigation}) => {
@@ -52,14 +53,7 @@ const ReviewScreen = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color="#111820" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('writeReview')}</Text>
-      </View>
+      <Header title={t('writeReview')} onBack={() => navigation.goBack()} />
 
       <ScrollView
         style={styles.scrollView}

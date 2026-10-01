@@ -9,18 +9,24 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useFamilyMembers} from '../api/queries';
 import Toast from '../components/common/Toast';
 import FamilySkeleton from '../components/home/FamilySkeleton';
 import Header from '../components/common/Header';
-import {useTabBarInset} from '../navigation/tabBarLayout';
+import PrimaryButton from '../components/common/PrimaryButton';
+import {TAB_BAR_HEIGHT, useTabBarBottom} from '../navigation/tabBarLayout';
 
 const FamilyScreen = ({navigation}) => {
   const {t} = useTranslation();
   const [toast, setToast] = React.useState({visible: false, message: '', type: 'success'});
-  const tabBarInset = useTabBarInset();
+  const tabBarBottom = useTabBarBottom();
+  const insets = useSafeAreaInsets();
+  const isTab = navigation?.getParent()?.getState()?.type === 'tab';
+  const bottomPadding = isTab
+    ? tabBarBottom + TAB_BAR_HEIGHT + 12
+    : Math.max(16, insets.bottom + 8);
 
   // React Query hooks
   const {data: familyMembersData, isLoading} = useFamilyMembers();
@@ -53,24 +59,12 @@ const FamilyScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-      <Header
-        title={t('family')}
-        onBack={() => navigation?.goBack()}
-        rightComponent={
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.addButton}
-            onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}>
-            <Icon name="add" size={20} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>{t('add')}</Text>
-          </TouchableOpacity>
-        }
-      />
+      <Header title={t('family')} onBack={() => navigation?.goBack()} />
 
       {/* ================= FAMILY LIST ================= */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, {paddingBottom: tabBarInset}]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <FamilySkeleton />
@@ -116,6 +110,14 @@ const FamilyScreen = ({navigation}) => {
         )}
       </ScrollView>
 
+      {/* ================= ADD MEMBER ================= */}
+      <View style={[styles.bottomContainer, {paddingBottom: bottomPadding}]}>
+        <PrimaryButton
+          title={t('addMember', 'Add member')}
+          onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}
+        />
+      </View>
+
       {/* Toast */}
       <Toast
         visible={toast.visible}
@@ -157,20 +159,11 @@ const styles = StyleSheet.create({
     color: '#172333',
   },
 
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  bottomContainer: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#008178',
-  },
-
-  addButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginLeft: 4,
+    paddingTop: 12,
   },
 
   // ================= SCROLL =================

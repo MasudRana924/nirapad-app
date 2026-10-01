@@ -162,7 +162,6 @@ const SupportChatScreen = () => {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const isTab = navigation.getParent()?.getState()?.type === 'tab';
   const queryClient = useQueryClient();
   const messagesRef = useRef([]);
   const hasMoreRef = useRef(false);
@@ -755,7 +754,7 @@ const SupportChatScreen = () => {
   return (
     <SafeAreaView
       style={styles.safeArea}
-      edges={isTab ? ['top', 'bottom', 'left', 'right'] : ['bottom', 'left', 'right']}>
+      edges={['bottom', 'left', 'right']}>
       <ChatThemeBackground />
       <Header title={t('Nirapod Support')} showBack />
       <KeyboardAvoidingView

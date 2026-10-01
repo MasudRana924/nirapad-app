@@ -14,6 +14,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useBookings} from '../api/queries';
 import BookingSkeleton from '../components/home/BookingSkeleton';
+import Header from '../components/common/Header';
 import {
   isCompletedStatus,
   isCancelledStatus,
@@ -138,24 +139,15 @@ const BookingsScreen = ({navigation}) => {
   return (
     <View style={styles.page}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() =>
-              navigation?.canGoBack()
-                ? navigation.goBack()
-                : navigation?.navigate('Home')
-            }>
-            <Icon name="arrow-back" size={22} color={INK} />
-          </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{t('myBookings')}</Text>
-          
-          </View>
-          <View style={styles.headerSpacer} />
-        </View>
+      <SafeAreaView style={styles.flex} edges={['left', 'right']}>
+        <Header
+          title={t('myBookings')}
+          onBack={() =>
+            navigation?.canGoBack()
+              ? navigation.goBack()
+              : navigation?.navigate('Home')
+          }
+        />
 
         <View style={styles.tabsRow}>
           {tabs.map(tab => {

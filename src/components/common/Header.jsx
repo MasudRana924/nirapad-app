@@ -1,10 +1,21 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, StatusBar, Platform} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, StatusBar} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const Header = ({title, onBack, showBack = true, rightComponent}) => {
+export const HEADER_HEIGHT = 56;
+
+const Header = ({
+  title,
+  onBack,
+  showBack = true,
+  rightComponent,
+  backgroundColor = '#FFFFFF',
+  applyTopInset = true,
+}) => {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const handleBack = () => {
     if (onBack) {
@@ -16,16 +27,22 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
 
   return (
     <>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#FFFFFF"
-      />
-      <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={backgroundColor} />
+      <View
+        style={[
+          styles.container,
+          {backgroundColor, paddingTop: applyTopInset ? insets.top : 0},
+        ]}>
         <View style={styles.content}>
+          <Text style={styles.title} numberOfLines={1} pointerEvents="none">
+            {title}
+          </Text>
+
           {showBack ? (
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.backButton}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}
               onPress={handleBack}>
               <Icon name="arrow-back" size={24} color="#172333" />
             </TouchableOpacity>
@@ -33,9 +50,7 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
             <View style={styles.placeholder} />
           )}
 
-          <Text style={styles.title}>{title}</Text>
-
-          {rightComponent || <View style={styles.placeholder} />}
+          <View style={styles.right}>{rightComponent}</View>
         </View>
       </View>
     </>
@@ -44,37 +59,43 @@ const Header = ({title, onBack, showBack = true, rightComponent}) => {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: '#008178',
     backgroundColor: '#FFFFFF',
   },
-  
+
   content: {
-    height: 90,
+    height: HEADER_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // paddingHorizontal: 16,
-    paddingTop:20
+    paddingHorizontal: 8,
   },
-  
+
   backButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    color: '#172333',
   },
-  
+
   placeholder: {
-    width: 36,
+    width: 40,
   },
-  
+
+  right: {
+    minWidth: 40,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingRight: 8,
+  },
+
   title: {
-    fontSize: 15,
-    fontWeight: '500',
+    position: 'absolute',
+    left: 64,
+    right: 64,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#172333',
     textAlign: 'center',
-    flex: 1,
   },
 });
 

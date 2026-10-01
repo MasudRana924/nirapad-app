@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useSearchCaregivers} from '../api/queries';
 import CaregiverSkeleton from '../components/home/CaregiverSkeleton';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Header from '../components/common/Header';
 import {storage} from '../utils/storage';
 import {useTranslation} from 'react-i18next';
 
@@ -134,20 +135,11 @@ const SelectCaregiverScreen = ({navigation, route}) => {
   return (
     <View style={styles.page}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={22} color={INK} />
-          </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{t('selectCaregiver', 'Select Caregiver')}</Text>
-
-          </View>
-          <View style={styles.headerSpacer} />
-        </View>
+      <SafeAreaView style={styles.flex} edges={['left', 'right']}>
+        <Header
+          title={t('selectCaregiver', 'Select Caregiver')}
+          onBack={() => navigation?.goBack()}
+        />
 
         <ScrollView
           showsVerticalScrollIndicator={false}

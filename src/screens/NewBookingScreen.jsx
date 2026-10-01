@@ -5,11 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
+import Header from '../components/common/Header';
 
 const getServices = (t) => [
   {
@@ -60,23 +60,11 @@ const NewBookingScreen = ({navigation}) => {
   const [selectedPatient, setSelectedPatient] = useState('abul');
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={25} color="#182331" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>{t('newBooking', 'New Booking')}</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header
+        title={t('newBooking', 'New Booking')}
+        onBack={() => navigation?.goBack()}
+      />
 
       {/* =====================================================
           CONTENT

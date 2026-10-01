@@ -5,7 +5,6 @@ import {
   Text,
   Image,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   TextInput,
   KeyboardAvoidingView,
@@ -16,6 +15,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Header from '../components/common/Header';
 import {useAppModal} from '../contexts/ModalContext';
 import {bangladeshDistricts} from '../data/bangladeshLocations';
 import {getThanasByDistrict} from '../data/bangladeshThanas';
@@ -86,17 +86,8 @@ const AreaSelectScreen = ({navigation, route}) => {
   return (
     <View style={styles.page}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={22} color={INK} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('selectArea')}</Text>
-          <View style={styles.headerSpacer} />
-        </View>
+      <SafeAreaView style={styles.flex} edges={['left', 'right']}>
+        <Header title={t('selectArea')} onBack={() => navigation?.goBack()} />
 
         <KeyboardAvoidingView
           style={styles.flex}

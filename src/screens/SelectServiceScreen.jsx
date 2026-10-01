@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {CARE_SERVICES} from '../data/careServices';
 import {storage} from '../utils/storage';
 import PrimaryButton from '../components/common/PrimaryButton';
+import Header from '../components/common/Header';
 import {useTranslation} from 'react-i18next';
 
 const PAGE = '#FFFFFF';
@@ -44,19 +45,11 @@ const SelectServiceScreen = ({navigation, route}) => {
   return (
     <View style={styles.page}>
       <StatusBar barStyle="dark-content" backgroundColor={PAGE} />
-      <SafeAreaView style={styles.flex} edges={['top', 'left', 'right']}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}>
-            <Icon name="arrow-back" size={22} color={INK} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {t('selectServiceTitle', 'Select a care service')}
-          </Text>
-          <View style={styles.headerSpacer} />
-        </View>
+      <SafeAreaView style={styles.flex} edges={['left', 'right']}>
+        <Header
+          title={t('selectServiceTitle', 'Select a care service')}
+          onBack={() => navigation?.goBack()}
+        />
 
         <ScrollView
           style={styles.scroll}

@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {getApiErrorMessage} from '../api/client';
 import {useAppModal} from '../contexts/ModalContext';
 import {useTranslation} from 'react-i18next';
+import Header from '../components/common/Header';
 
 const PaymentScreen = ({route, navigation}) => {
   const {t} = useTranslation();
@@ -38,14 +39,7 @@ const PaymentScreen = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color="#111820" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('payment')}</Text>
-      </View>
+      <Header title={t('payment')} onBack={() => navigation.goBack()} />
 
       <ScrollView
         style={styles.scrollView}

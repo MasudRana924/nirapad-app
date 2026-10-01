@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -12,6 +11,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useCaregiver} from '../api/queries';
 import {useTranslation} from 'react-i18next';
+import Header from '../components/common/Header';
 
 const CaregiverDetailsScreen = ({navigation, route}) => {
   const {t} = useTranslation();
@@ -63,25 +63,16 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={22} color="#182331" />
-        </TouchableOpacity>
-
-        <TouchableOpacity activeOpacity={0.8} style={styles.shareButton}>
-          <Icon name="share-outline" size={20} color="#182331" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header
+        title=""
+        onBack={() => navigation?.goBack()}
+        rightComponent={
+          <TouchableOpacity activeOpacity={0.8} style={styles.shareButton}>
+            <Icon name="share-outline" size={20} color="#182331" />
+          </TouchableOpacity>
+        }
+      />
 
       {/* =====================================================
           PAGE

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -11,6 +10,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
+import Header from '../components/common/Header';
 
 const ServicesScreen = () => {
   const {t} = useTranslation();
@@ -62,19 +62,8 @@ const ServicesScreen = () => {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={22} color="#182331" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('services')}</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header title={t('services')} onBack={() => navigation.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

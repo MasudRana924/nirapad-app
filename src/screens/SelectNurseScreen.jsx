@@ -7,11 +7,11 @@ import {
   TextInput,
   ScrollView,
   Image,
-  StatusBar,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
+import Header from '../components/common/Header';
 
 const nurses = [
   {
@@ -77,21 +77,8 @@ const SelectNurseScreen = ({navigation}) => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      {/* ================= HEADER ================= */}
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}>
-          <Icon name="arrow-back" size={27} color="#182331" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>{t('selectNurse')}</Text>
-      </View>
+    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+      <Header title={t('selectNurse')} onBack={() => navigation?.goBack()} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
