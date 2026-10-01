@@ -14,6 +14,7 @@ export const queryKeys = {
   userProfile: {
     all: ['userProfile'],
     current: () => ['userProfile', 'current'],
+    me: () => ['userProfile', 'me'],
   },
 
   // Family members keys

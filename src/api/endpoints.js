@@ -33,6 +33,8 @@ export const ENDPOINTS = {
     PROFILE: '/user/profile',
     AVATAR: '/user/avatar',
     BOOKINGS: '/user/bookings',
+    ME: '/user/me',
+    ME_PHOTO: '/user/me/photo',
   },
 
   // Family members endpoints

@@ -39,6 +39,21 @@ export const authService = {
 };
 
 /**
+ * My account (/user/me). Photo and profile fields are updated separately;
+ * both return the full account.
+ */
+export const accountService = {
+  getMe: () => apiRequest('/user/me', 'GET'),
+
+  /** JSON body with only the changed fields. Never includes the photo. */
+  updateMe: fields => apiRequest('/user/me', 'PUT', fields),
+
+  /** multipart/form-data with a single `photo` field. */
+  updateMyPhoto: formData =>
+    apiRequest('/user/me/photo', 'PUT', formData, true),
+};
+
+/**
  * Family Members Services
  */
 export const familyService = {
@@ -342,6 +357,7 @@ export const bookingChatService = {
 export default {
   apiRequest,
   authService,
+  accountService,
   familyService,
   caregiverService,
   bookingService,

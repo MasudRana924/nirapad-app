@@ -1,4 +1,11 @@
-import React, {createContext, useState, useEffect, useContext, useCallback} from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import notificationService from '../services/notificationService';
 import {setAuthFailureHandler} from '../api/client';
@@ -10,6 +17,8 @@ export const AuthProvider = ({children}) => {
   const [refreshToken, setRefreshToken] = useState(null);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const userRef = useRef(null);
+  userRef.current = user;
 
   const logout = useCallback(async () => {
     try {
@@ -78,16 +87,19 @@ export const AuthProvider = ({children}) => {
     }
   };
 
-  const updateUser = async (userData) => {
+  const updateUser = useCallback(async userData => {
+    if (!userData) {
+      return;
+    }
+    const merged = {...(userRef.current || {}), ...userData};
+    userRef.current = merged;
+    setUser(merged);
     try {
-      if (userData) {
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-      }
+      await AsyncStorage.setItem('user', JSON.stringify(merged));
     } catch (error) {
       console.error('Failed to update user:', error);
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider

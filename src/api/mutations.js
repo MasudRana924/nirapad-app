@@ -3,9 +3,11 @@
  * Custom mutation hooks for data mutations
  */
 
+import {useCallback} from 'react';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {familyService, bookingService, authService, inboxService, paymentService, notificationPreferenceService} from './services';
+import {accountService, familyService, bookingService, authService, inboxService, paymentService, notificationPreferenceService} from './services';
 import {queryKeys} from './queryKeys';
+import {useAuth} from '../context/AuthContext';
 
 /**
  * Family Members Mutations
@@ -296,6 +298,38 @@ export const useUpdateProfile = () => {
   });
 };
 
+/**
+ * Refetch GET /user/me (never served from cache), store it as the global
+ * user and refresh other profile queries (home header etc.).
+ */
+export const useRefreshMyAccount = () => {
+  const queryClient = useQueryClient();
+  const {updateUser} = useAuth();
+
+  return useCallback(async () => {
+    const response = await queryClient.fetchQuery({
+      queryKey: queryKeys.userProfile.me(),
+      queryFn: () => accountService.getMe(),
+      staleTime: 0,
+    });
+    if (response?.data) {
+      await updateUser(response.data);
+    }
+    queryClient.invalidateQueries({queryKey: queryKeys.userProfile.current()});
+    return response?.data;
+  }, [queryClient, updateUser]);
+};
+
+export const useUpdateMyPhoto = () =>
+  useMutation({
+    mutationFn: formData => accountService.updateMyPhoto(formData),
+  });
+
+export const useUpdateMyAccount = () =>
+  useMutation({
+    mutationFn: fields => accountService.updateMe(fields),
+  });
+
 export default {
   // Family members
   useAddFamilyMember,
@@ -325,4 +359,6 @@ export default {
   useLogin,
   useRegister,
   useUpdateProfile,
+  useUpdateMyPhoto,
+  useUpdateMyAccount,
 };

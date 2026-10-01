@@ -4,7 +4,7 @@
  */
 
 import {useQuery} from '@tanstack/react-query';
-import {familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService, conversationService} from './services';
+import {accountService, familyService, caregiverService, bookingService, hospitalService, authService, inboxService, notificationService, notificationPreferenceService, privacyPolicyService, conversationService} from './services';
 import {queryKeys} from './queryKeys';
 import {isSupportChatScreenFocused} from '../services/supportChatEvents';
 
@@ -15,6 +15,15 @@ export const useUserProfile = (options = {}) => {
   return useQuery({
     queryKey: queryKeys.userProfile.current(),
     queryFn: () => authService.getUserProfile(),
+    ...options,
+  });
+};
+
+/** GET /user/me — the account shown on Profile and Edit Profile. */
+export const useMyAccount = (options = {}) => {
+  return useQuery({
+    queryKey: queryKeys.userProfile.me(),
+    queryFn: () => accountService.getMe(),
     ...options,
   });
 };

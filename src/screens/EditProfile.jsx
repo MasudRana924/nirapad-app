@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -11,221 +11,171 @@ import {
   Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
-import CustomLoader from '../components/common/CustomLoader';
-import {useUserProfile} from '../api/queries';
-import {useUpdateProfile} from '../api/mutations';
+import {useTranslation} from 'react-i18next';
+import {useMyAccount} from '../api/queries';
+import {useRefreshMyAccount, useUpdateMyAccount} from '../api/mutations';
 import {getApiErrorMessage} from '../api/client';
-import {launchImageLibrary} from 'react-native-image-picker';
 import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
-import {requestGalleryPermission} from '../utils/permissions';
-import {useAppModal} from '../contexts/ModalContext';
-import {useAuth} from '../context/AuthContext';
-import {useTranslation} from 'react-i18next';
+import DateOfBirthPicker from '../components/common/DateOfBirthPicker';
+import {
+  GENDERS,
+  GENDER_LABEL_KEYS,
+  formatDateOfBirth,
+  parseIsoDate,
+  setPendingProfileToast,
+} from '../utils/account';
 
-const LANG_KEY = 'app_language';
+const FIELDS = ['name', 'gender', 'date_of_birth', 'address', 'emergency_contact'];
+const NAME_MAX = 255;
+const ADDRESS_MAX = 500;
+const EMERGENCY_MAX = 20;
+const PHONE_PATTERN = /^\+?[0-9\s-]*$/;
+
+const toFormValues = account => ({
+  name: account?.name || '',
+  gender: GENDERS.includes(account?.gender) ? account.gender : null,
+  date_of_birth: account?.date_of_birth
+    ? String(account.date_of_birth).slice(0, 10)
+    : '',
+  address: account?.address || '',
+  emergency_contact: account?.emergency_contact || '',
+});
+
+const normalize = (key, value) =>
+  key === 'gender' ? value || null : String(value ?? '').trim();
+
+const getChangedFields = (form, initial) => {
+  const changes = {};
+  FIELDS.forEach(key => {
+    const next = normalize(key, form[key]);
+    if (next === normalize(key, initial[key])) {
+      return;
+    }
+    changes[key] = key === 'name' || next ? next : null;
+  });
+  return changes;
+};
+
+const fieldFromError = error => {
+  const detail = Array.isArray(error?.errors) ? error.errors[0] : null;
+  const named = detail?.field || detail?.path || detail?.param;
+  if (FIELDS.includes(named)) {
+    return named;
+  }
+  const message = String(error?.message || '').toLowerCase();
+  if (message.includes('date_of_birth') || message.includes('date of birth')) {
+    return 'date_of_birth';
+  }
+  if (message.includes('gender')) {
+    return 'gender';
+  }
+  if (message.includes('emergency')) {
+    return 'emergency_contact';
+  }
+  if (message.includes('address')) {
+    return 'address';
+  }
+  if (message.includes('name')) {
+    return 'name';
+  }
+  return null;
+};
 
 const EditProfile = ({navigation}) => {
   const {t} = useTranslation();
-  const {data: profileData} = useUserProfile();
-  const updateMutation = useUpdateProfile();
-  const {showError} = useAppModal();
-  const {updateUser} = useAuth();
+  const {data: accountData} = useMyAccount({refetchOnMount: 'always'});
+  const updateAccount = useUpdateMyAccount();
+  const refreshAccount = useRefreshMyAccount();
+  const account = accountData?.data;
 
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success',
-  });
-  const [imageUri, setImageUri] = useState(null);
-  const [pickedPhoto, setPickedPhoto] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    language_preference: 'en',
-    emergency_contact: '',
-    address: '',
-    date_of_birth: '',
-  });
+  const touchedRef = useRef(false);
+  const [initial, setInitial] = useState(() => toFormValues(account));
+  const [form, setForm] = useState(() => toFormValues(account));
+  const [errors, setErrors] = useState({});
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [toast, setToast] = useState({visible: false, message: '', type: 'error'});
 
-  const user = profileData?.data || {};
-
-  React.useEffect(() => {
-    if (!user.name && !user.email) {
+  useEffect(() => {
+    if (!account || touchedRef.current) {
       return;
     }
+    const values = toFormValues(account);
+    setInitial(values);
+    setForm(values);
+  }, [account]);
 
-    let cancelled = false;
-
-    const hydrate = async () => {
-      let language =
-        user.language_preference === 'bn' || user.language_preference === 'en'
-          ? user.language_preference
-          : null;
-
-      if (!language) {
-        try {
-          const saved = await AsyncStorage.getItem(LANG_KEY);
-          if (saved === 'en' || saved === 'bn') {
-            language = saved;
-          }
-        } catch (_) {
-          // ignore storage read errors
-        }
-      }
-
-      if (cancelled) {
-        return;
-      }
-
-      setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        language_preference: language || 'en',
-        emergency_contact: user.emergency_contact || '',
-        address: user.address || '',
-        date_of_birth: user.date_of_birth
-          ? String(user.date_of_birth).split('T')[0]
-          : '',
-      });
-
-      if (user.profile_photo) {
-        setImageUri(user.profile_photo);
-      }
-    };
-
-    hydrate();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    user.name,
-    user.email,
-    user.phone,
-    user.language_preference,
-    user.emergency_contact,
-    user.address,
-    user.date_of_birth,
-    user.profile_photo,
-  ]);
+  const changes = getChangedFields(form, initial);
+  const hasChanges = Object.keys(changes).length > 0;
+  const saving = updateAccount.isPending;
 
   const updateField = (key, value) => {
-    setFormData(prev => ({...prev, [key]: value}));
-  };
-
-  const handleImagePick = async () => {
-    try {
-      const granted = await requestGalleryPermission();
-      if (!granted) {
-        showError(
-          t('pleaseAllowPhotoAccess'),
-          t('permissionRequired')
-        );
-        return;
-      }
-
-      const result = await launchImageLibrary({
-        mediaType: 'photo',
-        quality: 0.8,
-        selectionLimit: 1,
-      });
-
-      if (result.didCancel) return;
-      if (result.errorCode) {
-        showError(result.errorMessage || t('failedToOpenImagePicker'));
-        return;
-      }
-
-      const asset = result.assets?.[0];
-      if (asset?.uri) {
-        setImageUri(asset.uri);
-        setPickedPhoto(asset);
-      }
-    } catch (error) {
-      console.error('Image picker error:', error);
-      showError(t('failedToOpenImagePicker'));
+    touchedRef.current = true;
+    setForm(prev => ({...prev, [key]: value}));
+    if (errors[key]) {
+      setErrors(prev => ({...prev, [key]: null}));
     }
   };
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = 'error') => {
     setToast({visible: true, message, type});
   };
 
-  const handleSaveProfile = async () => {
-    const {
-      name,
-      email,
-      phone,
-      language_preference,
-      emergency_contact,
-      address,
-      date_of_birth,
-    } = formData;
-
-    if (!name.trim()) {
-      showError(t('enterName'));
-      return;
+  const validate = () => {
+    const next = {};
+    const name = form.name.trim();
+    if (!name) {
+      next.name = t('nameEmpty');
+    } else if (name.length > NAME_MAX) {
+      next.name = t('nameTooLong');
     }
-    if (!email.trim()) {
-      showError(t('enterEmail'));
-      return;
+    if (form.address.trim().length > ADDRESS_MAX) {
+      next.address = t('addressTooLong');
     }
-
-    try {
-      // PUT /api/v1/user/profile — multipart/form-data (any updated fields)
-      const data = new FormData();
-      data.append('name', name.trim());
-      data.append('email', email.trim());
-      data.append('phone', phone.trim());
-      data.append('language_preference', language_preference || 'en');
-      data.append('emergency_contact', emergency_contact.trim());
-      data.append('address', address.trim());
-      data.append('date_of_birth', date_of_birth.trim());
-
-      if (pickedPhoto?.uri) {
-        data.append('profile_photo', {
-          uri: pickedPhoto.uri,
-          type: pickedPhoto.type || 'image/jpeg',
-          name: pickedPhoto.fileName || 'profile_photo.jpg',
-        });
-      }
-
-      const response = await updateMutation.mutateAsync(data);
-
-      try {
-        await AsyncStorage.setItem(
-          LANG_KEY,
-          language_preference === 'bn' ? 'bn' : 'en',
-        );
-      } catch (_) {
-        // ignore storage write errors
-      }
-
-      // Update user state with the new profile data
-      if (response?.data) {
-        updateUser(response.data);
-      }
-
-      showToast(t('profileUpdated'));
-      navigation?.goBack();
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      showToast(
-        getApiErrorMessage(error, t('failedToUpdateProfile')),
-        'error',
-      );
+    const emergency = form.emergency_contact.trim();
+    if (emergency.length > EMERGENCY_MAX || !PHONE_PATTERN.test(emergency)) {
+      next.emergency_contact = t('emergencyContactInvalid');
     }
+    const dob = parseIsoDate(form.date_of_birth);
+    if (dob && dob > new Date()) {
+      next.date_of_birth = t('dateOfBirthFuture');
+    }
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
+
+  const handleSave = async () => {
+    if (!hasChanges || saving || !validate()) {
+      return;
+    }
+    try {
+      await updateAccount.mutateAsync(changes);
+    } catch (error) {
+      const message = getApiErrorMessage(error, t('failedToUpdateProfile'));
+      const field = fieldFromError(error);
+      if (field) {
+        setErrors(prev => ({...prev, [field]: message}));
+      } else {
+        showToast(message);
+      }
+      return;
+    }
+    try {
+      await refreshAccount();
+    } catch (error) {
+      console.log('Refetch after profile update failed:', error?.message);
+    }
+    setPendingProfileToast(t('profileSaved'));
+    navigation?.goBack();
+  };
+
+  const renderError = key =>
+    errors[key] ? <Text style={styles.errorText}>{errors[key]}</Text> : null;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <CustomLoader overlay visible={updateMutation.isPending} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
@@ -237,101 +187,130 @@ const EditProfile = ({navigation}) => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled">
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.photoWrap}
-            onPress={handleImagePick}>
-            {imageUri ? (
-              <Image source={{uri: imageUri}} style={styles.photo} />
+          <View style={styles.photoWrap}>
+            {account?.profile_photo ? (
+              <Image source={{uri: account.profile_photo}} style={styles.photo} />
             ) : (
               <View style={styles.photoEmpty}>
-                <Icon name="camera-outline" size={28} color="#008178" />
+                <Icon name="person-outline" size={34} color="#008178" />
               </View>
             )}
-            <View style={styles.cameraBadge}>
-              <Icon name="pencil" size={12} color="#FFFFFF" />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.photoHint}>{t('tapToChangePhoto')}</Text>
+          </View>
 
           <Text style={styles.label}>{t('nameLabel')}</Text>
           <TextInput
-            style={styles.input}
-            value={formData.name}
+            style={[styles.input, errors.name && styles.inputError]}
+            value={form.name}
             onChangeText={text => updateField('name', text)}
             placeholder={t('enterName')}
             placeholderTextColor="#8190A7"
+            maxLength={NAME_MAX}
           />
+          {renderError('name')}
 
-          <Text style={styles.label}>{t('emailLabel')}</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.email}
-            onChangeText={text => updateField('email', text)}
-            placeholder={t('enterEmail')}
-            placeholderTextColor="#8190A7"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+          <Text style={styles.label}>{t('gender')}</Text>
+          <View style={[styles.segment, errors.gender && styles.inputError]}>
+            {GENDERS.map(gender => {
+              const active = form.gender === gender;
+              return (
+                <TouchableOpacity
+                  key={gender}
+                  activeOpacity={0.85}
+                  style={[styles.segmentOption, active && styles.segmentOptionActive]}
+                  onPress={() => updateField('gender', gender)}>
+                  <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
+                    {t(GENDER_LABEL_KEYS[gender])}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          {renderError('gender')}
 
-          <Text style={styles.label}>{t('phoneLabel')}</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.phone}
-            onChangeText={text => updateField('phone', text)}
-            placeholder={t('enterPhoneNumber')}
-            placeholderTextColor="#8190A7"
-            keyboardType="phone-pad"
-          />
-{/* 
-          <Text style={styles.label}>Emergency contact</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.emergency_contact}
-            onChangeText={text => updateField('emergency_contact', text)}
-            placeholder="Enter emergency contact"
-            placeholderTextColor="#8190A7"
-            keyboardType="phone-pad"
-          /> */}
+          <Text style={styles.label}>{t('dateOfBirthLabel')}</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[styles.input, styles.pickerInput, errors.date_of_birth && styles.inputError]}
+            onPress={() => setPickerOpen(true)}>
+            <Text
+              style={[styles.pickerText, !form.date_of_birth && styles.placeholderText]}>
+              {formatDateOfBirth(form.date_of_birth) || t('selectDateOfBirth')}
+            </Text>
+            <Icon name="calendar-outline" size={18} color="#8190A7" />
+          </TouchableOpacity>
+          {renderError('date_of_birth')}
 
           <Text style={styles.label}>{t('addressLabel')}</Text>
           <TextInput
-            style={styles.input}
-            value={formData.address}
+            style={[styles.input, styles.multiline, errors.address && styles.inputError]}
+            value={form.address}
             onChangeText={text => updateField('address', text)}
             placeholder={t('enterAddress')}
             placeholderTextColor="#8190A7"
+            multiline
+            maxLength={ADDRESS_MAX}
+            textAlignVertical="top"
           />
+          {renderError('address')}
 
-          <Text style={styles.label}>{t('dateOfBirthLabel')}</Text>
+          <Text style={styles.label}>{t('emergencyContactLabel')}</Text>
           <TextInput
-            style={styles.input}
-            value={formData.date_of_birth}
-            onChangeText={text => updateField('date_of_birth', text)}
-            placeholder="YYYY-MM-DD"
+            style={[styles.input, errors.emergency_contact && styles.inputError]}
+            value={form.emergency_contact}
+            onChangeText={text => updateField('emergency_contact', text)}
+            placeholder={t('enterEmergencyContact')}
             placeholderTextColor="#8190A7"
+            keyboardType="phone-pad"
+            maxLength={EMERGENCY_MAX}
           />
+          {renderError('emergency_contact')}
+
+          <ReadOnlyField label={t('email')} value={account?.email} t={t} />
+          <ReadOnlyField label={t('phone')} value={account?.phone} t={t} />
         </ScrollView>
 
         <View style={styles.bottomContainer}>
           <PrimaryButton
             title={t('saveChanges')}
-            onPress={handleSaveProfile}
-            disabled={updateMutation.isPending}
-            loading={updateMutation.isPending}
+            onPress={handleSave}
+            disabled={!hasChanges || saving}
+            loading={saving}
           />
         </View>
       </KeyboardAvoidingView>
+
+      <DateOfBirthPicker
+        visible={pickerOpen}
+        value={form.date_of_birth}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={value => {
+          setPickerOpen(false);
+          updateField('date_of_birth', value);
+        }}
+      />
 
       <Toast
         visible={toast.visible}
         message={toast.message}
         type={toast.type}
-        onHide={() => setToast({...toast, visible: false})}
+        onHide={() => setToast(prev => ({...prev, visible: false}))}
       />
     </SafeAreaView>
   );
 };
+
+const ReadOnlyField = ({label, value, t}) => (
+  <View style={styles.readOnlyBlock}>
+    <Text style={styles.label}>{label}</Text>
+    <View style={[styles.input, styles.readOnlyInput]}>
+      <Text style={[styles.readOnlyText, !value && styles.placeholderText]}>
+        {value || t('notSet')}
+      </Text>
+      <Icon name="lock-closed-outline" size={16} color="#A3B1AF" />
+    </View>
+    <Text style={styles.hintText}>{t('readOnlyField')}</Text>
+  </View>
+);
 
 export default EditProfile;
 
@@ -348,43 +327,23 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   photoWrap: {
-    width: 96,
-    height: 96,
     alignSelf: 'center',
     marginTop: 8,
-    marginBottom: 8,
+    marginBottom: 24,
   },
   photo: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: '#E6F4F3',
   },
   photoEmpty: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     backgroundColor: '#E6F4F3',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  cameraBadge: {
-    position: 'absolute',
-    right: 2,
-    bottom: 2,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#008178',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  photoHint: {
-    textAlign: 'center',
-    fontSize: 13,
-    color: '#8190A7',
-    marginBottom: 24,
   },
   label: {
     fontSize: 14,
@@ -393,7 +352,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    height: 52,
+    minHeight: 52,
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
     paddingHorizontal: 14,
@@ -403,32 +362,78 @@ const styles = StyleSheet.create({
     borderColor: '#D4DCDA',
     marginBottom: 16,
   },
-  langSwitch: {
+  inputError: {
+    borderColor: '#E34242',
+    marginBottom: 4,
+  },
+  multiline: {
+    minHeight: 96,
+    paddingTop: 14,
+    paddingBottom: 14,
+  },
+  pickerInput: {
     flexDirection: 'row',
-    alignSelf: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  pickerText: {
+    fontSize: 15,
+    color: '#111820',
+  },
+  placeholderText: {
+    color: '#8190A7',
+  },
+  segment: {
+    flexDirection: 'row',
     backgroundColor: '#F0F2F5',
     borderRadius: 12,
     padding: 4,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
-  langOption: {
-    minWidth: 56,
-    height: 36,
+  segmentOption: {
+    flex: 1,
+    height: 40,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 12,
   },
-  langOptionActive: {
+  segmentOptionActive: {
     backgroundColor: '#008178',
   },
-  langText: {
+  segmentText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#8190A7',
+    color: '#5C6B7A',
   },
-  langTextActive: {
+  segmentTextActive: {
     color: '#FFFFFF',
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#E34242',
+    marginBottom: 12,
+  },
+  readOnlyBlock: {
+    marginBottom: 4,
+  },
+  readOnlyInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F6F8F8',
+    borderColor: '#E6ECEB',
+    marginBottom: 4,
+  },
+  readOnlyText: {
+    fontSize: 15,
+    color: '#5C6B7A',
+  },
+  hintText: {
+    fontSize: 12,
+    color: '#A3B1AF',
+    marginBottom: 12,
   },
   bottomContainer: {
     paddingHorizontal: 20,
