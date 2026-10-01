@@ -19,6 +19,7 @@ import {
   isCancelledStatus,
   isSearchingStatus,
   getStatusMeta,
+  canShowBookingChat,
 } from '../utils/bookingStatus';
 import {getBookingPatient} from '../utils/bookingPatient';
 
@@ -266,6 +267,9 @@ const BookingsScreen = ({navigation}) => {
                           {status.label}
                         </Text>
                       </View>
+                      {canShowBookingChat(booking) ? (
+                        <Icon name="chatbubbles-outline" size={18} color="#008178" />
+                      ) : null}
                       <Icon name="chevron-forward" size={18} color="#C5D0CE" />
                     </View>
                   </View>

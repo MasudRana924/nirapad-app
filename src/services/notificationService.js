@@ -19,6 +19,15 @@ import {
   emitSupportChatRefresh,
   isSupportChatScreenFocused,
 } from './supportChatEvents';
+import {
+  isBookingChatPush,
+  openBookingChatFromPush,
+} from '../utils/bookingChatPush';
+import {
+  endBookingChat,
+  isBookingChatOpen,
+  notifyBookingChatPush,
+} from './bookingChat';
 
 const AUTHORIZED = 1;
 const PROVISIONAL = 2;
@@ -320,6 +329,15 @@ class NotificationService {
       return;
     }
 
+    if (isBookingChatPush(payload) && isBookingChatOpen(id)) {
+      notifyBookingChatPush(payload);
+      return;
+    }
+
+    if (type === 'SERVICE_COMPLETED' && id) {
+      endBookingChat(id, 'SERVICE_COMPLETED');
+    }
+
     if (typeof this.foregroundBannerHandler === 'function') {
       this.foregroundBannerHandler({
         title: title || 'Notification',
@@ -358,6 +376,16 @@ class NotificationService {
     if (isSupportMessagePush(data)) {
       navigation.navigate('SupportChat');
       return;
+    }
+
+    if (isBookingChatPush(data)) {
+      if (openBookingChatFromPush(data, navigation)) {
+        return;
+      }
+    }
+
+    if (type === 'SERVICE_COMPLETED' && bookingId) {
+      endBookingChat(bookingId, 'SERVICE_COMPLETED');
     }
 
     if (routeBookingAlertTap(data, navigation)) {

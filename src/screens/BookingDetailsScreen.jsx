@@ -24,6 +24,8 @@ import StarReviewModal from '../components/common/StarReviewModal';
 import CancelBookingSheet from '../components/common/CancelBookingSheet';
 import DisputeSheet from '../components/common/DisputeSheet';
 import LiveTrackingMapSection from '../components/booking/LiveTrackingMapSection';
+import BookingChatCard from '../components/booking/BookingChatCard';
+import {useBookingChatSocket} from '../services/bookingChat';
 import BookingHeroIllustration from '../components/booking/BookingHeroIllustration';
 import {useAppModal} from '../contexts/ModalContext';
 import {useTranslation} from 'react-i18next';
@@ -35,6 +37,7 @@ import {
   normalizeBooking,
   formatRefund,
   canShowLiveTracking,
+  canShowBookingChat,
   isAwaitingNextCaregiver,
 } from '../utils/bookingStatus';
 import {emitBookingAlert, suggestAlertFromBooking} from '../utils/bookingAlerts';
@@ -52,7 +55,7 @@ const shouldShowStarModal = booking => {
 
 const BookingDetailsScreen = ({navigation, route}) => {
   const {t} = useTranslation();
-  const {bookingId, notificationOpenedAt} = route.params || {};
+  const {bookingId, notificationOpenedAt, openChat} = route.params || {};
   const [countdownTick, setCountdownTick] = useState(0);
   const cancelBooking = useCancelBooking();
   const submitReview = useSubmitBookingReview();
@@ -66,7 +69,12 @@ const BookingDetailsScreen = ({navigation, route}) => {
   const paymentKeyRef = useRef(createUuid());
   const statusForPollRef = useRef(null);
 
-  const {data: bookingData, isLoading, refetch} = useBookingDetails(bookingId, {
+  const {
+    data: bookingData,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useBookingDetails(bookingId, {
     refetchOnMount: 'always',
     refetchInterval: () =>
       shouldPollBookingStatus(statusForPollRef.current) ? 15000 : false,
@@ -79,6 +87,23 @@ const BookingDetailsScreen = ({navigation, route}) => {
     {enabled: !!bookingId, retry: false},
   );
   const disputes = Array.isArray(disputesData?.data) ? disputesData.data : [];
+
+  const showChat = canShowBookingChat(booking);
+  useBookingChatSocket(showChat);
+
+  const openBookingChat = () => {
+    navigation.navigate('BookingChat', {bookingId});
+  };
+
+  useEffect(() => {
+    if (!openChat || isLoading || !booking || (!showChat && isFetching)) {
+      return;
+    }
+    navigation.setParams({openChat: undefined});
+    if (showChat) {
+      navigation.navigate('BookingChat', {bookingId});
+    }
+  }, [openChat, isLoading, isFetching, booking, showChat, bookingId, navigation]);
 
   useEffect(() => {
     setReviewDismissed(false);
@@ -390,6 +415,13 @@ const BookingDetailsScreen = ({navigation, route}) => {
           <LiveTrackingMapSection
             bookingId={bookingId}
             enabled={showLiveTracking}
+          />
+        )}
+        {showChat && (
+          <BookingChatCard
+            chat={booking.chat}
+            fallbackName={caregiverName}
+            onPress={openBookingChat}
           />
         )}
         {awaitingNextCaregiver && (

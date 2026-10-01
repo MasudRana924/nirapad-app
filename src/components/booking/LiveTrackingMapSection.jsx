@@ -52,6 +52,7 @@ const formatUpdatedAt = value => {
 const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
   const isFocused = useIsFocused();
   const socketRef = useRef(null);
+  const handlersRef = useRef({});
   const endedRef = useRef(false);
 
   const [loading, setLoading] = useState(true);
@@ -168,22 +169,28 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
         }
         socketRef.current = socket;
 
-        socket.on('connect', () => {
-          setSocketConnected(true);
-          subscribeTracking(socket, bookingId);
-        });
-        socket.on('disconnect', () => setSocketConnected(false));
-        socket.on('tracking:location', payload => {
-          applyLocation(payload?.data ?? payload);
-        });
-        socket.on('tracking:ended', () => endTracking('Service ended'));
-        socket.on('tracking:error', payload => {
-          showToast(
-            payload?.message ||
-              payload?.error ||
-              (typeof payload === 'string' ? payload : null) ||
-              'Tracking error',
-          );
+        const handlers = {
+          connect: () => {
+            setSocketConnected(true);
+            subscribeTracking(socket, bookingId);
+          },
+          disconnect: () => setSocketConnected(false),
+          'tracking:location': payload => {
+            applyLocation(payload?.data ?? payload);
+          },
+          'tracking:ended': () => endTracking('Service ended'),
+          'tracking:error': payload => {
+            showToast(
+              payload?.message ||
+                payload?.error ||
+                (typeof payload === 'string' ? payload : null) ||
+                'Tracking error',
+            );
+          },
+        };
+        handlersRef.current = handlers;
+        Object.entries(handlers).forEach(([event, listener]) => {
+          socket.on(event, listener);
         });
 
         if (socket.connected) {
@@ -203,8 +210,9 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
 
     return () => {
       cancelled = true;
-      disconnectTrackingSocket(socketRef.current, bookingId);
+      disconnectTrackingSocket(socketRef.current, bookingId, handlersRef.current);
       socketRef.current = null;
+      handlersRef.current = {};
     };
   }, [enabled, bookingId, fetchLiveLocation, applyLocation, endTracking, showToast]);
 
@@ -227,8 +235,9 @@ const LiveTrackingMapSection = ({bookingId, enabled = true}) => {
     if (!ended || !socketRef.current) {
       return;
     }
-    disconnectTrackingSocket(socketRef.current, bookingId);
+    disconnectTrackingSocket(socketRef.current, bookingId, handlersRef.current);
     socketRef.current = null;
+    handlersRef.current = {};
     setSocketConnected(false);
   }, [ended, bookingId]);
 

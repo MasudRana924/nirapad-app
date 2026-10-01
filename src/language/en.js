@@ -465,6 +465,21 @@ export default {
   galleryPermission: 'Please allow photo access to send an image.',
   failedToPickDocument: 'Could not open the document picker.',
 
+  // Booking chat (caregiver)
+  chatWithCaregiver: 'Chat with caregiver',
+  bookingChatTapToStart: 'Tap to send a message',
+  bookingChatEmpty:
+    'Say hello to your caregiver. You can share instructions, photos or reports here.',
+  bookingChatNotice: 'Messages are deleted when the service ends.',
+  serviceInProgress: 'Service in progress',
+  isTyping: '{{name}} is typing…',
+  you: 'You',
+  sentPhoto: 'Sent a photo',
+  sentDocument: 'Sent a document',
+  serviceEnded: 'Service ended',
+  serviceEndedChatClosed:
+    'Service has ended. This chat is closed and messages have been deleted.',
+
   // Review Screen
   review: 'Review',
   submitReview: 'Submit Review',

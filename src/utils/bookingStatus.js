@@ -82,8 +82,18 @@ export const normalizeBooking = payload => {
     suggestion_response_timeout_minutes:
       raw.suggestion_response_timeout_minutes ??
       base.suggestion_response_timeout_minutes,
+    can_chat: raw.can_chat ?? base.can_chat,
+    chat: raw.chat ?? base.chat ?? null,
   };
 };
+
+/** Booking chat card is shown only while the service is in progress. */
+export const canShowBookingChat = booking =>
+  !!booking &&
+  isTrueFlag(booking.can_chat) &&
+  booking.status === BOOKING_STATUS.SERVICE_IN_PROGRESS &&
+  booking.chat?.is_active !== false &&
+  booking.chat?.is_active !== 'false';
 
 const isTrueFlag = value => value === true || value === 'true' || value === 1;
 

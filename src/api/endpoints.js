@@ -65,6 +65,9 @@ export const ENDPOINTS = {
     LIVE_LOCATION: id => `/bookings/${id}/live-location`,
     ACCEPT_NEXT_CAREGIVER: id => `/bookings/${id}/accept-next-caregiver`,
     DECLINE_NEXT_CAREGIVER: id => `/bookings/${id}/decline-next-caregiver`,
+    CHAT: id => `/bookings/${id}/chat`,
+    CHAT_MESSAGES: id => `/bookings/${id}/chat/messages`,
+    CHAT_READ: id => `/bookings/${id}/chat/read`,
   },
 
   // Hospitals endpoints

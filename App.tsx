@@ -21,6 +21,13 @@ import {queryKeys} from './src/api/queryKeys';
 import {ModalProvider} from './src/contexts/ModalContext';
 import BookingAlertHost from './src/components/booking/BookingAlertHost';
 import {showBookingAlertFromPush} from './src/utils/bookingAlerts';
+import {isBookingChatPush} from './src/utils/bookingChatPush';
+import BookingChatHost from './src/components/booking/BookingChatHost';
+import {
+  incrementBookingChatUnread,
+  isChatSocketConnected,
+  setBookingChatQueryClient,
+} from './src/services/bookingChat';
 
 const navTheme = {
   ...DefaultTheme,
@@ -45,6 +52,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+setBookingChatQueryClient(queryClient);
 
 function AppContent() {
   const {isLoading, userToken} = useAuth();
@@ -96,6 +105,12 @@ function AppContent() {
           queryClient.invalidateQueries({
             queryKey: queryKeys.supportChat.unread(),
           });
+        } else if (isBookingChatPush(data)) {
+          const chatBookingId = data.booking_id || data.bookingId;
+          // With the socket up, chat:message already bumped the badge.
+          if (chatBookingId && !isChatSocketConnected()) {
+            incrementBookingChatUnread(chatBookingId, null);
+          }
         } else {
           queryClient.invalidateQueries({queryKey: queryKeys.inbox.all});
           queryClient.invalidateQueries({queryKey: queryKeys.bookings.all});
@@ -169,6 +184,7 @@ function AppContent() {
         }}
       />
       {userToken ? <BookingAlertHost navigationRef={navigationRef} /> : null}
+      {userToken ? <BookingChatHost /> : null}
     </>
   );
 }

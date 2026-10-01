@@ -304,6 +304,41 @@ export const conversationService = {
   markAsRead: () => apiRequest('/conversations/me/read', 'PUT'),
 };
 
+/**
+ * Booking chat — user <-> assigned caregiver, only while the booking is
+ * SERVICE_IN_PROGRESS. Separate from support chat.
+ */
+export const bookingChatService = {
+  getSummary: bookingId => apiRequest(`/bookings/${bookingId}/chat`, 'GET'),
+
+  getMessages: (bookingId, {limit = 30, before, after} = {}) => {
+    const queryParams = new URLSearchParams();
+    if (after) {
+      queryParams.append('after', after);
+    } else {
+      queryParams.append('limit', String(limit));
+    }
+    if (before) {
+      queryParams.append('before', before);
+    }
+    return apiRequest(
+      `/bookings/${bookingId}/chat/messages?${queryParams.toString()}`,
+      'GET',
+    );
+  },
+
+  sendText: (bookingId, {message, client_message_id}) =>
+    apiRequest(`/bookings/${bookingId}/chat/messages`, 'POST', {
+      message,
+      client_message_id,
+    }),
+
+  sendFile: (bookingId, formData, onProgress) =>
+    apiUpload(`/bookings/${bookingId}/chat/messages`, formData, {onProgress}),
+
+  markAsRead: bookingId => apiRequest(`/bookings/${bookingId}/chat/read`, 'PUT'),
+};
+
 export default {
   apiRequest,
   authService,
@@ -317,4 +352,5 @@ export default {
   notificationPreferenceService,
   privacyPolicyService,
   conversationService,
+  bookingChatService,
 };

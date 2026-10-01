@@ -465,6 +465,21 @@ export default {
   galleryPermission: 'ছবি পাঠাতে গ্যালারি ব্যবহারের অনুমতি দিন।',
   failedToPickDocument: 'ডকুমেন্ট পিকার খোলা যায়নি।',
 
+  // Booking chat (caregiver)
+  chatWithCaregiver: 'কেয়ারগিভারের সাথে চ্যাট',
+  bookingChatTapToStart: 'মেসেজ পাঠাতে ট্যাপ করুন',
+  bookingChatEmpty:
+    'আপনার কেয়ারগিভারকে হ্যালো বলুন। এখানে নির্দেশনা, ছবি বা রিপোর্ট শেয়ার করতে পারবেন।',
+  bookingChatNotice: 'সার্ভিস শেষ হলে মেসেজগুলো মুছে ফেলা হবে।',
+  serviceInProgress: 'সার্ভিস চলছে',
+  isTyping: '{{name}} লিখছেন…',
+  you: 'আপনি',
+  sentPhoto: 'একটি ছবি পাঠিয়েছেন',
+  sentDocument: 'একটি ডকুমেন্ট পাঠিয়েছেন',
+  serviceEnded: 'সার্ভিস শেষ',
+  serviceEndedChatClosed:
+    'সার্ভিস শেষ হয়েছে। এই চ্যাট বন্ধ এবং মেসেজগুলো মুছে ফেলা হয়েছে।',
+
   // Review Screen
   review: 'রিভিউ',
   submitReview: 'রিভিউ জমা দিন',
