@@ -324,7 +324,7 @@ export default {
   failedToDeleteMember: 'পরিবারের সদস্য মুছতে ব্যর্থ',
 
   // Select Family Member
-  selectFamilyMember: 'রোগী নির্বাচন করুন',
+  selectFamilyMember: 'পরিবারের সদস্য নির্বাচন করুন',
   selectFamilyMemberDesc: 'এই বুকিংয়ের জন্য একজন পরিবারের সদস্য বেছে নিন',
   myself: 'আমি নিজে',
   bookForMyselfDesc: 'নিজের জন্য সেবা বুক করুন',

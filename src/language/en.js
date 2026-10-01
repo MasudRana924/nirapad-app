@@ -324,7 +324,7 @@ export default {
   failedToDeleteMember: 'Failed to delete family member',
 
   // Select Family Member
-  selectFamilyMember: 'Select Patient',
+  selectFamilyMember: 'Select Family Member',
   selectFamilyMemberDesc: 'Choose a family member for this booking',
   myself: 'Yourself',
   bookForMyselfDesc: 'Book care for yourself',

@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderWidth: 1,
     borderColor: '#E6ECEB',
     marginBottom: 12,
@@ -239,22 +239,22 @@ const styles = StyleSheet.create({
   },
 
   avatarContainer: {
-    width: 56,
-    height: 56,
+    width: 44,
+    height: 44,
     marginRight: 12,
   },
 
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#E5E5E5',
   },
 
   placeholderAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#E3E8F0',
     alignItems: 'center',
     justifyContent: 'center',
