@@ -16,16 +16,15 @@ import {useTranslation} from 'react-i18next';
 import {useMyAccount} from '../api/queries';
 import {useRefreshMyAccount, useUpdateMyAccount} from '../api/mutations';
 import {getApiErrorMessage} from '../api/client';
-import Toast from '../components/common/Toast';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import DateOfBirthPicker from '../components/common/DateOfBirthPicker';
+import {useAppModal} from '../contexts/ModalContext';
 import {
   GENDERS,
   GENDER_LABEL_KEYS,
   formatDateOfBirth,
   parseIsoDate,
-  setPendingProfileToast,
 } from '../utils/account';
 
 const FIELDS = ['name', 'gender', 'date_of_birth', 'address', 'emergency_contact'];
@@ -96,7 +95,8 @@ const EditProfile = ({navigation}) => {
   const [form, setForm] = useState(() => toFormValues(account));
   const [errors, setErrors] = useState({});
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [toast, setToast] = useState({visible: false, message: '', type: 'error'});
+  const [genderOpen, setGenderOpen] = useState(false);
+  const {showModal} = useAppModal();
 
   useEffect(() => {
     if (!account || touchedRef.current) {
@@ -119,8 +119,8 @@ const EditProfile = ({navigation}) => {
     }
   };
 
-  const showToast = (message, type = 'error') => {
-    setToast({visible: true, message, type});
+  const showError = message => {
+    showModal({type: 'error', title: t('error'), message});
   };
 
   const validate = () => {
@@ -158,7 +158,7 @@ const EditProfile = ({navigation}) => {
       if (field) {
         setErrors(prev => ({...prev, [field]: message}));
       } else {
-        showToast(message);
+        showError(message);
       }
       return;
     }
@@ -167,8 +167,8 @@ const EditProfile = ({navigation}) => {
     } catch (error) {
       console.log('Refetch after profile update failed:', error?.message);
     }
-    setPendingProfileToast(t('profileSaved'));
     navigation?.goBack();
+    showModal({type: 'success', title: t('success'), message: t('profileSaved')});
   };
 
   const renderError = key =>
@@ -209,22 +209,51 @@ const EditProfile = ({navigation}) => {
           {renderError('name')}
 
           <Text style={styles.label}>{t('gender')}</Text>
-          <View style={[styles.segment, errors.gender && styles.inputError]}>
-            {GENDERS.map(gender => {
-              const active = form.gender === gender;
-              return (
-                <TouchableOpacity
-                  key={gender}
-                  activeOpacity={0.85}
-                  style={[styles.segmentOption, active && styles.segmentOptionActive]}
-                  onPress={() => updateField('gender', gender)}>
-                  <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
-                    {t(GENDER_LABEL_KEYS[gender])}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.input,
+              styles.pickerInput,
+              genderOpen && styles.dropdownOpen,
+              errors.gender && styles.inputError,
+            ]}
+            onPress={() => setGenderOpen(open => !open)}>
+            <Text style={[styles.pickerText, !form.gender && styles.placeholderText]}>
+              {form.gender ? t(GENDER_LABEL_KEYS[form.gender]) : t('selectGender')}
+            </Text>
+            <Icon
+              name={genderOpen ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#8190A7"
+            />
+          </TouchableOpacity>
+          {genderOpen ? (
+            <View style={styles.dropdownList}>
+              {GENDERS.map((gender, index) => {
+                const active = form.gender === gender;
+                return (
+                  <TouchableOpacity
+                    key={gender}
+                    activeOpacity={0.8}
+                    style={[
+                      styles.dropdownItem,
+                      index > 0 && styles.dropdownItemBorder,
+                      active && styles.dropdownItemActive,
+                    ]}
+                    onPress={() => {
+                      updateField('gender', gender);
+                      setGenderOpen(false);
+                    }}>
+                    <Text
+                      style={[styles.dropdownText, active && styles.dropdownTextActive]}>
+                      {t(GENDER_LABEL_KEYS[gender])}
+                    </Text>
+                    {active ? <Icon name="checkmark" size={18} color="#008178" /> : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ) : null}
           {renderError('gender')}
 
           <Text style={styles.label}>{t('dateOfBirthLabel')}</Text>
@@ -287,13 +316,6 @@ const EditProfile = ({navigation}) => {
           setPickerOpen(false);
           updateField('date_of_birth', value);
         }}
-      />
-
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onHide={() => setToast(prev => ({...prev, visible: false}))}
       />
     </SafeAreaView>
   );
@@ -383,32 +405,39 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: '#8190A7',
   },
-  segment: {
-    flexDirection: 'row',
-    backgroundColor: '#F0F2F5',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 16,
+  dropdownOpen: {
+    borderColor: '#008178',
+    marginBottom: 6,
+  },
+  dropdownList: {
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#D4DCDA',
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    marginBottom: 16,
   },
-  segmentOption: {
-    flex: 1,
-    height: 40,
-    borderRadius: 10,
+  dropdownItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    height: 48,
+    paddingHorizontal: 14,
   },
-  segmentOptionActive: {
-    backgroundColor: '#008178',
+  dropdownItemBorder: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E6ECEB',
   },
-  segmentText: {
-    fontSize: 14,
+  dropdownItemActive: {
+    backgroundColor: '#F2FAF8',
+  },
+  dropdownText: {
+    fontSize: 15,
+    color: '#111820',
+  },
+  dropdownTextActive: {
+    color: '#008178',
     fontWeight: '600',
-    color: '#5C6B7A',
-  },
-  segmentTextActive: {
-    color: '#FFFFFF',
   },
   errorText: {
     fontSize: 12,

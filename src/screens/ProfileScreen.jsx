@@ -20,7 +20,6 @@ import {useAuth} from '../context/AuthContext';
 import {useMyAccount, useSupportUnreadCount} from '../api/queries';
 import {useRefreshMyAccount, useUpdateMyPhoto} from '../api/mutations';
 import {getApiErrorMessage} from '../api/client';
-import Toast from '../components/common/Toast';
 import {storage} from '../utils/storage';
 import {useAppModal} from '../contexts/ModalContext';
 import {useTranslation} from 'react-i18next';
@@ -31,7 +30,6 @@ import {
   PHOTO_PICKER_OPTIONS,
   formatDateOfBirth,
   photoFromAsset,
-  takePendingProfileToast,
   validatePhoto,
 } from '../utils/account';
 
@@ -42,7 +40,7 @@ const MUTED = '#6B7F7C';
 const ProfileScreen = ({navigation}) => {
   const {t} = useTranslation();
   const {logout, user: cachedUser} = useAuth();
-  const {showConfirm} = useAppModal();
+  const {showConfirm, showModal} = useAppModal();
   const {data: accountData, isLoading} = useMyAccount();
   const refreshAccount = useRefreshMyAccount();
   const updatePhoto = useUpdateMyPhoto();
@@ -50,28 +48,23 @@ const ProfileScreen = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success',
-  });
 
   const user = accountData?.data || cachedUser || {};
 
-  const showToast = useCallback((message, type = 'success') => {
-    setToast({visible: true, message, type});
-  }, []);
+  const notify = (message, type = 'success') => {
+    showModal({
+      type,
+      title: type === 'success' ? t('success') : t('error'),
+      message,
+    });
+  };
 
   useFocusEffect(
     useCallback(() => {
       refreshAccount().catch(error => {
         console.log('Failed to load account:', error?.message);
       });
-      const pending = takePendingProfileToast();
-      if (pending) {
-        showToast(pending);
-      }
-    }, [refreshAccount, showToast]),
+    }, [refreshAccount]),
   );
 
   const onRefresh = async () => {
@@ -79,7 +72,7 @@ const ProfileScreen = ({navigation}) => {
     try {
       await refreshAccount();
     } catch (error) {
-      showToast(getApiErrorMessage(error, t('failedToLoadProfile')), 'error');
+      notify(getApiErrorMessage(error, t('failedToLoadProfile')), 'error');
     } finally {
       setRefreshing(false);
     }
@@ -92,9 +85,9 @@ const ProfileScreen = ({navigation}) => {
       form.append('photo', {uri: photo.uri, name: photo.name, type: photo.type});
       await updatePhoto.mutateAsync(form);
       await refreshAccount();
-      showToast(t('profilePhotoUpdated'));
+      notify(t('profilePhotoUpdated'));
     } catch (error) {
-      showToast(getApiErrorMessage(error, t('failedToUpdatePhoto')), 'error');
+      notify(getApiErrorMessage(error, t('failedToUpdatePhoto')), 'error');
     } finally {
       setUploading(false);
     }
@@ -110,7 +103,7 @@ const ProfileScreen = ({navigation}) => {
               ? await requestCameraPermission()
               : await requestGalleryPermission();
           if (!granted) {
-            showToast(
+            notify(
               source === 'camera' ? t('cameraPermission') : t('galleryPermission'),
               'error',
             );
@@ -126,7 +119,7 @@ const ProfileScreen = ({navigation}) => {
             return;
           }
           if (result.errorCode) {
-            showToast(result.errorMessage || t('failedToOpenImagePicker'), 'error');
+            notify(result.errorMessage || t('failedToOpenImagePicker'), 'error');
             return;
           }
           const asset = result.assets?.[0];
@@ -136,13 +129,13 @@ const ProfileScreen = ({navigation}) => {
           const photo = photoFromAsset(asset);
           const errorKey = validatePhoto(photo);
           if (errorKey) {
-            showToast(t(errorKey), 'error');
+            notify(t(errorKey), 'error');
             return;
           }
           uploadPhoto(photo);
         } catch (error) {
           console.error('Photo picker error:', error);
-          showToast(t('failedToOpenImagePicker'), 'error');
+          notify(t('failedToOpenImagePicker'), 'error');
         }
       },
       Platform.OS === 'ios' ? 350 : 80,
@@ -254,21 +247,24 @@ const ProfileScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.profileName} numberOfLines={1}>
-            {isLoading && !user.name ? t('loading') : user.name || t('yourProfile')}
-          </Text>
-          {!!user.phone && (
-            <Text style={styles.profileContact} numberOfLines={1}>
-              {user.phone}
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName} numberOfLines={1}>
+              {isLoading && !user.name ? t('loading') : user.name || t('yourProfile')}
             </Text>
-          )}
+            {!!(user.phone || user.email) && (
+              <Text style={styles.profileContact} numberOfLines={1}>
+                {user.phone || user.email}
+              </Text>
+            )}
+          </View>
 
           <TouchableOpacity
-            activeOpacity={0.85}
+            activeOpacity={0.8}
             style={styles.editButton}
-            onPress={handleEditProfile}>
-            <Icon name="create-outline" size={16} color={PRIMARY} />
-            <Text style={styles.editButtonText}>{t('editProfile')}</Text>
+            onPress={handleEditProfile}
+            accessibilityLabel={t('editProfile')}
+            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+            <Icon name="create-outline" size={20} color={PRIMARY} />
           </TouchableOpacity>
         </View>
 
@@ -358,13 +354,6 @@ const ProfileScreen = ({navigation}) => {
           </View>
         </Pressable>
       </Modal>
-
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onHide={() => setToast(prev => ({...prev, visible: false}))}
-      />
     </SafeAreaView>
   );
 };
@@ -406,12 +395,13 @@ const styles = StyleSheet.create({
     paddingBottom: 110,
   },
   profileCard: {
+    flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#E6ECEB',
     overflow: 'hidden',
-    paddingVertical: 20,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     marginBottom: 16,
     backgroundColor: '#FFFFFF',
@@ -437,43 +427,43 @@ const styles = StyleSheet.create({
     transform: [{rotate: '-20deg'}],
   },
   avatarRing: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 76,
+    height: 76,
+    borderRadius: 38,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: '#E6F4F1',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarImage: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: '#E6F4F1',
   },
   avatarOverlay: {
     position: 'absolute',
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   cameraBadge: {
     position: 'absolute',
-    right: 0,
-    bottom: 0,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    right: -2,
+    bottom: -2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: PRIMARY,
     borderWidth: 2,
     borderColor: '#FFFFFF',
@@ -483,9 +473,13 @@ const styles = StyleSheet.create({
   cameraBadgeDisabled: {
     opacity: 0.5,
   },
+  profileInfo: {
+    flex: 1,
+    marginLeft: 14,
+    marginRight: 10,
+  },
   profileName: {
-    marginTop: 12,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: TEXT,
   },
@@ -495,19 +489,12 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   editButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 14,
-    paddingHorizontal: 18,
-    height: 38,
-    borderRadius: 19,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#E6F4F1',
-  },
-  editButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: PRIMARY,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailsCard: {
     borderRadius: 14,

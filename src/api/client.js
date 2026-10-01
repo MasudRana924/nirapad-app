@@ -223,6 +223,7 @@ export const apiRequest = async (
     headers: extraHeaders = {},
     idempotencyKey,
     skipAuth = false,
+    timeout = 0,
   } = {},
 ) => {
   const token = skipAuth ? null : await AsyncStorage.getItem('userToken');
@@ -249,7 +250,31 @@ export const apiRequest = async (
     config.body = isFormData ? body : JSON.stringify(body);
   }
 
-  const response = await fetch(getFullUrl(endpoint), config);
+  let timer = null;
+  if (timeout > 0) {
+    const controller = new AbortController();
+    config.signal = controller.signal;
+    timer = setTimeout(() => controller.abort(), timeout);
+  }
+
+  let response;
+  try {
+    response = await fetch(getFullUrl(endpoint), config);
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new ApiError(
+        undefined,
+        'Request timed out. Please check your connection and try again.',
+        [],
+        0,
+      );
+    }
+    throw error;
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
   const json = await parseJsonSafe(response);
   const skipRefresh = AUTH_SKIP_REFRESH.some(path =>
     endpoint.startsWith(path),
@@ -269,6 +294,7 @@ export const apiRequest = async (
         headers: extraHeaders,
         idempotencyKey,
         skipAuth,
+        timeout,
       });
     }
     await notifyAuthFailure();
@@ -291,7 +317,7 @@ export const apiRequest = async (
 export const apiUpload = async (
   endpoint,
   formData,
-  {onProgress, retry = true} = {},
+  {onProgress, retry = true, timeout = 0} = {},
 ) => {
   const token = await AsyncStorage.getItem('userToken');
 
@@ -318,6 +344,19 @@ export const apiUpload = async (
       xhr.onerror = () => {
         reject(new ApiError(undefined, 'Network request failed', [], 0));
       };
+      if (timeout > 0) {
+        xhr.timeout = timeout;
+        xhr.ontimeout = () => {
+          reject(
+            new ApiError(
+              undefined,
+              'Upload timed out. Please check your connection and try again.',
+              [],
+              0,
+            ),
+          );
+        };
+      }
       if (xhr.upload && typeof onProgress === 'function') {
         xhr.upload.onprogress = event => {
           if (event.lengthComputable && event.total > 0) {
@@ -333,7 +372,7 @@ export const apiUpload = async (
   if (isAuthFailure(json, status) && retry && token) {
     const newToken = await refreshAccessToken();
     if (newToken) {
-      return apiUpload(endpoint, formData, {onProgress, retry: false});
+      return apiUpload(endpoint, formData, {onProgress, retry: false, timeout});
     }
     await notifyAuthFailure();
     throw new ApiError(

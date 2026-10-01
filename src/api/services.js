@@ -50,7 +50,7 @@ export const accountService = {
 
   /** multipart/form-data with a single `photo` field. */
   updateMyPhoto: formData =>
-    apiRequest('/user/me/photo', 'PUT', formData, true),
+    apiRequest('/user/me/photo', 'PUT', formData, true, {timeout: 60000}),
 };
 
 /**

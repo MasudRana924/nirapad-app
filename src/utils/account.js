@@ -82,16 +82,3 @@ export const formatDateOfBirth = value => {
     year: 'numeric',
   });
 };
-
-let pendingProfileToast = null;
-
-/** Queue a toast for the Profile screen to show on its next focus. */
-export const setPendingProfileToast = message => {
-  pendingProfileToast = message;
-};
-
-export const takePendingProfileToast = () => {
-  const message = pendingProfileToast;
-  pendingProfileToast = null;
-  return message;
-};
