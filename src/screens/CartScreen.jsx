@@ -247,8 +247,10 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     padding: 12,
     marginBottom: 12,
   },
@@ -328,8 +330,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   summaryCard: {
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     padding: 16,
     marginTop: 4,
   },

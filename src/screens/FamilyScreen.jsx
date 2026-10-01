@@ -15,7 +15,6 @@ import {useFamilyMembers} from '../api/queries';
 import Toast from '../components/common/Toast';
 import FamilySkeleton from '../components/home/FamilySkeleton';
 import Header from '../components/common/Header';
-import PrimaryButton from '../components/common/PrimaryButton';
 import {TAB_BAR_HEIGHT, useTabBarBottom} from '../navigation/tabBarLayout';
 
 const FamilyScreen = ({navigation}) => {
@@ -59,12 +58,24 @@ const FamilyScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-      <Header title={t('family')} onBack={() => navigation?.goBack()} />
+      <Header
+        title={t('family')}
+        onBack={() => navigation?.goBack()}
+        rightComponent={
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.addButton}
+            onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}>
+            <Icon name="add" size={18} color="#FFFFFF" />
+            <Text style={styles.addButtonText}>{t('add')}</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* ================= FAMILY LIST ================= */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: bottomPadding}]}
         showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <FamilySkeleton />
@@ -110,14 +121,6 @@ const FamilyScreen = ({navigation}) => {
         )}
       </ScrollView>
 
-      {/* ================= ADD MEMBER ================= */}
-      <View style={[styles.bottomContainer, {paddingBottom: bottomPadding}]}>
-        <PrimaryButton
-          title={t('addMember', 'Add member')}
-          onPress={() => navigation?.navigate('AddFamilyMember', {redirectBack: 'FamilyScreen'})}
-        />
-      </View>
-
       {/* Toast */}
       <Toast
         visible={toast.visible}
@@ -159,11 +162,20 @@ const styles = StyleSheet.create({
     color: '#172333',
   },
 
-  bottomContainer: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingTop: 12,
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 32,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: '#008178',
+  },
+
+  addButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 2,
   },
 
   // ================= SCROLL =================

@@ -148,10 +148,6 @@ const MedicineScreen = ({navigation}) => {
   };
 
   const cartCount = Object.values(cart).reduce((sum, count) => sum + count, 0);
-  const totalPrice = Object.entries(cart).reduce((sum, [id, count]) => {
-    const medicine = medicines.find(m => m.id === parseInt(id, 10));
-    return sum + (medicine ? medicine.price * count : 0);
-  }, 0);
 
   const goToCart = () => navigation?.navigate('Cart', {cart, medicines});
 
@@ -293,24 +289,6 @@ const MedicineScreen = ({navigation}) => {
           })
         )}
       </ScrollView>
-
-      {cartCount > 0 && (
-        <View style={styles.bottomBar}>
-          <View>
-            <Text style={styles.bottomLabel}>
-              {cartCount} item{cartCount > 1 ? 's' : ''}
-            </Text>
-            <Text style={styles.bottomPrice}>৳{totalPrice}</Text>
-          </View>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.checkoutBtn}
-            onPress={goToCart}>
-            <Text style={styles.checkoutBtnText}>View cart</Text>
-            <Icon name="chevron-forward-sharp" size={16} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-      )}
     </SafeAreaView>
   );
 };
@@ -430,8 +408,10 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     padding: 12,
     marginBottom: 12,
   },
@@ -516,41 +496,6 @@ const styles = StyleSheet.create({
   },
   addBtnText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
-    backgroundColor: '#FFFFFF',
-  },
-  bottomLabel: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginBottom: 2,
-  },
-  bottomPrice: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111820',
-  },
-  checkoutBtn: {
-    height: 48,
-    paddingHorizontal: 18,
-    borderRadius: 14,
-    backgroundColor: '#008178',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  checkoutBtnText: {
-    fontSize: 15,
     fontWeight: '600',
     color: '#FFFFFF',
   },
