@@ -142,7 +142,7 @@ const ActiveBookingCard = ({navigation, booking, searching}) => {
         <Text style={styles.trackBtnText}>
           {finding ? t('viewStatus') : liveTracking ? t('trackLive') : t('viewDetails')}
         </Text>
-        <Icon name="chevron-forward-sharp" size={13} color={TEAL} />
+        <Icon name="chevron-forward-sharp" size={13} color="#FFFFFF" />
       </TouchableOpacity>
     </View>
   );
@@ -248,10 +248,12 @@ const styles = StyleSheet.create({
     color: '#5F716E',
   },
   trackBtn: {
+    alignSelf: 'flex-start',
     marginTop: 12,
     height: 32,
+    paddingHorizontal: 14,
     borderRadius: 16,
-    backgroundColor: '#DDF0EB',
+    backgroundColor: '#008178',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
   trackBtnText: {
     fontSize: 12.5,
     fontWeight: '700',
-    color: TEAL,
+    color: '#FFFFFF',
   },
 });
 

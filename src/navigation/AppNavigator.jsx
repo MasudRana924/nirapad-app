@@ -1,7 +1,6 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   View,
   Text,
@@ -55,6 +54,7 @@ import PrivacyPolicyScreen from '../screens/PrivacyPolicyScreen';
 import InboxScreen from '../screens/InboxScreen';
 import ServicesScreen from '../screens/ServicesScreen';
 import {useSupportUnreadCount} from '../api/queries';
+import {TAB_BAR_HEIGHT, useTabBarBottom} from './tabBarLayout';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,11 +62,7 @@ const Tab = createBottomTabNavigator();
 const HIDDEN_TAB_BAR_ROUTES = ['Messages'];
 
 function FloatingTabBar({state, descriptors, navigation}) {
-  const insets = useSafeAreaInsets();
-  // insets.bottom = real system navigation bar height reported by the OS
-  // after WindowCompat.setDecorFitsSystemWindows(window, false) in MainActivity.kt.
-  // Fallback 16 covers older Android devices where inset hasn't loaded yet.
-  const safeBottom = insets.bottom > 0 ? insets.bottom : 16;
+  const barBottom = useTabBarBottom();
   const activeRoute = state.routes[state.index];
 
   if (HIDDEN_TAB_BAR_ROUTES.includes(activeRoute.name)) {
@@ -76,7 +72,7 @@ function FloatingTabBar({state, descriptors, navigation}) {
   return (
     <View
       pointerEvents="box-none"
-      style={[tabStyles.barWrap, {bottom: safeBottom + 6}]}>
+      style={[tabStyles.barWrap, {bottom: barBottom}]}>
       <View style={tabStyles.bar}>
         {state.routes.map((route, index) => {
           const {options} = descriptors[route.key];
@@ -283,7 +279,7 @@ const tabStyles = StyleSheet.create({
   },
   bar: {
     width: '80%',
-    height: 64,
+    height: TAB_BAR_HEIGHT,
     borderRadius: 32,
     backgroundColor: '#008178',
     flexDirection: 'row',

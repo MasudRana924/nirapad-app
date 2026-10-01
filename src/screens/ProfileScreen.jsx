@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
   Modal,
   Pressable,
   Platform,
@@ -24,6 +23,8 @@ import {storage} from '../utils/storage';
 import {useAppModal} from '../contexts/ModalContext';
 import {useTranslation} from 'react-i18next';
 import LanguageSwitch from '../components/common/LanguageSwitch';
+import CustomLoader from '../components/common/CustomLoader';
+import {useTabBarInset} from '../navigation/tabBarLayout';
 import {requestCameraPermission, requestGalleryPermission} from '../utils/permissions';
 import {
   GENDER_LABEL_KEYS,
@@ -48,6 +49,7 @@ const ProfileScreen = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const tabBarInset = useTabBarInset();
 
   const user = accountData?.data || cachedUser || {};
 
@@ -211,7 +213,7 @@ const ProfileScreen = ({navigation}) => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: tabBarInset}]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -232,11 +234,6 @@ const ProfileScreen = ({navigation}) => {
                 <Icon name="person-outline" size={34} color={PRIMARY} />
               </View>
             )}
-            {uploading ? (
-              <View style={styles.avatarOverlay}>
-                <ActivityIndicator color="#FFFFFF" />
-              </View>
-            ) : null}
             <TouchableOpacity
               activeOpacity={0.8}
               disabled={uploading}
@@ -354,6 +351,8 @@ const ProfileScreen = ({navigation}) => {
           </View>
         </Pressable>
       </Modal>
+
+      <CustomLoader overlay visible={uploading} />
     </SafeAreaView>
   );
 };
@@ -392,7 +391,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 110,
   },
   profileCard: {
     flexDirection: 'row',
@@ -447,15 +445,6 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 36,
     backgroundColor: '#E6F4F1',
-  },
-  avatarOverlay: {
-    position: 'absolute',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   cameraBadge: {
     position: 'absolute',

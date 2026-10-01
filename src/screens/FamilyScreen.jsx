@@ -15,10 +15,12 @@ import {useFamilyMembers} from '../api/queries';
 import Toast from '../components/common/Toast';
 import FamilySkeleton from '../components/home/FamilySkeleton';
 import Header from '../components/common/Header';
+import {useTabBarInset} from '../navigation/tabBarLayout';
 
 const FamilyScreen = ({navigation}) => {
   const {t} = useTranslation();
   const [toast, setToast] = React.useState({visible: false, message: '', type: 'success'});
+  const tabBarInset = useTabBarInset();
 
   // React Query hooks
   const {data: familyMembersData, isLoading} = useFamilyMembers();
@@ -50,7 +52,7 @@ const FamilyScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <Header
         title={t('family')}
         onBack={() => navigation?.goBack()}
@@ -68,7 +70,7 @@ const FamilyScreen = ({navigation}) => {
       {/* ================= FAMILY LIST ================= */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: tabBarInset}]}
         showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <FamilySkeleton />
@@ -178,7 +180,6 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     padding: 16,
-    paddingBottom: 110,
   },
 
   // ================= FAMILY GRID =================

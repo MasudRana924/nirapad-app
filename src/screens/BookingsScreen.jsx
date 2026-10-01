@@ -22,6 +22,7 @@ import {
   canShowBookingChat,
 } from '../utils/bookingStatus';
 import {getBookingPatient} from '../utils/bookingPatient';
+import {useTabBarInset} from '../navigation/tabBarLayout';
 
 const INK = '#163532';
 const MUTED = '#7B9390';
@@ -98,6 +99,7 @@ const BookingsScreen = ({navigation}) => {
   });
   const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
   const [refreshing, setRefreshing] = useState(false);
+  const tabBarInset = useTabBarInset();
 
   useFocusEffect(
     useCallback(() => {
@@ -184,7 +186,7 @@ const BookingsScreen = ({navigation}) => {
 
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, {paddingBottom: tabBarInset}]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -383,7 +385,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 110,
   },
   emptyState: {
     alignItems: 'center',

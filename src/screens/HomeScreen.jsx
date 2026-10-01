@@ -13,6 +13,7 @@ import {
   useFamilyMembers,
 } from '../api/queries';
 import {isActiveStatus, isSearchingStatus} from '../utils/bookingStatus';
+import {useTabBarInset} from '../navigation/tabBarLayout';
 
 const PAGE = '#FFFFFF';
 
@@ -37,6 +38,7 @@ const HomeScreen = ({navigation}) => {
   const bookings = Array.isArray(bookingsData?.data) ? bookingsData.data : [];
   const activeBooking = bookings.find(item => isActiveStatus(item?.status));
   const [refreshing, setRefreshing] = useState(false);
+  const tabBarInset = useTabBarInset();
 
   const reloadHome = useCallback(async () => {
     await Promise.all([
@@ -79,7 +81,7 @@ const HomeScreen = ({navigation}) => {
       <HomeHeader navigation={navigation} profile={profileData?.data || profileData} />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{paddingBottom: tabBarInset}}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -114,9 +116,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: PAGE,
-  },
-  scrollContent: {
-    paddingBottom: 110,
   },
   activeWrap: {
     marginTop: 4,

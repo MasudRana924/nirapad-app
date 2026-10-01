@@ -19,6 +19,7 @@ import {getApiErrorMessage} from '../api/client';
 import Header from '../components/common/Header';
 import PrimaryButton from '../components/common/PrimaryButton';
 import DateOfBirthPicker from '../components/common/DateOfBirthPicker';
+import CustomLoader from '../components/common/CustomLoader';
 import {useAppModal} from '../contexts/ModalContext';
 import {
   GENDERS,
@@ -96,6 +97,7 @@ const EditProfile = ({navigation}) => {
   const [errors, setErrors] = useState({});
   const [pickerOpen, setPickerOpen] = useState(false);
   const [genderOpen, setGenderOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const {showModal} = useAppModal();
 
   useEffect(() => {
@@ -109,7 +111,7 @@ const EditProfile = ({navigation}) => {
 
   const changes = getChangedFields(form, initial);
   const hasChanges = Object.keys(changes).length > 0;
-  const saving = updateAccount.isPending;
+  const saving = submitting || updateAccount.isPending;
 
   const updateField = (key, value) => {
     touchedRef.current = true;
@@ -150,9 +152,11 @@ const EditProfile = ({navigation}) => {
     if (!hasChanges || saving || !validate()) {
       return;
     }
+    setSubmitting(true);
     try {
       await updateAccount.mutateAsync(changes);
     } catch (error) {
+      setSubmitting(false);
       const message = getApiErrorMessage(error, t('failedToUpdateProfile'));
       const field = fieldFromError(error);
       if (field) {
@@ -167,6 +171,7 @@ const EditProfile = ({navigation}) => {
     } catch (error) {
       console.log('Refetch after profile update failed:', error?.message);
     }
+    setSubmitting(false);
     navigation?.goBack();
     showModal({type: 'success', title: t('success'), message: t('profileSaved')});
   };
@@ -317,6 +322,8 @@ const EditProfile = ({navigation}) => {
           updateField('date_of_birth', value);
         }}
       />
+
+      <CustomLoader overlay visible={saving} />
     </SafeAreaView>
   );
 };
