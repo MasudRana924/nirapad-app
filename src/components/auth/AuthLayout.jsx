@@ -94,34 +94,81 @@ const AuthLayout = ({
   );
 };
 
-export const AuthField = ({icon, right, style, ...inputProps}) => {
-  const [focused, setFocused] = useState(false);
-
+export const AuthChannelToggle = ({value, onChange}) => {
+  const {t} = useTranslation();
   return (
-    <View
-      style={[
-        styles.inputRow,
-        focused && styles.inputRowFocused,
-        style,
-      ]}>
-      <Icon name={icon} size={18} color={MUTED} />
-      <TextInput
-        style={styles.input}
-        placeholderTextColor={MUTED}
-        {...inputProps}
-        onFocus={event => {
-          setFocused(true);
-          inputProps.onFocus?.(event);
-        }}
-        onBlur={event => {
-          setFocused(false);
-          inputProps.onBlur?.(event);
-        }}
-      />
-      {right}
+    <View style={styles.toggle}>
+      {['email', 'phone'].map(channel => {
+        const active = value === channel;
+        return (
+          <TouchableOpacity
+            key={channel}
+            activeOpacity={0.85}
+            onPress={() => onChange(channel)}
+            style={[styles.toggleItem, active && styles.toggleItemActive]}>
+            <Text style={[styles.toggleText, active && styles.toggleTextActive]}>
+              {t(channel)}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
+
+export const AuthField = ({icon, right, prefix, error, style, ...inputProps}) => {
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <View>
+      <View
+        style={[
+          styles.inputRow,
+          focused && styles.inputRowFocused,
+          error ? styles.inputRowError : null,
+          error ? styles.inputRowWithError : null,
+          style,
+        ]}>
+        {icon ? <Icon name={icon} size={18} color={MUTED} /> : null}
+        {prefix}
+        <TextInput
+          style={styles.input}
+          placeholderTextColor={MUTED}
+          {...inputProps}
+          onFocus={event => {
+            setFocused(true);
+            inputProps.onFocus?.(event);
+          }}
+          onBlur={event => {
+            setFocused(false);
+            inputProps.onBlur?.(event);
+          }}
+        />
+        {right}
+      </View>
+      {error ? <Text style={styles.fieldError}>{error}</Text> : null}
+    </View>
+  );
+};
+
+export const AuthPhoneField = ({value, onChangeText, error}) => (
+  <AuthField
+    prefix={
+      <View style={styles.phonePrefix}>
+        <View style={styles.flag}>
+          <View style={styles.flagRed} />
+        </View>
+        <Text style={styles.phonePrefixText}>+880</Text>
+      </View>
+    }
+    placeholder="1XXXXXXXXX"
+    keyboardType="number-pad"
+    value={value}
+    onChangeText={onChangeText}
+    maxLength={14}
+    error={error}
+  />
+);
 
 export const AuthPrimaryButton = ({title, onPress, disabled, loading}) => (
   <PrimaryButton
@@ -286,6 +333,77 @@ const styles = StyleSheet.create({
   },
   inputRowFocused: {
     borderColor: TEAL,
+  },
+  inputRowError: {
+    borderColor: '#C0392B',
+  },
+  inputRowWithError: {
+    marginBottom: 4,
+  },
+  fieldError: {
+    marginTop: -2,
+    marginBottom: 12,
+    marginLeft: 4,
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#C0392B',
+  },
+  toggle: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: '#F5F5F5',
+    padding: 4,
+    marginBottom: 16,
+    height: 52,
+  },
+  toggleItem: {
+    flex: 1,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toggleItemActive: {
+    backgroundColor: TEAL,
+  },
+  toggleText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: INK,
+  },
+  toggleTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  phonePrefix: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 12,
+    marginRight: 2,
+    borderRightWidth: 1,
+    borderRightColor: '#D4DCDA',
+  },
+  flag: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#006A4E',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flagRed: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#F42A41',
+    marginLeft: -2,
+  },
+  phonePrefixText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: INK,
   },
   input: {
     flex: 1,

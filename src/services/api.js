@@ -9,29 +9,58 @@ export {
   getApiErrorMessage,
 } from '../api/client';
 
-export const registerUser = async (name, email, password) => {
-  return apiRequest('/auth/register', 'POST', {
-    name,
-    email,
-    password,
-    role: 'USER',
-  });
+const publicAuth = {skipAuth: true};
+
+const identifierBody = ({email, phone}) =>
+  phone ? {phone} : {email};
+
+export const registerUser = async ({name, email, phone, password}) => {
+  return apiRequest(
+    '/auth/register',
+    'POST',
+    {
+      name,
+      password,
+      role: 'USER',
+      ...identifierBody({email, phone}),
+    },
+    false,
+    publicAuth,
+  );
 };
 
 export const sendOtp = async email => {
-  return apiRequest('/auth/send-otp', 'POST', {email});
+  return apiRequest('/auth/send-otp', 'POST', {email}, false, publicAuth);
 };
 
-export const verifyOtp = async (email, otp) => {
-  return apiRequest('/auth/verify-otp', 'POST', {email, otp});
+export const verifyOtp = async ({email, phone, otp}) => {
+  return apiRequest(
+    '/auth/verify-otp',
+    'POST',
+    {otp, ...identifierBody({email, phone})},
+    false,
+    publicAuth,
+  );
 };
 
-export const resendOtp = async email => {
-  return apiRequest('/auth/resend-otp', 'POST', {email});
+export const resendOtp = async ({email, phone}) => {
+  return apiRequest(
+    '/auth/resend-otp',
+    'POST',
+    identifierBody({email, phone}),
+    false,
+    publicAuth,
+  );
 };
 
-export const loginUser = async (email, password) => {
-  return apiRequest('/auth/login', 'POST', {email, password});
+export const loginUser = async ({email, phone, password}) => {
+  return apiRequest(
+    '/auth/login',
+    'POST',
+    {password, ...identifierBody({email, phone})},
+    false,
+    publicAuth,
+  );
 };
 
 export const refreshAuthToken = async refreshToken => {

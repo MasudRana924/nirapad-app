@@ -4,32 +4,51 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 import CustomLoader from '../components/common/CustomLoader';
 import AuthLayout, {
+  AuthChannelToggle,
   AuthField,
+  AuthPhoneField,
   AuthPrimaryButton,
   AuthFooterLink,
 } from '../components/auth/AuthLayout';
-import {loginUser, extractAuthPayload} from '../services/api';
+import {loginUser, resendOtp, extractAuthPayload} from '../services/api';
 import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
 import {useAppModal} from '../contexts/ModalContext';
 import notificationService from '../services/notificationService';
 import LanguageSwitch from '../components/common/LanguageSwitch';
+import {isValidBdPhone, normalizeBdPhone} from '../utils/phone';
 
 const LoginScreen = ({navigation}) => {
   const {t} = useTranslation();
+  const [channel, setChannel] = useState('email');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isPhoneLogin, setIsPhoneLogin] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const [loading, setLoading] = useState(false);
   const {login} = useAuth();
   const {showError} = useAppModal();
 
+  const switchChannel = next => {
+    setChannel(next);
+    setIdentifier('');
+    setPhoneError('');
+  };
+
   const handleLogin = async () => {
-    if (!identifier.trim()) {
-      showError(
-        isPhoneLogin ? t('pleaseEnterPhone') : t('pleaseEnterEmail'),
-      );
+    const isPhone = channel === 'phone';
+    const trimmed = identifier.trim();
+
+    if (!trimmed) {
+      if (isPhone) {
+        setPhoneError(t('invalidPhone'));
+      } else {
+        showError(t('pleaseEnterEmail'));
+      }
+      return;
+    }
+    if (isPhone && !isValidBdPhone(trimmed)) {
+      setPhoneError(t('invalidPhone'));
       return;
     }
     if (!password.trim()) {
@@ -37,9 +56,14 @@ const LoginScreen = ({navigation}) => {
       return;
     }
 
+    const phone = isPhone ? normalizeBdPhone(trimmed) : '';
+    const email = isPhone ? '' : trimmed;
+    setPhoneError('');
     setLoading(true);
     try {
-      const response = await loginUser(identifier.trim(), password);
+      const response = await loginUser(
+        isPhone ? {phone, password} : {email, password},
+      );
       const {token, refreshToken, user} = extractAuthPayload(response);
       if (!token) {
         showError(t('loginFailed'));
@@ -50,24 +74,34 @@ const LoginScreen = ({navigation}) => {
       await notificationService.initialize(token);
       await notificationService.registerTokenWithServer(token);
     } catch (err) {
-      const message = getApiErrorMessage(err, t('somethingWentWrong'));
-      const needsVerify =
-        err?.errors?.some?.(e =>
-          String(e?.message || e)
-            .toLowerCase()
-            .includes('verify'),
-        ) || message.toLowerCase().includes('verify');
-      if (needsVerify && !isPhoneLogin) {
-        navigation?.navigate('VerifyPhone', {email: identifier.trim()});
+      if (
+        err?.statusCode === 403 &&
+        err?.code === API_CODES.ACCOUNT_NOT_VERIFIED
+      ) {
+        try {
+          await resendOtp(isPhone ? {phone} : {email});
+        } catch (resendError) {
+          const cooldown =
+            resendError?.code === API_CODES.TOO_MANY_REQUESTS ||
+            resendError?.statusCode === 429;
+          if (!cooldown) {
+            showError(
+              getApiErrorMessage(resendError, t('somethingWentWrong')),
+            );
+          }
+        }
+        navigation?.navigate('VerifyPhone', {
+          channel,
+          value: isPhone ? phone : email,
+        });
+        return;
       }
-      if (err?.code === API_CODES.OTP_INVALID) {
-        showError(message);
-      } else if (err?.code === API_CODES.TOO_MANY_REQUESTS) {
-        showError(message || t('tooManyAttempts'));
+      if (err?.statusCode === 401 || err?.code === API_CODES.UNAUTHORIZED) {
+        showError(t('invalidCredentials'));
       } else {
-        showError(message);
+        showError(getApiErrorMessage(err, t('somethingWentWrong')));
       }
-      console.error('❌ Login error:', err);
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }
@@ -78,16 +112,31 @@ const LoginScreen = ({navigation}) => {
       <CustomLoader overlay visible={loading} />
       <AuthLayout
         title={t('welcomeBack')}
-        subtitle={t('signInSubtitle')}
+        subtitle={
+          channel === 'phone' ? t('signInWithPhone') : t('signInWithEmail')
+        }
         langSwitch={<LanguageSwitch />}>
-        <AuthField
-          icon={isPhoneLogin ? 'call-outline' : 'mail-outline'}
-          value={identifier}
-          onChangeText={setIdentifier}
-          placeholder={isPhoneLogin ? t('phoneNumber') : t('emailAddress')}
-          keyboardType={isPhoneLogin ? 'phone-pad' : 'email-address'}
-          autoCapitalize="none"
-        />
+        <AuthChannelToggle value={channel} onChange={switchChannel} />
+
+        {channel === 'phone' ? (
+          <AuthPhoneField
+            value={identifier}
+            error={phoneError}
+            onChangeText={text => {
+              setPhoneError('');
+              setIdentifier(text);
+            }}
+          />
+        ) : (
+          <AuthField
+            icon="mail-outline"
+            value={identifier}
+            onChangeText={setIdentifier}
+            placeholder={t('emailAddress')}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        )}
 
         <AuthField
           icon="lock-closed-outline"

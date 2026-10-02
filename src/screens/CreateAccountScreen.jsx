@@ -3,30 +3,32 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomLoader from '../components/common/CustomLoader';
 import AuthLayout, {
+  AuthChannelToggle,
   AuthField,
+  AuthPhoneField,
   AuthPrimaryButton,
   AuthFooterLink,
 } from '../components/auth/AuthLayout';
 import {registerUser} from '../services/api';
 import {getApiErrorMessage} from '../api/client';
 import {useAppModal} from '../contexts/ModalContext';
-import {
-  EMAIL_NOT_SENT_MESSAGE,
-  getDevOtpHint,
-  isEmailSent,
-} from '../utils/otpHelpers';
+import {isValidBdPhone, normalizeBdPhone} from '../utils/phone';
 import {useTranslation} from 'react-i18next';
 
 const CreateAccountScreen = ({navigation}) => {
   const {t} = useTranslation();
+  const [channel, setChannel] = useState('email');
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const {showError} = useAppModal();
+  const [phoneError, setPhoneError] = useState('');
+  const {showError, showConfirm} = useAppModal();
   const [form, setForm] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
+    confirmPassword: '',
   });
 
   const updateField = (field, value) => {
@@ -34,13 +36,23 @@ const CreateAccountScreen = ({navigation}) => {
   };
 
   const handleRegister = async () => {
-    const {name, email, password} = form;
+    const {name, email, phone, password, confirmPassword} = form;
+    const isPhone = channel === 'phone';
 
     if (!name.trim()) {
       showError(t('pleaseEnterName'));
       return;
     }
-    if (!email.trim()) {
+    if (isPhone) {
+      if (!phone.trim()) {
+        setPhoneError(t('invalidPhone'));
+        return;
+      }
+      if (!isValidBdPhone(phone)) {
+        setPhoneError(t('invalidPhone'));
+        return;
+      }
+    } else if (!email.trim()) {
       showError(t('pleaseEnterEmail'));
       return;
     }
@@ -48,28 +60,46 @@ const CreateAccountScreen = ({navigation}) => {
       showError(t('pleaseEnterAPassword'));
       return;
     }
+    if (password.length < 6) {
+      showError(t('passwordMinLength'));
+      return;
+    }
+    if (password !== confirmPassword) {
+      showError(t('passwordsDoNotMatch'));
+      return;
+    }
     if (!agreed) {
       showError(t('pleaseAcceptPrivacy'));
       return;
     }
 
+    const normalizedPhone = isPhone ? normalizeBdPhone(phone) : '';
+    setPhoneError('');
     setLoading(true);
     try {
-      const response = await registerUser(name.trim(), email.trim(), password);
-      if (!isEmailSent(response)) {
-        showError(EMAIL_NOT_SENT_MESSAGE, t('emailNotSent'));
-        return;
-      }
-      const params = {email: email.trim()};
-      const devOtp = getDevOtpHint(response);
-      if (devOtp) {
-        params.devOtpHint = devOtp;
-      }
-      navigation?.navigate('VerifyPhone', params);
+      const response = await registerUser({
+        name: name.trim(),
+        password,
+        ...(isPhone ? {phone: normalizedPhone} : {email: email.trim()}),
+      });
+      const otpChannel =
+        response?.data?.otp_channel === 'phone' ? 'phone' : 'email';
+      navigation?.navigate('VerifyPhone', {
+        channel: otpChannel,
+        value: otpChannel === 'phone' ? normalizedPhone : email.trim(),
+      });
     } catch (error) {
-      showError(
-        getApiErrorMessage(error, t('somethingWentWrong')),
-      );
+      if (error?.statusCode === 409) {
+        showConfirm({
+          title: t('error'),
+          message: getApiErrorMessage(error, t('somethingWentWrong')),
+          confirmText: t('loginInstead'),
+          cancelText: t('close'),
+          onConfirm: () => navigation?.navigate('Login'),
+        });
+      } else {
+        showError(getApiErrorMessage(error, t('somethingWentWrong')));
+      }
       console.error('Register error:', error);
     } finally {
       setLoading(false);
@@ -83,7 +113,11 @@ const CreateAccountScreen = ({navigation}) => {
         showBack
         onBack={() => navigation?.goBack()}
         title={t('createAccount')}
-        subtitle={t('registerSubtitle')}>
+        subtitle={
+          channel === 'phone' ? t('registerWithPhone') : t('registerWithEmail')
+        }>
+        <AuthChannelToggle value={channel} onChange={setChannel} />
+
         <AuthField
           icon="person-outline"
           placeholder={t('fullName')}
@@ -92,14 +126,25 @@ const CreateAccountScreen = ({navigation}) => {
           autoCapitalize="words"
         />
 
-        <AuthField
-          icon="mail-outline"
-          placeholder={t('emailAddress')}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={form.email}
-          onChangeText={text => updateField('email', text)}
-        />
+        {channel === 'phone' ? (
+          <AuthPhoneField
+            value={form.phone}
+            error={phoneError}
+            onChangeText={text => {
+              setPhoneError('');
+              updateField('phone', text);
+            }}
+          />
+        ) : (
+          <AuthField
+            icon="mail-outline"
+            placeholder={t('emailAddress')}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={form.email}
+            onChangeText={text => updateField('email', text)}
+          />
+        )}
 
         <AuthField
           icon="lock-closed-outline"
@@ -119,6 +164,14 @@ const CreateAccountScreen = ({navigation}) => {
               />
             </TouchableOpacity>
           }
+        />
+
+        <AuthField
+          icon="lock-closed-outline"
+          placeholder={t('confirmPassword')}
+          secureTextEntry={!showPassword}
+          value={form.confirmPassword}
+          onChangeText={text => updateField('confirmPassword', text)}
         />
 
         <View style={styles.termsRow}>
@@ -143,7 +196,6 @@ const CreateAccountScreen = ({navigation}) => {
           disabled={loading}
           onPress={handleRegister}
         />
-
 
         <AuthFooterLink
           prompt={t('alreadyHaveAccount')}

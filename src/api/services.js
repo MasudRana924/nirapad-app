@@ -10,19 +10,49 @@ export {apiRequest, ApiError, extractAuthPayload, createUuid} from './client';
 /**
  * Auth Services
  */
+const publicAuth = {skipAuth: true};
+
+const identifierBody = ({email, phone}) => (phone ? {phone} : {email});
+
 export const authService = {
-  register: (name, email, password) =>
-    apiRequest('/auth/register', 'POST', {name, email, password, role: 'USER'}),
+  register: ({name, email, phone, password}) =>
+    apiRequest(
+      '/auth/register',
+      'POST',
+      {name, password, role: 'USER', ...identifierBody({email, phone})},
+      false,
+      publicAuth,
+    ),
 
-  login: (email, password) =>
-    apiRequest('/auth/login', 'POST', {email, password}),
+  login: ({email, phone, password}) =>
+    apiRequest(
+      '/auth/login',
+      'POST',
+      {password, ...identifierBody({email, phone})},
+      false,
+      publicAuth,
+    ),
 
-  sendOtp: email => apiRequest('/auth/send-otp', 'POST', {email}),
+  sendOtp: email =>
+    apiRequest('/auth/send-otp', 'POST', {email}, false, publicAuth),
 
-  verifyOtp: (email, otp) =>
-    apiRequest('/auth/verify-otp', 'POST', {email, otp}),
+  verifyOtp: ({email, phone, otp}) =>
+    apiRequest(
+      '/auth/verify-otp',
+      'POST',
+      {otp, ...identifierBody({email, phone})},
+      false,
+      publicAuth,
+    ),
 
-  resendOtp: email => apiRequest('/auth/resend-otp', 'POST', {email}),
+  resendOtp: ({email, phone}) =>
+    apiRequest(
+      '/auth/resend-otp',
+      'POST',
+      identifierBody({email, phone}),
+      false,
+      publicAuth,
+    ),
 
   refreshToken: refreshToken =>
     apiRequest('/auth/refresh-token', 'POST', {refreshToken}),

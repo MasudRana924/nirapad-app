@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
   View,
@@ -15,63 +15,144 @@ import {API_CODES, getApiErrorMessage} from '../api/client';
 import {useAuth} from '../context/AuthContext';
 import {useAppModal} from '../contexts/ModalContext';
 import notificationService from '../services/notificationService';
-import {
-  EMAIL_NOT_SENT_MESSAGE,
-  getDevOtpHint,
-  isEmailSent,
-} from '../utils/otpHelpers';
+import {maskContact, normalizeBdPhone} from '../utils/phone';
 
 const OTP_LENGTH = 4;
+const RESEND_SECONDS = 60;
 
 const VerifyPhoneScreen = ({navigation, route}) => {
   const {t} = useTranslation();
+  const channel = route?.params?.channel === 'phone' ? 'phone' : 'email';
+  const rawValue =
+    route?.params?.value ||
+    route?.params?.email ||
+    route?.params?.phone ||
+    '';
+  const contactValue =
+    channel === 'phone' ? normalizeBdPhone(rawValue) : String(rawValue).trim();
+
   const [otp, setOtp] = useState(['', '', '', '']);
-  const [seconds, setSeconds] = useState(42);
+  const [seconds, setSeconds] = useState(RESEND_SECONDS);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-  const [devHint, setDevHint] = useState(
-    typeof __DEV__ !== 'undefined' && __DEV__
-      ? route?.params?.devOtpHint || null
-      : null,
-  );
+  const [otpError, setOtpError] = useState('');
   const inputs = useRef([]);
+  const verifyingRef = useRef(false);
   const {login} = useAuth();
   const {showError, showSuccess} = useAppModal();
-  const email = route?.params?.email || '';
 
   useEffect(() => {
-    if (seconds <= 0) {
-      return;
-    }
     const timer = setInterval(() => {
-      setSeconds(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setSeconds(prev => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
-  }, [seconds]);
+  }, []);
+
+  const handleVerify = useCallback(
+    async code => {
+      const enteredOtp = code || otp.join('');
+      if (enteredOtp.length !== OTP_LENGTH || verifyingRef.current) {
+        return;
+      }
+      if (!contactValue) {
+        showError(t('somethingWentWrong'));
+        return;
+      }
+
+      verifyingRef.current = true;
+      setOtpError('');
+      setLoading(true);
+      try {
+        const response = await verifyOtp({
+          otp: enteredOtp,
+          ...(channel === 'phone'
+            ? {phone: contactValue}
+            : {email: contactValue}),
+        });
+        const {token, refreshToken, user} = extractAuthPayload(response);
+        if (!token) {
+          showError(t('otpVerificationFailed'));
+          return;
+        }
+
+        await login(token, refreshToken, user);
+        await notificationService.initialize(token);
+        await notificationService.registerTokenWithServer(token);
+      } catch (error) {
+        if (error?.code === API_CODES.OTP_INVALID) {
+          setOtp(['', '', '', '']);
+          setOtpError(t('invalidOtpInline'));
+          inputs.current[0]?.focus();
+        } else if (
+          error?.code === API_CODES.NOT_FOUND ||
+          error?.statusCode === 404
+        ) {
+          showError(t('userNotFound'));
+          navigation?.navigate('Register');
+        } else if (
+          error?.code === API_CODES.CONFLICT ||
+          error?.statusCode === 409
+        ) {
+          showError(
+            getApiErrorMessage(error, t('accountAlreadyVerified')),
+          );
+          navigation?.navigate('Login');
+        } else if (
+          error?.code === API_CODES.TOO_MANY_REQUESTS ||
+          error?.statusCode === 429
+        ) {
+          showError(getApiErrorMessage(error, t('tooManyAttempts')));
+        } else {
+          showError(getApiErrorMessage(error, t('somethingWentWrong')));
+        }
+        console.error('Verify OTP error:', error);
+      } finally {
+        verifyingRef.current = false;
+        setLoading(false);
+      }
+    },
+    [channel, contactValue, login, navigation, otp, showError, t],
+  );
+
+  const applyDigits = digits => {
+    const chars = digits.replace(/[^0-9]/g, '').slice(0, OTP_LENGTH).split('');
+    const next = ['', '', '', ''];
+    chars.forEach((char, index) => {
+      next[index] = char;
+    });
+    setOtp(next);
+    setOtpError('');
+    if (chars.length === OTP_LENGTH) {
+      Keyboard.dismiss();
+      handleVerify(chars.join(''));
+    } else if (chars.length > 0) {
+      inputs.current[chars.length]?.focus();
+    }
+  };
 
   const handleOtpChange = (value, index) => {
     const numericValue = value.replace(/[^0-9]/g, '');
-    const newOtp = [...otp];
-
     if (!numericValue) {
-      newOtp[index] = '';
-      setOtp(newOtp);
+      const next = [...otp];
+      next[index] = '';
+      setOtp(next);
+      return;
+    }
+    if (numericValue.length > 1) {
+      applyDigits(numericValue);
       return;
     }
 
-    newOtp[index] = numericValue.charAt(numericValue.length - 1);
-    setOtp(newOtp);
+    const next = [...otp];
+    next[index] = numericValue;
+    setOtp(next);
+    setOtpError('');
 
     if (index < OTP_LENGTH - 1) {
       inputs.current[index + 1]?.focus();
     } else {
       Keyboard.dismiss();
+      handleVerify(next.join(''));
     }
   };
 
@@ -82,60 +163,39 @@ const VerifyPhoneScreen = ({navigation, route}) => {
   };
 
   const handleResend = async () => {
-    if (seconds > 0 || resending) {
+    if (seconds > 0 || resending || !contactValue) {
       return;
     }
     setResending(true);
     try {
-      const response = await resendOtp(email);
-      if (!isEmailSent(response)) {
-        showError(EMAIL_NOT_SENT_MESSAGE, t('emailNotSent'));
-        return;
-      }
-      setSeconds(42);
-      setDevHint(getDevOtpHint(response));
-      showSuccess(t('otpResent'));
-    } catch (error) {
-      showError(
-        getApiErrorMessage(error, t('somethingWentWrong')),
+      const response = await resendOtp(
+        channel === 'phone' ? {phone: contactValue} : {email: contactValue},
       );
+      setSeconds(RESEND_SECONDS);
+      setOtp(['', '', '', '']);
+      setOtpError('');
+      showSuccess(response?.message || t('otpResent'));
+    } catch (error) {
+      const message = getApiErrorMessage(error, t('somethingWentWrong'));
+      const waitMatch = String(message).match(/(\d+)/);
+      if (
+        error?.code === API_CODES.TOO_MANY_REQUESTS ||
+        error?.statusCode === 429
+      ) {
+        const wait = waitMatch ? Number(waitMatch[1]) : RESEND_SECONDS;
+        if (wait > 0) {
+          setSeconds(wait);
+        }
+      }
+      showError(message);
       console.error('Resend OTP error:', error);
     } finally {
       setResending(false);
     }
   };
 
-  const handleVerify = async () => {
-    const enteredOtp = otp.join('');
-    if (enteredOtp.length !== OTP_LENGTH) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await verifyOtp(email, enteredOtp);
-      const {token, refreshToken, user} = extractAuthPayload(response);
-      if (!token) {
-        showError(t('otpVerificationFailed'));
-        return;
-      }
-
-      await login(token, refreshToken, user);
-      await notificationService.initialize(token);
-      await notificationService.registerTokenWithServer(token);
-    } catch (error) {
-      const fallback =
-        error?.code === API_CODES.OTP_INVALID
-          ? t('invalidOtp')
-          : t('somethingWentWrong');
-      showError(getApiErrorMessage(error, fallback));
-      console.error('❌ Verify OTP error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const isOtpComplete = otp.every(value => value !== '');
+  const masked = maskContact(channel, contactValue);
 
   return (
     <>
@@ -144,8 +204,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         showBack
         onBack={() => navigation?.goBack()}
         title={t('verifyOtp')}
-        subtitle={t('enterOtpSubtitle')}
-        extra={email ? <Text style={styles.emailText}>{email}</Text> : null}>
+        subtitle={t('enterOtpSentTo', {target: masked})}>
         <View style={styles.otpContainer}>
           {otp.map((value, index) => (
             <TextInput
@@ -157,17 +216,19 @@ const VerifyPhoneScreen = ({navigation, route}) => {
               onChangeText={text => handleOtpChange(text, index)}
               onKeyPress={event => handleKeyPress(event, index)}
               keyboardType="number-pad"
-              maxLength={1}
+              maxLength={index === 0 ? OTP_LENGTH : 1}
               textAlign="center"
               selectionColor="#008178"
+              autoComplete="off"
+              textContentType="none"
+              importantForAutofill="no"
               style={[styles.otpInput, value ? styles.otpInputFilled : null]}
             />
           ))}
         </View>
 
-        {!!devHint && (
-          <Text style={styles.devHint}>Dev only — API otp: {devHint}</Text>
-        )}
+        {otpError ? <Text style={styles.otpError}>{otpError}</Text> : null}
+        <Text style={styles.hint}>{t('useCodeHint')}</Text>
 
         <View style={styles.resendRow}>
           <Text style={styles.resendText}>{t('didntGetCode')}</Text>
@@ -192,7 +253,8 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         <AuthPrimaryButton
           title={t('verify')}
           disabled={!isOtpComplete || loading}
-          onPress={handleVerify}
+          loading={loading}
+          onPress={() => handleVerify()}
         />
       </AuthLayout>
     </>
@@ -202,12 +264,6 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 export default VerifyPhoneScreen;
 
 const styles = StyleSheet.create({
-  emailText: {
-    marginTop: 4,
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1B3330',
-  },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -233,11 +289,17 @@ const styles = StyleSheet.create({
     borderColor: '#008178',
     backgroundColor: '#FFFFFF',
   },
-  devHint: {
+  otpError: {
+    marginTop: 4,
+    textAlign: 'center',
+    fontSize: 13,
+    color: '#C0392B',
+  },
+  hint: {
     marginTop: 8,
     marginBottom: 4,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 13,
     color: '#7B9390',
   },
   resendRow: {
