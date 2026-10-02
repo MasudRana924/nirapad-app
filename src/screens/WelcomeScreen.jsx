@@ -22,21 +22,32 @@ const WelcomeScreen = ({navigation}) => {
 
   const steps = [
     {
+      image: require('../assets/welcome-family.jpg'),
       heading: t('welcomeHeading1'),
       headingBlue: t('welcomeHeadingBlue1'),
       description: t('welcomeDesc1'),
     },
     {
+      image: require('../assets/welcome-nurse.jpg'),
       heading: t('welcomeHeading2'),
       headingBlue: t('welcomeHeadingBlue2'),
       description: t('welcomeDesc2'),
     },
     {
+      image: require('../assets/welcome-physio.jpg'),
       heading: t('welcomeHeading3'),
       headingBlue: t('welcomeHeadingBlue3'),
       description: t('welcomeDesc3'),
     },
+    {
+      image: require('../assets/welcome-medicine.jpg'),
+      heading: t('welcomeHeading4'),
+      headingBlue: t('welcomeHeadingBlue4'),
+      description: t('welcomeDesc4'),
+    },
   ];
+
+  const lastStep = steps.length - 1;
 
   const handleGetStarted = async () => {
     try {
@@ -49,13 +60,13 @@ const WelcomeScreen = ({navigation}) => {
   };
 
   const handleNext = () => {
-    if (currentStep < 2) {
+    if (currentStep < lastStep) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handleSkip = () => {
-    setCurrentStep(2);
+    setCurrentStep(lastStep);
   };
 
   const currentStepData = steps[currentStep];
@@ -71,7 +82,7 @@ const WelcomeScreen = ({navigation}) => {
       {/* Step Indicators and Skip */}
       <View style={styles.stepIndicatorsTop} pointerEvents="box-none">
         <View style={styles.stepIndicatorsRow}>
-          {[0, 1, 2].map(step => (
+          {steps.map((_, step) => (
             <View
               key={step}
               style={[
@@ -81,7 +92,7 @@ const WelcomeScreen = ({navigation}) => {
             />
           ))}
         </View>
-        {currentStep < 2 ? (
+        {currentStep < lastStep ? (
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.skipButtonTop}
@@ -95,7 +106,7 @@ const WelcomeScreen = ({navigation}) => {
 
       {/* Background Image */}
       <Image
-        source={require('../assets/welcome-family.jpg')}
+        source={currentStepData.image}
         style={styles.heroImage}
         resizeMode="cover"
       />
@@ -134,13 +145,13 @@ const WelcomeScreen = ({navigation}) => {
 
           {/* Buttons */}
           <View style={styles.buttonSection}>
-            {currentStep === 2 ? (
+            {currentStep === lastStep ? (
               <PrimaryButton title={t('getStarted')} onPress={handleGetStarted} />
             ) : (
               <PrimaryButton title={t('next')} onPress={handleNext} />
             )}
 
-            {currentStep === 2 && (
+            {currentStep === lastStep && (
               <PrimaryButton
                 title={t('iAlreadyHaveAccount')}
                 variant="secondary"
@@ -151,7 +162,7 @@ const WelcomeScreen = ({navigation}) => {
           </View>
 
           {/* Terms */}
-          {currentStep === 2 && (
+          {currentStep === lastStep && (
             <View style={styles.termsContainer}>
               <Text style={styles.termsText}>
                 {t('byContinuingYouAgree')}
@@ -248,7 +259,7 @@ const styles = StyleSheet.create({
   },
 
   stepIndicator: {
-    width: 56,
+    width: 40,
     height: 4,
     borderRadius: 2,
     backgroundColor: '#D1D5DB',
@@ -257,7 +268,7 @@ const styles = StyleSheet.create({
 
   stepIndicatorActive: {
     backgroundColor: '#008178',
-    width: 56,
+    width: 40,
   },
 
   skipButtonTop: {
