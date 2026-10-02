@@ -304,6 +304,17 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                               t('noLocation', 'No location')}
                           </Text>
                         </View>
+
+                        {rate != null && rate !== '' ? (
+                          <Text style={styles.price}>
+                            ৳{formatRate(rate)}
+                            <Text style={styles.perHour}> {t('perDay', '/ hr')}</Text>
+                          </Text>
+                        ) : null}
+                      </View>
+
+                      <View style={[styles.radio, isSelected && styles.radioActive]}>
+                        {isSelected ? <View style={styles.radioDot} /> : null}
                       </View>
                     </View>
 
@@ -326,42 +337,6 @@ const SelectCaregiverScreen = ({navigation, route}) => {
                         )}
                       </View>
                     )}
-
-                    <View style={styles.cardFooter}>
-                      {rate != null && rate !== '' ? (
-                        <View style={styles.priceBlock}>
-                          <View style={styles.rateIcon}>
-                            <Icon name="cash-outline" size={16} color={TEAL} />
-                          </View>
-                          <View>
-                            <Text style={styles.rateLabel}>{t('rate', 'Rate')}</Text>
-                            <Text style={styles.price}>
-                              ৳{formatRate(rate)}
-                              <Text style={styles.perHour}> {t('perDay', '/ hr')}</Text>
-                            </Text>
-                          </View>
-                        </View>
-                      ) : (
-                        <View style={styles.priceBlock} />
-                      )}
-
-                      <View
-                        style={[
-                          styles.selectPill,
-                          isSelected && styles.selectPillActive,
-                        ]}>
-                        <Text
-                          style={[
-                            styles.selectPillText,
-                            isSelected && styles.selectPillTextActive,
-                          ]}>
-                          {isSelected ? t('selected', 'Selected') : t('select', 'Select')}
-                        </Text>
-                        {!isSelected ? (
-                          <Icon name="chevron-forward-sharp" size={14} color="#FFFFFF" />
-                        ) : null}
-                      </View>
-                    </View>
                   </TouchableOpacity>
                 );
               })}
@@ -374,11 +349,26 @@ const SelectCaregiverScreen = ({navigation, route}) => {
             styles.bottomContainer,
             {paddingBottom: Math.max(16, insets.bottom + 8)},
           ]}>
-          <PrimaryButton
-            title={t('next', 'Next')}
-            onPress={handleNext}
-            disabled={!selectedCaregiver}
-          />
+          {selectedCaregiver ? (
+            <View style={styles.bottomButton}>
+              <PrimaryButton
+                variant="secondary"
+                title={t('seeDetails', 'See Details')}
+                onPress={() =>
+                  navigation?.navigate('CaregiverDetails', {
+                    caregiver: selectedCaregiver,
+                  })
+                }
+              />
+            </View>
+          ) : null}
+          <View style={styles.bottomButton}>
+            <PrimaryButton
+              title={t('next', 'Next')}
+              onPress={handleNext}
+              disabled={!selectedCaregiver}
+            />
+          </View>
         </View>
       </SafeAreaView>
     </View>
@@ -679,71 +669,48 @@ const styles = StyleSheet.create({
     color: TEAL,
     fontWeight: '600',
   },
-  cardFooter: {
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F4F3',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  priceBlock: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  rateIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: '#E8F6F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rateLabel: {
-    fontSize: 11,
-    color: MUTED,
-    marginBottom: 1,
-  },
   price: {
+    marginTop: 4,
     fontSize: 16,
     fontWeight: '800',
     color: INK,
+  },
+  radio: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: '#C5D4D0',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+    marginTop: 2,
+  },
+  radioActive: {
+    borderColor: TEAL,
+  },
+  radioDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: TEAL,
   },
   perHour: {
     fontSize: 13,
     fontWeight: '500',
     color: MUTED,
   },
-  selectPill: {
-    minWidth: 96,
-    height: 36,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: TEAL,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 6,
-  },
-  selectPillActive: {
-    backgroundColor: TEAL,
-  },
-  selectPillText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  selectPillTextActive: {
-    color: '#FFFFFF',
-  },
   bottomContainer: {
     width: '100%',
+    flexDirection: 'row',
+    gap: 12,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
     paddingTop: 12,
+  },
+  bottomButton: {
+    flex: 1,
   },
   nextButton: {
     backgroundColor: TEAL,

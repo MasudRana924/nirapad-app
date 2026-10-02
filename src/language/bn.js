@@ -106,6 +106,7 @@ export default {
   viewStatus: 'স্ট্যাটাস দেখুন',
   trackLive: 'লাইভ ট্র্যাক করুন',
   viewDetails: 'বিস্তারিত দেখুন',
+  seeDetails: 'বিস্তারিত দেখুন',
 
   // Home - Empty Active Booking
   noActiveBooking: 'কোনো সক্রিয় বুকিং নেই',

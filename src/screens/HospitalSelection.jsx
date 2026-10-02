@@ -163,37 +163,17 @@ const HospitalSelection = ({navigation, route}) => {
                           </View>
                         )}
 
-                        <Text style={styles.name} numberOfLines={2}>
-                          {hospital.name}
-                        </Text>
-                      </View>
-
-                      <View style={styles.infoRow}>
-                        <Icon name="star" size={13} color="#F6A900" />
-                        <Text style={styles.infoText}>
-                          {formatRating(hospital.rating)}
-                          {hospital.completed_bookings != null
-                            ? ` (${hospital.completed_bookings})`
-                            : ' (0)'}
-                          {hospital.type ? `  ·  ${hospital.type}` : ''}
-                        </Text>
-                      </View>
-
-                      <View style={styles.infoRow}>
-                        <Icon name="location-outline" size={13} color={MUTED} />
-                        <Text style={styles.infoText} numberOfLines={1}>
-                          {locationLine || hospital.address || 'No location'}
-                        </Text>
-                      </View>
-
-                      {!!hospital.address && (
-                        <View style={styles.addressRow}>
-                          <Icon name="notifications-outline" size={15} color={MUTED} />
-                          <Text style={styles.addressText} numberOfLines={2}>
-                            {hospital.address}
+                        <View style={styles.nameBlock}>
+                          <Text style={styles.name} numberOfLines={2}>
+                            {hospital.name}
                           </Text>
+                          {!!hospital.address && (
+                            <Text style={styles.addressText} numberOfLines={2}>
+                              {hospital.address}
+                            </Text>
+                          )}
                         </View>
-                      )}
+                      </View>
                     </View>
 
                     <View style={styles.radioButton}>
@@ -312,7 +292,6 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
   },
   hospitalImage: {
     width: 40,
@@ -350,18 +329,14 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: MUTED,
   },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F4F3',
+  nameBlock: {
+    flex: 1,
+    minWidth: 0,
   },
   addressText: {
-    flex: 1,
+    marginTop: 2,
     fontSize: 13,
+    lineHeight: 18,
     color: MUTED,
   },
   radioButton: {

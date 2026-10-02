@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Loader from '../components/common/Loader';
+import CustomLoader from '../components/common/CustomLoader';
 import SearchableDropdown from '../components/common/SearchableDropdown';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useAddFamilyMember, useUpdateFamilyMember} from '../api/mutations';
@@ -182,7 +182,7 @@ const AddFamilyMember = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <Loader visible={isPending} />
+      <CustomLoader overlay visible={isPending} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}>
@@ -246,7 +246,6 @@ const AddFamilyMember = ({navigation, route}) => {
             title={isEditMode ? t('updateMember') : t('addMember')}
             onPress={handleSubmit}
             disabled={isPending}
-            loading={isPending}
           />
         </View>
       </KeyboardAvoidingView>

@@ -106,6 +106,7 @@ export default {
   viewStatus: 'View status',
   trackLive: 'Track live',
   viewDetails: 'View details',
+  seeDetails: 'See Details',
 
   // Home - Empty Active Booking
   noActiveBooking: 'No active booking',
