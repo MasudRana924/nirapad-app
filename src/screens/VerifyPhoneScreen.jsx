@@ -8,7 +8,7 @@ import {
   TextInput,
   Keyboard,
 } from 'react-native';
-import Loader from '../components/common/Loader';
+import CustomLoader from '../components/common/CustomLoader';
 import AuthLayout, {AuthPrimaryButton} from '../components/auth/AuthLayout';
 import {verifyOtp, resendOtp, extractAuthPayload} from '../services/api';
 import {API_CODES, getApiErrorMessage} from '../api/client';
@@ -199,7 +199,7 @@ const VerifyPhoneScreen = ({navigation, route}) => {
 
   return (
     <>
-      <Loader visible={loading} />
+      <CustomLoader overlay visible={loading} />
       <AuthLayout
         showBack
         onBack={() => navigation?.goBack()}
@@ -253,7 +253,6 @@ const VerifyPhoneScreen = ({navigation, route}) => {
         <AuthPrimaryButton
           title={t('verify')}
           disabled={!isOtpComplete || loading}
-          loading={loading}
           onPress={() => handleVerify()}
         />
       </AuthLayout>
