@@ -18,8 +18,6 @@ import {useTranslation} from 'react-i18next';
 const AllCaregiversScreen = ({navigation}) => {
   const {t} = useTranslation();
   const [search, setSearch] = useState('');
-  const [location, setLocation] = useState('');
-  const [gender, setGender] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
 
   const filters = [
@@ -30,7 +28,6 @@ const AllCaregiversScreen = ({navigation}) => {
 
   const {data: caregiversData, isLoading} = useSearchCaregivers({
     name: search,
-    location,
     gender: selectedFilter === 'all' ? '' : selectedFilter,
   });
 
@@ -66,21 +63,6 @@ const AllCaregiversScreen = ({navigation}) => {
               style={styles.searchInput}
             />
           </View>
-          <TouchableOpacity style={styles.filterButton}>
-            <Icon name="options-outline" size={22} color="#1473DC" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Location Filter */}
-        <View style={styles.locationFilter}>
-          <Icon name="location-outline" size={18} color="#7D8BA5" />
-          <TextInput
-            value={location}
-            onChangeText={setLocation}
-            placeholder={t('filter')}
-            placeholderTextColor="#7D8BA5"
-            style={styles.locationInput}
-          />
         </View>
 
         {/* ================= FILTERS ================= */}
@@ -237,7 +219,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 14,
-    marginRight: 10,
 
     borderColor: '#D4DCDA',
 
@@ -249,39 +230,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 14,
     color: '#172333',
-  },
-
-  filterButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#E9F1FC',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // ================= LOCATION FILTER =================
-  locationFilter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    paddingHorizontal: 14,
-    height: 44,
-    backgroundColor: '#F5F7FA',
-    borderRadius: 12,
-  },
-
-  locationInput: {
-
-    backgroundColor: '#FFFFFF',
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#172333',
-
-    borderColor: '#D4DCDA',
-
-    borderWidth: 1,
   },
 
   // =====================================================
@@ -297,12 +245,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     marginRight: 8,
   },
 
   activeFilter: {
     backgroundColor: '#008178',
+    borderColor: '#008178',
   },
 
   filterText: {

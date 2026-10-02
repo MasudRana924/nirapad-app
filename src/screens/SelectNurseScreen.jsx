@@ -12,53 +12,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from 'react-i18next';
 import Header from '../components/common/Header';
-
-const nurses = [
-  {
-    id: 1,
-    name: 'Sumaiya Begum',
-    image: 'https://randomuser.me/api/portraits/women/68.jpg',
-    rating: '4.8',
-    jobs: '87 jobs',
-    experience: '3 yrs',
-    distance: '2.1 km',
-    price: '৳700',
-    tags: ['Home Care', 'ICU'],
-  },
-  {
-    id: 2,
-    name: 'Nasrin Akter',
-    image: 'https://randomuser.me/api/portraits/women/55.jpg',
-    rating: '4.7',
-    jobs: '65 jobs',
-    experience: '2 yrs',
-    distance: '3.5 km',
-    price: '৳650',
-    tags: ['Elderly', 'Recovery'],
-  },
-  {
-    id: 3,
-    name: 'Ruma Islam',
-    image: 'https://randomuser.me/api/portraits/women/42.jpg',
-    rating: '4.6',
-    jobs: '54 jobs',
-    experience: '2 yrs',
-    distance: '1.9 km',
-    price: '৳600',
-    tags: ['Hospital', 'Pediatric'],
-  },
-  {
-    id: 4,
-    name: 'Khaleda Begum',
-    image: 'https://randomuser.me/api/portraits/women/38.jpg',
-    rating: '4.5',
-    jobs: '42 jobs',
-    experience: '1 yr',
-    distance: '4.2 km',
-    price: '৳550',
-    tags: ['Post-Surgery', 'Dialysis'],
-  },
-];
+import {NURSES as nurses} from '../data/nurses';
 
 const SelectNurseScreen = ({navigation}) => {
   const {t} = useTranslation();

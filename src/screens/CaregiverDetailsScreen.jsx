@@ -7,15 +7,15 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useCaregiver} from '../api/queries';
 import {useTranslation} from 'react-i18next';
 import Header from '../components/common/Header';
+import PrimaryButton from '../components/common/PrimaryButton';
 
 const CaregiverDetailsScreen = ({navigation, route}) => {
   const {t} = useTranslation();
-  const insets = useSafeAreaInsets();
   const routeCaregiver = route?.params?.caregiver || {};
   const caregiverId = routeCaregiver.id || route?.params?.caregiverId;
   const shouldFetch =
@@ -248,24 +248,17 @@ const CaregiverDetailsScreen = ({navigation, route}) => {
             </Text>
           </View>
         </View>
-
-        {/* Bottom spacing for fixed button */}
-        <View style={[styles.bottomSpace, {height: 65 + insets.bottom}]} />
       </ScrollView>
 
-      {/* =====================================================
-          FIXED BOOK BUTTON
-      ===================================================== */}
-
-      <View style={[styles.bottomBar, {bottom: insets.bottom}]}>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.bookButton}
-          onPress={() => navigation?.navigate('SelectFamilyMember', {selectedCaregiver: caregiver})}>
-          <Icon name="calendar-outline" size={19} color="#FFFFFF" />
-
-          <Text style={styles.bookButtonText}>{t('bookNow')} {caregiver.name} — {caregiver.price}{t('perDay', '/visit')}</Text>
-        </TouchableOpacity>
+      <View style={styles.bottomContainer}>
+        <PrimaryButton
+          title={t('bookNow', 'Book Now')}
+          onPress={() =>
+            navigation?.navigate('SelectFamilyMember', {
+              selectedCaregiver: caregiver,
+            })
+          }
+        />
       </View>
     </SafeAreaView>
   );
@@ -667,37 +660,11 @@ const styles = StyleSheet.create({
   // BOTTOM SPACE
   // =======================================================
 
-  bottomSpace: {
-    height: 65,
-  },
-
-  // =======================================================
-  // FIXED BOOK BUTTON
-  // =======================================================
-
-  bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 9,
-  },
-
-  bookButton: {
+  bottomContainer: {
     width: '100%',
-    height: 60,
-    borderRadius: 14,
-    backgroundColor: '#008178',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  bookButtonText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-    marginLeft: 6,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
 });

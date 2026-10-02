@@ -147,6 +147,8 @@ export default {
   yourFamily: 'Your Family',
   manageFamilyHint: 'Manage your family members and their care needs.',
   homeFamilyMembers: 'Family Members',
+  homeCaregiversTitle: 'Caregivers',
+  homeNursesTitle: 'Nurses',
   viewAndManage: 'View & manage',
   homeAddMember: 'Add Member',
   includeALovedOne: 'Include a loved one',

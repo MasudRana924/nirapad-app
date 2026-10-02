@@ -147,6 +147,8 @@ export default {
   yourFamily: 'আপনার পরিবার',
   manageFamilyHint: 'পরিবারের সদস্য ও তাদের যত্নের প্রয়োজন দেখুন।',
   homeFamilyMembers: 'পরিবারের সদস্য',
+  homeCaregiversTitle: 'কেয়ারগিভার',
+  homeNursesTitle: 'নার্স',
   viewAndManage: 'দেখুন ও পরিচালনা করুন',
   homeAddMember: 'সদস্য যোগ',
   includeALovedOne: 'একজন প্রিয়জনকে যোগ করুন',
