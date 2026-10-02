@@ -37,8 +37,8 @@ const AuthLayout = ({
       <StatusBar barStyle="dark-content" backgroundColor={PAGE} />
       <View pointerEvents="none" style={styles.blobTop} />
       <View pointerEvents="none" style={styles.blobTopSoft} />
-      <View pointerEvents="none" style={styles.blobBottomLeft} />
-      <View pointerEvents="none" style={styles.blobBottomRight} />
+      {/* <View pointerEvents="none" style={styles.blobBottomLeft} /> */}
+      {/* <View pointerEvents="none" style={styles.blobBottomRight} /> */}
 
       {/* Language switch pinned to top-right, below status bar / notch */}
       {langSwitch ? (
