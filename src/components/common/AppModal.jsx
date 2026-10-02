@@ -8,7 +8,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 /**
@@ -64,21 +64,21 @@ const AppModal = ({
         return (
           <View style={[styles.iconCircle, {backgroundColor: '#E1F5ED'}]}>
             <Animated.View style={{transform: [{scale: iconScale}]}}>
-              <Icon name="check" size={28} color="#008178" />
+              <Icon name="checkmark" size={30} color="#008178" />
             </Animated.View>
           </View>
         );
       case 'confirm':
         return (
           <View style={[styles.iconCircle, {backgroundColor: '#FEF3C7'}]}>
-            <Icon name="help-circle" size={28} color="#F59E0B" />
+            <Icon name="help-circle-outline" size={30} color="#F59E0B" />
           </View>
         );
       case 'error':
       default:
         return (
           <View style={[styles.iconCircle, {backgroundColor: '#FEE2E2'}]}>
-            <Icon name="alert-circle" size={28} color="#DC2626" />
+            <Icon name="alert-circle-outline" size={30} color="#DC2626" />
           </View>
         );
     }
