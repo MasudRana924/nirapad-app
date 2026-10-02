@@ -200,15 +200,7 @@ const CheckoutScreen = ({navigation, route}) => {
         </ScrollView>
 
         <View style={styles.bottomBar}>
-          <View>
-            <Text style={styles.bottomLabel}>{t('totalCost')}</Text>
-            <Text style={styles.bottomPrice}>৳{total}</Text>
-          </View>
-          <PrimaryButton
-            title={t('placeOrder')}
-            onPress={handlePlaceOrder}
-            style={styles.placeBtn}
-          />
+          <PrimaryButton title={t('placeOrder')} onPress={handlePlaceOrder} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -270,10 +262,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   noteInput: {
-    backgroundColor: '#FFFFFF',
     height: '100%',
-    borderColor: '#D4DCDA',
-    borderWidth: 1,
   },
   paymentCard: {
     flexDirection: 'row',
@@ -392,31 +381,9 @@ const styles = StyleSheet.create({
     color: '#008178',
   },
   bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
     backgroundColor: '#FFFFFF',
-  },
-  bottomLabel: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginBottom: 2,
-  },
-  bottomPrice: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111820',
-  },
-  placeBtn: {
-    height: 48,
-    width: undefined,
-    minWidth: 140,
-    paddingHorizontal: 22,
-    borderRadius: 14,
   },
 });

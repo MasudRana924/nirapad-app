@@ -165,10 +165,6 @@ const CartScreen = ({navigation, route}) => {
 
       {cartItems.length > 0 && (
         <View style={styles.bottomBar}>
-          <View>
-            <Text style={styles.bottomLabel}>{t('totalCost')}</Text>
-            <Text style={styles.bottomPrice}>৳{totalPrice + 50}</Text>
-          </View>
           <TouchableOpacity
             activeOpacity={0.85}
             style={styles.checkoutBtn}
@@ -369,33 +365,18 @@ const styles = StyleSheet.create({
     color: '#008178',
   },
   bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
     backgroundColor: '#FFFFFF',
   },
-  bottomLabel: {
-    fontSize: 12,
-    color: '#8190A7',
-    marginBottom: 2,
-  },
-  bottomPrice: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111820',
-  },
   checkoutBtn: {
-    height: 48,
-    paddingHorizontal: 20,
-    borderRadius: 14,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: '#008178',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
   },
   checkoutBtnText: {

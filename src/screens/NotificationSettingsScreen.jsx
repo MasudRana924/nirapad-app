@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Switch, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import Toggle from '../components/common/Toggle';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Header from '../components/common/Header';
@@ -76,14 +77,7 @@ const NotificationSettingsScreen = ({navigation}) => {
         </View>
 
         <View style={styles.switchWrap}>
-          <Switch
-            value={muted}
-            onValueChange={handleToggle}
-            trackColor={{false: '#D1D5DB', true: '#7BC9C3'}}
-            thumbColor={muted ? '#008178' : '#F4F4F5'}
-            ios_backgroundColor="#E5E7EB"
-            style={styles.switch}
-          />
+          <Toggle value={muted} onValueChange={handleToggle} disabled={saving} />
         </View>
       </View>
 
@@ -105,7 +99,9 @@ const styles = StyleSheet.create({
   card: {
     marginTop: 12,
     marginHorizontal: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     borderRadius: 16,
     padding: 14,
     flexDirection: 'row',
@@ -128,9 +124,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 8,
-  },
-  switch: {
-    transform: [{scaleX: 1.05}, {scaleY: 1.05}],
   },
   title: {
     fontSize: 15,

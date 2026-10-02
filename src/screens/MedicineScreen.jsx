@@ -277,9 +277,10 @@ const MedicineScreen = ({navigation}) => {
                       <TouchableOpacity
                         activeOpacity={0.85}
                         style={styles.addBtn}
+                        accessibilityLabel={t('addToCart')}
+                        hitSlop={{top: 6, bottom: 6, left: 6, right: 6}}
                         onPress={() => addToCart(medicine)}>
-                        <Icon name="add" size={16} color="#FFFFFF" />
-                        <Text style={styles.addBtnText}>{t('addToCart')}</Text>
+                        <Icon name="cart-outline" size={18} color="#FFFFFF" />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -486,17 +487,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 32,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#008178',
-    gap: 4,
-  },
-  addBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

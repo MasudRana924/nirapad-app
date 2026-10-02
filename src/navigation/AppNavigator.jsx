@@ -123,7 +123,7 @@ function MainTabs() {
     <Icon
       name={iconName}
       size={21}
-      color={focused ? '#FFFFFF' : '#8A9290'}
+      color={focused ? '#FFFFFF' : '#C9D1CF'}
     />
   );
 
@@ -296,10 +296,11 @@ const tabStyles = StyleSheet.create({
     marginTop: 3,
     fontSize: 10,
     fontWeight: '600',
-    color: '#8A9290',
+    color: '#C9D1CF',
   },
   labelActive: {
     color: '#FFFFFF',
+    fontWeight: '700',
   },
   chatButton: {
     width: 46,
