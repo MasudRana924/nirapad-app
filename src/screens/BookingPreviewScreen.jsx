@@ -57,6 +57,18 @@ const Row = ({label, value, last}) => (
   </View>
 );
 
+const Section = ({icon, title, children, first}) => (
+  <View style={[styles.section, first && styles.sectionFirst]}>
+    <View style={styles.cardHeader}>
+      <View style={styles.iconTile}>
+        <Icon name={icon} size={16} color="#008178" />
+      </View>
+      <Text style={styles.cardTitle}>{title}</Text>
+    </View>
+    {children}
+  </View>
+);
+
 const BookingPreviewScreen = ({navigation, route}) => {
   const {
     selectedMember,
@@ -212,10 +224,7 @@ const BookingPreviewScreen = ({navigation, route}) => {
         </Text>
 
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Icon name="person-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>{t('patient', 'Care recipient')}</Text>
-          </View>
+        <Section first icon="person-outline" title={t('patient', 'Care recipient')}>
           <Row label={t('name', 'Name')} value={selectedMember?.name} />
           <Row
             label={t('relationship', 'Relation')}
@@ -224,18 +233,16 @@ const BookingPreviewScreen = ({navigation, route}) => {
             }
             last
           />
+        </Section>
 
-          <View style={styles.sectionHeader}>
-            <Icon name="grid-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>{t('service', 'Service')}</Text>
-          </View>
+        <Section icon="grid-outline" title={t('service', 'Service')}>
           <Row label={t('type', 'Type')} value={selectedService?.title} />
           <Row label={t('rate', 'Rate')} value={selectedService?.priceLabel} last />
+        </Section>
 
-          <View style={styles.sectionHeader}>
-            <Icon name="medkit-outline" size={18} color="#008178" />
-            <Text style={styles.cardTitle}>{t('caregiverDetails', 'Care provider')}</Text>
-          </View>
+        <Section
+          icon="medkit-outline"
+          title={t('caregiverDetails', 'Care provider')}>
           <Row label={t('name', 'Name')} value={selectedCaregiver?.name} />
           <Row
             label={t('experience', 'Experience')}
@@ -246,37 +253,30 @@ const BookingPreviewScreen = ({navigation, route}) => {
             }
             last
           />
+        </Section>
 
         {!!selectedHospital?.name && (
-          <View>
-            <View style={styles.sectionHeader}>
-              <Icon name="business-outline" size={18} color="#008178" />
-              <Text style={styles.cardTitle}>{t('hospital', 'Hospital')}</Text>
-            </View>
+          <Section icon="business-outline" title={t('hospital', 'Hospital')}>
             <Row label={t('name', 'Name')} value={selectedHospital.name} last />
-          </View>
+          </Section>
         )}
 
-        <View style={styles.sectionHeader}>
-          <Icon name="location-outline" size={18} color="#008178" />
-          <Text style={styles.cardTitle}>{t('location', 'Location')}</Text>
-        </View>
-        <Row label={t('address', 'Address')} value={locationText} last />
+        <Section icon="location-outline" title={t('location', 'Location')}>
+          <Row label={t('address', 'Address')} value={locationText} last />
+        </Section>
 
-        <View style={styles.sectionHeader}>
-          <Icon name="calendar-outline" size={18} color="#008178" />
-          <Text style={styles.cardTitle}>{t('schedule', 'Schedule')}</Text>
-        </View>
-        <Row label={t('dateAndTime', 'Date and time')} value={scheduleText} last />
+        <Section icon="calendar-outline" title={t('schedule', 'Schedule')}>
+          <Row
+            label={t('dateAndTime', 'Date and time')}
+            value={scheduleText}
+            last
+          />
+        </Section>
 
         {!!notes && (
-          <View>
-            <View style={styles.sectionHeader}>
-              <Icon name="document-text-outline" size={18} color="#008178" />
-              <Text style={styles.cardTitle}>{t('notes', 'Notes')}</Text>
-            </View>
+          <Section icon="document-text-outline" title={t('notes', 'Notes')}>
             <Row label={t('notes', 'Notes')} value={notes} last />
-          </View>
+          </Section>
         )}
 
         <View style={styles.pricingSummary}>
@@ -326,55 +326,73 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   card: {
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
+    paddingHorizontal: 16,
+    paddingVertical: 4,
     marginBottom: 12,
+  },
+  section: {
+    paddingVertical: 14,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F4F3',
+  },
+  sectionFirst: {
+    borderTopWidth: 0,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 16,
+    gap: 10,
     marginBottom: 4,
+  },
+  iconTile: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    backgroundColor: '#E8F6F2',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cardTitle: {
     fontSize: 15,
-    fontWeight: '700',
-    color: '#111820',
+    fontWeight: '600',
+    color: '#172824',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingVertical: 8,
-    gap: 12,
+    paddingVertical: 7,
+    gap: 16,
   },
   rowLast: {
     paddingBottom: 0,
   },
   rowLabel: {
     fontSize: 13,
-    color: '#8190A7',
+    lineHeight: 19,
+    color: '#8A9A97',
   },
   rowValue: {
     flex: 1,
     textAlign: 'right',
     fontSize: 14,
-    fontWeight: '600',
-    color: '#111820',
+    lineHeight: 19,
+    fontWeight: '500',
+    color: '#2E3F3B',
   },
   pricingSummary: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 16,
+    backgroundColor: '#F1F9F7',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 12,
   },
   pricingCopy: {
     flex: 1,
@@ -382,18 +400,18 @@ const styles = StyleSheet.create({
   },
   pricingLabel: {
     fontSize: 13,
+    fontWeight: '500',
     color: '#008178',
-    marginBottom: 4,
   },
   pricingValue: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111820',
+    color: '#0B6E65',
   },
   pricingNote: {
-    marginTop: 4,
+    marginTop: 3,
     fontSize: 12,
-    color: '#8190A7',
+    color: '#8A9A97',
   },
   bottomContainer: {
     paddingHorizontal: 20,

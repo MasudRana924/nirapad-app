@@ -184,7 +184,11 @@ const InboxScreen = ({navigation}) => {
                   emergency && styles.cardEmergency,
                 ]}
                 onPress={() => handleNotificationPress(notification)}>
-                <View style={styles.iconWrap}>
+                <View
+                  style={[
+                    styles.iconWrap,
+                    !unread && !emergency && styles.iconWrapRead,
+                  ]}>
                   <Icon
                     name={getNotificationIcon(notification.type)}
                     size={20}
@@ -275,13 +279,16 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E6ECEB',
     borderRadius: 16,
     padding: 14,
     marginBottom: 10,
   },
   cardUnread: {
     backgroundColor: '#E6F4F3',
+    borderColor: '#E6F4F3',
   },
   cardEmergency: {
     backgroundColor: '#FEF2F2',
@@ -315,6 +322,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+  },
+  iconWrapRead: {
+    backgroundColor: '#E8F6F2',
   },
   content: {
     flex: 1,

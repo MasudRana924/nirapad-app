@@ -67,7 +67,7 @@ const BookingConfirmedScreen = ({navigation, route}) => {
 
         <View style={styles.spacer} />
 
-        <PrimaryButton title={t('goToBookings', 'View bookings')} onPress={handleTrackBooking} />
+        {/* <PrimaryButton title={t('goToBookings', 'View bookings')} onPress={handleTrackBooking} /> */}
 
         <PrimaryButton
           title={t('goHome', 'Back to home')}
